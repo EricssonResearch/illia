@@ -1,2 +1,2 @@
-import illia.distributions.static
-import illia.distributions.dynamic
+from illia.distributions.base import *
+from illia.distributions.gaussian import *

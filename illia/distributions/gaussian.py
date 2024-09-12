@@ -2,17 +2,19 @@
 from typing import Tuple, Optional, Literal, Any
 
 # own modules
-import illia.distributions.dynamic as dynamic
+from illia.distributions.base import Distribution
 
 
-class GaussianDistribution(dynamic.DynamicDistribution):
+class GaussianDistribution(Distribution):
     # overriding method
     def __init__(
         self,
         shape: Tuple[int, ...],
+        mu_prior: float = 0.0,
+        std_prior: float = 0.1,
         mu_init: float = 0.0,
         rho_init: float = -7.0,
-        backend: int = 0,
+        backend: Literal["torch", "tf"] = "torch",
     ) -> None:
         """
         This function is a gaussian distribution.
@@ -32,23 +34,23 @@ class GaussianDistribution(dynamic.DynamicDistribution):
         super().__init__()
 
         # choose backend
-        self.distribution: dynamic.DynamicDistribution
-        if backend == 0:
+        self.distribution: Distribution
+        if backend == "torch":
             # import dynamically torch part
-            import illia.distributions.dynamic.torch as torch_gaussian
+            import illia.distributions.torch as torch_gaussian
 
             # define distribution
             self.distribution = torch_gaussian.GaussianDistribution(
-                shape, mu_init, rho_init
+                shape, mu_prior, std_prior, mu_init, rho_init
             )
 
-        elif backend == 1:
+        elif backend == "tf":
             # import dynamically illia library
-            import illia.distributions.dynamic.tf as tf_gaussian
+            import illia.distributions.tf as tf_gaussian
 
             # define distribution
             self.distribution = tf_gaussian.GaussianDistribution(
-                shape, mu_init, rho_init
+                shape, mu_prior, std_prior, mu_init, rho_init
             )
 
         else:
@@ -59,7 +61,7 @@ class GaussianDistribution(dynamic.DynamicDistribution):
         return self.distribution.sample()
 
     # overriding method
-    def log_prob(self, x: Optional[Any]) -> Any:
+    def log_prob(self, x: Optional[Any] = None) -> Any:
         return self.distribution.log_prob(x)
 
     @property
