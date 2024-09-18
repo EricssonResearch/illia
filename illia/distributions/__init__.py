@@ -1,2 +1,1 @@
-from illia.distributions.base import *
-from illia.distributions.gaussian import *
+from .gaussian import GaussianDistribution

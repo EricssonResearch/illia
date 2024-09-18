@@ -2,7 +2,7 @@
 from typing import Tuple, Optional, Literal, Any
 
 # own modules
-from illia.distributions.base import Distribution
+from .base import Distribution
 
 
 class GaussianDistribution(Distribution):
@@ -20,8 +20,7 @@ class GaussianDistribution(Distribution):
         This function is a gaussian distribution.
 
         Args:
-            shape: shape of the parameters tensors.
-            mu_init: init value for the mu. Defaults to 0.0.
+            shape: shape of the parameters tensors.            mu_init: init value for the mu. Defaults to 0.0.
             rho_init: init value for the rho. Defaults to -7.0.
             backend: backend to use. Defaults to 0, which mean is
                 using torch.

@@ -5,7 +5,7 @@ import torch
 from typing import Tuple, Optional
 
 # own modules
-from src.core.torch_bayesian.distributions.base import (
+from ..base import (
     Distribution,
 )
 
@@ -24,15 +24,15 @@ class GaussianDistribution(Distribution):
         super().__init__()
 
         # define priors
-        self.mu_prior: torch.Tensor = torch.tensor([mu_prior])
-        self.std_prior: torch.Tensor = torch.tensor([std_prior])
+        self.mu_prior: torch.Tensor = torch.tensor([mu_prior],dtype=torch.float32)
+        self.std_prior: torch.Tensor = torch.tensor([std_prior],dtype=torch.float32)
 
         # define initial mu and rho
         self.mu: torch.Tensor = torch.nn.Parameter(
-            torch.randn(shape).normal_(mu_init, 0.1)
+            torch.randn(shape,dtype=torch.float32).normal_(mu_init, 0.1)
         )
         self.rho: torch.Tensor = torch.nn.Parameter(
-            torch.randn(shape).normal_(rho_init, 0.1)
+            torch.randn(shape,dtype=torch.float32).normal_(rho_init, 0.1)
         )
 
     # overriding method
