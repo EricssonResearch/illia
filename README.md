@@ -1,10 +1,10 @@
-# torch_bayesian
+# illia
 
 ## Generate python wheel
 
 To generate the python wheel from the repo we run the following command
 
-```
+``` 
 python setup.py bdist_wheel
 ```
 

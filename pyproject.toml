@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "illia"
+version = "0.1.0"
+description = "__THIS_IS_USED_FOR_DEVELOPMENT_ONLY__"
+authors = ["Oscar Llorente <oscar.llorente.gonzalez@ericsson.com>"]
+maintainers = [
+    "Anubhab Samal <anubhab.samal@ericsson.com>",
+    "Daniel Bazo <dani.bazo@ericsson.com>",
+]
+
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.12"
+torch = "2.4.0"
+tensorflow = "2.15.0"
+scipy = "^1.14.1"
+matplotlib = "^3.9.2"
+torch-geometric = "^2.6.1"
+black = "^24.10.0"
+
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.29.5"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

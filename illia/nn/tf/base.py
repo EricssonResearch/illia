@@ -1,12 +1,15 @@
-# deep learning libraries
-import tensorflow as tf
-# other libraries
+# Libraries
 from abc import ABC, abstractmethod
 from typing import Tuple
 
-class BayesianModule(ABC, tf.keras.layers.Layer):
+import tensorflow as tf
+from tensorflow.keras import layers
+
+
+class BayesianModule(ABC, layers.Layer):
+
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(BayesianModule, self).__init__(*args, **kwargs)
         self.frozen = False
 
     def freeze(self):

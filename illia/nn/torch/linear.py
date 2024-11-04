@@ -7,7 +7,7 @@ from typing import Optional, Tuple
 
 # own modules
 import illia.distributions.static as static
-from illia.nn.base import BayesianModule
+from illia.nn.torch.base import BayesianModule
 from illia.distributions.static import StaticDistribution
 from illia.distributions.dynamic import (
     DynamicDistribution,

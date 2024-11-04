@@ -3,7 +3,7 @@ from typing import Tuple, Union
 import torch
 import torch.nn.functional as F
 from torch import Tensor
-from torch_bayesian.nn import Linear
+from illia.nn.torch.linear import Linear
 
 from torch_geometric.nn import MessagePassing
 from torch_geometric.typing import Adj, OptTensor, PairTensor
