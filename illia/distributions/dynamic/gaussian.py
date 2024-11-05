@@ -1,10 +1,11 @@
 # Libraries
 from typing import Tuple, Optional, Any
 
-import illia.distributions.dynamic as dynamic
+from illia.distributions.dynamic import DynamicDistribution
 
 
-class GaussianDistribution(dynamic.DynamicDistribution):
+class GaussianDistribution(DynamicDistribution):
+
     # Overriding method
     def __init__(
         self,
@@ -30,7 +31,7 @@ class GaussianDistribution(dynamic.DynamicDistribution):
         super(GaussianDistribution, self).__init__()
 
         # Choose backend
-        self.distribution: dynamic.DynamicDistribution
+        self.distribution: DynamicDistribution
         if backend == "torch":
             # Import dynamically torch part
             import illia.distributions.dynamic.torch as torch_gaussian

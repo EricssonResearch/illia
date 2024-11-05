@@ -1,26 +1,30 @@
-# deep learning libraries
-import torch
-
-# other libraries
-from abc import ABC, abstractmethod
+# Libraries
+from abc import abstractmethod
 from typing import Tuple
 
+from torch import Tensor
+from torch.nn import Module
 
-class BayesianModule(ABC, torch.nn.Module):
+from illia.nn.base import BayesianModule
+
+
+class BayesianModule(BayesianModule, Module):
     frozen: bool
 
     def __init__(self) -> None:
-        # call super class constructor
-        super().__init__()
+        
+        # Call super class constructor
+        super(BayesianModule, self).__init__()
 
-        # set freeze false by default
+        # Set freeze false by default
         self.frozen = False
 
     def freeze(self) -> None:
-        # set frozen indicator to true for current layer
+
+        # Set frozen indicator to true for current layer
         self.frozen = True
 
-        # set forzen indicator to true for children
+        # Set frozen indicator to true for children
         for module in self.modules():
             if self != module and isinstance(module, BayesianModule):
                 module.freeze()
@@ -28,14 +32,15 @@ class BayesianModule(ABC, torch.nn.Module):
                 continue
 
     def unfreeze(self) -> None:
-        # set frozen indicator to false for current layer
+        
+        # Set frozen indicator to false for current layer
         self.frozen = False
 
-        # set forzen indicators to false for children
+        # Set frozen indicators to false for children
         for module in self.modules():
             if module != self and isinstance(module, BayesianModule):
                 module.unfreeze()
 
     @abstractmethod
-    def kl_cost(self) -> Tuple[torch.Tensor, int]:
+    def kl_cost(self) -> Tuple[Tensor, int]:
         pass

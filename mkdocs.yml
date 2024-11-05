@@ -1,0 +1,50 @@
+site_name: illia
+site_description: "illia library"
+
+nav:
+  - Home:
+    - User guide: index.md
+  - Package Reference:
+    - illia.distributions: distributions/distributions.md
+    - illia.nn: nn/nn.md
+    - illia.nn_geom: nn_geom/nn_geom.md
+
+theme:
+  name: "material"
+  locale: en
+  palette:
+  # Palette toggle for light mode
+  - media: "(prefers-color-scheme: light)"
+    scheme: default
+    toggle:
+      icon: material/brightness-7
+      name: Switch to dark mode
+  # Palette toggle for dark mode
+  - media: "(prefers-color-scheme: dark)"
+    scheme: slate
+    toggle:
+      icon: material/brightness-4
+      name: Switch to light mode
+  logo: _images/logo.png
+  icon:
+    repo: fontawesome/brands/github
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - attr_list
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - footnotes
+
+plugins:
+  - search:
+      lang: en
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_root_heading: true
+            show_source: false
+          

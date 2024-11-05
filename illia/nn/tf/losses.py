@@ -3,10 +3,11 @@ from typing import Literal
 
 import tensorflow as tf
 
-from tensorflow_bayesian.nn import BayesianModule
+from illia.nn import losses
+from illia.nn.tf.base import BayesianModule
 
 
-class KLDivergenceLoss(tf.keras.layers.Layer):
+class KLDivergenceLoss(losses.KLDivergenceLoss, tf.keras.layers.Layer):
 
     def __init__(self, reduction: Literal["mean"] = "mean", weight: float = 1.0):
         super(KLDivergenceLoss, self).__init__()
@@ -44,7 +45,8 @@ class KLDivergenceLoss(tf.keras.layers.Layer):
         return kl_global_cost
 
 
-class ELBOLoss(tf.keras.losses.Loss):
+class ELBOLoss(losses.ELBOLoss, tf.keras.losses.Loss):
+
     def __init__(
         self,
         loss_function: tf.keras.losses.Loss,
@@ -53,6 +55,7 @@ class ELBOLoss(tf.keras.losses.Loss):
         name: str = "elbo_loss",
     ):
         super().__init__(name=name)
+        
         self.loss_function = loss_function
         self.num_samples = num_samples
         self.kl_weight = kl_weight

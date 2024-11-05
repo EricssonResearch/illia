@@ -1,6 +1,6 @@
 # illia
 
-## What is illia?
+### What is illia?
 
 illia is a library focused on Bayesian Neural Networks with support for multiple backends. 
 The main goal is to enable the use of backends such as PyTorch, Tensorflow, and Jax.
@@ -24,7 +24,7 @@ poetry run mkdocs serve
 
 For more information on how to set up MkDocs [visit the following page](https://mkdocstrings.github.io/usage/).
 
-## Contribute
+### Contribute
 
 To start contributing to the repository, follow these steps:
 
@@ -33,7 +33,8 @@ To start contributing to the repository, follow these steps:
 
 2. **Update system packages and install `make`**: In some cases, you may need to update 
     your operating system packages and install `make`. Run the following commands:
-    ```sh
+
+    ```bash
     sudo apt-get update
     sudo apt-get install build-essential
     ```

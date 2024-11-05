@@ -1,9 +1,10 @@
-# other libraries
+# Libraries
 from abc import ABC, abstractmethod
-from typing import Dict, Any
+from typing import Any
 
 
 class StaticDistribution(ABC):
+
     @abstractmethod
     def log_prob(self, x: Any) -> Any:
         pass

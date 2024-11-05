@@ -2,19 +2,20 @@
 from abc import abstractmethod
 from typing import Optional
 
-import tensorflow as tf
+from tensorflow import Variable, Tensor
+from tensorflow.keras import Model
 
-import illia.distributions.dynamic as dynamic
+from illia.distributions.dynamic.base import DynamicDistribution
 
 
-class DynamicDistribution(dynamic.base.DynamicDistribution, tf.keras.Model):
+class DynamicDistribution(DynamicDistribution, Model):
 
     @abstractmethod
-    def sample(self) -> tf.Variable:
+    def sample(self) -> Variable:
         pass
 
     @abstractmethod
-    def log_prob(self, x: Optional[tf.Tensor]) -> tf.Tensor:
+    def log_prob(self, x: Optional[Tensor]) -> Tensor:
         pass
 
     @property

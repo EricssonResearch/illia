@@ -10,7 +10,7 @@ from torch_geometric.typing import Adj, OptTensor, PairTensor
 
 
 class CGConv(MessagePassing):
-    r"""The crystal graph convolutional operator from the
+    """The crystal graph convolutional operator from the
     `"Crystal Graph Convolutional Neural Networks for an
     Accurate and Interpretable Prediction of Material Properties"
     <https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.120.145301>`_
@@ -79,7 +79,6 @@ class CGConv(MessagePassing):
     def forward(
         self, x: Union[Tensor, PairTensor], edge_index: Adj, edge_attr: OptTensor = None
     ) -> Tensor:
-        """"""
         if isinstance(x, Tensor):
             x = (x, x)
 

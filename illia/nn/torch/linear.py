@@ -1,12 +1,11 @@
-# deep learning libraries
+# Libraries
+from typing import Optional, Tuple, Union
+
 import torch
 import torch.nn.functional as F
 
-# other libraries
-from typing import Optional, Tuple
-
-# own modules
 import illia.distributions.static as static
+from illia.nn import linear
 from illia.nn.torch.base import BayesianModule
 from illia.distributions.static import StaticDistribution
 from illia.distributions.dynamic import (
@@ -15,7 +14,7 @@ from illia.distributions.dynamic import (
 )
 
 
-class Linear(BayesianModule):
+class Linear(linear.Linear, BayesianModule):
     """
     This class is the Linear bayesian layer.
 

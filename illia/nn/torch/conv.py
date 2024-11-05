@@ -1,21 +1,20 @@
-# deep learning libraries
+# Libraries
+from typing import Optional, Tuple, Union
+
 import torch
 import torch.nn.functional as F
 
-# other libraries
-from typing import Optional, Tuple, Union
-
-# own modules
-import torch_bayesian.distributions.static as static
-from torch_bayesian.nn.base import BayesianModule
-from torch_bayesian.distributions.static import StaticDistribution
-from torch_bayesian.distributions.dynamic import (
+import illia.distributions.static as static
+from illia.nn import conv
+from illia.nn.torch.base import BayesianModule
+from illia.distributions.static import StaticDistribution
+from illia.distributions.dynamic import (
     DynamicDistribution,
     GaussianDistribution,
 )
 
 
-class Conv2d(BayesianModule):
+class Conv2d(conv.Conv2d, BayesianModule):
     input_channels: int
     output_channels: int
     weights_posterior: DynamicDistribution

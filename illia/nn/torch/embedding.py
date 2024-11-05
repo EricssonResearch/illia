@@ -1,21 +1,20 @@
-# deep learning libraries
+# Libraries
+from typing import Optional, Tuple, Union
+
 import torch
 import torch.nn.functional as F
 
-# other libraries
-from typing import Optional, Tuple
-
-# own modules
-import torch_bayesian.distributions.static as static
-from torch_bayesian.nn.base import BayesianModule
-from torch_bayesian.distributions.static import StaticDistribution
-from torch_bayesian.distributions.dynamic import (
+import illia.distributions.static as static
+from illia.nn import embedding
+from illia.nn.torch.base import BayesianModule
+from illia.distributions.static import StaticDistribution
+from illia.distributions.dynamic import (
     DynamicDistribution,
     GaussianDistribution,
 )
 
 
-class Embedding(BayesianModule):
+class Embedding(embedding.Embedding, BayesianModule):
     input_size: int
     output_size: int
     weights_posterior: DynamicDistribution

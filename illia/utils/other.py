@@ -1,4 +1,4 @@
-# other libraries
+# Libraries
 from typing import Literal
 
 

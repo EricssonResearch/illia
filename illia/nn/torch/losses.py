@@ -1,14 +1,13 @@
-# deep learning library
-import torch
-
-# other libraries
+# Libraries
 from typing import Literal
 
-# own modules
-from torch_bayesian.nn import BayesianModule
+import torch
+
+from illia.nn import losses
+from illia.nn.torch.base import BayesianModule
 
 
-class KLDivergenceLoss(torch.nn.Module):
+class KLDivergenceLoss(losses.KLDivergenceLoss, torch.nn.Module):
     reduction: Literal["mean"]
     weight: float
 
@@ -47,7 +46,7 @@ class KLDivergenceLoss(torch.nn.Module):
         return kl_global_cost
 
 
-class ELBOLoss(torch.nn.Module):
+class ELBOLoss(losses.ELBOLoss, torch.nn.Module):
     def __init__(
         self,
         loss_function: torch.nn.Module,

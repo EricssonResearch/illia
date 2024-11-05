@@ -18,6 +18,11 @@ scipy = "^1.14.1"
 matplotlib = "^3.9.2"
 torch-geometric = "^2.6.1"
 black = "^24.10.0"
+mkdocs = "^1.6.1"
+mkdocstrings = {extras = ["python"], version = "^0.26.2"}
+mypy = "^1.13.0"
+pytest = "^8.3.3"
+mkdocs-material = "^9.5.43"
 
 
 [tool.poetry.group.dev.dependencies]

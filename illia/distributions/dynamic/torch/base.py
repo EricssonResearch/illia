@@ -2,19 +2,20 @@
 from abc import abstractmethod
 from typing import Optional
 
-import torch
+from torch import Tensor
+from torch.nn import Module
 
-import illia.distributions.dynamic as dynamic
+from illia.distributions.dynamic.base import DynamicDistribution
 
 
-class DynamicDistribution(dynamic.base.DynamicDistribution, torch.nn.Module):
+class DynamicDistribution(DynamicDistribution, Module):
 
     @abstractmethod
-    def sample(self) -> torch.Tensor:
+    def sample(self) -> Tensor:
         pass
 
     @abstractmethod
-    def log_prob(self, x: Optional[torch.Tensor]) -> torch.Tensor:
+    def log_prob(self, x: Optional[Tensor]) -> Tensor:
         pass
 
     @property

@@ -5,28 +5,33 @@ import illia.distributions.static as static
 
 
 class GaussianDistribution(static.StaticDistribution):
-    # overriding method
+    
     def __init__(
         self,
         mu: float,
         std: float,
         backend: Optional[str] = "torch",
     ) -> None:
-        # call super class constructor
+        
+        # Call super class constructor
         super(GaussianDistribution, self).__init__()
 
-        self.distribution: static.StaticDistribution
+        # Set attributes
+        self.backend = backend
+
+        # Choose backend
         if backend == "torch":
-            import illia.distributions.static.torch as torch_gaussian
-
-            self.distribution = torch_gaussian.GaussianDistribution(mu, std)
+            # Import torch part
+            from illia.distributions.static.torch import gaussian
         elif backend == "tf":
-            import illia.distributions.static.tf as tf_gaussian
-
-            self.distribution = tf_gaussian.GaussianDistribution(mu, std)
+            # Import tensorflow part
+            from illia.distributions.static.tf import gaussian
         else:
             raise ValueError("Invalid backend value")
+        
+        # Define distribution based on the imported library
+        self.distribution = gaussian.GaussianDistribution(mu, std)
 
-    # overriding method
+    # Overriding method
     def log_prob(self, x: Any) -> Any:
         return self.distribution.log_prob(x)
