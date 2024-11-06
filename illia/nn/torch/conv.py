@@ -38,8 +38,27 @@ class Conv2d(conv.Conv2d, BayesianModule):
         weights_posterior: Optional[DynamicDistribution] = None,
         bias_posterior: Optional[DynamicDistribution] = None,
     ) -> None:
-        super().__init__()
+        """
+        Definition of a Bayesian Convolution 2D layer.
 
+        Args:
+            input_channels (int): Number of channels in the input image.
+            output_channels (int): Number of channels produced by the convolution.
+            kernel_size (Union[int, Tuple[int, int]]): Size of the convolving kernel.
+            stride (Union[int, Tuple[int, int]]): Stride of the convolution.
+            padding (Union[int, Tuple[int, int]]): Padding added to all four sides of the input.
+            dilation (Union[int, Tuple[int, int]]): Spacing between kernel elements.
+            groups (int, optional): Number of blocked connections from input channels to output channels. Defaults to 1.
+            weights_prior (Optional[StaticDistribution], optional): The prior distribution for the weights. Defaults to None.
+            bias_prior (Optional[StaticDistribution], optional): The prior distribution for the bias. Defaults to None.
+            weights_posterior (Optional[DynamicDistribution], optional): The posterior distribution for the weights. Defaults to None.
+            bias_posterior (Optional[DynamicDistribution], optional): The posterior distribution for the bias. Defaults to None.
+        """
+        
+        # Call super class constructor
+        super(Conv2d, self).__init__()
+
+        # Set attributes
         self.input_channels = input_channels
         self.output_channels = output_channels
         self.kernel_size = kernel_size

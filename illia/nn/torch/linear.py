@@ -45,36 +45,36 @@ class Linear(linear.Linear, BayesianModule):
         weights_posterior: Optional[DynamicDistribution] = None,
         bias_posterior: Optional[DynamicDistribution] = None,
     ) -> None:
-        # call super class constructor
-        super().__init__()
+        # Call super class constructor
+        super(Linear, self).__init__()
 
-        # set sizes
+        # Set attributes
         self.input_size = input_size
         self.output_size = output_size
 
-        # set defaults parameters for gaussian
+        # Set defaults parameters for gaussian
         mean: float = 0.0
         std: float = 0.1
 
-        # set weights prior
+        # Set weights prior
         if weights_prior is None:
             self.weights_prior = static.GaussianDistribution(mean, std)
         else:
             self.weights_prior = weights_prior
 
-        # set bias prior
+        # Set bias prior
         if bias_prior is None:
             self.bias_prior = static.GaussianDistribution(mean, std)
         else:
             self.bias_prior = bias_prior
 
-        # set weights posterior
+        # Set weights posterior
         if weights_posterior is None:
             self.weights_posterior = GaussianDistribution((output_size, input_size))
         else:
             self.weights_posterior = weights_posterior
 
-        # set bias posterior
+        # Set bias posterior
         if bias_posterior is None:
             self.bias_posterior = GaussianDistribution((output_size,))
         else:

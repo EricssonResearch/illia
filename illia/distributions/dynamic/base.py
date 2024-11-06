@@ -5,8 +5,9 @@ from typing import Optional, Any
 
 class DynamicDistribution(ABC):
     """
-    A base class for creating a dynamic distribution.
-    Each of the functions is subsequently override by the specific backend.
+    A base class for creating a Dynamic distribution.
+    Each function in this class is intended to be overridden by specific 
+    backend implementations.
     """
 
     @abstractmethod

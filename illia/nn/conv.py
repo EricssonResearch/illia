@@ -27,21 +27,21 @@ class Conv2d(ABC):
         Definition of a Bayesian Convolution 2D layer.
 
         Args:
-            input_channels (int): _description_
-            output_channels (int): _description_
-            kernel_size (Union[int, Tuple[int, int]]): _description_
-            stride (Union[int, Tuple[int, int]]): _description_
-            padding (Union[int, Tuple[int, int]]): _description_
-            dilation (Union[int, Tuple[int, int]]): _description_
-            groups (int, optional): _description_. Defaults to 1.
-            weights_prior (Optional[StaticDistribution], optional): _description_. Defaults to None.
-            bias_prior (Optional[StaticDistribution], optional): _description_. Defaults to None.
-            weights_posterior (Optional[DynamicDistribution], optional): _description_. Defaults to None.
-            bias_posterior (Optional[DynamicDistribution], optional): _description_. Defaults to None.
-            backend (Optional[str], optional): _description_. Defaults to "torch".
+            input_channels (int): Number of channels in the input image.
+            output_channels (int): Number of channels produced by the convolution.
+            kernel_size (Union[int, Tuple[int, int]]): Size of the convolving kernel.
+            stride (Union[int, Tuple[int, int]]): Stride of the convolution.
+            padding (Union[int, Tuple[int, int]]): Padding added to all four sides of the input.
+            dilation (Union[int, Tuple[int, int]]): Spacing between kernel elements.
+            groups (int, optional): Number of blocked connections from input channels to output channels. Defaults to 1.
+            weights_prior (Optional[StaticDistribution], optional): The prior distribution for the weights. Defaults to None.
+            bias_prior (Optional[StaticDistribution], optional): The prior distribution for the bias. Defaults to None.
+            weights_posterior (Optional[DynamicDistribution], optional): The posterior distribution for the weights. Defaults to None.
+            bias_posterior (Optional[DynamicDistribution], optional): The posterior distribution for the bias. Defaults to None.
+            backend (Optional[str], optional): The backend to use. Defaults to 'torch'.
 
         Raises:
-            ValueError: _description_
+            ValueError: If an invalid backend value is provided.
         """
 
         # Call super class constructor

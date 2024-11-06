@@ -12,7 +12,7 @@ class KLDivergenceLoss(losses.KLDivergenceLoss, torch.nn.Module):
     weight: float
 
     def __init__(self, reduction: Literal["mean"] = "mean", weight: float = 1.0):
-        super().__init__()
+        super(KLDivergenceLoss, self).__init__()
 
         self.reduction = reduction
         self.weight = weight
@@ -53,7 +53,7 @@ class ELBOLoss(losses.ELBOLoss, torch.nn.Module):
         num_samples: int = 1,
         kl_weight: float = 1e-3,
     ) -> None:
-        super().__init__()
+        super(ELBOLoss, self).__init__()
 
         self.loss_function = loss_function
         self.num_samples = num_samples

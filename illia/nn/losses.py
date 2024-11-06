@@ -5,6 +5,7 @@ from typing import Literal, Optional, Union
 from tensorflow.keras.losses import Loss
 from torch.nn import Module
 
+
 class KLDivergenceLoss(ABC):
     
     def __init__(
@@ -17,13 +18,14 @@ class KLDivergenceLoss(ABC):
         Definition of the KL Divergence Loss function.
 
         Args:
-            reduction (Literal[&quot;mean&quot;], optional): _description_. Defaults to "mean".
-            weight (float, optional): _description_. Defaults to 1.0.
-            backend (Optional[str], optional): _description_. Defaults to "torch".
+            reduction (Literal[&quot;mean&quot;], optional): Specifies the reduction to apply to the output. Defaults to "mean".
+            weight (float, optional): Weight for the loss. Defaults to 1.0.
+            backend (Optional[str], optional): The backend to use. Defaults to 'torch'.
 
         Raises:
-            ValueError: _description_
+            ValueError: If an invalid backend value is provided.
         """
+
         # Call super class constructor
         super(KLDivergenceLoss, self).__init__()
 
@@ -60,16 +62,16 @@ class ELBOLoss(ABC):
         backend: Optional[str] = "torch",
     ) -> None:
         """
-        Definition of the ELBO Loss function.
+        Initializes the Evidence Lower Bound (ELBO) loss function.
 
         Args:
-            loss_function (Union[Loss, Module]): _description_
-            num_samples (int, optional): _description_. Defaults to 1.
-            kl_weight (float, optional): _description_. Defaults to 1e-3.
-            backend (Optional[str], optional): _description_. Defaults to "torch".
-
+            loss_function (Union[Loss, Module]): The loss function to be used for computing the reconstruction loss.
+            num_samples (int, optional): The number of samples to draw for estimating the ELBO. Defaults to 1.
+            kl_weight (float, optional): The weight applied to the KL divergence. Defaults to 1e-3.
+            backend (Optional[str], optional): The backend to use. Defaults to 'torch'.
+            
         Raises:
-            ValueError: _description_
+            ValueError: If an invalid backend is provided.
         """
     
         # Call super class constructor

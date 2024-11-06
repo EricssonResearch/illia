@@ -22,16 +22,16 @@ class Linear(ABC):
         Definition of a Bayesian Linear layer.
 
         Args:
-            input_size (int): _description_
-            output_size (int): _description_
-            weights_prior (Optional[static.StaticDistribution], optional): _description_. Defaults to None.
-            bias_prior (Optional[static.StaticDistribution], optional): _description_. Defaults to None.
-            weights_posterior (Optional[dynamic.DynamicDistribution], optional): _description_. Defaults to None.
-            bias_posterior (Optional[dynamic.DynamicDistribution], optional): _description_. Defaults to None.
-            backend (Optional[str], optional): _description_. Defaults to "torch".
+            input_size (int): Size of each input sample.
+            output_size (int): Size of each output sample.
+            weights_prior (Optional[StaticDistribution], optional): The prior distribution for the weights. Defaults to None.
+            bias_prior (Optional[StaticDistribution], optional): The prior distribution for the bias. Defaults to None.
+            weights_posterior (Optional[DynamicDistribution], optional): The posterior distribution for the weights. Defaults to None.
+            bias_posterior (Optional[DynamicDistribution], optional): The posterior distribution for the bias. Defaults to None.
+            backend (Optional[str], optional): The backend to use. Defaults to 'torch'.
 
         Raises:
-            ValueError: _description_
+            ValueError: If an invalid backend value is provided.
         """
         
         # Call super class constructor

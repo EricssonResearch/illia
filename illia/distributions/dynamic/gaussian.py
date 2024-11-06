@@ -5,8 +5,12 @@ from illia.distributions.dynamic import DynamicDistribution
 
 
 class GaussianDistribution(DynamicDistribution):
-
-    # Overriding method
+    """
+    A base class for creating a Dynamic Gaussian distribution.
+    Each function in this class is intended to be overridden by specific 
+    backend implementations.
+    """
+        
     def __init__(
         self,
         shape: Tuple[int, ...],
@@ -15,18 +19,18 @@ class GaussianDistribution(DynamicDistribution):
         backend: Optional[str] = "torch",
     ) -> None:
         """
-        This function is a gaussian distribution.
+        Initializes a Gaussian distribution parameter set.
 
         Args:
-            shape: shape of the parameters tensors.
-            mu_init: init value for the mu. Defaults to 0.0.
-            rho_init: init value for the rho. Defaults to -7.0.
-            backend: backend to use.
+            shape (Tuple[int, ...]): The shape of the parameter tensors.
+            mu_init (float, optional): The initial value for mu. Defaults to 0.0.
+            rho_init (float, optional): The initial value for rho. Defaults to -7.0.
+            backend (Optional[str], optional): The backend to use. Defaults to 'torch'.
 
         Raises:
-            ValueError: Invalid backend value.
+            ValueError: If an invalid backend value is provided.
         """
-
+        
         # Call super class constructor
         super(GaussianDistribution, self).__init__()
 

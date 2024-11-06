@@ -10,46 +10,8 @@ from torch_geometric.typing import Adj, OptTensor, PairTensor
 
 
 class CGConv(MessagePassing):
-    """The crystal graph convolutional operator from the
-    `"Crystal Graph Convolutional Neural Networks for an
-    Accurate and Interpretable Prediction of Material Properties"
-    <https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.120.145301>`_
-    paper
-
-    .. math::
-        \mathbf{x}^{\prime}_i = \mathbf{x}_i + \sum_{j \in \mathcal{N}(i)}
-        \sigma \left( \mathbf{z}_{i,j} \mathbf{W}_f + \mathbf{b}_f \right)
-        \odot g \left( \mathbf{z}_{i,j} \mathbf{W}_s + \mathbf{b}_s  \right)
-
-    where :math:`\mathbf{z}_{i,j} = [ \mathbf{x}_i, \mathbf{x}_j,
-    \mathbf{e}_{i,j} ]` denotes the concatenation of central node features,
-    neighboring node features and edge features.
-    In addition, :math:`\sigma` and :math:`g` denote the sigmoid and softplus
-    functions, respectively.
-
-    Args:
-        channels (int or tuple): Size of each input sample. A tuple
-            corresponds to the sizes of source and target dimensionalities.
-        dim (int, optional): Edge feature dimensionality. (default: :obj:`0`)
-        aggr (string, optional): The aggregation operator to use
-            (:obj:`"add"`, :obj:`"mean"`, :obj:`"max"`).
-            (default: :obj:`"add"`)
-        batch_norm (bool, optional): If set to :obj:`True`, will make use of
-            batch normalization. (default: :obj:`False`)
-        bias (bool, optional): If set to :obj:`False`, the layer will not learn
-            an additive bias. (default: :obj:`True`)
-        **kwargs (optional): Additional arguments of
-            :class:`torch_geometric.nn.conv.MessagePassing`.
-
-    Shapes:
-        - **input:**
-          node features :math:`(|\mathcal{V}|, F)` or
-          :math:`((|\mathcal{V_s}|, F_{s}), (|\mathcal{V_t}|, F_{t}))`
-          if bipartite,
-          edge indices :math:`(2, |\mathcal{E}|)`,
-          edge features :math:`(|\mathcal{E}|, D)` *(optional)*
-        - **output:** node features :math:`(|\mathcal{V}|, F)` or
-          :math:`(|\mathcal{V_t}|, F_{t})` if bipartite
+    """
+    Definition of the Crystal Graph Convolutional operator.
     """
 
     def __init__(
@@ -59,7 +21,37 @@ class CGConv(MessagePassing):
         aggr: str = "add",
         **kwargs,
     ):
-        super().__init__(aggr=aggr, **kwargs)
+        """
+        "Crystal Graph Convolutional Neural Networks for an Accurate and Interpretable Prediction of Material Properties"
+        (https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.120.145301).
+
+        The operation is defined as:
+
+        $$
+        \mathbf{x}^{\prime}_i = \mathbf{x}_i + \sum_{j \in \mathcal{N}(i)}\sigma ( \mathbf{z}_{i,j} \mathbf{W}_f + \mathbf{b}_f ) 
+        \odot g ( \mathbf{z}_{i,j} \mathbf{W}_s + \mathbf{b}_s )
+        $$
+
+        where \(\mathbf{z}_{i,j} = [ \mathbf{x}_i, \mathbf{x}_j, \mathbf{e}_{i,j} ]\)
+        denotes the concatenation of central node features, neighboring node features,
+        and edge features. In addition, \(\sigma\) and \(g\) denote the sigmoid
+        and softplus functions, respectively.
+
+        Args:
+            channels (int or tuple): The size of each input sample. A tuple corresponds to the sizes of source and target dimensionalities.
+            dim (int, optional): The edge feature dimensionality. Defaults to 0.
+            aggr (str, optional): The aggregation operator to use ("add", "mean", "max"). Defaults to "add".
+            **kwargs (optional): Additional arguments for :class:`torch_geometric.nn.conv.MessagePassing`.
+
+        Shapes:
+            - **input:**
+            node features \((|\mathcal{V}|, F)\) or \(((|\mathcal{V_s}|, F_{s}), (|\mathcal{V_t}|, F_{t}))\) if bipartite,
+            edge indices \((2, |\mathcal{E}|)\),
+            edge features \((|\mathcal{E}|, D)\) *(optional)*
+            - **output:** node features \((|\mathcal{V}|, F)\) or \((|\mathcal{V_t}|, F_{t})\) if bipartite
+        """
+            
+        super(CGConv, self).__init__(aggr=aggr, **kwargs)
         self.channels = channels
         self.dim = dim
 
