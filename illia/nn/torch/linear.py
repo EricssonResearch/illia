@@ -22,12 +22,12 @@ class Linear(BayesianModule):
     Attr:
         input_size: input size of the Linear Layer.
         output_size: output size of the Linear layer.
-        weights_posterior: 
+        weights_posterior:
 
     Returns:
         _description_
     """
-    
+
     input_size: int
     output_size: int
     weights_posterior: DynamicDistribution
@@ -46,7 +46,6 @@ class Linear(BayesianModule):
         weights_posterior: Optional[DynamicDistribution] = None,
         bias_posterior: Optional[DynamicDistribution] = None,
     ) -> None:
-        
         # call super class constructor
         super().__init__()
 
@@ -92,7 +91,7 @@ class Linear(BayesianModule):
         Returns:
             output tensor. Dimension: [*, output size].
         """
-        
+
         if not self.frozen:
             self.weights = self.weights_posterior.sample()
             self.bias = self.bias_posterior.sample()
@@ -115,7 +114,7 @@ class Linear(BayesianModule):
             kl cost.
             number of parameters of the layer.
         """
-        
+
         log_posterior: torch.Tensor = self.weights_posterior.log_prob(
             self.weights
         ) + self.bias_posterior.log_prob(self.bias)

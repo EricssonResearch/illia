@@ -1,15 +1,15 @@
-# other libraries
+# standard libraries
 from abc import ABC, abstractmethod
 from typing import Optional, Any
 
 
-class DynamicDistribution(ABC):
+class Distribution(ABC):
     @abstractmethod
-    def sample(self) -> Any:
+    def sample(self, **kwargs) -> Any:
         pass
 
     @abstractmethod
-    def log_prob(self, x: Optional[Any]) -> Any:
+    def log_prob(self, x: Optional[Any] = None) -> Any:
         pass
 
     @property

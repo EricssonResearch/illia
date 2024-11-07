@@ -1,2 +1,1 @@
-import illia.distributions.static
-import illia.distributions.dynamic
+from .gaussian import GaussianDistribution
