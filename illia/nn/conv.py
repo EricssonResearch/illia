@@ -44,19 +44,16 @@ class Conv2d(ABC):
             ValueError: If an invalid backend value is provided.
         """
 
-        # Call super class constructor
-        super(Conv2d, self).__init__()
-
         # Set attributes
         self.backend = backend
 
         # Choose backend
         if self.backend == "torch":
             # Import torch part
-            from illia.nn.torch import conv
+            from illia.nn.torch import conv  # type: ignore
         else:
             raise ValueError("Invalid backend value")
-        
+
         # Define layer based on the imported library
         self.layer = conv.Conv2d(
             input_channels=input_channels,
@@ -74,7 +71,7 @@ class Conv2d(ABC):
 
     def __call__(self, inputs):
         return self.layer(inputs)
-        
+
     @abstractmethod
     def kl_cost(self) -> Tuple[Any, int]:
         pass

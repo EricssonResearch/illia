@@ -7,10 +7,10 @@ from illia.distributions.dynamic import DynamicDistribution
 class GaussianDistribution(DynamicDistribution):
     """
     A base class for creating a Dynamic Gaussian distribution.
-    Each function in this class is intended to be overridden by specific 
+    Each function in this class is intended to be overridden by specific
     backend implementations.
     """
-        
+
     def __init__(
         self,
         shape: Tuple[int, ...],
@@ -30,30 +30,21 @@ class GaussianDistribution(DynamicDistribution):
         Raises:
             ValueError: If an invalid backend value is provided.
         """
-        
-        # Call super class constructor
-        super(GaussianDistribution, self).__init__()
 
         # Choose backend
-        self.distribution: DynamicDistribution
         if backend == "torch":
-            # Import dynamically torch part
-            import illia.distributions.dynamic.torch as torch_gaussian
-
-            # Define distribution
-            self.distribution = torch_gaussian.GaussianDistribution(
-                shape, mu_init, rho_init
-            )
+            # Import torch part
+            from illia.distributions.dynamic.torch import gaussian  # type: ignore
         elif backend == "tf":
-            # Import dynamically illia library
-            import illia.distributions.dynamic.tf as tf_gaussian
-
-            # Define distribution
-            self.distribution = tf_gaussian.GaussianDistribution(
-                shape, mu_init, rho_init
-            )
+            # Import tensorflow part
+            from illia.distributions.dynamic.tf import gaussian  # type: ignore
         else:
             raise ValueError("Invalid backend value")
+
+        # Define distribution based on the imported library
+        self.distribution = gaussian.GaussianDistribution(
+            shape=shape, mu_init=mu_init, rho_init=rho_init
+        )
 
     # Overriding method
     def sample(self) -> Any:

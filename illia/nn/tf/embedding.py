@@ -5,22 +5,19 @@ import tensorflow as tf
 from tensorflow.keras.utils import register_keras_serializable
 
 import illia.distributions.static as static
-from illia.nn.tf.base import BayesianModule
-from illia.distributions.static import StaticDistribution
-from illia.distributions.dynamic import (
-    DynamicDistribution,
-    GaussianDistribution,
-)
+import illia.distributions.dynamic as dynamic
+from illia.nn.torch.base import BayesianModule
 
 
 @register_keras_serializable(package="Embedding")
 class Embedding(BayesianModule):
+
     input_size: int
     output_size: int
-    weights_posterior: DynamicDistribution
-    weights_prior: StaticDistribution
-    bias_posterior: DynamicDistribution
-    bias_prior: StaticDistribution
+    weights_posterior: dynamic.DynamicDistribution
+    weights_prior: static.StaticDistribution
+    bias_posterior: dynamic.DynamicDistribution
+    bias_prior: static.StaticDistribution
     weights: tf.Tensor
     bias: tf.Tensor
 
@@ -28,8 +25,8 @@ class Embedding(BayesianModule):
         self,
         num_embeddings: int,
         embeddings_dim: int,
-        weights_prior: Optional[StaticDistribution] = None,
-        weights_posterior: Optional[DynamicDistribution] = None,
+        weights_prior: Optional[static.StaticDistribution] = None,
+        weights_posterior: Optional[dynamic.DynamicDistribution] = None,
         padding_idx: Optional[int] = None,
         max_norm: Optional[float] = None,
         norm_type: float = 2.0,
@@ -38,7 +35,7 @@ class Embedding(BayesianModule):
     ) -> None:
 
         # Call super class constructor
-        super(Embedding, self).__init__()
+        super().__init__()
 
         # Define parameters
         parameters = {"mean": 0, "std": 0.1}
@@ -54,13 +51,15 @@ class Embedding(BayesianModule):
 
         # Set prior if they are None
         if weights_prior is None:
-            self.weights_prior = static.GaussianDistribution(parameters)
+            self.weights_prior = static.GaussianDistribution(
+                mu=parameters["mean"], std=parameters["std"]
+            )
         else:
             self.weights_prior = weights_prior
 
         # Set posterior if they are None
         if weights_posterior is None:
-            self.weights_posterior = GaussianDistribution(
+            self.weights_posterior = dynamic.GaussianDistribution(
                 (num_embeddings, embeddings_dim)
             )
         else:
@@ -89,7 +88,7 @@ class Embedding(BayesianModule):
             )
 
         if max_norm is not None:
-            norms = tf.norm(embeddings, ord=int(norm_type), axis=-1, keepdims=True)
+            norms = tf.norm(embeddings, ord=norm_type, axis=-1, keepdims=True)
             desired = tf.clip_by_value(norms, clip_value_min=0, clip_value_max=max_norm)
             scale = desired / (tf.maximum(norms, 1e-7))
             embeddings = embeddings * scale
@@ -98,7 +97,7 @@ class Embedding(BayesianModule):
 
     def get_config(self):
         # Get the base configuration
-        base_config = super(Embedding, self).get_config()
+        base_config = super().get_config()
 
         # Add the custom configurations
         custom_config = {

@@ -12,7 +12,7 @@ class BayesianModule(ABC):
     @abstractmethod
     def freeze(self) -> None:
         pass
-    
+
     @abstractmethod
     def unfreeze(self) -> None:
         pass

@@ -13,17 +13,6 @@ To create a Python wheel from the repository, execute the following command:
 python setup.py bdist_wheel
 ```
 
-### Some useful commands
-
-Currently the documentation will be done with MkDocs, to start the service locally run the
-Next command:
-
-```bash
-poetry run mkdocs serve
-```
-
-For more information on how to set up MkDocs [visit the following page](https://mkdocstrings.github.io/usage/).
-
 ## Contribute
 
 To start contributing to the repository, follow these steps:
@@ -49,3 +38,5 @@ To start contributing to the repository, follow these steps:
     ```sh
     make install
     ```
+    Poetry is configured to be used as a way to install the dependencies, and manage package versions, 
+    needed for this repository without creating a new virtual environment.

@@ -5,10 +5,10 @@ from typing import Optional
 from tensorflow import Variable, Tensor
 from tensorflow.keras import Model
 
-from illia.distributions.dynamic.base import DynamicDistribution
+import illia.distributions.dynamic as dynamic
 
 
-class DynamicDistribution(DynamicDistribution, Model):
+class DynamicDistribution(dynamic.DynamicDistribution, Model):
 
     @abstractmethod
     def sample(self) -> Variable:

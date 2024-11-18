@@ -5,22 +5,18 @@ import torch
 import torch.nn.functional as F
 
 import illia.distributions.static as static
-from illia.nn import conv
+import illia.distributions.dynamic as dynamic
 from illia.nn.torch.base import BayesianModule
-from illia.distributions.static import StaticDistribution
-from illia.distributions.dynamic import (
-    DynamicDistribution,
-    GaussianDistribution,
-)
 
 
-class Conv2d(conv.Conv2d, BayesianModule):
+class Conv2d(BayesianModule):
+
     input_channels: int
     output_channels: int
-    weights_posterior: DynamicDistribution
-    weights_prior: StaticDistribution
-    bias_posterior: DynamicDistribution
-    bias_prior: StaticDistribution
+    weights_posterior: dynamic.DynamicDistribution
+    weights_prior: static.StaticDistribution
+    bias_posterior: dynamic.DynamicDistribution
+    bias_prior: static.StaticDistribution
     weights: torch.Tensor
     bias: torch.Tensor
 
@@ -33,10 +29,10 @@ class Conv2d(conv.Conv2d, BayesianModule):
         padding: Union[int, Tuple[int, int]],
         dilation: Union[int, Tuple[int, int]],
         groups: int = 1,
-        weights_prior: Optional[StaticDistribution] = None,
-        bias_prior: Optional[StaticDistribution] = None,
-        weights_posterior: Optional[DynamicDistribution] = None,
-        bias_posterior: Optional[DynamicDistribution] = None,
+        weights_prior: Optional[static.StaticDistribution] = None,
+        bias_prior: Optional[static.StaticDistribution] = None,
+        weights_posterior: Optional[dynamic.DynamicDistribution] = None,
+        bias_posterior: Optional[dynamic.DynamicDistribution] = None,
     ) -> None:
         """
         Definition of a Bayesian Convolution 2D layer.
@@ -54,9 +50,9 @@ class Conv2d(conv.Conv2d, BayesianModule):
             weights_posterior (Optional[DynamicDistribution], optional): The posterior distribution for the weights. Defaults to None.
             bias_posterior (Optional[DynamicDistribution], optional): The posterior distribution for the bias. Defaults to None.
         """
-        
+
         # Call super class constructor
-        super(Conv2d, self).__init__()
+        super().__init__()
 
         # Set attributes
         self.input_channels = input_channels
@@ -70,29 +66,33 @@ class Conv2d(conv.Conv2d, BayesianModule):
         parameters = {"mean": 0, "std": 0.1}
 
         if weights_prior is None:
-            self.weights_prior = static.GaussianDistribution(parameters)
+            self.weights_prior = static.GaussianDistribution(
+                mu=parameters["mean"], std=parameters["std"]
+            )
         else:
             self.weights_prior = weights_prior
 
         if bias_prior is None:
-            self.bias_prior = static.GaussianDistribution(parameters)
+            self.bias_prior = static.GaussianDistribution(
+                mu=parameters["mean"], std=parameters["std"]
+            )
         else:
             self.bias_prior = bias_prior
 
         if weights_posterior is None:
             if isinstance(kernel_size, int):
-                self.weights_posterior = GaussianDistribution(
+                self.weights_posterior = dynamic.GaussianDistribution(
                     (output_channels, input_channels // groups, kernel_size)
                 )
             else:
-                self.weights_posterior = GaussianDistribution(
+                self.weights_posterior = dynamic.GaussianDistribution(
                     (output_channels, input_channels // groups, *kernel_size)
                 )
         else:
             self.weights_posterior = weights_posterior
 
         if bias_posterior is None:
-            self.bias_posterior = GaussianDistribution((output_channels,))
+            self.bias_posterior = dynamic.GaussianDistribution((output_channels,))
         else:
             self.bias_posterior = bias_posterior
 

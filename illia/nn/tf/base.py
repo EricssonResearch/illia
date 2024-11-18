@@ -5,16 +5,18 @@ from typing import Tuple
 from tensorflow import Tensor
 from tensorflow.keras.layers import Layer
 
-from illia.nn.base import BayesianModule
+from illia.nn import base
 
 
-class BayesianModule(BayesianModule, Layer):
+class BayesianModule(base.BayesianModule, Layer):
+
+    frozen: bool
 
     def __init__(self, *args, **kwargs):
 
         # Call super class constructor
-        super(BayesianModule, self).__init__(*args, **kwargs)
-        
+        super().__init__(*args, **kwargs)
+
         # Set freeze false by default
         self.frozen = False
 

@@ -2,8 +2,8 @@
 from abc import ABC, abstractmethod
 from typing import Optional, Tuple, Any
 
-from illia.distributions import dynamic
-from illia.distributions import static
+from illia.distributions.dynamic import DynamicDistribution
+from illia.distributions.static import StaticDistribution
 
 
 class Linear(ABC):
@@ -12,10 +12,10 @@ class Linear(ABC):
         self,
         input_size: int,
         output_size: int,
-        weights_prior: Optional[static.StaticDistribution] = None,
-        bias_prior: Optional[static.StaticDistribution] = None,
-        weights_posterior: Optional[dynamic.DynamicDistribution] = None,
-        bias_posterior: Optional[dynamic.DynamicDistribution] = None,
+        weights_prior: Optional[StaticDistribution] = None,
+        bias_prior: Optional[StaticDistribution] = None,
+        weights_posterior: Optional[DynamicDistribution] = None,
+        bias_posterior: Optional[DynamicDistribution] = None,
         backend: Optional[str] = "torch",
     ) -> None:
         """
@@ -33,9 +33,6 @@ class Linear(ABC):
         Raises:
             ValueError: If an invalid backend value is provided.
         """
-        
-        # Call super class constructor
-        super(Linear, self).__init__()
 
         # Set attributes
         self.backend = backend

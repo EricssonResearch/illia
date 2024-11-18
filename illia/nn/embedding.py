@@ -2,8 +2,8 @@
 from abc import ABC, abstractmethod
 from typing import Optional, Tuple, Any
 
-from illia.distributions import dynamic
-from illia.distributions import static
+from illia.distributions.dynamic import DynamicDistribution
+from illia.distributions.static import StaticDistribution
 
 
 class Embedding(ABC):
@@ -12,8 +12,8 @@ class Embedding(ABC):
         self,
         num_embeddings: int,
         embeddings_dim: int,
-        weights_prior: Optional[static.StaticDistribution] = None,
-        weights_posterior: Optional[dynamic.DynamicDistribution] = None,
+        weights_prior: Optional[StaticDistribution] = None,
+        weights_posterior: Optional[DynamicDistribution] = None,
         padding_idx: Optional[int] = None,
         max_norm: Optional[float] = None,
         norm_type: float = 2.0,
@@ -29,11 +29,11 @@ class Embedding(ABC):
             embeddings_dim (int): The size of each embedding vector
             weights_prior (Optional[StaticDistribution], optional): The prior distribution for the weights. Defaults to None.
             weights_posterior (Optional[DynamicDistribution], optional): The posterior distribution for the weights. Defaults to None.
-            padding_idx (Optional[int], optional): If padding_idx is specified, its entries do not affect the gradient, meaning the 
-                                                    embedding vector at padding_idx stays constant during training. Initially, this 
-                                                    embedding vector defaults to zeros but can be set to a different value to serve 
+            padding_idx (Optional[int], optional): If padding_idx is specified, its entries do not affect the gradient, meaning the
+                                                    embedding vector at padding_idx stays constant during training. Initially, this
+                                                    embedding vector defaults to zeros but can be set to a different value to serve
                                                     as the padding vector.
-            max_norm (Optional[float], optional): If given, each embedding vector with norm larger than max_norm is renormalized to have 
+            max_norm (Optional[float], optional): If given, each embedding vector with norm larger than max_norm is renormalized to have
                                                     norm max_norm. Defaults to None.
             norm_type (float, optional): The p of the p-norm to compute for the max_norm option. Defaults to 2.0.
             scale_grad_by_freq (bool, optional): If given, this will scale gradients by the inverse of frequency of the words in the mini-batch. Defaults to False.
@@ -43,9 +43,6 @@ class Embedding(ABC):
         Raises:
             ValueError: If an invalid backend value is provided.
         """
-        
-        # Call super class constructor
-        super(Embedding, self).__init__()
 
         # Set attributes
         self.backend = backend
@@ -53,10 +50,10 @@ class Embedding(ABC):
         # Choose backend
         if self.backend == "torch":
             # Import torch part
-            from illia.nn.torch import embedding
+            from illia.nn.torch import embedding  # type: ignore
         elif self.backend == "tf":
             # Import tensorflow part
-            from illia.nn.tf import embedding
+            from illia.nn.tf import embedding  # type: ignore
         else:
             raise ValueError("Invalid backend value")
 

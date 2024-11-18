@@ -1,13 +1,13 @@
 # Libraries
 from typing import Any, Optional
 
-import illia.distributions.static as static
+from illia.distributions.static import StaticDistribution
 
 
-class GaussianDistribution(static.StaticDistribution):
+class GaussianDistribution(StaticDistribution):
     """
     A base class for creating a Static Gaussian distribution.
-    Each function in this class is intended to be overridden by specific 
+    Each function in this class is intended to be overridden by specific
     backend implementations.
     """
 
@@ -22,15 +22,12 @@ class GaussianDistribution(static.StaticDistribution):
 
         Args:
             mu (float, optional): The value for mu.
-            std (float, optional): The value for std. 
+            std (float, optional): The value for std.
             backend (Optional[str], optional): The backend to use. Defaults to 'torch'.
 
         Raises:
             ValueError: If an invalid backend value is provided.
         """
-        
-        # Call super class constructor
-        super(GaussianDistribution, self).__init__()
 
         # Set attributes
         self.backend = backend
@@ -38,15 +35,15 @@ class GaussianDistribution(static.StaticDistribution):
         # Choose backend
         if backend == "torch":
             # Import torch part
-            from illia.distributions.static.torch import gaussian
+            from illia.distributions.static.torch import gaussian  # type: ignore
         elif backend == "tf":
             # Import tensorflow part
-            from illia.distributions.static.tf import gaussian
+            from illia.distributions.static.tf import gaussian  # type: ignore
         else:
             raise ValueError("Invalid backend value")
-        
+
         # Define distribution based on the imported library
-        self.distribution = gaussian.GaussianDistribution(mu, std)
+        self.distribution = gaussian.GaussianDistribution(mu=mu, std=std)
 
     # Overriding method
     def log_prob(self, x: Any) -> Any:

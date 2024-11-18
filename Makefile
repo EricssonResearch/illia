@@ -1,6 +1,6 @@
 # Allows you to indicate that the targets you define are executed as commands
 # commands and do not refer to project files
-.PHONY: install format type-check clean tests requirements all
+.PHONY: install format type-check clean tests wiki-up requirements all 
 
 # Default command
 .DEFAULT_GOAL := init
@@ -30,9 +30,14 @@ clean:
 	find . -type d -name .pytest_cache -exec rm -rf {} +
 
 # Allows testing the code
-tests: clean delete_logs format type-check
+tests: clean format type-check
 	@echo "Testing code..."
 	poetry run pytest -v $(TEST_FILE)
+
+# Allows run the MkDocs
+wiki-up:
+	@echo "Runing MkDocs..."
+	poetry run mkdocs serve
 
 # Generates a requirements.txt file with the project dependencies
 requirements: pyproject.toml

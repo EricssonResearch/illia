@@ -7,12 +7,14 @@ from illia.nn import losses
 from illia.nn.torch.base import BayesianModule
 
 
-class KLDivergenceLoss(losses.KLDivergenceLoss, torch.nn.Module):
+class KLDivergenceLoss(torch.nn.Module):
+
     reduction: Literal["mean"]
     weight: float
 
     def __init__(self, reduction: Literal["mean"] = "mean", weight: float = 1.0):
-        super(KLDivergenceLoss, self).__init__()
+
+        super().__init__()
 
         self.reduction = reduction
         self.weight = weight
@@ -47,13 +49,20 @@ class KLDivergenceLoss(losses.KLDivergenceLoss, torch.nn.Module):
 
 
 class ELBOLoss(losses.ELBOLoss, torch.nn.Module):
+
     def __init__(
         self,
         loss_function: torch.nn.Module,
         num_samples: int = 1,
         kl_weight: float = 1e-3,
     ) -> None:
-        super(ELBOLoss, self).__init__()
+
+        super().__init__(
+            loss_function=loss_function,
+            num_samples=num_samples,
+            kl_weight=kl_weight,
+            backend="torch",
+        )
 
         self.loss_function = loss_function
         self.num_samples = num_samples

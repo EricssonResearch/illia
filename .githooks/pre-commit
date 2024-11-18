@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# Run the following checks:
+# 1. Install all project dependencies managed by Poetry
+# 2. Remove the cache and logs stored for testing the code
+# 3. Extract the requirements (requirements.txt) for setup.py
+# 4. Create the Wiki
+make all

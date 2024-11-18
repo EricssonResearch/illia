@@ -1,18 +1,19 @@
 # Libraries
+import math
 from typing import Tuple, Optional
 
 import torch
 
 from illia.distributions.dynamic.base import DynamicDistribution
 
-# Static nn.Parameters
-PI: torch.Tensor = torch.acos(torch.zeros(1)) * 2
-
 
 class GaussianDistribution(DynamicDistribution):
 
     def __init__(
-        self, shape: Tuple[int, ...], mu_init: float = 0.0, rho_init: float = -7.0
+        self,
+        shape: Tuple[int, ...],
+        mu_init: float = 0.0,
+        rho_init: float = -7.0,
     ) -> None:
         """
         Initializes a set of parameters for a distribution.
@@ -24,14 +25,20 @@ class GaussianDistribution(DynamicDistribution):
         """
 
         # Call super class constructor
-        super(GaussianDistribution, self).__init__()
+        super().__init__()
+
+        # Parameter for standard deviation
+        self.std = 0.1
 
         # Set attributes
+        self.shape = shape
+        self.mu_init = mu_init
+        self.rho_init = rho_init
         self.mu: torch.Tensor = torch.nn.Parameter(
-            torch.randn(shape).normal_(mu_init, 0.1)
+            torch.randn(self.shape).normal_(mean=self.mu_init, std=self.std)
         )
         self.rho: torch.Tensor = torch.nn.Parameter(
-            torch.randn(shape).normal_(rho_init, 0.1)
+            torch.randn(self.shape).normal_(mean=self.rho_init, std=self.std)
         )
 
     def sample(self) -> torch.Tensor:
@@ -65,7 +72,7 @@ class GaussianDistribution(DynamicDistribution):
         sigma: torch.Tensor = torch.log1p(torch.exp(self.rho))
 
         log_posteriors: torch.Tensor = (
-            -torch.log(torch.sqrt(2 * PI))
+            -torch.log(torch.sqrt(2 * torch.tensor(math.pi)))
             - torch.log(sigma)
             - (((x - self.mu) ** 2) / (2 * sigma**2))
             - 0.5
@@ -83,5 +90,5 @@ class GaussianDistribution(DynamicDistribution):
         Returns:
             int: The total number of parameters.
         """
-        
+
         return len(self.mu.view(-1))

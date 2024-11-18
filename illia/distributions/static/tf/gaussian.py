@@ -1,14 +1,9 @@
-# deep larning libraries
+# Libraries
+import math
+
 import tensorflow as tf
 
-# other libraries
-from typing import Dict
-
-# own modules
-from illia.distributions.static import StaticDistribution
-
-# static variables
-PI: tf.Tensor = tf.math.acos(tf.zeros(1)) * 2
+from illia.distributions.static.base import StaticDistribution
 
 
 class GaussianDistribution(StaticDistribution):
@@ -22,11 +17,26 @@ class GaussianDistribution(StaticDistribution):
             std: standard deviation parameter.
         """
 
-        # set attributes
-        self.mu = tf.Tensor(mu)
-        self.std = tf.Tensor(std)
+        # Call super class constructor
+        super().__init__()
 
-    # overriding method
+        # Set attributes
+        self.mu = tf.constant(mu)
+        self.std = tf.constant(std)
+
+    def get_config(self):
+        # Get the base configuration
+        base_config = super().get_config()
+
+        # Add the custom configurations
+        custom_config = {
+            "mu": self.mu,
+            "std": self.std,
+        }
+
+        # Combine both configurations
+        return {**base_config, **custom_config}
+
     def log_prob(self, x: tf.Tensor) -> tf.Tensor:
         """
         This method computes the log probabilities.
@@ -38,16 +48,12 @@ class GaussianDistribution(StaticDistribution):
             output tensor. Dimensions:
         """
 
-        # change device
-        self.mu = self.mu.to(x.device)
-        self.std = self.std.to(x.device)
-
-        # compute log probs
+        # Compute log probs
         log_probs = (
-            -tf.log(tf.sqrt(2 * PI)).to(x.device)
-            - tf.log(self.std)
+            -tf.math.log(tf.sqrt(2 * tf.constant(math.pi)))
+            - tf.math.log(self.std)
             - (((x - self.mu) ** 2) / (2 * self.std**2))
             - 0.5
         )
 
-        return log_probs.sum()
+        return tf.math.reduce_sum(log_probs)

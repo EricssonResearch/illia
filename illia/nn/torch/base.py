@@ -5,16 +5,17 @@ from typing import Tuple
 from torch import Tensor
 from torch.nn import Module
 
-from illia.nn.base import BayesianModule
+from illia.nn import base
 
 
-class BayesianModule(BayesianModule, Module):
+class BayesianModule(base.BayesianModule, Module):
+
     frozen: bool
 
     def __init__(self) -> None:
-        
+
         # Call super class constructor
-        super(BayesianModule, self).__init__()
+        super().__init__()
 
         # Set freeze false by default
         self.frozen = False
@@ -32,7 +33,7 @@ class BayesianModule(BayesianModule, Module):
                 continue
 
     def unfreeze(self) -> None:
-        
+
         # Set frozen indicator to false for current layer
         self.frozen = False
 

@@ -1,15 +1,14 @@
-# deep learning libraries
-import tensorflow as tf
-
-# other libraries
+# Libraries
 from abc import abstractmethod
 from typing import Dict
 
-# own modules
+import tensorflow as tf
+
 import illia.distributions.static as static
 
 
 class StaticDistribution(static.StaticDistribution):
+
     @abstractmethod
     def __init__(self, parameters: Dict[str, float]) -> None:
         pass

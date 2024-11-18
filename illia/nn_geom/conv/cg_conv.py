@@ -21,14 +21,14 @@ class CGConv(MessagePassing):
         aggr: str = "add",
         **kwargs,
     ):
-        """
+        r"""
         "Crystal Graph Convolutional Neural Networks for an Accurate and Interpretable Prediction of Material Properties"
         (https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.120.145301).
 
         The operation is defined as:
 
         $$
-        \mathbf{x}^{\prime}_i = \mathbf{x}_i + \sum_{j \in \mathcal{N}(i)}\sigma ( \mathbf{z}_{i,j} \mathbf{W}_f + \mathbf{b}_f ) 
+        \mathbf{x}^{\prime}_i = \mathbf{x}_i + \sum_{j \in \mathcal{N}(i)}\sigma ( \mathbf{z}_{i,j} \mathbf{W}_f + \mathbf{b}_f )
         \odot g ( \mathbf{z}_{i,j} \mathbf{W}_s + \mathbf{b}_s )
         $$
 
@@ -50,7 +50,7 @@ class CGConv(MessagePassing):
             edge features \((|\mathcal{E}|, D)\) *(optional)*
             - **output:** node features \((|\mathcal{V}|, F)\) or \((|\mathcal{V_t}|, F_{t})\) if bipartite
         """
-            
+
         super(CGConv, self).__init__(aggr=aggr, **kwargs)
         self.channels = channels
         self.dim = dim

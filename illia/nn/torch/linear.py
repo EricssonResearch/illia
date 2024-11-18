@@ -5,16 +5,11 @@ import torch
 import torch.nn.functional as F
 
 import illia.distributions.static as static
-from illia.nn import linear
+import illia.distributions.dynamic as dynamic
 from illia.nn.torch.base import BayesianModule
-from illia.distributions.static import StaticDistribution
-from illia.distributions.dynamic import (
-    DynamicDistribution,
-    GaussianDistribution,
-)
 
 
-class Linear(linear.Linear, BayesianModule):
+class Linear(BayesianModule):
     """
     This class is the Linear bayesian layer.
 
@@ -29,10 +24,10 @@ class Linear(linear.Linear, BayesianModule):
 
     input_size: int
     output_size: int
-    weights_posterior: DynamicDistribution
-    weights_prior: StaticDistribution
-    bias_posterior: DynamicDistribution
-    bias_prior: StaticDistribution
+    weights_posterior: dynamic.DynamicDistribution
+    weights_prior: static.StaticDistribution
+    bias_posterior: dynamic.DynamicDistribution
+    bias_prior: static.StaticDistribution
     weights: torch.Tensor
     bias: torch.Tensor
 
@@ -40,13 +35,14 @@ class Linear(linear.Linear, BayesianModule):
         self,
         input_size: int,
         output_size: int,
-        weights_prior: Optional[StaticDistribution] = None,
-        bias_prior: Optional[StaticDistribution] = None,
-        weights_posterior: Optional[DynamicDistribution] = None,
-        bias_posterior: Optional[DynamicDistribution] = None,
+        weights_prior: Optional[static.StaticDistribution] = None,
+        bias_prior: Optional[static.StaticDistribution] = None,
+        weights_posterior: Optional[dynamic.DynamicDistribution] = None,
+        bias_posterior: Optional[dynamic.DynamicDistribution] = None,
     ) -> None:
+
         # Call super class constructor
-        super(Linear, self).__init__()
+        super().__init__()
 
         # Set attributes
         self.input_size = input_size
@@ -70,13 +66,15 @@ class Linear(linear.Linear, BayesianModule):
 
         # Set weights posterior
         if weights_posterior is None:
-            self.weights_posterior = GaussianDistribution((output_size, input_size))
+            self.weights_posterior = dynamic.GaussianDistribution(
+                (output_size, input_size)
+            )
         else:
             self.weights_posterior = weights_posterior
 
         # Set bias posterior
         if bias_posterior is None:
-            self.bias_posterior = GaussianDistribution((output_size,))
+            self.bias_posterior = dynamic.GaussianDistribution((output_size,))
         else:
             self.bias_posterior = bias_posterior
 

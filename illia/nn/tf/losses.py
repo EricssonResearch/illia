@@ -3,17 +3,34 @@ from typing import Literal
 
 import tensorflow as tf
 
-from illia.nn import losses
-from illia.nn.tf.base import BayesianModule
+from illia.nn.torch.base import BayesianModule
 
 
-class KLDivergenceLoss(losses.KLDivergenceLoss, tf.keras.layers.Layer):
+class KLDivergenceLoss(tf.keras.layers.Layer):
+
+    reduction: Literal["mean"]
+    weight: float
 
     def __init__(self, reduction: Literal["mean"] = "mean", weight: float = 1.0):
-        super(KLDivergenceLoss, self).__init__()
+
+        super().__init__()
 
         self.reduction = reduction
         self.weight = weight
+
+    def get_config(self):
+
+        # Get the base configuration
+        base_config = super().get_config()
+
+        # Add the custom configurations
+        custom_config = {
+            "reduction": self.reduction,
+            "weight": self.weight,
+        }
+
+        # Combine both configurations
+        return {**base_config, **custom_config}
 
     def call(self, model: tf.keras.Model) -> tf.Tensor:
         """
@@ -45,17 +62,16 @@ class KLDivergenceLoss(losses.KLDivergenceLoss, tf.keras.layers.Layer):
         return kl_global_cost
 
 
-class ELBOLoss(losses.ELBOLoss, tf.keras.losses.Loss):
+class ELBOLoss(tf.keras.losses.Loss):
 
     def __init__(
         self,
         loss_function: tf.keras.losses.Loss,
         num_samples: int = 1,
         kl_weight: float = 1e-3,
-        name: str = "elbo_loss",
     ):
-        super().__init__(name=name)
-        
+        super().__init__()
+
         self.loss_function = loss_function
         self.num_samples = num_samples
         self.kl_weight = kl_weight
@@ -74,13 +90,16 @@ class ELBOLoss(losses.ELBOLoss, tf.keras.losses.Loss):
 
         return loss_value
 
-    # for custom losses
     def get_config(self):
-        config = super().get_config()
-        config.update(
-            {
-                "num_samples": self.num_samples,
-                "kl_weight": self.kl_weight,
-            }
-        )
-        return config
+        # Get the base configuration
+        base_config = super().get_config()
+
+        # Add the custom configurations
+        custom_config = {
+            "loss_function": self.loss_function,
+            "num_samples": self.num_samples,
+            "kl_weight": self.kl_weight,
+        }
+
+        # Combine both configurations
+        return {**base_config, **custom_config}
