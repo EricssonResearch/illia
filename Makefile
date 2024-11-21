@@ -3,15 +3,21 @@
 .PHONY: install format type-check clean tests wiki-up requirements all 
 
 # Default command
-.DEFAULT_GOAL := init
+.DEFAULT_GOAL := all
 
 # Variable for the test file
 TEST_FILE ?= ./tests
 
-# Allows the installation of Poetry dependencies for the project
+# Allows the installation of project dependencies using Poetry
 install: pyproject.toml
 	@echo "Installing Poetry dependencies..."
 	poetry install
+
+# Allows the installation of all dependencies for the project using Poetry
+# This is for development
+install-all: pyproject.toml
+	@echo "Installing Poetry dependencies..."
+	poetry install --with dev,docs 
 
 # Check format of the code using Black
 format:
@@ -25,7 +31,7 @@ type-check:
 
 # Allows cache clearing
 clean:
-	@echo "Cleaning cache..."
+	@echo "Cleaning pycache..."
 	find . -type d -name __pycache__ -exec rm -rf {} +
 	find . -type d -name .pytest_cache -exec rm -rf {} +
 
@@ -39,7 +45,7 @@ wiki-up:
 	@echo "Runing MkDocs..."
 	poetry run mkdocs serve
 
-# Generates a requirements.txt file with the project dependencies
+# Generates a requirements.txt file with the project dependencies using Poetry
 requirements: pyproject.toml
 	@echo "Generating requirements.txt file..."
 	poetry export -f requirements.txt --without-hashes > requirements.txt

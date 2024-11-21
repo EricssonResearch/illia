@@ -3,7 +3,7 @@ from typing import Literal
 
 import tensorflow as tf
 
-from illia.nn.torch.base import BayesianModule
+from illia.nn.tf.base import BayesianModule
 
 
 class KLDivergenceLoss(tf.keras.layers.Layer):
@@ -13,12 +13,25 @@ class KLDivergenceLoss(tf.keras.layers.Layer):
 
     def __init__(self, reduction: Literal["mean"] = "mean", weight: float = 1.0):
 
+        # Call super class constructor
         super().__init__()
 
+        # Set atributtes
         self.reduction = reduction
         self.weight = weight
 
     def get_config(self):
+        """
+        Get the configuration of the Gaussian Distribution object. This method retrieves the base
+        configuration of the parent class and combines it with custom configurations specific to
+        the Gaussian Distribution.
+
+        Args:
+            self (GaussianDistribution): The instance of the Gaussian Distribution object.
+
+        Returns:
+            dict: A dictionary containing the combined configuration of the Gaussian Distribution.
+        """
 
         # Get the base configuration
         base_config = super().get_config()
@@ -38,12 +51,11 @@ class KLDivergenceLoss(tf.keras.layers.Layer):
 
         Args:
             model: tensorflow model.
-            reduction: type of reduction for the loss. Defaults to "mean".
-            weight: weight for the loss. Defaults to 1.0.
 
         Returns:
             kl divergence cost
         """
+
         kl_global_cost = tf.constant(0.0, dtype=tf.float32)
         num_params_global = 0
 
@@ -70,8 +82,10 @@ class ELBOLoss(tf.keras.losses.Loss):
         num_samples: int = 1,
         kl_weight: float = 1e-3,
     ):
+        # Call super class constructor
         super().__init__()
 
+        # Set atributtes
         self.loss_function = loss_function
         self.num_samples = num_samples
         self.kl_weight = kl_weight
@@ -91,6 +105,18 @@ class ELBOLoss(tf.keras.losses.Loss):
         return loss_value
 
     def get_config(self):
+        """
+        Get the configuration of the Gaussian Distribution object. This method retrieves the base
+        configuration of the parent class and combines it with custom configurations specific to
+        the Gaussian Distribution.
+
+        Args:
+            self (GaussianDistribution): The instance of the Gaussian Distribution object.
+
+        Returns:
+            dict: A dictionary containing the combined configuration of the Gaussian Distribution.
+        """
+
         # Get the base configuration
         base_config = super().get_config()
 

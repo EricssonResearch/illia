@@ -24,11 +24,11 @@ class Linear(ABC):
         Args:
             input_size (int): Size of each input sample.
             output_size (int): Size of each output sample.
-            weights_prior (Optional[StaticDistribution], optional): The prior distribution for the weights. Defaults to None.
-            bias_prior (Optional[StaticDistribution], optional): The prior distribution for the bias. Defaults to None.
-            weights_posterior (Optional[DynamicDistribution], optional): The posterior distribution for the weights. Defaults to None.
-            bias_posterior (Optional[DynamicDistribution], optional): The posterior distribution for the bias. Defaults to None.
-            backend (Optional[str], optional): The backend to use. Defaults to 'torch'.
+            weights_prior (Optional[StaticDistribution], optional): The prior distribution for the weights.
+            bias_prior (Optional[StaticDistribution], optional): The prior distribution for the bias.
+            weights_posterior (Optional[DynamicDistribution], optional): The posterior distribution for the weights.
+            bias_posterior (Optional[DynamicDistribution], optional): The posterior distribution for the bias.
+            backend (Optional[str], optional): The backend to use.
 
         Raises:
             ValueError: If an invalid backend value is provided.
@@ -55,8 +55,25 @@ class Linear(ABC):
         )
 
     def __call__(self, inputs):
+        """
+        Call the underlying layer with the given inputs to apply the layer operation.
+
+        Args:
+            inputs (Any): The input data to the layer.
+
+        Returns:
+            output (Any): The output of the layer operation.
+        """
+
         return self.layer(inputs)
 
     @abstractmethod
     def kl_cost(self) -> Tuple[Any, int]:
+        """
+        Calculate the Kullback-Leibler (KL) divergence cost for the weights and bias of the layer.
+
+        Returns:
+            Tuple[Any, int]: A tuple containing the KL divergence cost for the weights and bias, and the total number of parameters.
+        """
+
         pass

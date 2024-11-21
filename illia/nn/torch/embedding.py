@@ -81,6 +81,19 @@ class Embedding(BayesianModule):
             self.weights_posterior = weights_posterior
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
+        """
+        Performs a forward pass through the Bayesian Embedding layer.
+
+        If the layer is not frozen, it samples weights and bias from their respective posterior distributions.
+        If the layer is frozen and the weights or bias are not initialized, it samples them from their respective posterior distributions.
+
+        Args:
+            inputs (torch.Tensor): Input tensor to the layer.
+
+        Returns:
+            torch.Tensor: Output tensor after passing through the layer.
+        """
+
         # Forward depeding of frozen state
         if not self.frozen:
             self.weights = self.weights_posterior.sample()
@@ -91,7 +104,7 @@ class Embedding(BayesianModule):
                 self.bias = self.bias_posterior.sample()
 
         # Run torch forward
-        outputs: torch.Tensor = F.embedding(
+        return F.embedding(
             inputs,
             self.weights,
             self.padding_idx,
@@ -101,9 +114,17 @@ class Embedding(BayesianModule):
             self.sparse,
         )
 
-        return outputs
-
     def kl_cost(self) -> Tuple[torch.Tensor, int]:
+        """
+        Calculate the Kullback-Leibler (KL) divergence cost for the weights and bias of the layer.
+
+        Args:
+            self (Conv2d): The instance of the Bayesian Convolution 2D layer.
+
+        Returns:
+            Tuple[torch.Tensor, int]: A tuple containing the KL divergence cost for the weights and bias, and the total number of parameters.
+        """
+
         # Get log posterior and log prior
         log_posterior: torch.Tensor = self.weights_posterior.log_prob(
             self.weights

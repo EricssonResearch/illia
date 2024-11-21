@@ -10,11 +10,11 @@ class GaussianDistribution(StaticDistribution):
 
     def __init__(self, mu: float, std: float) -> None:
         """
-        This method is the constrcutor of the class.
+        Initialize a Gaussian distribution with given mean (mu) and standard deviation (std).
 
         Args:
-            mu: mu parameter.
-            std: standard deviation parameter.
+                mu (float): The mean of the Gaussian distribution.
+                std (float): The standard deviation of the Gaussian distribution.
         """
 
         # Call super class constructor
@@ -25,6 +25,18 @@ class GaussianDistribution(StaticDistribution):
         self.std = tf.constant(std)
 
     def get_config(self):
+        """
+        Get the configuration of the Gaussian Distribution object. This method retrieves the base
+        configuration of the parent class and combines it with custom configurations specific to
+        the Gaussian Distribution.
+
+        Args:
+            self (GaussianDistribution): The instance of the Gaussian Distribution object.
+
+        Returns:
+            dict: A dictionary containing the combined configuration of the Gaussian Distribution.
+        """
+
         # Get the base configuration
         base_config = super().get_config()
 
@@ -39,13 +51,17 @@ class GaussianDistribution(StaticDistribution):
 
     def log_prob(self, x: tf.Tensor) -> tf.Tensor:
         """
-        This method computes the log probabilities.
+        Calculate the log probability density function (PDF) of the given input data.
+
+        If no input data is provided, a sample is generated using the current parameters.
+        The log PDF is calculated using the current parameters mu and rho, which represent
+        the mean and standard deviation of the Gaussian distribution, respectively.
 
         Args:
-            x: _description_
+            x (Optional[tf.Tensor]): Input data for which the log PDF needs to be calculated.
 
         Returns:
-            output tensor. Dimensions:
+            output (tf.Tensor): The log probability density function (PDF) of the input data or sample.
         """
 
         # Compute log probs

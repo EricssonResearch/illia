@@ -44,11 +44,11 @@ class Conv2d(BayesianModule):
             stride (Union[int, Tuple[int, int]]): Stride of the convolution.
             padding (Union[int, Tuple[int, int]]): Padding added to all four sides of the input.
             dilation (Union[int, Tuple[int, int]]): Spacing between kernel elements.
-            groups (int, optional): Number of blocked connections from input channels to output channels. Defaults to 1.
-            weights_prior (Optional[StaticDistribution], optional): The prior distribution for the weights. Defaults to None.
-            bias_prior (Optional[StaticDistribution], optional): The prior distribution for the bias. Defaults to None.
-            weights_posterior (Optional[DynamicDistribution], optional): The posterior distribution for the weights. Defaults to None.
-            bias_posterior (Optional[DynamicDistribution], optional): The posterior distribution for the bias. Defaults to None.
+            groups (int, optional): Number of blocked connections from input channels to output channels.
+            weights_prior (Optional[StaticDistribution], optional): The prior distribution for the weights.
+            bias_prior (Optional[StaticDistribution], optional): The prior distribution for the bias.
+            weights_posterior (Optional[DynamicDistribution], optional): The posterior distribution for the weights.
+            bias_posterior (Optional[DynamicDistribution], optional): The posterior distribution for the bias.
         """
 
         # Call super class constructor
@@ -63,6 +63,7 @@ class Conv2d(BayesianModule):
         self.dilation = dilation
         self.groups = groups
 
+        # Set parameters
         parameters = {"mean": 0, "std": 0.1}
 
         if weights_prior is None:
@@ -97,16 +98,30 @@ class Conv2d(BayesianModule):
             self.bias_posterior = bias_posterior
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
+        """
+        Performs a forward pass through the Bayesian Convolution 2D layer.
+
+        If the layer is not frozen, it samples weights and bias from their respective posterior distributions.
+        If the layer is frozen and the weights or bias are not initialized, it samples them from their respective posterior distributions.
+
+        Args:
+            inputs (torch.Tensor): Input tensor to the layer.
+
+        Returns:
+            torch.Tensor: Output tensor after passing through the layer.
+        """
+
+        # Forward depeding of frozen state
         if not self.frozen:
             self.weights = self.weights_posterior.sample()
             self.bias = self.bias_posterior.sample()
-
         else:
             if self.weights is None or self.bias is None:
                 self.weights = self.weights_posterior.sample()
                 self.bias = self.bias_posterior.sample()
 
-        outputs: torch.Tensor = F.conv2d(
+        # Run torch forward
+        return F.conv2d(
             inputs,
             weight=self.weights,
             bias=self.bias,
@@ -116,9 +131,17 @@ class Conv2d(BayesianModule):
             groups=self.groups,
         )
 
-        return outputs
-
     def kl_cost(self) -> Tuple[torch.Tensor, int]:
+        """
+        Calculate the Kullback-Leibler (KL) divergence cost for the weights and bias of the layer.
+
+        Args:
+            self (Conv2d): The instance of the Bayesian Convolution 2D layer.
+
+        Returns:
+            Tuple[torch.Tensor, int]: A tuple containing the KL divergence cost for the weights and bias, and the total number of parameters.
+        """
+
         log_posterior: torch.Tensor = self.weights_posterior.log_prob(
             self.weights
         ) + self.bias_posterior.log_prob(self.bias)

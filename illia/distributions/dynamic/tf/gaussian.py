@@ -16,12 +16,14 @@ class GaussianDistribution(DynamicDistribution):
         rho_init: float = -7.0,
     ) -> None:
         """
-        Initializes a set of parameters for a distribution.
+        Initialize a Gaussian Distribution object with trainable parameters mu and rho.
+        The parameters are initialized with a normal distribution with mean mu_init and rho_init,
+        and a standard deviation of 0.1.
 
         Args:
-            shape (Tuple[int, ...]): The shape of the parameter tensors.
-            mu_init (float, optional): The initial value for the parameter mu. Defaults to 0.0.
-            rho_init (float, optional): The initial value for the parameter rho. Defaults to -7.0.
+            shape (Tuple[int, ...]): The shape of the distribution parameters.
+            mu_init (float): The initial mean value for mu.
+            rho_init (float): The initial mean value for rho.
         """
 
         # Call super class constructor
@@ -42,6 +44,18 @@ class GaussianDistribution(DynamicDistribution):
         )
 
     def get_config(self):
+        """
+        Get the configuration of the Gaussian Distribution object. This method retrieves the base
+        configuration of the parent class and combines it with custom configurations specific to
+        the Gaussian Distribution.
+
+        Args:
+            self (GaussianDistribution): The instance of the Gaussian Distribution object.
+
+        Returns:
+            dict: A dictionary containing the combined configuration of the Gaussian Distribution.
+        """
+
         # Get the base configuration
         base_config = super().get_config()
 
@@ -57,10 +71,15 @@ class GaussianDistribution(DynamicDistribution):
 
     def sample(self) -> tf.Tensor:
         """
-        Samples a tensor from the distribution using the reparameterization trick.
+        Generate a sample from the Gaussian distribution using the current parameters
+        mu and rho. The sample is obtained by adding a random noise (epsilon) to the mean (mu),
+        where the noise is scaled by the standard deviation (sigma).
+
+        Args:
+            self (GaussianDistribution): The instance of the Gaussian Distribution object.
 
         Returns:
-            tf.Tensor: A sample tensor from the distribution.
+            tf.Tensor: A tensor representing a sample from the Gaussian distribution.
         """
 
         eps: tf.Tensor = tf.random.normal(shape=self.rho.shape)
@@ -70,14 +89,18 @@ class GaussianDistribution(DynamicDistribution):
 
     def log_prob(self, x: Optional[tf.Tensor]) -> tf.Tensor:
         """
-        Computes the log probability of a given tensor under the distribution.
+        Calculate the log probability density function (PDF) of the given input data.
+
+        If no input data is provided, a sample is generated using the current parameters.
+        The log PDF is calculated using the current parameters mu and rho, which represent
+        the mean and standard deviation of the Gaussian distribution, respectively.
 
         Args:
-            x (Optional[tf.Tensor]): The tensor for which to compute the log probability.
-                                        If None, a sample is drawn from the distribution.
+            x (Optional[tf.Tensor]): Input data for which the log PDF needs to be calculated.
+                                If None, a sample is generated using the current parameters.
 
         Returns:
-            tf.Tensor: The log probability of the tensor under the distribution.
+            tf.Tensor: The log probability density function (PDF) of the input data or sample.
         """
 
         if x is None:
@@ -97,12 +120,14 @@ class GaussianDistribution(DynamicDistribution):
     @property
     def num_params(self) -> int:
         """
-        Returns the number of parameters in the distribution.
+        Calculate the total number of parameters in the Gaussian Distribution, which is the product
+        of the dimensions of the mean (mu) parameter.
 
-        This is calculated as the total number of elements in the tensor representing mu.
+        Args:
+            self (GaussianDistribution): The instance of the Gaussian Distribution object.
 
         Returns:
-            int: The total number of parameters.
+            int: The total number of parameters in the Gaussian Distribution.
         """
 
         return tf.size(tf.reshape(self.mu, [-1])).numpy()

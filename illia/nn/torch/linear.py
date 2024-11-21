@@ -10,17 +10,6 @@ from illia.nn.torch.base import BayesianModule
 
 
 class Linear(BayesianModule):
-    """
-    This class is the Linear bayesian layer.
-
-    Attr:
-        input_size: input size of the Linear Layer.
-        output_size: output size of the Linear layer.
-        weights_posterior:
-
-    Returns:
-        _description_
-    """
 
     input_size: int
     output_size: int
@@ -40,6 +29,17 @@ class Linear(BayesianModule):
         weights_posterior: Optional[dynamic.DynamicDistribution] = None,
         bias_posterior: Optional[dynamic.DynamicDistribution] = None,
     ) -> None:
+        """
+        Definition of a Bayesian Linear layer.
+
+        Args:
+            input_size (int): Size of each input sample.
+            output_size (int): Size of each output sample.
+            weights_prior (Optional[StaticDistribution], optional): The prior distribution for the weights. Defaults to None.
+            bias_prior (Optional[StaticDistribution], optional): The prior distribution for the bias. Defaults to None.
+            weights_posterior (Optional[DynamicDistribution], optional): The posterior distribution for the weights. Defaults to None.
+            bias_posterior (Optional[DynamicDistribution], optional): The posterior distribution for the bias. Defaults to None.
+        """
 
         # Call super class constructor
         super().__init__()
@@ -80,36 +80,39 @@ class Linear(BayesianModule):
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
-        This methos is the forward pass of the model.
+        Performs a forward pass through the Bayesian Linear layer.
+
+        If the layer is not frozen, it samples weights and bias from their respective posterior distributions.
+        If the layer is frozen and the weights or bias are not initialized, it samples them from their respective posterior distributions.
 
         Args:
-            inputs: inputs of the model. Dimensions: [*, input size].
+            inputs (torch.Tensor): Input tensor to the layer.
 
         Returns:
-            output tensor. Dimension: [*, output size].
+            torch.Tensor: Output tensor after passing through the layer.
         """
 
+        # Forward depeding of frozen state
         if not self.frozen:
             self.weights = self.weights_posterior.sample()
             self.bias = self.bias_posterior.sample()
-
         else:
             if self.weights is None or self.bias is None:
                 self.weights = self.weights_posterior.sample()
                 self.bias = self.bias_posterior.sample()
 
-        # compurte the outputs
-        outputs: torch.Tensor = F.linear(inputs, self.weights, self.bias)
-
-        return outputs
+        # Run torch forward
+        return F.linear(inputs, self.weights, self.bias)
 
     def kl_cost(self) -> Tuple[torch.Tensor, int]:
         """
-        This method computes the kl-divergence cost for the layer.
+        Calculate the Kullback-Leibler (KL) divergence cost for the weights and bias of the layer.
+
+        Args:
+            self (Conv2d): The instance of the Bayesian Convolution 2D layer.
 
         Returns:
-            kl cost.
-            number of parameters of the layer.
+            Tuple[torch.Tensor, int]: A tuple containing the KL divergence cost for the weights and bias, and the total number of parameters.
         """
 
         log_posterior: torch.Tensor = self.weights_posterior.log_prob(

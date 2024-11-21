@@ -3,7 +3,6 @@ from typing import Literal
 
 import torch
 
-from illia.nn import losses
 from illia.nn.torch.base import BayesianModule
 
 
@@ -13,23 +12,30 @@ class KLDivergenceLoss(torch.nn.Module):
     weight: float
 
     def __init__(self, reduction: Literal["mean"] = "mean", weight: float = 1.0):
+        """
+        Definition of the KL Divergence Loss function.
 
+        Args:
+            reduction (Literal["mean"], optional): Specifies the reduction to apply to the output.
+            weight (float, optional): Weight for the loss.
+        """
+
+        # Call super class constructor
         super().__init__()
 
+        # Set attributes
         self.reduction = reduction
         self.weight = weight
 
     def forward(self, model: torch.nn.Module) -> torch.Tensor:
         """
-        This method computes the forward for KLDivergenceLoss
+        Computes the forward pass of the KL Divergence Loss for a given model.
 
         Args:
-            model: torch model.
-            reduction: type of reduction for the loss. Defaults to "mean".
-            weight: weight for the loss. Defaults to 1e-3.
+            model (torch.nn.Module): The model for which the KL Divergence Loss needs to be computed.
 
         Returns:
-            kl divergence cost
+            kl_global_cost (torch.Tensor): The computed KL Divergence Loss for the given model.
         """
 
         kl_global_cost: torch.Tensor = torch.tensor(
@@ -48,7 +54,7 @@ class KLDivergenceLoss(torch.nn.Module):
         return kl_global_cost
 
 
-class ELBOLoss(losses.ELBOLoss, torch.nn.Module):
+class ELBOLoss(torch.nn.Module):
 
     def __init__(
         self,
@@ -56,27 +62,45 @@ class ELBOLoss(losses.ELBOLoss, torch.nn.Module):
         num_samples: int = 1,
         kl_weight: float = 1e-3,
     ) -> None:
+        """
+        Initializes the Evidence Lower Bound (ELBO) loss function.
 
-        super().__init__(
-            loss_function=loss_function,
-            num_samples=num_samples,
-            kl_weight=kl_weight,
-            backend="torch",
-        )
+        Args:
+            loss_function (Union[Any, Any]): The loss function to be used for computing the reconstruction loss.
+            num_samples (int, optional): The number of samples to draw for estimating the ELBO.
+            kl_weight (float, optional): The weight applied to the KL divergence.
+        """
 
+        # Call super class constructor
+        super().__init__()
+
+        # Set attributes
         self.loss_function = loss_function
         self.num_samples = num_samples
         self.kl_weight = kl_weight
         self.kl_loss = KLDivergenceLoss(weight=kl_weight)
 
     def forward(
-        self, outputs: torch.Tensor, targets: torch.Tensor, model: torch.nn.Module
+        self, y_true: torch.Tensor, y_pred: torch.Tensor, model: torch.nn.Module
     ) -> torch.Tensor:
+        """
+        Computes the forward pass of the ELBO (Evidence Lower Bound) loss.
+
+        Parameters:
+            y_true (torch.Tensor): The true target values.
+                y_pred (torch.Tensor): The predicted values.
+                model (torch.nn.Module): The model to compute the ELBO loss for.
+
+        Returns:
+                loss_value (torch.Tensor): The computed ELBO loss.
+        """
+
         loss_value = torch.tensor(
             0, device=next(model.parameters()).device, dtype=torch.float32
         )
+
         for _ in range(self.num_samples):
-            loss_value += self.loss_function(outputs, targets) + self.kl_loss(model)
+            loss_value += self.loss_function(y_true, y_pred) + self.kl_loss(model)
 
         loss_value /= self.num_samples
 

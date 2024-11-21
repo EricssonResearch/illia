@@ -27,18 +27,18 @@ class Embedding(ABC):
         Args:
             num_embeddings (int): Size of the dictionary of embeddings.
             embeddings_dim (int): The size of each embedding vector
-            weights_prior (Optional[StaticDistribution], optional): The prior distribution for the weights. Defaults to None.
-            weights_posterior (Optional[DynamicDistribution], optional): The posterior distribution for the weights. Defaults to None.
+            weights_prior (Optional[StaticDistribution], optional): The prior distribution for the weights.
+            weights_posterior (Optional[DynamicDistribution], optional): The posterior distribution for the weights.
             padding_idx (Optional[int], optional): If padding_idx is specified, its entries do not affect the gradient, meaning the
                                                     embedding vector at padding_idx stays constant during training. Initially, this
                                                     embedding vector defaults to zeros but can be set to a different value to serve
                                                     as the padding vector.
             max_norm (Optional[float], optional): If given, each embedding vector with norm larger than max_norm is renormalized to have
-                                                    norm max_norm. Defaults to None.
-            norm_type (float, optional): The p of the p-norm to compute for the max_norm option. Defaults to 2.0.
-            scale_grad_by_freq (bool, optional): If given, this will scale gradients by the inverse of frequency of the words in the mini-batch. Defaults to False.
-            sparse (bool, optional): If True, gradient w.r.t. weight matrix will be a sparse tensor. Defaults to False.
-            backend (Optional[str], optional): The backend to use. Defaults to 'torch'.
+                                                    norm max_norm.
+            norm_type (float, optional): The p of the p-norm to compute for the max_norm option.
+            scale_grad_by_freq (bool, optional): If given, this will scale gradients by the inverse of frequency of the words in the mini-batch.
+            sparse (bool, optional): If True, gradient w.r.t. weight matrix will be a sparse tensor.
+            backend (Optional[str], optional): The backend to use.
 
         Raises:
             ValueError: If an invalid backend value is provided.
@@ -70,9 +70,26 @@ class Embedding(ABC):
             sparse=sparse,
         )
 
-    def __call__(self, inputs):
+    def __call__(self, inputs: Any) -> Any:
+        """
+        Call the underlying layer with the given inputs to apply the layer operation.
+
+        Args:
+            inputs (Any): The input data to the layer.
+
+        Returns:
+            output (Any): The output of the layer operation.
+        """
+
         return self.layer(inputs)
 
     @abstractmethod
     def kl_cost(self) -> Tuple[Any, int]:
+        """
+        Calculate the Kullback-Leibler (KL) divergence cost for the weights and bias of the layer.
+
+        Returns:
+            Tuple[Any, int]: A tuple containing the KL divergence cost for the weights and bias, and the total number of parameters.
+        """
+
         pass
