@@ -15,6 +15,7 @@ def readme():
 setup(
     name="illia",
     version="0.1",
+    license="MIT",
     description="__THIS_IS_USED_FOR_DEVELOPMENT_ONLY__",
     long_description=readme(),
     url="",
@@ -27,4 +28,11 @@ setup(
     include_package_data=True,
     package_data={"": ["*.zip"]},
     zip_safe=False,
+    classifiers=[
+        "License :: OSI Approved :: MIT License",
+        "Development Status :: 2 - Pre-Alpha",
+        "Topic :: Software Development :: Libraries :: Python Modules",
+        "Programming Language :: Python",
+        "Intended Audience :: Developers",
+    ],
 )

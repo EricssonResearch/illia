@@ -3,10 +3,10 @@ from typing import Literal
 
 import tensorflow as tf
 
-from illia.nn.tf.base import BayesianModule
+from illia.nn.base import BayesianModule
 
 
-class KLDivergenceLoss(tf.keras.layers.Layer):
+class KLDivergenceLoss(tf.keras.losses.Loss):
 
     reduction: Literal["mean"]
     weight: float
@@ -26,11 +26,8 @@ class KLDivergenceLoss(tf.keras.layers.Layer):
         configuration of the parent class and combines it with custom configurations specific to
         the Gaussian Distribution.
 
-        Args:
-            self (GaussianDistribution): The instance of the Gaussian Distribution object.
-
         Returns:
-            dict: A dictionary containing the combined configuration of the Gaussian Distribution.
+            A dictionary containing the combined configuration of the Gaussian Distribution.
         """
 
         # Get the base configuration
@@ -110,11 +107,8 @@ class ELBOLoss(tf.keras.losses.Loss):
         configuration of the parent class and combines it with custom configurations specific to
         the Gaussian Distribution.
 
-        Args:
-            self (GaussianDistribution): The instance of the Gaussian Distribution object.
-
         Returns:
-            dict: A dictionary containing the combined configuration of the Gaussian Distribution.
+            A dictionary containing the combined configuration of the Gaussian Distribution.
         """
 
         # Get the base configuration

@@ -1,9 +1,17 @@
 # Libraries
-from abc import ABC, abstractmethod
-from typing import Optional, Any
+from abc import abstractmethod
+from typing import Any
+
+# Illia backend selection
+from illia.backend import backend
+
+if backend() == "torch":
+    from torch.nn import Module as BackendModule
+elif backend() == "tf":
+    from tensorflow.keras import Model as BackendModule
 
 
-class DynamicDistribution(ABC):
+class DynamicDistribution(BackendModule):
     """
     A base class for creating a Dynamic distribution.
     Each function in this class is intended to be overridden by specific
@@ -15,7 +23,7 @@ class DynamicDistribution(ABC):
         pass
 
     @abstractmethod
-    def log_prob(self, x: Optional[Any]) -> Any:
+    def log_prob(self, x: Any) -> Any:
         pass
 
     @property

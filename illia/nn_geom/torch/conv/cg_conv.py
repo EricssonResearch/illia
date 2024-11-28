@@ -1,12 +1,13 @@
+# Libraries
 from typing import Tuple, Union
 
 import torch
 import torch.nn.functional as F
 from torch import Tensor
-from illia.nn.torch.linear import Linear
-
 from torch_geometric.nn import MessagePassing
 from torch_geometric.typing import Adj, OptTensor, PairTensor
+
+from illia.nn.torch.linear import Linear
 
 
 class CGConv(MessagePassing):
@@ -51,7 +52,9 @@ class CGConv(MessagePassing):
             - **output:** node features \((|\mathcal{V}|, F)\) or \((|\mathcal{V_t}|, F_{t})\) if bipartite
         """
 
+        # Call super class constructor
         super(CGConv, self).__init__(aggr=aggr, **kwargs)
+
         self.channels = channels
         self.dim = dim
 

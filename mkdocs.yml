@@ -20,23 +20,39 @@ theme:
   # Palette toggle for light mode
   - media: "(prefers-color-scheme: light)"
     scheme: default
+    primary: yellow
+    accent: yellow
     toggle:
-      icon: material/brightness-7
+      icon: material/lightbulb-outline
       name: Switch to dark mode
   # Palette toggle for dark mode
   - media: "(prefers-color-scheme: dark)"
     scheme: slate
+    primary: yellow
+    accent: yellow
     toggle:
-      icon: material/brightness-4
+      icon: material/lightbulb
       name: Switch to light mode
   logo: _images/logo.png
   icon:
     repo: fontawesome/brands/github
   favicon: _images/logo_small.png
   features:
-    - navigation.indexes
-    - toc.follow
+    - content.tabs.link
+    - content.code.annotate
+    - content.code.copy
+    - announce.dismiss
+    - navigation.tabs
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.instant.preview
+    - navigation.instant.progress
+    - navigation.path
+    - navigation.sections
     - navigation.top
+    - navigation.tracking
+    - search.suggest
+    - toc.follow
 
 markdown_extensions:
   - admonition
@@ -75,8 +91,10 @@ plugins:
             show_root_heading: true
             show_source: false
             show_bases: false
-            show_root_full_path: true
+            show_root_full_path: false
             show_symbol_type_heading: true
+            show_special_methods: false
+            show_symbol_type_toc: true
             modernize_annotations: true
 
 extra:

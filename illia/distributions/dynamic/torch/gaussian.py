@@ -1,10 +1,10 @@
 # Libraries
 import math
-from typing import Tuple, Optional
+from typing import Tuple
 
 import torch
 
-from illia.distributions.dynamic.base import DynamicDistribution
+from illia.distributions.dynamic import DynamicDistribution
 
 
 class GaussianDistribution(DynamicDistribution):
@@ -21,9 +21,9 @@ class GaussianDistribution(DynamicDistribution):
         and a standard deviation of 0.1.
 
         Args:
-            shape (Tuple[int, ...]): The shape of the distribution parameters.
-            mu_init (float): The initial mean value for mu.
-            rho_init (float): The initial mean value for rho.
+            shape: The shape of the distribution parameters.
+            mu_init: The initial mean value for mu.
+            rho_init: The initial mean value for rho.
         """
 
         # Call super class constructor
@@ -49,11 +49,8 @@ class GaussianDistribution(DynamicDistribution):
         mu and rho. The sample is obtained by adding a random noise (epsilon) to the mean (mu),
         where the noise is scaled by the standard deviation (sigma).
 
-        Args:
-            self (GaussianDistribution): The instance of the Gaussian Distribution object.
-
         Returns:
-            torch.Tensor: A tensor representing a sample from the Gaussian distribution.
+            A tensor representing a sample from the Gaussian distribution.
         """
 
         eps: torch.Tensor = torch.randn_like(self.rho)
@@ -61,7 +58,7 @@ class GaussianDistribution(DynamicDistribution):
 
         return self.mu + sigma * eps
 
-    def log_prob(self, x: Optional[torch.Tensor]) -> torch.Tensor:
+    def log_prob(self, x: torch.Tensor) -> torch.Tensor:
         """
         Calculate the log probability density function (PDF) of the given input data.
 
@@ -70,11 +67,11 @@ class GaussianDistribution(DynamicDistribution):
         the mean and standard deviation of the Gaussian distribution, respectively.
 
         Args:
-            x (Optional[torch.Tensor]): Input data for which the log PDF needs to be calculated.
-                                If None, a sample is generated using the current parameters.
+            x: Input data for which the log PDF needs to be calculated.
+                If None, a sample is generated using the current parameters.
 
         Returns:
-            torch.Tensor: The log probability density function (PDF) of the input data or sample.
+            The log probability density function (PDF) of the input data or sample.
         """
 
         if x is None:
@@ -97,11 +94,8 @@ class GaussianDistribution(DynamicDistribution):
         Calculate the total number of parameters in the Gaussian Distribution, which is the product
         of the dimensions of the mean (mu) parameter.
 
-        Args:
-            self (GaussianDistribution): The instance of the Gaussian Distribution object.
-
         Returns:
-            int: The total number of parameters in the Gaussian Distribution.
+            The total number of parameters in the Gaussian Distribution.
         """
 
         return len(self.mu.view(-1))

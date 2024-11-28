@@ -1,12 +1,20 @@
 # Libraries
-from abc import ABC, abstractmethod
 from typing import Optional, Tuple, Any, Union
 
 from illia.distributions.dynamic import DynamicDistribution
 from illia.distributions.static import StaticDistribution
+from illia.nn.base import BayesianModule
+
+# Illia backend selection
+from illia.backend import backend
+
+if backend() == "torch":
+    from illia.nn.torch import conv
+elif backend() == "tf":
+    from illia.nn.tf import conv
 
 
-class Conv2d(ABC):
+class Conv2d(BayesianModule):
 
     def __init__(
         self,
@@ -21,38 +29,29 @@ class Conv2d(ABC):
         bias_prior: Optional[StaticDistribution] = None,
         weights_posterior: Optional[DynamicDistribution] = None,
         bias_posterior: Optional[DynamicDistribution] = None,
-        backend: Optional[str] = "torch",
     ) -> None:
         """
         Definition of a Bayesian Convolution 2D layer.
 
         Args:
-            input_channels (int): Number of channels in the input image.
-            output_channels (int): Number of channels produced by the convolution.
-            kernel_size (Union[int, Tuple[int, int]]): Size of the convolving kernel.
-            stride (Union[int, Tuple[int, int]]): Stride of the convolution.
-            padding (Union[int, Tuple[int, int]]): Padding added to all four sides of the input.
-            dilation (Union[int, Tuple[int, int]]): Spacing between kernel elements.
-            groups (int, optional): Number of blocked connections from input channels to output channels.
-            weights_prior (Optional[StaticDistribution], optional): The prior distribution for the weights.
-            bias_prior (Optional[StaticDistribution], optional): The prior distribution for the bias.
-            weights_posterior (Optional[DynamicDistribution], optional): The posterior distribution for the weights.
-            bias_posterior (Optional[DynamicDistribution], optional): The posterior distribution for the bias.
-            backend (Optional[str], optional): The backend to use.
+            input_channels: Number of channels in the input image.
+            output_channels: Number of channels produced by the convolution.
+            kernel_size: Size of the convolving kernel.
+            stride: Stride of the convolution.
+            padding: Padding added to all four sides of the input.
+            dilation: Spacing between kernel elements.
+            groups: Number of blocked connections from input channels to output channels.
+            weights_prior: The prior distribution for the weights.
+            bias_prior: The prior distribution for the bias.
+            weights_posterior: The posterior distribution for the weights.
+            bias_posterior: The posterior distribution for the bias.
 
         Raises:
             ValueError: If an invalid backend value is provided.
         """
 
-        # Set attributes
-        self.backend = backend
-
-        # Choose backend
-        if self.backend == "torch":
-            # Import torch part
-            from illia.nn.torch import conv  # type: ignore
-        else:
-            raise ValueError("Invalid backend value")
+        # Call super class constructor
+        super().__init__()
 
         # Define layer based on the imported library
         self.layer = conv.Conv2d(
@@ -74,21 +73,20 @@ class Conv2d(ABC):
         Call the underlying layer with the given inputs to apply the layer operation.
 
         Args:
-            inputs (Any): The input data to the layer.
+            inputs: The input data to the layer.
 
         Returns:
-            Any: The output of the layer operation.
+            The output of the layer operation.
         """
 
         return self.layer(inputs)
 
-    @abstractmethod
     def kl_cost(self) -> Tuple[Any, int]:
         """
         Calculate the Kullback-Leibler (KL) divergence cost for the weights and bias of the layer.
 
         Returns:
-            Tuple[Any, int]: A tuple containing the KL divergence cost for the weights and bias, and the total number of parameters.
+            A tuple containing the KL divergence cost for the weights and bias, and the total number of parameters.
         """
 
-        pass
+        return self.layer.kl_cost()

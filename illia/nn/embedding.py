@@ -1,12 +1,20 @@
 # Libraries
-from abc import ABC, abstractmethod
 from typing import Optional, Tuple, Any
 
 from illia.distributions.dynamic import DynamicDistribution
 from illia.distributions.static import StaticDistribution
+from illia.nn.base import BayesianModule
+
+# Illia backend selection
+from illia.backend import backend
+
+if backend() == "torch":
+    from illia.nn.torch import embedding
+elif backend() == "tf":
+    from illia.nn.tf import embedding
 
 
-class Embedding(ABC):
+class Embedding(BayesianModule):
 
     def __init__(
         self,
@@ -19,43 +27,31 @@ class Embedding(ABC):
         norm_type: float = 2.0,
         scale_grad_by_freq: bool = False,
         sparse: bool = False,
-        backend: Optional[str] = "torch",
     ) -> None:
         """
         Definition of a Bayesian Embedding layer.
 
         Args:
-            num_embeddings (int): Size of the dictionary of embeddings.
-            embeddings_dim (int): The size of each embedding vector
-            weights_prior (Optional[StaticDistribution], optional): The prior distribution for the weights.
-            weights_posterior (Optional[DynamicDistribution], optional): The posterior distribution for the weights.
-            padding_idx (Optional[int], optional): If padding_idx is specified, its entries do not affect the gradient, meaning the
-                                                    embedding vector at padding_idx stays constant during training. Initially, this
-                                                    embedding vector defaults to zeros but can be set to a different value to serve
-                                                    as the padding vector.
-            max_norm (Optional[float], optional): If given, each embedding vector with norm larger than max_norm is renormalized to have
-                                                    norm max_norm.
-            norm_type (float, optional): The p of the p-norm to compute for the max_norm option.
-            scale_grad_by_freq (bool, optional): If given, this will scale gradients by the inverse of frequency of the words in the mini-batch.
-            sparse (bool, optional): If True, gradient w.r.t. weight matrix will be a sparse tensor.
-            backend (Optional[str], optional): The backend to use.
+            num_embeddings: Size of the dictionary of embeddings.
+            embeddings_dim: The size of each embedding vector
+            weights_prior: The prior distribution for the weights.
+            weights_posterior: The posterior distribution for the weights.
+            padding_idx: If padding_idx is specified, its entries do not affect the gradient, meaning the
+                            embedding vector at padding_idx stays constant during training. Initially, this
+                            embedding vector defaults to zeros but can be set to a different value to serve
+                            as the padding vector.
+            max_norm: If given, each embedding vector with norm larger than max_norm is renormalized to have
+                        norm max_norm.
+            norm_type: The p of the p-norm to compute for the max_norm option.
+            scale_grad_by_freq: If given, this will scale gradients by the inverse of frequency of the words in the mini-batch.
+            sparse: If True, gradient w.r.t. weight matrix will be a sparse tensor.
 
         Raises:
             ValueError: If an invalid backend value is provided.
         """
 
-        # Set attributes
-        self.backend = backend
-
-        # Choose backend
-        if self.backend == "torch":
-            # Import torch part
-            from illia.nn.torch import embedding  # type: ignore
-        elif self.backend == "tf":
-            # Import tensorflow part
-            from illia.nn.tf import embedding  # type: ignore
-        else:
-            raise ValueError("Invalid backend value")
+        # Call super class constructor
+        super().__init__()
 
         # Define layer based on the imported library
         self.layer = embedding.Embedding(
@@ -75,21 +71,20 @@ class Embedding(ABC):
         Call the underlying layer with the given inputs to apply the layer operation.
 
         Args:
-            inputs (Any): The input data to the layer.
+            inputs: The input data to the layer.
 
         Returns:
-            output (Any): The output of the layer operation.
+            The output of the layer operation.
         """
 
         return self.layer(inputs)
 
-    @abstractmethod
     def kl_cost(self) -> Tuple[Any, int]:
         """
         Calculate the Kullback-Leibler (KL) divergence cost for the weights and bias of the layer.
 
         Returns:
-            Tuple[Any, int]: A tuple containing the KL divergence cost for the weights and bias, and the total number of parameters.
+            A tuple containing the KL divergence cost for the weights and bias, and the total number of parameters.
         """
 
-        pass
+        return self.layer.kl_cost()

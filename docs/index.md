@@ -1,4 +1,8 @@
-# illia
+# Welcome to illia
+
+!!! warning
+
+    This library is still in early development and there could be breaking in the future.
 
 ### What is illia?
 
@@ -43,10 +47,6 @@ A more extensive usage can be found in the [Package Reference](./distributions/d
 
 ### Contributing
 
-The first thing you need to do to contribute to the project is to install its dependencies. In this project, we use [Poetry](https://python-poetry.org/) as the dependency manager. This allows us to group all the required libraries for each part of the process (normal library usage, development, and documentation generation) and manage these dependencies automatically.
-
-Currently, Poetry is configured not to create a package from this repository, meaning it does not generate a new environment with the project's dependencies. Instead, it installs the dependencies into the currently active environment, similar to any other library. You can use Poetry solely for dependency management without packaging the project.
-
 To simplify the process, we have created a Makefile that allows for a quick and easy installation. Follow these steps:
 
 1. Clone the current repository, update your system packages, and install `make`. On Linux, though it may vary by operating system or distribution, the commands are typically:
@@ -56,10 +56,9 @@ To simplify the process, we have created a Makefile that allows for a quick and 
     sudo apt-get install build-essential
     ```
 
-2. Once the repository has been downloaded locally, navigate to its location. Ensure you have created and activated a Python environment. Then, install the Poetry library and all the required dependencies using the following command:
+2. Once the repository has been downloaded locally, navigate to its location. Ensure you have created and activated a Python environment. Then, install all the required dependencies using the following command:
 
     ```bash
-    pip install poetry
     make install-all
     ```
 

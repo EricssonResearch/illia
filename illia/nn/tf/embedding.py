@@ -6,7 +6,7 @@ from tensorflow.keras.utils import register_keras_serializable
 
 import illia.distributions.static as static
 import illia.distributions.dynamic as dynamic
-from illia.nn.torch.base import BayesianModule
+from illia.nn.base import BayesianModule
 
 
 @register_keras_serializable(package="Embedding")
@@ -37,19 +37,19 @@ class Embedding(BayesianModule):
         Definition of a Bayesian Embedding layer.
 
         Args:
-            num_embeddings (int): Size of the dictionary of embeddings.
-            embeddings_dim (int): The size of each embedding vector
-            weights_prior (Optional[StaticDistribution], optional): The prior distribution for the weights.
-            weights_posterior (Optional[DynamicDistribution], optional): The posterior distribution for the weights.
-            padding_idx (Optional[int], optional): If padding_idx is specified, its entries do not affect the gradient, meaning the
-                                                    embedding vector at padding_idx stays constant during training. Initially, this
-                                                    embedding vector defaults to zeros but can be set to a different value to serve
-                                                    as the padding vector.
-            max_norm (Optional[float], optional): If given, each embedding vector with norm larger than max_norm is renormalized to have
-                                                    norm max_norm.
-            norm_type (float, optional): The p of the p-norm to compute for the max_norm option.
-            scale_grad_by_freq (bool, optional): If given, this will scale gradients by the inverse of frequency of the words in the mini-batch.
-            sparse (bool, optional): If True, gradient w.r.t. weight matrix will be a sparse tensor.
+            num_embeddings: Size of the dictionary of embeddings.
+            embeddings_dim: The size of each embedding vector
+            weights_prior: The prior distribution for the weights.
+            weights_posterior: The posterior distribution for the weights.
+            padding_idx: If padding_idx is specified, its entries do not affect the gradient, meaning the
+                            embedding vector at padding_idx stays constant during training. Initially, this
+                            embedding vector defaults to zeros but can be set to a different value to serve
+                            as the padding vector.
+            max_norm: If given, each embedding vector with norm larger than max_norm is renormalized to have
+                            norm max_norm.
+            norm_type: The p of the p-norm to compute for the max_norm option.
+            scale_grad_by_freq: If given, this will scale gradients by the inverse of frequency of the words in the mini-batch.
+            sparse: If True, gradient w.r.t. weight matrix will be a sparse tensor.
         """
 
         # Call super class constructor
@@ -119,11 +119,8 @@ class Embedding(BayesianModule):
         configuration of the parent class and combines it with custom configurations specific to
         the Gaussian Distribution.
 
-        Args:
-            self (GaussianDistribution): The instance of the Gaussian Distribution object.
-
         Returns:
-            dict: A dictionary containing the combined configuration of the Gaussian Distribution.
+            A dictionary containing the combined configuration of the Gaussian Distribution.
         """
 
         # Get the base configuration
@@ -170,6 +167,13 @@ class Embedding(BayesianModule):
 
     @tf.function
     def kl_cost(self) -> Tuple[tf.Tensor, int]:
+        """
+        Calculate the Kullback-Leibler (KL) divergence cost for the weights and bias of the layer.
+
+        Returns:
+            A tuple containing the KL divergence cost for the weights and bias, and the total number of parameters.
+        """
+
         # Get log posterior and log prior
         log_posterior: tf.Tensor = self.weights_posterior.log_prob(
             self.weights

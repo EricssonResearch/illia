@@ -1,3 +1,3 @@
 # illia.nn_geom
 
-::: illia.nn_geom.conv.cg_conv
+::: illia.nn_geom.torch.conv.cg_conv

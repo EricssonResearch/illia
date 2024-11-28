@@ -3,7 +3,7 @@ import math
 
 import torch
 
-from illia.distributions.static.base import StaticDistribution
+from illia.distributions.static import StaticDistribution
 
 
 class GaussianDistribution(StaticDistribution):
@@ -13,8 +13,8 @@ class GaussianDistribution(StaticDistribution):
         Initialize a Gaussian distribution with given mean (mu) and standard deviation (std).
 
         Args:
-                mu (float): The mean of the Gaussian distribution.
-                std (float): The standard deviation of the Gaussian distribution.
+            mu: The mean of the Gaussian distribution.
+            std: The standard deviation of the Gaussian distribution.
         """
 
         # Call super class constructor
@@ -33,10 +33,10 @@ class GaussianDistribution(StaticDistribution):
         the mean and standard deviation of the Gaussian distribution, respectively.
 
         Args:
-            x (Optional[torch.Tensor]): Input data for which the log PDF needs to be calculated.
+            x: Input data for which the log PDF needs to be calculated.
 
         Returns:
-            output (torch.Tensor): The log probability density function (PDF) of the input data or sample.
+            The log probability density function (PDF) of the input data or sample.
         """
 
         self.mu = self.mu.to(x.device)

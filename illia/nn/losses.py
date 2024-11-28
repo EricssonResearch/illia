@@ -1,40 +1,40 @@
 # Libraries
-from abc import ABC
-from typing import Literal, Optional, Any
+from typing import Literal, Any
+
+# Illia backend selection
+from illia.backend import backend
+
+if backend() == "torch":
+    from torch.nn import Module as BackendModule
+    from illia.nn.torch import losses
+elif backend() == "tf":
+    from tensorflow.keras import Model as BackendModule
+    from illia.nn.tf import losses
 
 
-class KLDivergenceLoss(ABC):
+class KLDivergenceLoss(BackendModule):
+
+    reduction: Literal["mean"]
+    weight: float
 
     def __init__(
         self,
         reduction: Literal["mean"] = "mean",
         weight: float = 1.0,
-        backend: Optional[str] = "torch",
     ):
         """
         Definition of the KL Divergence Loss function.
 
         Args:
-            reduction (Literal["mean"], optional): Specifies the reduction to apply to the output.
-            weight (float, optional): Weight for the loss.
-            backend (Optional[str], optional): The backend to use.
+            reduction: Specifies the reduction to apply to the output.
+            weight: Weight for the loss.
 
         Raises:
             ValueError: If an invalid backend value is provided.
         """
 
-        # Set attributes
-        self.backend = backend
-
-        # Choose backend
-        if self.backend == "torch":
-            # Import torch part
-            from illia.nn.torch import losses  # type: ignore
-        elif self.backend == "tf":
-            # Import tensorflow part
-            from illia.nn.tf import losses  # type: ignore
-        else:
-            raise ValueError("Invalid backend value")
+        # Call super class constructor
+        super().__init__()
 
         # Define layer based on the imported library
         self.loss = losses.KLDivergenceLoss(reduction=reduction, weight=weight)
@@ -44,49 +44,37 @@ class KLDivergenceLoss(ABC):
         Call the underlying layer with the given inputs to apply the loss operation.
 
         Args:
-            model (Any): The model used to apply the loss.
+            model: The model used to apply the loss.
 
         Returns:
-            Any: The output of the loss operation.
+            The output of the loss operation.
         """
 
         return self.loss(model)
 
 
-class ELBOLoss(ABC):
+class ELBOLoss(BackendModule):
 
     def __init__(
         self,
         loss_function: Any,
         num_samples: int = 1,
         kl_weight: float = 1e-3,
-        backend: Optional[str] = "torch",
     ) -> None:
         """
         Initializes the Evidence Lower Bound (ELBO) loss function.
 
         Args:
-            loss_function (Union[Any, Any]): The loss function to be used for computing the reconstruction loss.
-            num_samples (int, optional): The number of samples to draw for estimating the ELBO.
-            kl_weight (float, optional): The weight applied to the KL divergence.
-            backend (Optional[str], optional): The backend to use.
+            loss_function: The loss function to be used for computing the reconstruction loss.
+            num_samples: The number of samples to draw for estimating the ELBO.
+            kl_weight: The weight applied to the KL divergence.
 
         Raises:
             ValueError: If an invalid backend is provided.
         """
 
-        # Set attributes
-        self.backend = backend
-
-        # Choose backend
-        if self.backend == "torch":
-            # Import torch part
-            from illia.nn.torch import losses  # type: ignore
-        elif self.backend == "tf":
-            # Import tensorflow part
-            from illia.nn.tf import losses  # type: ignore
-        else:
-            raise ValueError("Invalid backend value")
+        # Call super class constructor
+        super().__init__()
 
         # Define layer based on the imported library
         self.loss = losses.ELBOLoss(
@@ -100,12 +88,12 @@ class ELBOLoss(ABC):
         Calls the ELBO loss function with the provided inputs.
 
         Args:
-            y_true (Any): The true values of the data.
-            y_pred (Any): The predicted values of the data.
-            y_model (Any): The model's output.
+            y_true: The true values of the data.
+            y_pred: The predicted values of the data.
+            y_model: The model's output.
 
         Returns:
-            Any: The computed ELBO loss value.
+            The computed ELBO loss value.
         """
 
         return self.loss(y_true, y_pred, y_model)

@@ -6,7 +6,7 @@ import torch.nn.functional as F
 
 import illia.distributions.static as static
 import illia.distributions.dynamic as dynamic
-from illia.nn.torch.base import BayesianModule
+from illia.nn.base import BayesianModule
 
 
 class Conv2d(BayesianModule):
@@ -38,17 +38,17 @@ class Conv2d(BayesianModule):
         Definition of a Bayesian Convolution 2D layer.
 
         Args:
-            input_channels (int): Number of channels in the input image.
-            output_channels (int): Number of channels produced by the convolution.
-            kernel_size (Union[int, Tuple[int, int]]): Size of the convolving kernel.
-            stride (Union[int, Tuple[int, int]]): Stride of the convolution.
-            padding (Union[int, Tuple[int, int]]): Padding added to all four sides of the input.
-            dilation (Union[int, Tuple[int, int]]): Spacing between kernel elements.
-            groups (int, optional): Number of blocked connections from input channels to output channels.
-            weights_prior (Optional[StaticDistribution], optional): The prior distribution for the weights.
-            bias_prior (Optional[StaticDistribution], optional): The prior distribution for the bias.
-            weights_posterior (Optional[DynamicDistribution], optional): The posterior distribution for the weights.
-            bias_posterior (Optional[DynamicDistribution], optional): The posterior distribution for the bias.
+            input_channels: Number of channels in the input image.
+            output_channels: Number of channels produced by the convolution.
+            kernel_size: Size of the convolving kernel.
+            stride: Stride of the convolution.
+            padding: Padding added to all four sides of the input.
+            dilation: Spacing between kernel elements.
+            groups: Number of blocked connections from input channels to output channels.
+            weights_prior: The prior distribution for the weights.
+            bias_prior: The prior distribution for the bias.
+            weights_posterior: The posterior distribution for the weights.
+            bias_posterior: The posterior distribution for the bias.
         """
 
         # Call super class constructor
@@ -105,10 +105,10 @@ class Conv2d(BayesianModule):
         If the layer is frozen and the weights or bias are not initialized, it samples them from their respective posterior distributions.
 
         Args:
-            inputs (torch.Tensor): Input tensor to the layer.
+            inputs: Input tensor to the layer.
 
         Returns:
-            torch.Tensor: Output tensor after passing through the layer.
+            Output tensor after passing through the layer.
         """
 
         # Forward depeding of frozen state
@@ -135,11 +135,8 @@ class Conv2d(BayesianModule):
         """
         Calculate the Kullback-Leibler (KL) divergence cost for the weights and bias of the layer.
 
-        Args:
-            self (Conv2d): The instance of the Bayesian Convolution 2D layer.
-
         Returns:
-            Tuple[torch.Tensor, int]: A tuple containing the KL divergence cost for the weights and bias, and the total number of parameters.
+            A tuple containing the KL divergence cost for the weights and bias, and the total number of parameters.
         """
 
         log_posterior: torch.Tensor = self.weights_posterior.log_prob(

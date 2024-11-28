@@ -1,10 +1,10 @@
 # Libraries
 import math
-from typing import Tuple, Optional
+from typing import Tuple
 
 import tensorflow as tf
 
-from illia.distributions.dynamic.base import DynamicDistribution
+from illia.distributions.dynamic import DynamicDistribution
 
 
 class GaussianDistribution(DynamicDistribution):
@@ -21,9 +21,9 @@ class GaussianDistribution(DynamicDistribution):
         and a standard deviation of 0.1.
 
         Args:
-            shape (Tuple[int, ...]): The shape of the distribution parameters.
-            mu_init (float): The initial mean value for mu.
-            rho_init (float): The initial mean value for rho.
+            shape: The shape of the distribution parameters.
+            mu_init: The initial mean value for mu.
+            rho_init: The initial mean value for rho.
         """
 
         # Call super class constructor
@@ -49,11 +49,8 @@ class GaussianDistribution(DynamicDistribution):
         configuration of the parent class and combines it with custom configurations specific to
         the Gaussian Distribution.
 
-        Args:
-            self (GaussianDistribution): The instance of the Gaussian Distribution object.
-
         Returns:
-            dict: A dictionary containing the combined configuration of the Gaussian Distribution.
+            A dictionary containing the combined configuration of the Gaussian Distribution.
         """
 
         # Get the base configuration
@@ -75,11 +72,8 @@ class GaussianDistribution(DynamicDistribution):
         mu and rho. The sample is obtained by adding a random noise (epsilon) to the mean (mu),
         where the noise is scaled by the standard deviation (sigma).
 
-        Args:
-            self (GaussianDistribution): The instance of the Gaussian Distribution object.
-
         Returns:
-            tf.Tensor: A tensor representing a sample from the Gaussian distribution.
+            A tensor representing a sample from the Gaussian distribution.
         """
 
         eps: tf.Tensor = tf.random.normal(shape=self.rho.shape)
@@ -87,7 +81,7 @@ class GaussianDistribution(DynamicDistribution):
 
         return self.mu + sigma * eps
 
-    def log_prob(self, x: Optional[tf.Tensor]) -> tf.Tensor:
+    def log_prob(self, x: tf.Tensor) -> tf.Tensor:
         """
         Calculate the log probability density function (PDF) of the given input data.
 
@@ -96,11 +90,11 @@ class GaussianDistribution(DynamicDistribution):
         the mean and standard deviation of the Gaussian distribution, respectively.
 
         Args:
-            x (Optional[tf.Tensor]): Input data for which the log PDF needs to be calculated.
-                                If None, a sample is generated using the current parameters.
+            x: Input data for which the log PDF needs to be calculated.
+                If None, a sample is generated using the current parameters.
 
         Returns:
-            tf.Tensor: The log probability density function (PDF) of the input data or sample.
+            The log probability density function (PDF) of the input data or sample.
         """
 
         if x is None:
@@ -123,11 +117,8 @@ class GaussianDistribution(DynamicDistribution):
         Calculate the total number of parameters in the Gaussian Distribution, which is the product
         of the dimensions of the mean (mu) parameter.
 
-        Args:
-            self (GaussianDistribution): The instance of the Gaussian Distribution object.
-
         Returns:
-            int: The total number of parameters in the Gaussian Distribution.
+            The total number of parameters in the Gaussian Distribution.
         """
 
         return tf.size(tf.reshape(self.mu, [-1])).numpy()

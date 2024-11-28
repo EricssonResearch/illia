@@ -3,7 +3,7 @@ from typing import Literal
 
 import torch
 
-from illia.nn.torch.base import BayesianModule
+from illia.nn.base import BayesianModule
 
 
 class KLDivergenceLoss(torch.nn.Module):
@@ -38,9 +38,15 @@ class KLDivergenceLoss(torch.nn.Module):
             kl_global_cost (torch.Tensor): The computed KL Divergence Loss for the given model.
         """
 
-        kl_global_cost: torch.Tensor = torch.tensor(
-            0, device=next(model.parameters()).device, dtype=torch.float32
-        )
+        # Ensure the model has parameters and is on the desired device
+        if model is not None and any(model.parameters()):
+            device = next(model.parameters()).device
+        else:
+            raise ValueError(
+                "Model does not have any parameters or is not initialized."
+            )
+
+        kl_global_cost = torch.tensor(0, device=device, dtype=torch.float32)
         num_params_global: int = 0
         for module in model.modules():
             if module != model and isinstance(module, BayesianModule):
@@ -48,7 +54,7 @@ class KLDivergenceLoss(torch.nn.Module):
                 kl_global_cost += kl_cost
                 num_params_global += num_params
 
-        kl_global_cost /= num_params
+        kl_global_cost /= num_params_global
         kl_global_cost *= self.weight
 
         return kl_global_cost
@@ -88,11 +94,11 @@ class ELBOLoss(torch.nn.Module):
 
         Parameters:
             y_true (torch.Tensor): The true target values.
-                y_pred (torch.Tensor): The predicted values.
-                model (torch.nn.Module): The model to compute the ELBO loss for.
+            y_pred (torch.Tensor): The predicted values.
+            model (torch.nn.Module): The model to compute the ELBO loss for.
 
         Returns:
-                loss_value (torch.Tensor): The computed ELBO loss.
+            loss_value (torch.Tensor): The computed ELBO loss.
         """
 
         loss_value = torch.tensor(

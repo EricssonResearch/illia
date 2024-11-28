@@ -3,7 +3,7 @@ import math
 
 import tensorflow as tf
 
-from illia.distributions.static.base import StaticDistribution
+from illia.distributions.static import StaticDistribution
 
 
 class GaussianDistribution(StaticDistribution):
@@ -13,8 +13,8 @@ class GaussianDistribution(StaticDistribution):
         Initialize a Gaussian distribution with given mean (mu) and standard deviation (std).
 
         Args:
-                mu (float): The mean of the Gaussian distribution.
-                std (float): The standard deviation of the Gaussian distribution.
+            mu: The mean of the Gaussian distribution.
+            std: The standard deviation of the Gaussian distribution.
         """
 
         # Call super class constructor
@@ -30,11 +30,8 @@ class GaussianDistribution(StaticDistribution):
         configuration of the parent class and combines it with custom configurations specific to
         the Gaussian Distribution.
 
-        Args:
-            self (GaussianDistribution): The instance of the Gaussian Distribution object.
-
         Returns:
-            dict: A dictionary containing the combined configuration of the Gaussian Distribution.
+            A dictionary containing the combined configuration of the Gaussian Distribution.
         """
 
         # Get the base configuration
@@ -58,10 +55,10 @@ class GaussianDistribution(StaticDistribution):
         the mean and standard deviation of the Gaussian distribution, respectively.
 
         Args:
-            x (Optional[tf.Tensor]): Input data for which the log PDF needs to be calculated.
+            x: Input data for which the log PDF needs to be calculated.
 
         Returns:
-            output (tf.Tensor): The log probability density function (PDF) of the input data or sample.
+            The log probability density function (PDF) of the input data or sample.
         """
 
         # Compute log probs

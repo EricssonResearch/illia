@@ -6,7 +6,7 @@ import torch.nn.functional as F
 
 import illia.distributions.static as static
 import illia.distributions.dynamic as dynamic
-from illia.nn.torch.base import BayesianModule
+from illia.nn.base import BayesianModule
 
 
 class Linear(BayesianModule):
@@ -33,12 +33,12 @@ class Linear(BayesianModule):
         Definition of a Bayesian Linear layer.
 
         Args:
-            input_size (int): Size of each input sample.
-            output_size (int): Size of each output sample.
-            weights_prior (Optional[StaticDistribution], optional): The prior distribution for the weights. Defaults to None.
-            bias_prior (Optional[StaticDistribution], optional): The prior distribution for the bias. Defaults to None.
-            weights_posterior (Optional[DynamicDistribution], optional): The posterior distribution for the weights. Defaults to None.
-            bias_posterior (Optional[DynamicDistribution], optional): The posterior distribution for the bias. Defaults to None.
+            input_size: Size of each input sample.
+            output_size: Size of each output sample.
+            weights_prior: The prior distribution for the weights.
+            bias_prior: The prior distribution for the bias.
+            weights_posterior: The posterior distribution for the weights.
+            bias_posterior: The posterior distribution for the bias.
         """
 
         # Call super class constructor
@@ -48,19 +48,22 @@ class Linear(BayesianModule):
         self.input_size = input_size
         self.output_size = output_size
 
-        # Set defaults parameters for gaussian
-        mean: float = 0.0
-        std: float = 0.1
+        # Define default parameters
+        parameters = {"mean": 0, "std": 0.1}
 
         # Set weights prior
         if weights_prior is None:
-            self.weights_prior = static.GaussianDistribution(mean, std)
+            self.weights_prior = static.GaussianDistribution(
+                parameters["mean"], parameters["std"]
+            )
         else:
             self.weights_prior = weights_prior
 
         # Set bias prior
         if bias_prior is None:
-            self.bias_prior = static.GaussianDistribution(mean, std)
+            self.bias_prior = static.GaussianDistribution(
+                parameters["mean"], parameters["std"]
+            )
         else:
             self.bias_prior = bias_prior
 
@@ -86,10 +89,10 @@ class Linear(BayesianModule):
         If the layer is frozen and the weights or bias are not initialized, it samples them from their respective posterior distributions.
 
         Args:
-            inputs (torch.Tensor): Input tensor to the layer.
+            inputs: Input tensor to the layer.
 
         Returns:
-            torch.Tensor: Output tensor after passing through the layer.
+            Output tensor after passing through the layer.
         """
 
         # Forward depeding of frozen state
@@ -108,11 +111,8 @@ class Linear(BayesianModule):
         """
         Calculate the Kullback-Leibler (KL) divergence cost for the weights and bias of the layer.
 
-        Args:
-            self (Conv2d): The instance of the Bayesian Convolution 2D layer.
-
         Returns:
-            Tuple[torch.Tensor, int]: A tuple containing the KL divergence cost for the weights and bias, and the total number of parameters.
+            A tuple containing the KL divergence cost for the weights and bias, and the total number of parameters.
         """
 
         log_posterior: torch.Tensor = self.weights_posterior.log_prob(

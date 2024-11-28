@@ -6,7 +6,7 @@ import torch.nn.functional as F
 
 import illia.distributions.static as static
 import illia.distributions.dynamic as dynamic
-from illia.nn.torch.base import BayesianModule
+from illia.nn.base import BayesianModule
 
 
 class Embedding(BayesianModule):
@@ -36,20 +36,20 @@ class Embedding(BayesianModule):
         Definition of a Bayesian Embedding layer.
 
         Args:
-            num_embeddings (int): Size of the dictionary of embeddings.
-            embeddings_dim (int): The size of each embedding vector
-            weights_prior (Optional[StaticDistribution], optional): The prior distribution for the weights. Defaults to None.
-            weights_posterior (Optional[DynamicDistribution], optional): The posterior distribution for the weights. Defaults to None.
-            padding_idx (Optional[int], optional): If padding_idx is specified, its entries do not affect the gradient, meaning the
-                                                    embedding vector at padding_idx stays constant during training. Initially, this
-                                                    embedding vector defaults to zeros but can be set to a different value to serve
-                                                    as the padding vector.
-            max_norm (Optional[float], optional): If given, each embedding vector with norm larger than max_norm is renormalized to have
-                                                    norm max_norm. Defaults to None.
-            norm_type (float, optional): The p of the p-norm to compute for the max_norm option. Defaults to 2.0.
-            scale_grad_by_freq (bool, optional): If given, this will scale gradients by the inverse of frequency of the words in the
-                                                    mini-batch. Defaults to False.
-            sparse (bool, optional): If True, gradient w.r.t. weight matrix will be a sparse tensor. Defaults to False.
+            num_embeddings: Size of the dictionary of embeddings.
+            embeddings_dim: The size of each embedding vector
+            weights_prior: The prior distribution for the weights.
+            weights_posterior: The posterior distribution for the weights.
+            padding_idx: If padding_idx is specified, its entries do not affect the gradient, meaning the
+                            embedding vector at padding_idx stays constant during training. Initially, this
+                            embedding vector defaults to zeros but can be set to a different value to serve
+                            as the padding vector.
+            max_norm: If given, each embedding vector with norm larger than max_norm is renormalized to have
+                        norm max_norm.
+            norm_type: The p of the p-norm to compute for the max_norm option.
+            scale_grad_by_freq: If given, this will scale gradients by the inverse of frequency of the words in the
+                                mini-batch.
+            sparse: If True, gradient w.r.t. weight matrix will be a sparse tensor.
         """
 
         # Call super class constructor
@@ -88,10 +88,10 @@ class Embedding(BayesianModule):
         If the layer is frozen and the weights or bias are not initialized, it samples them from their respective posterior distributions.
 
         Args:
-            inputs (torch.Tensor): Input tensor to the layer.
+            inputs: Input tensor to the layer.
 
         Returns:
-            torch.Tensor: Output tensor after passing through the layer.
+            Output tensor after passing through the layer.
         """
 
         # Forward depeding of frozen state
@@ -118,11 +118,8 @@ class Embedding(BayesianModule):
         """
         Calculate the Kullback-Leibler (KL) divergence cost for the weights and bias of the layer.
 
-        Args:
-            self (Conv2d): The instance of the Bayesian Convolution 2D layer.
-
         Returns:
-            Tuple[torch.Tensor, int]: A tuple containing the KL divergence cost for the weights and bias, and the total number of parameters.
+            A tuple containing the KL divergence cost for the weights and bias, and the total number of parameters.
         """
 
         # Get log posterior and log prior
