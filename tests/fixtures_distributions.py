@@ -7,45 +7,17 @@ import numpy as np
 import torch
 import tensorflow as tf
 
-from illia.distributions.static.gaussian import (
-    GaussianDistribution as BackendAgnosticStaticGaussian,
-)
-from illia.distributions.dynamic.gaussian import (
-    GaussianDistribution as BackendAgnosticDynamicGaussian,
-)
-from illia.nn.torch.base import BayesianModule as TorchBayesianModule
-from illia.nn.tf.base import BayesianModule as TFBayesianModule
+# Specific libraries for each backend
+from illia.distributions.static.tf.gaussian import GaussianDistribution as TFStaticGaussianDistribution
+from illia.distributions.static.torch.gaussian import GaussianDistribution as TorchStaticGaussianDistribution
+
+from illia.distributions.dynamic.tf.gaussian import GaussianDistribution as TFDynamicGaussianDistribution
+from illia.distributions.dynamic.torch.gaussian import GaussianDistribution as TorchDynamicGaussianDistribution
 
 random.seed(0)
 np.random.seed(0)
 torch.manual_seed(0)
 tf.random.set_seed(0)
-
-
-class TorchTestModule(TorchBayesianModule):
-
-    def __init__(self):
-        super().__init__()
-        self.linear = torch.nn.Linear(10, 5)
-
-    def forward(self, x):
-        return self.linear(x)
-
-    def kl_cost(self):
-        return torch.tensor(1.0), 1
-
-
-class TFTestModule(TFBayesianModule):
-
-    def __init__(self):
-        super().__init__()
-        self.linear = tf.keras.layers.Dense(5, activation=None)
-
-    def call(self, x):
-        return self.linear(x)
-
-    def kl_cost(self):
-        return tf.constant(1.0), 1
 
 
 @pytest.fixture
@@ -103,11 +75,11 @@ def set_dynamic_distributions(set_parameters) -> Tuple:
     rho_init = set_parameters["rho_init"]
 
     # Initialize dynamic distributions
-    torch_dynamic_dist = BackendAgnosticDynamicGaussian(
-        shape=shape, mu_init=mu_init, rho_init=rho_init, backend="torch"
+    torch_dynamic_dist = TorchDynamicGaussianDistribution(
+        shape=shape, mu_init=mu_init, rho_init=rho_init
     )
-    tf_dynamic_dist = BackendAgnosticDynamicGaussian(
-        shape=shape, mu_init=mu_init, rho_init=rho_init, backend="tf"
+    tf_dynamic_dist = TFDynamicGaussianDistribution(
+        shape=shape, mu_init=mu_init, rho_init=rho_init
     )
 
     return torch_dynamic_dist, tf_dynamic_dist
@@ -137,32 +109,11 @@ def set_static_distributions(set_parameters) -> Tuple:
     std_prior = set_parameters["std_prior"]
 
     # Initialize static distributions
-    torch_static_dist = BackendAgnosticStaticGaussian(
-        mu=mu_prior, std=std_prior, backend="torch"
+    torch_static_dist = TorchStaticGaussianDistribution(
+        mu=mu_prior, std=std_prior
     )
-    tf_static_dist = BackendAgnosticStaticGaussian(
-        mu=mu_prior, std=std_prior, backend="tf"
+    tf_static_dist = TFStaticGaussianDistribution(
+        mu=mu_prior, std=std_prior
     )
 
     return torch_static_dist, tf_static_dist
-
-
-@pytest.fixture
-def set_base_module() -> Tuple[TorchBayesianModule, TFBayesianModule]:
-    """
-    This function initializes two instances of Bayesian neural network modules: one for PyTorch and one for TensorFlow.
-
-    Returns:
-        Tuple[TorchBayesianModule, TFBayesianModule]:
-            A tuple containing two initialized Bayesian neural network modules:
-            - torch_module: An instance of TorchBayesianModule.
-            - tf_module: An instance of TFBayesianModule.
-    """
-
-    # Initialize the PyTorch module
-    torch_module = TorchTestModule()
-
-    # Initialize the Tensorflow module
-    tf_module = TFTestModule()
-
-    return torch_module, tf_module

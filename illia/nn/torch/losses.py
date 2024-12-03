@@ -16,8 +16,8 @@ class KLDivergenceLoss(torch.nn.Module):
         Definition of the KL Divergence Loss function.
 
         Args:
-            reduction (Literal["mean"], optional): Specifies the reduction to apply to the output.
-            weight (float, optional): Weight for the loss.
+            reduction: Specifies the reduction to apply to the output.
+            weight: Weight for the loss.
         """
 
         # Call super class constructor
@@ -32,21 +32,15 @@ class KLDivergenceLoss(torch.nn.Module):
         Computes the forward pass of the KL Divergence Loss for a given model.
 
         Args:
-            model (torch.nn.Module): The model for which the KL Divergence Loss needs to be computed.
+            model: The model for which the KL Divergence Loss needs to be computed.
 
         Returns:
-            kl_global_cost (torch.Tensor): The computed KL Divergence Loss for the given model.
+            The computed KL Divergence Loss for the given model.
         """
 
-        # Ensure the model has parameters and is on the desired device
-        if model is not None and any(model.parameters()):
-            device = next(model.parameters()).device
-        else:
-            raise ValueError(
-                "Model does not have any parameters or is not initialized."
-            )
-
-        kl_global_cost = torch.tensor(0, device=device, dtype=torch.float32)
+        kl_global_cost: torch.Tensor = torch.tensor(
+            0, device=next(model.parameters()).device, dtype=torch.float32
+        )
         num_params_global: int = 0
         for module in model.modules():
             if module != model and isinstance(module, BayesianModule):
@@ -72,9 +66,9 @@ class ELBOLoss(torch.nn.Module):
         Initializes the Evidence Lower Bound (ELBO) loss function.
 
         Args:
-            loss_function (Union[Any, Any]): The loss function to be used for computing the reconstruction loss.
-            num_samples (int, optional): The number of samples to draw for estimating the ELBO.
-            kl_weight (float, optional): The weight applied to the KL divergence.
+            loss_function: The loss function to be used for computing the reconstruction loss.
+            num_samples: The number of samples to draw for estimating the ELBO.
+            kl_weight: The weight applied to the KL divergence.
         """
 
         # Call super class constructor
@@ -93,12 +87,12 @@ class ELBOLoss(torch.nn.Module):
         Computes the forward pass of the ELBO (Evidence Lower Bound) loss.
 
         Parameters:
-            y_true (torch.Tensor): The true target values.
-            y_pred (torch.Tensor): The predicted values.
-            model (torch.nn.Module): The model to compute the ELBO loss for.
+            y_true: The true target values.
+            y_pred: The predicted values.
+            model: The model to compute the ELBO loss for.
 
         Returns:
-            loss_value (torch.Tensor): The computed ELBO loss.
+            The computed ELBO loss.
         """
 
         loss_value = torch.tensor(

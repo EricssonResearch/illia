@@ -9,6 +9,8 @@ if backend() == "torch":
     from torch.nn import Module as BackendModule
 elif backend() == "tf":
     from tensorflow.keras import Model as BackendModule
+else:
+    raise RuntimeError(f"Backend '{backend()}' not available.")
 
 
 class BayesianModule(BackendModule):
@@ -55,14 +57,18 @@ class BayesianModule(BackendModule):
         if backend() == "torch":
             # Set frozen indicators to false for children
             for module in self.modules():
-                if module != self and isinstance(module, BayesianModule):
+                if self != module and isinstance(module, BayesianModule):
                     module.unfreeze()
+                else:
+                    continue
         elif backend() == "tf":
             # Set frozen indicators to false for children
             for layer in self.submodules:
                 if isinstance(layer, BayesianModule):
                     layer.unfreeze()
-
+                else:
+                    continue
+                
     @abstractmethod
     def kl_cost(self) -> Tuple[Any, int]:
         pass

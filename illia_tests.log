@@ -1,0 +1,6 @@
+2024-12-02 14:24:35,316 - tests.test_prueba - INFO - Running test with backend: tf
+2024-12-02 14:24:37,143 - tests.test_prueba - INFO - Model initialized successfully with backend: tf
+2024-12-02 14:24:37,148 - tests.test_prueba - INFO - Running test with backend: torch
+2024-12-02 14:24:38,152 - tests.test_prueba - INFO - Model initialized successfully with backend: torch
+2024-12-02 14:24:38,158 - tests.test_prueba - INFO - Running TensorFlow-specific test
+2024-12-02 14:24:38,164 - tests.test_prueba - INFO - Running PyTorch-specific test

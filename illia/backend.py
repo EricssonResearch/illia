@@ -55,3 +55,16 @@ def gnn_backend():
     """
 
     return _GNN_BACKEND
+
+
+def show_available_backends():
+
+    print("Available backends for DNN: ")
+    for i, dnn_backend in enumerate(_AVAILABLE_DNN_BACKENDS):
+        print(f"\t{i+1}. {dnn_backend}.")
+
+    print("\n")
+
+    print("Available backends for GNN: ")
+    for i, gnn_backend in enumerate(_AVAILABLE_GNN_BACKENDS):
+        print(f"\t{i+1}. {gnn_backend}.")

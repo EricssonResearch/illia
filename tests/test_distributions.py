@@ -6,7 +6,7 @@ import numpy as np
 import torch
 import tensorflow as tf
 
-from tests.fixtures import (
+from tests.fixtures_distributions import (
     set_parameters,
     set_dynamic_distributions,
     set_static_distributions,
