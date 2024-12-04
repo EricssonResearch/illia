@@ -8,11 +8,19 @@ import torch
 import tensorflow as tf
 
 # Specific libraries for each backend
-from illia.distributions.static.tf.gaussian import GaussianDistribution as TFStaticGaussianDistribution
-from illia.distributions.static.torch.gaussian import GaussianDistribution as TorchStaticGaussianDistribution
+from illia.tf.distributions.static.gaussian import (
+    GaussianDistribution as TFStaticGaussianDistribution,
+)
+from illia.torch.distributions.static.gaussian import (
+    GaussianDistribution as TorchStaticGaussianDistribution,
+)
 
-from illia.distributions.dynamic.tf.gaussian import GaussianDistribution as TFDynamicGaussianDistribution
-from illia.distributions.dynamic.torch.gaussian import GaussianDistribution as TorchDynamicGaussianDistribution
+from illia.tf.distributions.dynamic.gaussian import (
+    GaussianDistribution as TFDynamicGaussianDistribution,
+)
+from illia.torch.distributions.dynamic.gaussian import (
+    GaussianDistribution as TorchDynamicGaussianDistribution,
+)
 
 random.seed(0)
 np.random.seed(0)
@@ -109,11 +117,7 @@ def set_static_distributions(set_parameters) -> Tuple:
     std_prior = set_parameters["std_prior"]
 
     # Initialize static distributions
-    torch_static_dist = TorchStaticGaussianDistribution(
-        mu=mu_prior, std=std_prior
-    )
-    tf_static_dist = TFStaticGaussianDistribution(
-        mu=mu_prior, std=std_prior
-    )
+    torch_static_dist = TorchStaticGaussianDistribution(mu=mu_prior, std=std_prior)
+    tf_static_dist = TFStaticGaussianDistribution(mu=mu_prior, std=std_prior)
 
     return torch_static_dist, tf_static_dist

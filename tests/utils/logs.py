@@ -4,7 +4,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 
 
-def setup_logging(log_dir: str, name: str="illia_tests") -> logging.Logger:
+def setup_logging(log_dir: str, name: str = "illia_tests") -> logging.Logger:
     """
     Set up logging with a rotating file handler.
 

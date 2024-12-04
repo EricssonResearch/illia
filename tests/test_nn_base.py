@@ -6,7 +6,7 @@ import numpy as np
 import torch
 import tensorflow as tf
 
-from tests.fixtures_distributions import set_base_module
+from tests.fixtures_nn import set_base_module
 
 random.seed(0)
 np.random.seed(0)
@@ -30,6 +30,7 @@ def test_base_freeze_unfreeze(set_base_module):
     # Test PyTorch module
     assert not torch_module.frozen, "PyTorch module should not be frozen initially"
     torch_module.freeze()
+
     assert torch_module.frozen, "PyTorch module should be frozen after freeze()"
     torch_module.unfreeze()
     assert (
@@ -39,8 +40,10 @@ def test_base_freeze_unfreeze(set_base_module):
     # Test TensorFlow module
     assert not tf_module.frozen, "TensorFlow module should not be frozen initially"
     tf_module.freeze()
+
     assert tf_module.frozen, "TensorFlow module should be frozen after freeze()"
     tf_module.unfreeze()
+
     assert (
         not tf_module.frozen
     ), "TensorFlow module should not be frozen after unfreeze()"
