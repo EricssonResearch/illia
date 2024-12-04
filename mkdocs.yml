@@ -8,10 +8,13 @@ copyright: © Telefonaktiebolaget LM Ericsson 1994-2024
 nav:
   - Home:
     - User guide: index.md
-  - Package Reference:
-    - illia.distributions: distributions/distributions.md
-    - illia.nn: nn/nn.md
-    - illia.nn_geom: nn_geom/nn_geom.md
+  - PyTorch Reference:
+    - illia.torch.distributions: torch/distributions/distributions.md
+    - illia.torch.nn: torch/nn/nn.md
+    - illia.torch.nn_geom: torch/nn_geom/nn_geom.md
+  - Tensorflow Reference:
+    - illia.tf.distributions: tf/distributions/distributions.md
+    - illia.tf.nn: tf/nn/nn.md
 
 theme:
   name: "material"

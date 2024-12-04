@@ -26,24 +26,23 @@ For the use case of graph neural networks, illia has the goal to support:
 
 ```python
 # Include the library
-from illia.nn import Linear
+from illia.torch.nn.linear import Linear as TorchLinear
+from illia.tf.nn.linear import Linear as TFLinear
 
 # Define the layer with torch backend
-linear_layer_torch = Linear(
+linear_layer_torch = TorchLinear(
     input_size=3,
     output_size=3,
-    backend="torch",
 )
 
 # Define the layer with tensorflow backend
-linear_layer_tf = Linear(
+linear_layer_tf = TFLinear(
     input_size=3,
     output_size=3,
-    backend="tf",
 )
 ```
 
-A more extensive usage can be found in the [Package Reference](./distributions/distributions.md).
+A more extensive usage can be found in the respective backend reference.
 
 ### Contributing
 
