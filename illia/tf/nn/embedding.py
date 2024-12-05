@@ -1,18 +1,16 @@
 # Libraries
 from typing import Optional, Tuple
 
-import tensorflow as tf
+import tensorflow as tf  # type: ignore
 from tensorflow.keras.utils import register_keras_serializable  # type: ignore
 
-from illia.tf.distributions.static.base import StaticDistribution
-from illia.tf.distributions.dynamic.base import DynamicDistribution
-from illia.tf.distributions.static.gaussian import (
-    GaussianDistribution as StaticGaussianDistribution,
+from . import (
+    StaticDistribution,
+    DynamicDistribution,
+    StaticGaussianDistribution,
+    DynamicGaussianDistribution,
+    BayesianModule,
 )
-from illia.tf.distributions.dynamic.gaussian import (
-    GaussianDistribution as DynamicGaussianDistribution,
-)
-from illia.tf.nn.base import BayesianModule
 
 
 @register_keras_serializable(package="Embedding")

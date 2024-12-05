@@ -1,17 +1,15 @@
 # Libraries
 from typing import Optional, Tuple, Union
 
-import tensorflow as tf
+import tensorflow as tf  # type: ignore
 
-from illia.tf.distributions.static.base import StaticDistribution
-from illia.tf.distributions.dynamic.base import DynamicDistribution
-from illia.tf.distributions.static.gaussian import (
-    GaussianDistribution as StaticGaussianDistribution,
+from . import (
+    StaticDistribution,
+    DynamicDistribution,
+    StaticGaussianDistribution,
+    DynamicGaussianDistribution,
+    BayesianModule,
 )
-from illia.tf.distributions.dynamic.gaussian import (
-    GaussianDistribution as DynamicGaussianDistribution,
-)
-from illia.tf.nn.base import BayesianModule
 
 
 class Linear(BayesianModule):

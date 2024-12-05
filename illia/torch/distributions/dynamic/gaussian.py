@@ -4,7 +4,7 @@ from typing import Tuple
 
 import torch
 
-from illia.torch.distributions.dynamic.base import DynamicDistribution
+from . import DynamicDistribution
 
 
 class GaussianDistribution(DynamicDistribution):

@@ -1,17 +1,17 @@
 # Libraries
 import random
 
-import pytest
-import numpy as np
+import pytest  # type: ignore
+import numpy as np  # type: ignore
 import torch
-import tensorflow as tf
+import tensorflow as tf  # type: ignore
 
 from tests.fixtures_distributions import (
     set_parameters,
     set_dynamic_distributions,
     set_static_distributions,
 )
-from tests.utils.utils import compare_tensors
+from .utils import compare_tensors
 
 random.seed(0)
 np.random.seed(0)
@@ -26,8 +26,8 @@ def test_dynamic_sampling(n_samples, set_dynamic_distributions) -> None:
     This function tests the dynamic sampling of distributions.
 
     Args:
-        n_samples (int): The number of samples to generate for each distribution.
-        set_dynamic_distributions (tuple): A tuple containing the dynamic distributions.
+        n_samples: The number of samples to generate for each distribution.
+        set_dynamic_distributions: A tuple containing the dynamic distributions.
     """
 
     # Obtain the dynamic distributions
@@ -63,10 +63,10 @@ def test_dynamic_log_probs(
     This function tests the log probabilities of dynamic distributions.
 
     Args:
-        rtol (float): The relative tolerance for comparing the log probabilities.
-        atol (float): The absolute tolerance for comparing the log probabilities.
-        set_parameters (dict): A dictionary containing parameters required for the test.
-        set_dynamic_distributions (tuple): A tuple containing the dynamic distributions.
+        rtol: The relative tolerance for comparing the log probabilities.
+        atol: The absolute tolerance for comparing the log probabilities.
+        set_parameters: A dictionary containing parameters required for the test.
+        set_dynamic_distributions: A tuple containing the dynamic distributions.
     """
 
     # Access to the variables
@@ -95,7 +95,7 @@ def test_dynamic_num_params(set_dynamic_distributions) -> None:
     This function tests the number of parameters of dynamic distributions.
 
     Args:
-        set_dynamic_distributions (tuple): A tuple containing the dynamic distributions.
+        set_dynamic_distributions: A tuple containing the dynamic distributions.
     """
 
     # Obtain the dynamic distributions
@@ -114,10 +114,10 @@ def test_static_log_probs(n_samples, rtol, atol, set_static_distributions) -> No
     This function tests the log probabilities of static distributions.
 
     Args:
-        n_samples (int): The number of samples to generate for each distribution.
-        rtol (float): The relative tolerance for comparing the log probabilities.
-        atol (float): The absolute tolerance for comparing the log probabilities.
-        set_static_distributions (tuple): A tuple containing the static distributions.
+        n_samples: The number of samples to generate for each distribution.
+        rtol: The relative tolerance for comparing the log probabilities.
+        atol: The absolute tolerance for comparing the log probabilities.
+        set_static_distributions: A tuple containing the static distributions.
     """
 
     # Obtain the static distributions

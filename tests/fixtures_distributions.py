@@ -2,25 +2,19 @@
 import random
 from typing import Dict, Tuple
 
-import pytest
-import numpy as np
+import pytest  # type: ignore
+import numpy as np  # type: ignore
 import torch
-import tensorflow as tf
+import tensorflow as tf  # type: ignore
 
 # Specific libraries for each backend
-from illia.tf.distributions.static.gaussian import (
-    GaussianDistribution as TFStaticGaussianDistribution,
-)
-from illia.torch.distributions.static.gaussian import (
-    GaussianDistribution as TorchStaticGaussianDistribution,
+from . import (
+    TFStaticGaussianDistribution,
+    TorchStaticGaussianDistribution,
+    TFDynamicGaussianDistribution,
+    TorchDynamicGaussianDistribution,
 )
 
-from illia.tf.distributions.dynamic.gaussian import (
-    GaussianDistribution as TFDynamicGaussianDistribution,
-)
-from illia.torch.distributions.dynamic.gaussian import (
-    GaussianDistribution as TorchDynamicGaussianDistribution,
-)
 
 random.seed(0)
 np.random.seed(0)

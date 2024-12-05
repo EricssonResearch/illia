@@ -2,10 +2,10 @@
 from typing import Tuple, Union
 
 import torch
-import torch.nn.functional as F
+import torch.nn.functional as F  # type: ignore
 from torch import Tensor
-from torch_geometric.nn import MessagePassing
-from torch_geometric.typing import Adj, OptTensor, PairTensor
+from torch_geometric.nn import MessagePassing  # type: ignore
+from torch_geometric.typing import Adj, OptTensor, PairTensor  # type: ignore
 
 from illia.torch.nn.linear import Linear
 

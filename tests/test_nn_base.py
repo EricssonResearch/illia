@@ -1,10 +1,10 @@
 # Libraries
 import random
 
-import pytest
-import numpy as np
+import pytest  # type: ignore
+import numpy as np  # type: ignore
 import torch
-import tensorflow as tf
+import tensorflow as tf  # type: ignore
 
 from tests.fixtures_nn import set_base_module
 
@@ -21,7 +21,7 @@ def test_base_freeze_unfreeze(set_base_module):
     The base module is expected to have a 'frozen' attribute and 'freeze' and 'unfreeze' methods.
 
     Args:
-        set_base_module (tuple): A tuple containing the base modules.
+        set_base_module: A tuple containing the base modules.
     """
 
     # Obtain the base module
@@ -56,7 +56,7 @@ def test_base_kl_cost_function(set_base_module):
     It compares the KL divergence and the number of samples (N) returned by both frameworks.
 
     Args:
-        set_base_module (tuple): A tuple containing the base modules.
+        set_base_module: A tuple containing the base modules.
     """
 
     # Obtain the base module
@@ -80,7 +80,7 @@ def test_base_forward_pass(set_base_module):
     It compares the outputs of both frameworks and prints a warning if the difference exceeds a certain threshold.
 
     Args:
-        set_base_module (tuple): A tuple containing the base modules.
+        set_base_module: A tuple containing the base modules.
     """
 
     # Obtain the base module

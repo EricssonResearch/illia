@@ -2,13 +2,12 @@
 import random
 from typing import Dict, Tuple
 
-import pytest
-import numpy as np
+import pytest  # type: ignore
+import numpy as np  # type: ignore
 import torch
-import tensorflow as tf
+import tensorflow as tf  # type: ignore
 
-from illia.torch.nn.base import BayesianModule as TorchBayesianModule
-from illia.tf.nn.base import BayesianModule as TFBayesianModule
+from . import TorchBayesianModule, TFBayesianModule
 
 random.seed(0)
 np.random.seed(0)
@@ -18,6 +17,11 @@ tf.random.set_seed(0)
 
 @pytest.fixture
 def set_base_module() -> Tuple:
+    """
+    This function initializes and returns instances of custom neural network modules.
+    These modules are designed to demonstrate the functionality of a base module
+    for a Bayesian neural network.
+    """
 
     class TorchTestModule(TorchBayesianModule):
         def __init__(self):

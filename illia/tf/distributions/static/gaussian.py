@@ -1,9 +1,9 @@
 # Libraries
 import math
 
-import tensorflow as tf
+import tensorflow as tf  # type: ignore
 
-from illia.tf.distributions.static.base import StaticDistribution
+from . import StaticDistribution
 
 
 class GaussianDistribution(StaticDistribution):

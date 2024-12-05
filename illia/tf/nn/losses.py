@@ -1,9 +1,9 @@
 # Libraries
 from typing import Literal
 
-import tensorflow as tf
+import tensorflow as tf  # type: ignore
 
-from illia.tf.nn.base import BayesianModule
+from . import BayesianModule
 
 
 class KLDivergenceLoss(tf.keras.Model):

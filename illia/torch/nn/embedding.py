@@ -2,17 +2,15 @@
 from typing import Optional, Tuple
 
 import torch
-import torch.nn.functional as F
+import torch.nn.functional as F  # type: ignore
 
-from illia.torch.distributions.static.base import StaticDistribution
-from illia.torch.distributions.dynamic.base import DynamicDistribution
-from illia.torch.distributions.static.gaussian import (
-    GaussianDistribution as StaticGaussianDistribution,
+from . import (
+    StaticDistribution,
+    DynamicDistribution,
+    StaticGaussianDistribution,
+    DynamicGaussianDistribution,
+    BayesianModule,
 )
-from illia.torch.distributions.dynamic.gaussian import (
-    GaussianDistribution as DynamicGaussianDistribution,
-)
-from illia.torch.nn.base import BayesianModule
 
 
 class Embedding(BayesianModule):

@@ -3,7 +3,7 @@ import math
 
 import torch
 
-from illia.torch.distributions.static.base import StaticDistribution
+from . import StaticDistribution
 
 
 class GaussianDistribution(StaticDistribution):

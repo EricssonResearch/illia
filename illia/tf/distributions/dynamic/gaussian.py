@@ -2,9 +2,9 @@
 import math
 from typing import Tuple
 
-import tensorflow as tf
+import tensorflow as tf  # type: ignore
 
-from illia.tf.distributions.dynamic.base import DynamicDistribution
+from . import DynamicDistribution
 
 
 class GaussianDistribution(DynamicDistribution):
