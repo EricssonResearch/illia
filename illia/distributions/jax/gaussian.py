@@ -4,7 +4,7 @@ from typing import Optional
 # 3pp
 import jax
 import jax.numpy as jnp
-from flax import linen as nn
+from flax import nnx
 
 # own modules
 from ..base import (
@@ -12,7 +12,7 @@ from ..base import (
 )
 
 
-class GaussianDistribution(Distribution, nn.Module):
+class GaussianDistribution(Distribution, nnx.Module):
     """
     This is the class to implement a learnable gausssian distribution
     in jax and flax.
@@ -28,32 +28,34 @@ class GaussianDistribution(Distribution, nn.Module):
         _description_
     """
 
-    shape: tuple[int, ...]
-    mu_prior: float = 0.0
-    std_prior: float = 0.1
-    mu_init: float = 0.0
-    rho_init: float = -7.0
+    # shape: tuple[int, ...]
+    # mu_prior: float = 0.0
+    # std_prior: float = 0.1
+    # mu_init: float = 0.0
+    # rho_init: float = -7.0
 
-    def setup(self) -> None:
-        """
-        This is the setup method to define the parameters of the module.
-
-        Returns:
-            None.
-        """
-
+    # overriding method
+    def __init__(
+        self,
+        shape: tuple[int, ...],
+        mu_prior: float = 0.0,
+        std_prior: float = 0.1,
+        mu_init: float = 0.0,
+        rho_init: float = -7.0,
+    ) -> None:
         # call super-class constructor
         super().__init__()
 
-        # define initial mu and rho
-        self.mu: jax.Array = self.mu_init + self.param(
-            "mu", nn.initializers.normal(self.rho_init), self.shape
-        )
-        self.rho: jax.Array = self.mu_init + self.param(
-            "rho", nn.initializers.normal(self.rho_init), self.shape
-        )
+        # define priors
+        self.mu_prior = mu_prior
+        self.std_prior = std_prior
 
-        return None
+        # get key
+        key = jax.random.key(0)
+
+        # define initial mu and rho
+        self.mu = nnx.Param(mu_init + rho_init * jax.random.normal(key, shape))
+        self.rho = nnx.Param(mu_init + rho_init * jax.random.normal(key, shape))
 
     # overriding method
     def sample(self, seed: int = 0, **kwargs) -> jax.Array:
@@ -69,7 +71,7 @@ class GaussianDistribution(Distribution, nn.Module):
 
         # compute epsilon and sigma
         eps: jax.Array = jax.random.normal(key, self.rho.shape)
-        sigma: jax.Array = jnp.log1p(jnp.exp(self.rho))
+        sigma: jax.Array = jnp.log1p(jnp.exp(self.rho))  # type: ignore
 
         return self.mu + sigma * eps
 
@@ -112,7 +114,7 @@ class GaussianDistribution(Distribution, nn.Module):
         )
 
         # compute sigma
-        sigma: jax.Array = jnp.log1p(jnp.exp(self.rho))
+        sigma: jax.Array = jnp.log1p(jnp.exp(self.rho))  # type: ignore
 
         # compute log posteriors
         log_posteriors = (

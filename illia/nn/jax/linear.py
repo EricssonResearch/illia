@@ -1,21 +1,22 @@
 # standard libraries
 from typing import Optional
 
-# deep learning libraries
-import torch
-import torch.nn.functional as F
-
-# other libraries
-from typing import Optional
+# 3pp
+import jax
+import jax.numpy as jnp
+from flax import nnx
+from jax import lax
+from flax.nnx import rnglib
+from flax.nnx.nn import dtypes
+from flax.typing import (
+  Dtype,
+  PrecisionLike,
+  DotGeneralT,
+)
 
 # own modules
-import illia.distributions.static as static
-from illia.nn.base import BayesianModule
-from illia.distributions.static import StaticDistribution
-from illia.distributions.dynamic import (
-    DynamicDistribution,
-    GaussianDistribution,
-)
+from illia.distributions.jax import GaussianDistribution
+from illia.nn.jax.base import BayesianModule
 
 
 class Linear(BayesianModule):
@@ -31,60 +32,45 @@ class Linear(BayesianModule):
         _description_
     """
 
-    input_size: int
-    output_size: int
-    weights_posterior: DynamicDistribution
-    weights_prior: StaticDistribution
-    bias_posterior: DynamicDistribution
-    bias_prior: StaticDistribution
-    weights: torch.Tensor
-    bias: torch.Tensor
-
     def __init__(
         self,
         input_size: int,
         output_size: int,
-        weights_prior: Optional[StaticDistribution] = None,
-        bias_prior: Optional[StaticDistribution] = None,
-        weights_posterior: Optional[DynamicDistribution] = None,
-        bias_posterior: Optional[DynamicDistribution] = None,
+        weights_distribution: Optional[GaussianDistribution] = None,
+        bias_distribution: Optional[GaussianDistribution] = None,
+        *,
+        use_bias: bool = True,
+        dtype: Optional[Dtype] = None,
+        param_dtype: Dtype = jnp.float32,
+        precision: PrecisionLike = None,
+        dot_general: DotGeneralT = lax.dot_general,
+        rngs: rnglib.Rngs = nnx.Rngs(0),
     ) -> None:
         # call super class constructor
         super().__init__()
 
-        # set sizes
-        self.input_size = input_size
-        self.output_size = output_size
-
-        # set defaults parameters for gaussian
-        mean: float = 0.0
-        std: float = 0.1
+        # set attributes
+        self.use_bias = use_bias
+        self.dtype = dtype
+        self.param_dtype = param_dtype
+        self.precision = precision
+        self.dot_general = dot_general
 
         # set weights prior
-        if weights_prior is None:
-            self.weights_prior = static.GaussianDistribution(mean, std)
+        if weights_distribution is None:
+            self.weights_distribution = GaussianDistribution((input_size, output_size))
+
         else:
-            self.weights_prior = weights_prior
+            self.weights_distribution = weights_distribution
 
         # set bias prior
-        if bias_prior is None:
-            self.bias_prior = static.GaussianDistribution(mean, std)
-        else:
-            self.bias_prior = bias_prior
+        if bias_distribution is None:
+            self.bias_distribution = GaussianDistribution((output_size,))
 
-        # set weights posterior
-        if weights_posterior is None:
-            self.weights_posterior = GaussianDistribution((output_size, input_size))
         else:
-            self.weights_posterior = weights_posterior
+            self.bias_distribution = self.bias_distribution
 
-        # set bias posterior
-        if bias_posterior is None:
-            self.bias_posterior = GaussianDistribution((output_size,))
-        else:
-            self.bias_posterior = bias_posterior
-
-    def forward(self, inputs: torch.Tensor) -> torch.Tensor:
+    def __call__(self, inputs: jax.Array) -> jax.Array:
         """
         This methos is the forward pass of the model.
 
@@ -95,21 +81,28 @@ class Linear(BayesianModule):
             output tensor. Dimension: [*, output size].
         """
 
+        # sample if model not frozen
         if not self.frozen:
-            self.weights = self.weights_posterior.sample()
-            self.bias = self.bias_posterior.sample()
+            # sample
+            self.weights: jax.Array = self.weights_distribution.sample()
+            self.bias: jax.Array = self.bias_distribution.sample()
 
-        else:
-            if self.weights is None or self.bias is None:
-                self.weights = self.weights_posterior.sample()
-                self.bias = self.bias_posterior.sample()
-
-        # compurte the outputs
-        outputs: torch.Tensor = F.linear(inputs, self.weights, self.bias)
+        # compute ouputs
+        inputs, kernel, bias = dtypes.promote_dtype(
+            (inputs, self.weights, self.bias), dtype=self.dtype
+        )
+        outputs = self.dot_general(
+            inputs,
+            self.weights,
+            (((inputs.ndim - 1,), (0,)), ((), ())),
+            precision=self.precision,
+        )
+        if self.bias is not None:
+            outputs += jnp.reshape(self.bias, (1,) * (outputs.ndim - 1) + (-1,))
 
         return outputs
 
-    def kl_cost(self) -> tuple[torch.Tensor, int]:
+    def kl_cost(self) -> tuple[jax.Array, int]:
         """
         This method computes the kl-divergence cost for the layer.
 
@@ -118,15 +111,16 @@ class Linear(BayesianModule):
             number of parameters of the layer.
         """
 
-        log_posterior: torch.Tensor = self.weights_posterior.log_prob(
+        # compute log probs
+        log_probs: jax.Array = self.weights_distribution.log_prob(
             self.weights
-        ) + self.bias_posterior.log_prob(self.bias)
-        log_prior: torch.Tensor = self.weights_prior.log_prob(
-            self.weights
-        ) + self.bias_prior.log_prob(self.bias)
-
-        num_params: int = (
-            self.weights_posterior.num_params + self.bias_posterior.num_params
+        ) + self.bias_distribution.log_prob(
+            self.bias
         )
 
-        return log_posterior - log_prior, num_params
+        # compute the number of parameters
+        num_params: int = (
+            self.weights_distribution.num_params + self.bias_distribution.num_params
+        )
+
+        return log_probs, num_params

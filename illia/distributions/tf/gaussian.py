@@ -27,7 +27,7 @@ class GaussianDistribution(Distribution):
         )
 
     @tf.function
-    def sample(self) -> tf.Tensor:
+    def sample(self, **kwargs) -> tf.Tensor:
         eps = tf.random.normal(tf.shape(self.rho))
         sigma = tf.math.log1p(tf.exp(self.rho))
         return self.mu + sigma * eps

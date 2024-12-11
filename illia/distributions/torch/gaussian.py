@@ -10,7 +10,7 @@ from ..base import (
 )
 
 
-class GaussianDistribution(Distribution):
+class GaussianDistribution(Distribution, torch.nn.Module):
     # overriding method
     def __init__(
         self,
@@ -37,7 +37,7 @@ class GaussianDistribution(Distribution):
 
     # overriding method
     @torch.jit.export
-    def sample(self) -> torch.Tensor:
+    def sample(self, **kwargs) -> torch.Tensor:
         eps: torch.Tensor = torch.randn_like(self.rho)
         sigma: torch.Tensor = torch.log1p(torch.exp(self.rho))
 

@@ -1,5 +1,5 @@
 # other libraries
-from typing import Tuple, Optional, Literal, Any
+from typing import Optional, Literal, Any
 
 # own modules
 from .base import Distribution
@@ -9,12 +9,12 @@ class GaussianDistribution(Distribution):
     # overriding method
     def __init__(
         self,
-        shape: Tuple[int, ...],
+        shape: tuple[int, ...],
         mu_prior: float = 0.0,
         std_prior: float = 0.1,
         mu_init: float = 0.0,
         rho_init: float = -7.0,
-        backend: Literal["torch", "tf"] = "torch",
+        backend: Literal["torch", "tf", "jax"] = "torch",
     ) -> None:
         """
         This function is a gaussian distribution.

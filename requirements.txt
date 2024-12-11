@@ -1,5 +1,5 @@
 black==23.1.0
-flax==0.8.5
+flax==0.10.1
 -f https://storage.googleapis.com/jax-releases/jax_releases.html
 jax[cuda12]==0.4.31
 matplotlib==3.9.1

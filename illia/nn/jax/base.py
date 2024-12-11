@@ -1,18 +1,24 @@
 # standard libraries
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
 # 3pp
 import jax
-from flax import linen as nn
+from flax import nnx
 
 
-class BayesianModule(ABC, nn.Module):
+class BayesianModule(nnx.Module):
+    """
+    This class is the base class for BayesianModule for jax. Every
+    module that should behave as a bayesian layer should inherit from
+    this class.
+
+    Attr:
+        frozen: indicator if this module if frozen or not.
+    """
+
     frozen: bool
 
     def __init__(self) -> None:
-        # call super class constructor
-        super().__init__()
-
         # set freeze false by default
         self.frozen = False
 
@@ -21,7 +27,7 @@ class BayesianModule(ABC, nn.Module):
         self.frozen = True
 
         # set forzen indicator to true for children
-        for module in self.modules():
+        for _, module in self.iter_modules():
             if self != module and isinstance(module, BayesianModule):
                 module.freeze()
             else:
@@ -32,7 +38,7 @@ class BayesianModule(ABC, nn.Module):
         self.frozen = False
 
         # set forzen indicators to false for children
-        for module in self.modules():
+        for _, module in self.iter_modules():
             if module != self and isinstance(module, BayesianModule):
                 module.unfreeze()
 
