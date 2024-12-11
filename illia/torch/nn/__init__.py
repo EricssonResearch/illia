@@ -1,10 +1,6 @@
-# Libraries
-from illia.torch.distributions.static.base import StaticDistribution
-from illia.torch.distributions.dynamic.base import DynamicDistribution
-from illia.torch.distributions.static.gaussian import (
-    GaussianDistribution as StaticGaussianDistribution,
-)
-from illia.torch.distributions.dynamic.gaussian import (
-    GaussianDistribution as DynamicGaussianDistribution,
-)
-from illia.torch.nn.base import BayesianModule
+# own modules
+from illia.torch.nn.linear import Linear
+from illia.torch.nn.embedding import Embedding
+
+# define all names to vbe imported
+__all__: list[str] = ["Linear", "Embedding"]

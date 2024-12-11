@@ -1,133 +1,127 @@
-# Libraries
-from typing import Optional, Tuple
+# other libraries
+from typing import Optional
 
+# 3pp
 import torch
-import torch.nn.functional as F  # type: ignore
+import torch.nn.functional as F
 
-from . import (
-    StaticDistribution,
-    DynamicDistribution,
-    StaticGaussianDistribution,
-    DynamicGaussianDistribution,
-    BayesianModule,
+# own modules
+from illia.torch.nn.base import BayesianModule
+from illia.torch.distributions import (
+    Distribution,
+    GaussianDistribution,
 )
 
 
 class Linear(BayesianModule):
-
-    input_size: int
-    output_size: int
-    weights_posterior: DynamicDistribution
-    weights_prior: StaticDistribution
-    bias_posterior: DynamicDistribution
-    bias_prior: StaticDistribution
-    weights: torch.Tensor
-    bias: torch.Tensor
-
     def __init__(
         self,
         input_size: int,
         output_size: int,
-        weights_prior: Optional[StaticDistribution] = None,
-        bias_prior: Optional[StaticDistribution] = None,
-        weights_posterior: Optional[DynamicDistribution] = None,
-        bias_posterior: Optional[DynamicDistribution] = None,
+        weights_distribution: Optional[Distribution] = None,
+        bias_distribution: Optional[Distribution] = None,
     ) -> None:
         """
-        Definition of a Bayesian Linear layer.
+        This is the constructor of the Linear class.
 
         Args:
-            input_size: Size of each input sample.
-            output_size: Size of each output sample.
-            weights_prior: The prior distribution for the weights.
-            bias_prior: The prior distribution for the bias.
-            weights_posterior: The posterior distribution for the weights.
-            bias_posterior: The posterior distribution for the bias.
+            input_size: _description_
+            output_size: _description_
+            weights_distribution: _description_. Defaults to None.
+            bias_distribution: _description_. Defaults to None.
         """
 
-        # Call super class constructor
+        # call super-class constructor
         super().__init__()
 
-        # Set attributes
-        self.input_size = input_size
-        self.output_size = output_size
-
-        # Define default parameters
-        parameters = {"mean": 0, "std": 0.1}
-
-        # Set weights prior
-        if weights_prior is None:
-            self.weights_prior = StaticGaussianDistribution(
-                parameters["mean"], parameters["std"]
-            )
-        else:
-            self.weights_prior = weights_prior
-
-        # Set bias prior
-        if bias_prior is None:
-            self.bias_prior = StaticGaussianDistribution(
-                parameters["mean"], parameters["std"]
-            )
-        else:
-            self.bias_prior = bias_prior
-
-        # Set weights posterior
-        if weights_posterior is None:
-            self.weights_posterior = DynamicGaussianDistribution(
+        # set weights distribution
+        if weights_distribution is None:
+            self.weights_distribution: Distribution = GaussianDistribution(
                 (output_size, input_size)
             )
         else:
-            self.weights_posterior = weights_posterior
+            self.weights_distribution = weights_distribution
 
-        # Set bias posterior
-        if bias_posterior is None:
-            self.bias_posterior = DynamicGaussianDistribution((output_size,))
+        # set bias distribution
+        if bias_distribution is None:
+            self.bias_distribution: Distribution = GaussianDistribution((output_size,))
         else:
-            self.bias_posterior = bias_posterior
+            self.bias_distribution = bias_distribution
+
+        # sample initial weights
+        weights = self.weights_distribution.sample()
+        bias = self.bias_distribution.sample()
+
+        # register buffers
+        self.register_buffer("weights", weights)
+        self.register_buffer("bias", bias)
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
-        Performs a forward pass through the Bayesian Linear layer.
-
-        If the layer is not frozen, it samples weights and bias from their respective posterior distributions.
-        If the layer is frozen and the weights or bias are not initialized, it samples them from their respective posterior distributions.
+        This method is the forward pass of the layer.
 
         Args:
-            inputs: Input tensor to the layer.
+            inputs: input tensor. Dimensions: [*].
+
+        Raises:
+            ValueError: Module has been frozen with undefined weights.
 
         Returns:
-            Output tensor after passing through the layer.
+            _description_
         """
 
-        # Forward depeding of frozen state
         if not self.frozen:
-            self.weights = self.weights_posterior.sample()
-            self.bias = self.bias_posterior.sample()
+            self.weights = self.weights_distribution.sample()
+            self.bias = self.bias_distribution.sample()
+
         else:
             if self.weights is None or self.bias is None:
-                self.weights = self.weights_posterior.sample()
-                self.bias = self.bias_posterior.sample()
+                raise ValueError("Module has been frozen with undefined weights")
 
-        # Run torch forward
-        return F.linear(inputs, self.weights, self.bias)
+        outputs: torch.Tensor = F.linear(inputs, self.weights, self.bias)
 
-    def kl_cost(self) -> Tuple[torch.Tensor, int]:
+        return outputs
+
+    @torch.jit.export
+    def freeze(self) -> None:
         """
-        Calculate the Kullback-Leibler (KL) divergence cost for the weights and bias of the layer.
+        This method is to freeze the layer.
 
         Returns:
-            A tuple containing the KL divergence cost for the weights and bias, and the total number of parameters.
+            None.
         """
 
-        log_posterior: torch.Tensor = self.weights_posterior.log_prob(
-            self.weights
-        ) + self.bias_posterior.log_prob(self.bias)
-        log_prior: torch.Tensor = self.weights_prior.log_prob(
-            self.weights
-        ) + self.bias_prior.log_prob(self.bias)
+        # set indicator
+        self.frozen = True
 
+        # sample weights if they are undefined
+        if self.weights is None:
+            self.weights = self.weights_distribution.sample()
+
+        # sample bias is they are undefined
+        # if self.bias
+
+        # detach weights and bias
+        self.weights = self.weights.detach()
+        self.bias = self.bias.detach()
+
+    @torch.jit.export
+    def kl_cost(self) -> tuple[torch.Tensor, int]:
+        """
+        This method is to compute the kl cost of the library.
+
+        Returns:
+            _description_
+        """
+
+        # compute log probs
+        log_probs: torch.Tensor = self.weights_distribution.log_prob(
+            self.weights
+        ) + self.bias_distribution.log_prob(self.bias)
+
+        # compute the number of parameters
         num_params: int = (
-            self.weights_posterior.num_params + self.bias_posterior.num_params
+            self.weights_distribution.num_params + self.bias_distribution.num_params
         )
 
-        return log_posterior - log_prior, num_params
+        return log_probs, num_params

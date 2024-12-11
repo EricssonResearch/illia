@@ -1,8 +1,8 @@
 # Libraries
 from typing import Optional, Tuple
 
-import tensorflow as tf  # type: ignore
-from tensorflow.keras.utils import register_keras_serializable  # type: ignore
+import tensorflow as tf
+from tensorflow.keras.utils import register_keras_serializable
 
 from . import (
     StaticDistribution,
@@ -15,7 +15,6 @@ from . import (
 
 @register_keras_serializable(package="Embedding")
 class Embedding(BayesianModule):
-
     input_size: int
     output_size: int
     weights_posterior: DynamicDistribution
@@ -97,7 +96,6 @@ class Embedding(BayesianModule):
         norm_type: Optional[float] = 2.0,
         sparse: bool = False,
     ) -> tf.Tensor:
-
         if sparse is not None:
             embeddings = tf.nn.embedding_lookup(input, weight)
         else:

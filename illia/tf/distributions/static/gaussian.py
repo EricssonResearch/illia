@@ -7,7 +7,6 @@ from . import StaticDistribution
 
 
 class GaussianDistribution(StaticDistribution):
-
     def __init__(self, mu: float, std: float) -> None:
         """
         Initialize a Gaussian distribution with given mean (mu) and standard deviation (std).

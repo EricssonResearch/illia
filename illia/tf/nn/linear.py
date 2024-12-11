@@ -13,7 +13,6 @@ from . import (
 
 
 class Linear(BayesianModule):
-
     def __init__(
         self,
         input_size: int,

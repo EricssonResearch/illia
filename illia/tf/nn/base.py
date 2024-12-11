@@ -1,11 +1,12 @@
-# Libraries
+# standard libraries
 from abc import abstractmethod
 from typing import Tuple, Any
 
-from tensorflow.keras import Model  # type: ignore
+# 3pp
+import tensorflow as tf
 
 
-class BayesianModule(Model):
+class BayesianModule(tf.keras.Model):
     """
     A base class for creating a Bayesion Module.
     Each of the functions is subsequently override by the specific backend.
@@ -14,7 +15,6 @@ class BayesianModule(Model):
     frozen: bool
 
     def __init__(self):
-
         # Call super class constructor
         super().__init__()
 
@@ -22,7 +22,6 @@ class BayesianModule(Model):
         self.frozen = False
 
     def freeze(self) -> None:
-
         # Set frozen indicator to true for current layer
         self.frozen = True
 
@@ -34,7 +33,6 @@ class BayesianModule(Model):
                 continue
 
     def unfreeze(self) -> None:
-
         # Set frozen indicator to false for current layer
         self.frozen = False
 

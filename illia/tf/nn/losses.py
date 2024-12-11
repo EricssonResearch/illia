@@ -7,9 +7,7 @@ from . import BayesianModule
 
 
 class KLDivergenceLoss(tf.keras.Model):
-
     def __init__(self, reduction: Literal["mean"] = "mean", weight: float = 1.0):
-
         # Call super class constructor
         super().__init__()
 
@@ -69,7 +67,6 @@ class KLDivergenceLoss(tf.keras.Model):
 
 
 class ELBOLoss(tf.keras.Model):
-
     def __init__(
         self,
         loss_function: tf.keras.losses.Loss,

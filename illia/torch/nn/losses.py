@@ -1,17 +1,17 @@
-# Libraries
+# standard libraries
 from typing import Literal
 
+# 3pp
 import torch
 
-from . import BayesianModule
+# own modules
+from illia.torch.nn.base import BayesianModule
 
 
 class KLDivergenceLoss(torch.nn.Module):
-
-    reduction: Literal["mean"]
-    weight: float
-
-    def __init__(self, reduction: Literal["mean"] = "mean", weight: float = 1.0):
+    def __init__(
+        self, reduction: Literal["mean"] = "mean", weight: float = 1.0
+    ) -> None:
         """
         Definition of the KL Divergence Loss function.
 
@@ -29,10 +29,12 @@ class KLDivergenceLoss(torch.nn.Module):
 
     def forward(self, model: torch.nn.Module) -> torch.Tensor:
         """
-        Computes the forward pass of the KL Divergence Loss for a given model.
+        Computes the forward pass of the KL Divergence Loss for a given
+        model.
 
         Args:
-            model: The model for which the KL Divergence Loss needs to be computed.
+            model: The model for which the KL Divergence Loss needs to
+                be computed.
 
         Returns:
             The computed KL Divergence Loss for the given model.
@@ -55,7 +57,6 @@ class KLDivergenceLoss(torch.nn.Module):
 
 
 class ELBOLoss(torch.nn.Module):
-
     def __init__(
         self,
         loss_function: torch.nn.Module,
@@ -66,8 +67,10 @@ class ELBOLoss(torch.nn.Module):
         Initializes the Evidence Lower Bound (ELBO) loss function.
 
         Args:
-            loss_function: The loss function to be used for computing the reconstruction loss.
-            num_samples: The number of samples to draw for estimating the ELBO.
+            loss_function: The loss function to be used for computing
+                the reconstruction loss.
+            num_samples: The number of samples to draw for estimating
+                the ELBO.
             kl_weight: The weight applied to the KL divergence.
         """
 
@@ -84,7 +87,8 @@ class ELBOLoss(torch.nn.Module):
         self, y_true: torch.Tensor, y_pred: torch.Tensor, model: torch.nn.Module
     ) -> torch.Tensor:
         """
-        Computes the forward pass of the ELBO (Evidence Lower Bound) loss.
+        Computes the forward pass of the ELBO (Evidence Lower Bound)
+        loss.
 
         Parameters:
             y_true: The true target values.

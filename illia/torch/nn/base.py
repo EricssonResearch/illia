@@ -7,14 +7,12 @@ from torch.nn import Module
 
 class BayesianModule(Module):
     """
-    A base class for creating a Bayesion Module.
-    Each of the functions is subsequently override by the specific backend.
+    A base class for creating a Bayesian Module with the torch backend.
     """
 
     frozen: bool
 
     def __init__(self):
-
         # Call super class constructor
         super().__init__()
 
@@ -22,7 +20,6 @@ class BayesianModule(Module):
         self.frozen = False
 
     def freeze(self) -> None:
-
         # Set frozen indicator to true for current layer
         self.frozen = True
 
@@ -34,7 +31,6 @@ class BayesianModule(Module):
                 continue
 
     def unfreeze(self) -> None:
-
         # Set frozen indicator to false for current layer
         self.frozen = False
 

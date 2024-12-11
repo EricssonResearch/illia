@@ -8,7 +8,6 @@ from . import DynamicDistribution
 
 
 class GaussianDistribution(DynamicDistribution):
-
     def __init__(
         self,
         shape: Tuple[int, ...],
