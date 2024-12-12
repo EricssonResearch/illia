@@ -1,46 +1,53 @@
-# Libraries
-from abc import abstractmethod
-from typing import Tuple, Any
-
-from torch.nn import Module
+# 3pp
+import torch
 
 
-class BayesianModule(Module):
-    """
-    A base class for creating a Bayesian Module with the torch backend.
-    """
+class BayesianModule(torch.nn.Module):
+    def __init__(self) -> None:
+        """
+        This method is the constructor for BayesianModule.
+        """
 
-    frozen: bool
-
-    def __init__(self):
-        # Call super class constructor
+        # call super class constructor
         super().__init__()
 
-        # Set freeze false by default
-        self.frozen = False
+        # set state
+        self.frozen: bool = False
 
+        # create attribute to know is a bayesian layer
+        self.is_bayesian: bool = True
+
+    @torch.jit.export
     def freeze(self) -> None:
-        # Set frozen indicator to true for current layer
+        """
+        This method freezes the layer.
+
+        Returns:
+            None.
+        """
+
         self.frozen = True
 
-        # Set frozen indicator to true for children
-        for module in self.modules():
-            if self != module and isinstance(module, BayesianModule):
-                module.freeze()
-            else:
-                continue
-
+    @torch.jit.export
     def unfreeze(self) -> None:
-        # Set frozen indicator to false for current layer
+        """
+        This method unfreezes the layer.
+
+        Returns:
+            None.
+        """
+
         self.frozen = False
 
-        # Set frozen indicators to false for children
-        for module in self.modules():
-            if self != module and isinstance(module, BayesianModule):
-                module.unfreeze()
-            else:
-                continue
+    @torch.jit.export
+    def kl_cost(self) -> tuple[torch.Tensor, int]:
+        """
+        This is a default implementation of the kl_cots function,
+        which computes
 
-    @abstractmethod
-    def kl_cost(self) -> Tuple[Any, int]:
-        pass
+        Returns:
+            tensor with the kl cost.
+            number of parameters of the layer.
+        """
+
+        return torch.tensor([0.0]), 0

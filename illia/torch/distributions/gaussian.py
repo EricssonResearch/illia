@@ -20,6 +20,17 @@ class GaussianDistribution(Distribution):
         mu_init: float = 0.0,
         rho_init: float = -7.0,
     ) -> None:
+        """
+        This class is the constructor for GaussianDistribution.
+
+        Args:
+            shape: _description_
+            mu_prior: _description_. Defaults to 0.0.
+            std_prior: _description_. Defaults to 0.1.
+            mu_init: _description_. Defaults to 0.0.
+            rho_init: _description_. Defaults to -7.0.
+        """
+
         # call super-class constructor
         super().__init__()
 
@@ -38,6 +49,15 @@ class GaussianDistribution(Distribution):
     # overriding method
     @torch.jit.export
     def sample(self) -> torch.Tensor:
+        """
+        This method samples a tensor from the distribution.
+
+        Returns:
+            sampled tensor. Dimensions: [*] (same ones as the mu and
+                std parameters).
+        """
+
+        # sampling with reparametrization trick
         eps: torch.Tensor = torch.randn_like(self.rho)
         sigma: torch.Tensor = torch.log1p(torch.exp(self.rho))
 
@@ -46,6 +66,18 @@ class GaussianDistribution(Distribution):
     # overriding method
     @torch.jit.export
     def log_prob(self, x: Optional[torch.Tensor] = None) -> torch.Tensor:
+        """
+        This function computes the log probability.
+
+        Args:
+            x: output already sampled. If no output is introduced,
+                first we will sample a tensor from the current
+                distribution. Defaults to None.
+
+        Returns:
+            log probs. Dimensions: [].
+        """
+
         # sample if x is None
         if x is None:
             x = self.sample()

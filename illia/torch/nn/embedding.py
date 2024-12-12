@@ -28,6 +28,13 @@ class Embedding(BayesianModule):
         # call super class constructor
         super().__init__()
 
+        # set embeddings atributtes
+        self.padding_idx = padding_idx
+        self.max_norm = max_norm
+        self.norm_type = norm_type
+        self.scale_grad_by_freq = scale_grad_by_freq
+        self.sparse = sparse
+
         # set weights distribution
         self.weights_distribution: Distribution
         if weights_distribution is None:
@@ -42,13 +49,6 @@ class Embedding(BayesianModule):
 
         # register buffers
         self.register_buffer("weights", weights)
-
-        # set embeddings atributtes
-        self.padding_idx = padding_idx
-        self.max_norm = max_norm
-        self.norm_type = norm_type
-        self.scale_grad_by_freq = scale_grad_by_freq
-        self.sparse = sparse
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         # forward depeding of frozen state
