@@ -24,11 +24,15 @@ class GaussianDistribution(Distribution):
         This class is the constructor for GaussianDistribution.
 
         Args:
-            shape: _description_
-            mu_prior: _description_. Defaults to 0.0.
-            std_prior: _description_. Defaults to 0.1.
-            mu_init: _description_. Defaults to 0.0.
-            rho_init: _description_. Defaults to -7.0.
+            shape: shape of the distribution.
+            mu_prior: mu for the prior distribution. Defaults to 0.0.
+            std_prior: std for the prior distribution. Defaults to 0.1.
+            mu_init: init value for mu. This tensor will be initialized
+                with a normal distribution with std 0.1 and the mean is
+                the parameter specified here. Defaults to 0.0.
+            rho_init: init value for rho. This tensor will be initialized
+                with a normal distribution with std 0.1 and the mean is
+                the parameter specified here. Defaults to -7.0.
         """
 
         # call super-class constructor

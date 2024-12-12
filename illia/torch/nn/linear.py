@@ -25,10 +25,12 @@ class Linear(BayesianModule):
         This is the constructor of the Linear class.
 
         Args:
-            input_size: _description_
-            output_size: _description_
-            weights_distribution: _description_. Defaults to None.
-            bias_distribution: _description_. Defaults to None.
+            input_size: input size of the linear layer.
+            output_size: output size of the linear layer.
+            weights_distribution: distribution for the weights of the
+                layer. Defaults to None.
+            bias_distribution: distribution for the bias of the layer.
+                Defaults to None.
         """
 
         # call super-class constructor

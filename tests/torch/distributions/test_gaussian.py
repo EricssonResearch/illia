@@ -3,16 +3,33 @@ import pytest
 import torch
 
 # own modules
-from illia.torch.distributions.gaussian import GaussianDistribution
+from illia.torch.distributions import GaussianDistribution
 
 
-@pytest.mark.parametrize("shape", [((32, 30, 20)), ((64, 3, 32, 32))])
-def test_gaussian_init(shape: tuple[int, ...]) -> None:
+@pytest.mark.parametrize(
+    "shape, mu_prior, std_prior, mu_init, rho_init",
+    [((32, 30, 20), 0.0, 0.1, 0.0, -0.7), ((64, 3, 32, 32), 0.1, 0.3, 0.1, -0.3)],
+)
+def test_gaussian_init(
+    shape: tuple[int, ...],
+    mu_prior: float,
+    std_prior: float,
+    mu_init: float,
+    rho_init: float,
+) -> None:
     """
     This test is to check the constructor of GaussianDistribution class.
 
     Args:
         shape: shape of the distribution.
+        mu_prior: mu for the prior distribution.
+        std_prior: std for the prior distribution.
+        mu_init: init value for mu. This tensor will be initialized
+            with a normal distribution with std 0.1 and the mean is
+            the parameter specified here.
+        rho_init: init value for rho. This tensor will be initialized
+            with a normal distribution with std 0.1 and the mean is
+            the parameter specified here.
 
     Returns:
         None.
@@ -54,8 +71,17 @@ def test_gaussian_init(shape: tuple[int, ...]) -> None:
     return None
 
 
-@pytest.mark.parametrize("shape", [((32, 30, 20)), ((64, 3, 32, 32))])
-def test_gaussian_sample(shape: tuple[int, ...]) -> None:
+@pytest.mark.parametrize(
+    "shape, mu_prior, std_prior, mu_init, rho_init",
+    [((32, 30, 20), 0.0, 0.1, 0.0, -0.7), ((64, 3, 32, 32), 0.1, 0.3, 0.1, -0.3)],
+)
+def test_gaussian_sample(
+    shape: tuple[int, ...],
+    mu_prior: float,
+    std_prior: float,
+    mu_init: float,
+    rho_init: float,
+) -> None:
     """
     This test checks the sample method of GaussianDistribution.
 
@@ -110,8 +136,17 @@ def test_gaussian_sample(shape: tuple[int, ...]) -> None:
     return None
 
 
-@pytest.mark.parametrize("shape", [((32, 30, 20)), ((64, 3, 32, 32))])
-def test_gaussian_log_prob(shape: tuple[int, ...]) -> None:
+@pytest.mark.parametrize(
+    "shape, mu_prior, std_prior, mu_init, rho_init",
+    [((32, 30, 20), 0.0, 0.1, 0.0, -0.7), ((64, 3, 32, 32), 0.1, 0.3, 0.1, -0.3)],
+)
+def test_gaussian_log_prob(
+    shape: tuple[int, ...],
+    mu_prior: float,
+    std_prior: float,
+    mu_init: float,
+    rho_init: float,
+) -> None:
     """
     This test checks the log_prob method of GaussianDistribution.
 
@@ -172,8 +207,17 @@ def test_gaussian_log_prob(shape: tuple[int, ...]) -> None:
     return None
 
 
-@pytest.mark.parametrize("shape", [((32, 30, 20)), ((64, 3, 32, 32))])
-def test_gaussian_script_jit(shape: tuple[int, ...]) -> None:
+@pytest.mark.parametrize(
+    "shape, mu_prior, std_prior, mu_init, rho_init",
+    [((32, 30, 20), 0.0, 0.1, 0.0, -0.7), ((64, 3, 32, 32), 0.1, 0.3, 0.1, -0.3)],
+)
+def test_gaussian_script_jit(
+    shape: tuple[int, ...],
+    mu_prior: float,
+    std_prior: float,
+    mu_init: float,
+    rho_init: float,
+) -> None:
     """
     This functions test the scripting wit torchscript of the
     GaussianDistribution.
