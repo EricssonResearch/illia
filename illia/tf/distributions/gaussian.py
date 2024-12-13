@@ -13,13 +13,20 @@ from illia.tf.distributions.base import (
 
 class GaussianDistribution(Distribution):
     """
-    This class is the implementation of GaussianDistribution in 
+    This class is the implementation of GaussianDistribution in
     tensorflow.
 
     Attr:
-        Distribution: _description_
+        mu_prior: mu for the prior distribution.
+        std_prior: std for the prior distribution.
+        mu_init: init value for mu. This tensor will be initialized
+            with a normal distribution with std 0.1 and the mean is
+            the parameter specified here.
+        rho_init: init value for rho. This tensor will be initialized
+            with a normal distribution with std 0.1 and the mean is
+            the parameter specified here.
     """
-    
+
     # overriding method
     def __init__(
         self,
@@ -52,11 +59,11 @@ class GaussianDistribution(Distribution):
         self.std_prior: tf.Tensor = tf.constant(std_prior, dtype=tf.float32)
 
         # define initial mu and rho
-        self.mu: tf.Tensor = tf.Variable(
-            tf.random.normal(shape=self.shape, mean=self.mu_init, stddev=0.1)
+        self.mu: tf.Variable = tf.keras.Variable(
+            tf.random.normal(shape=shape, mean=mu_init, stddev=0.1), trainable=True
         )
-        self.rho: tf.Tensor = tf.Variable(
-            tf.random.normal(shape=self.shape, mean=self.rho_init, stddev=0.1)
+        self.rho: tf.Variable = tf.keras.Variable(
+            tf.random.normal(shape=shape, mean=rho_init, stddev=0.1), trainable=True
         )
 
     # overriding method

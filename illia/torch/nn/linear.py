@@ -15,7 +15,7 @@ from illia.torch.distributions import (
 
 class Linear(BayesianModule):
     """
-    This class is the bayesian implementation of the Linear class.
+    This class is the bayesian implementation of the torch Linear layer.
 
     Attr:
         weights_distribution: distribution for the weights of the

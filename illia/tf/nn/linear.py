@@ -1,161 +1,145 @@
-# Libraries
-from typing import Optional, Tuple, Union
+# standard libraries
+from typing import Optional
 
-import tensorflow as tf  # type: ignore
+# 3pp
+import tensorflow as tf
 
-from . import (
-    StaticDistribution,
-    DynamicDistribution,
-    StaticGaussianDistribution,
-    DynamicGaussianDistribution,
-    BayesianModule,
+# own modules
+from illia.tf.nn.base import BayesianModule
+from illia.tf.distributions import (
+    Distribution,
+    GaussianDistribution,
 )
 
 
 class Linear(BayesianModule):
+    """
+    This class is the bayesian implementation of the tensorflow Linear
+    layer.
+
+    Attr:
+        weights_distribution: distribution for the weights of the
+            layer. Dimensions: [output size, input size].
+        bias_distribution: distribution of the bias layer. Dimensions:
+            [output size].
+        weights: sampled weights of the layer. They are registered in
+            the buffer. Dimensions: [output size, input size].
+        bias: sampled bias of the layer. They are registered in
+            the buffer. Dimensions: [output size].
+    """
+
     def __init__(
         self,
         input_size: int,
         output_size: int,
-        weights_prior: Optional[StaticDistribution] = None,
-        bias_prior: Optional[StaticDistribution] = None,
-        weights_posterior: Optional[DynamicDistribution] = None,
-        bias_posterior: Optional[DynamicDistribution] = None,
+        weights_distribution: Optional[Distribution] = None,
+        bias_distribution: Optional[Distribution] = None,
     ) -> None:
         """
-        Definition of a Bayesian Linear layer.
+        This is the constructor of the Linear class.
 
         Args:
-            input_size: Size of each input sample.
-            output_size: Size of each output sample.
-            weights_prior: The prior distribution for the weights.
-            bias_prior: The prior distribution for the bias.
-            weights_posterior: The posterior distribution for the weights.
-            bias_posterior: The posterior distribution for the bias.
+            input_size: input size of the linear layer.
+            output_size: output size of the linear layer.
+            weights_distribution: distribution for the weights of the
+                layer. Defaults to None.
+            bias_distribution: distribution for the bias of the layer.
+                Defaults to None.
         """
 
-        # Call super class constructor
+        # call super-class constructor
         super().__init__()
 
-        # Set attributes
-        self.input_size = input_size
-        self.output_size = output_size
-
-        # Define default parameters
-        parameters = {"mean": 0, "std": 0.1}
-
-        # Set weights prior
-        if weights_prior is None:
-            self.weights_prior = StaticGaussianDistribution(
-                parameters["mean"], parameters["std"]
+        # set weights distribution
+        if weights_distribution is None:
+            self.weights_distribution: Distribution = GaussianDistribution(
+                (output_size, input_size)
             )
         else:
-            self.weights_prior = weights_prior
+            self.weights_distribution = weights_distribution
 
-        # Set bias prior
-        if bias_prior is None:
-            self.bias_prior = StaticGaussianDistribution(
-                parameters["mean"], parameters["std"]
-            )
+        # set bias distribution
+        if bias_distribution is None:
+            self.bias_distribution: Distribution = GaussianDistribution((output_size,))
         else:
-            self.bias_prior = bias_prior
+            self.bias_distribution = bias_distribution
 
-        # Set weights posterior
-        if weights_posterior is None:
-            self.weights_posterior = DynamicGaussianDistribution(
-                (input_size, output_size)
-            )
-        else:
-            self.weights_posterior = weights_posterior
+        # sample initial weights
+        weights = self.weights_distribution.sample()
+        bias = self.bias_distribution.sample()
 
-        # Set bias posterior
-        if bias_posterior is None:
-            self.bias_posterior = DynamicGaussianDistribution((output_size,))
-        else:
-            self.bias_posterior = bias_posterior
+        # register non-trainable variables
+        self.weights = tf.keras.Variable(weights, trainable=False)
+        self.bias = tf.keras.Variable(bias, trainable=False)
 
-        # Initialize weight and bias variables
-        self.sampled_weights = tf.Variable(
-            initial_value=tf.zeros((input_size, output_size)),
-            trainable=False,
-            dtype=tf.float32,
-        )
-        self.sampled_bias = tf.Variable(
-            initial_value=tf.zeros((output_size,)), trainable=False, dtype=tf.float32
-        )
-
-    def get_config(self):
+    def forward(self, inputs: tf.Tensor) -> tf.Tensor:
         """
-        Get the configuration of the Gaussian Distribution object. This method retrieves the base
-        configuration of the parent class and combines it with custom configurations specific to
-        the Gaussian Distribution.
-
-        Returns:
-            A dictionary containing the combined configuration of the Gaussian Distribution.
-        """
-
-        # Get the base configuration
-        base_config = super().get_config()
-
-        # Add the custom configurations
-        custom_config = {
-            "input_size": self.input_size,
-            "output_size": self.output_size,
-            "weights_prior": self.weights_prior,
-            "weights_posterior": self.weights_posterior,
-            "bias_prior": self.bias_prior,
-            "bias_posterior": self.bias_posterior,
-        }
-
-        # Combine both configurations
-        return {**base_config, **custom_config}
-
-    def call(self, inputs: tf.Tensor) -> tf.Tensor:
-        """
-        Performs a forward pass through the Bayesian Linear layer.
-
-        If the layer is not frozen, it samples weights and bias from their respective posterior distributions.
-        If the layer is frozen and the weights or bias are not initialized, it samples them from their respective posterior distributions.
+        This method is the forward pass of the layer.
 
         Args:
-            inputs: Input tensor to the layer.
+            inputs: input tensor. Dimensions: [batch, *].
+
+        Raises:
+            ValueError: Module has been frozen with undefined weights.
 
         Returns:
-            Output tensor after passing through the layer.
+            outputs tensor. Dimensions: [batch, *].
         """
 
-        # Forward depeding of frozen state
+        # check if layer is frozen
         if not self.frozen:
-            self.sampled_weights.assign(self.weights_posterior.sample())
-            self.sampled_bias.assign(self.bias_posterior.sample())
+            self.weights = self.weights_distribution.sample()
+            self.bias = self.bias_distribution.sample()
+
         else:
-            if tf.reduce_all(self.sampled_weights == 0) or tf.reduce_all(
-                self.sampled_bias == 0
-            ):
-                self.sampled_weights.assign(self.weights_posterior.sample())
-                self.sampled_bias.assign(self.bias_posterior.sample())
+            if self.weights is None or self.bias is None:
+                raise ValueError("Module has been frozen with undefined weights")
 
-        # Run tf forward
-        return tf.linalg.matmul(inputs, self.sampled_weights) + self.sampled_bias
+        # compute outputs
+        outputs: tf.Tensor = tf.linalg.matmul(inputs, self.weights) + self.bias
 
-    @tf.function
-    def kl_cost(self) -> Tuple[tf.Tensor, int]:
+        return outputs
+
+    def freeze(self) -> None:
         """
-        Calculate the Kullback-Leibler (KL) divergence cost for the weights and bias of the layer.
+        This method is to freeze the layer.
 
         Returns:
-            A tuple containing the KL divergence cost for the weights and bias, and the total number of parameters.
+            None.
         """
 
-        log_posterior: tf.Tensor = self.weights_posterior.log_prob(
-            self.sampled_weights
-        ) + self.bias_posterior.log_prob(self.sampled_bias)
-        log_prior: tf.Tensor = self.weights_prior.log_prob(
-            self.sampled_weights
-        ) + self.bias_prior.log_prob(self.sampled_bias)
+        # set indicator
+        self.frozen = True
 
+        # sample weights if they are undefined
+        if self.weights is None:
+            self.weights = self.weights_distribution.sample()
+
+        # sample bias is they are undefined
+        if self.bias is None:
+            self.bias = self.bias_distribution.sample()
+
+        # detach weights and bias
+        # self.weights = self.weights.detach()
+        # self.bias = self.bias.detach()
+
+    def kl_cost(self) -> tuple[tf.Tensor, int]:
+        """
+        This method is to compute the kl cost of the library.
+
+        Returns:
+            kl cost. Dimensions: [].
+            number of parameters of the layer.
+        """
+
+        # compute log probs
+        log_probs: tf.Tensor = self.weights_distribution.log_prob(
+            self.weights
+        ) + self.bias_distribution.log_prob(self.bias)
+
+        # compute the number of parameters
         num_params: int = (
-            self.weights_posterior.num_params + self.bias_posterior.num_params
+            self.weights_distribution.num_params + self.bias_distribution.num_params
         )
 
-        return log_posterior - log_prior, num_params
+        return log_probs, num_params
