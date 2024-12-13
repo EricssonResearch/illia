@@ -545,15 +545,17 @@ def get_outputs_shape(
     This function returns the output shape
 
     Args:
-        batch_size: _description_
-        output_channels: _description_
-        height: _description_
-        width: _description_
-        kernel_size: _description_
-        stride: _description_
-        padding: _description_
-        dilation: _description_
-        groups: _description_
+        batch_size: batch size to use in the tests.
+        output_channels: Number of channels produced by the
+            convolution.
+        height: height of the inputs.
+        width: width of the inputs.
+        kernel_size: Size of the convolving kernel.
+        stride: Stride of the convolution.
+        padding: Padding added to all four sides of the input.
+        dilation: Spacing between kernel elements.
+        groups: Number of blocked connections from input channels
+            to output channels.
 
     Returns:
         batch size.

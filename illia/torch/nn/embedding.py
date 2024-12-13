@@ -19,23 +19,21 @@ class Embedding(BayesianModule):
 
     Attr:
         weights_distribution: distribution for the weights of the
-            layer. Defaults to None. Dimensions:
-            [number of embeddings, embedding dim].
+            layer. Dimensions: [number of embeddings, embedding dim].
         weights: sampled weights of the layer. They are registered in
             the buffer. Dimensions: [number of embeddings,
             embedding dim].
         padding_idx: If specified, the entries at padding_idx do
-            not contribute to the gradient. Defaults to None.
+            not contribute to the gradient. 
         max_norm: If given, each embedding vector with norm larger
             than max_norm is renormalized to have norm max_norm.
-            Defaults to None.
         norm_type: The p of the p-norm to compute for the max_norm
-            option. Defaults to 2.0.
+            option.
         scale_grad_by_freq: If given, this will scale gradients by
             the inverse of frequency of the words in the
-            mini-batch. Defaults to False.
+            mini-batch.
         sparse: If True, gradient w.r.t. weight matrix will be a
-            sparse tensor. Defaults to False.
+            sparse tensor.
     """
 
     def __init__(

@@ -12,8 +12,19 @@ class KLDivergenceLoss(torch.nn.Module):
     def __init__(
         self, reduction: Literal["mean"] = "mean", weight: float = 1.0
     ) -> None:
+        """
+        This method is the KLDivergenceLoss class constructor.
+
+        Args:
+            reduction: reduction function to use in the computation. 
+                Defaults to "mean".
+            weight: weight to ponderate it. Defaults to 1.0.
+        """
+        
+        # call super class constructor
         super().__init__()
 
+        # set parameters
         self.reduction = reduction
         self.weight = weight
 
@@ -23,11 +34,9 @@ class KLDivergenceLoss(torch.nn.Module):
 
         Args:
             model: torch model.
-            reduction: type of reduction for the loss. Defaults to "mean".
-            weight: weight for the loss. Defaults to 1e-3.
 
         Returns:
-            kl divergence cost
+            kl divergence cost. Dimensions: [].
         """
 
         kl_global_cost: torch.Tensor = torch.tensor(

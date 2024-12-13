@@ -14,6 +14,31 @@ from illia.torch.distributions import (
 
 
 class Conv2d(BayesianModule):
+    """
+    This class is the bayesian implementation of the Conv2d class.
+
+    Attr:
+        weights_distribution: distribution for the weights of the
+            layer. Dimensions: [output channels, 
+            input channels // groups, kernel size, kernel size].
+        bias_distribution: distribution of the bias layer. Dimensions: 
+            [output channels].
+        weights: sampled weights of the layer. They are registered in
+            the buffer. Dimensions: [output channels, 
+            input channels // groups, kernel size, kernel size].
+        bias: sampled bias of the layer. They are registered in
+            the buffer. Dimensions: [output channels].
+        input_channels: Number of channels in the input image.
+        output_channels: Number of channels produced by the
+            convolution.
+        kernel_size: Size of the convolving kernel.
+        stride: Stride of the convolution.
+        padding: Padding added to all four sides of the input.
+        dilation: Spacing between kernel elements.
+        groups: Number of blocked connections from input channels
+            to output channels.
+    """
+    
     def __init__(
         self,
         input_channels: int,
@@ -38,7 +63,7 @@ class Conv2d(BayesianModule):
             padding: Padding added to all four sides of the input.
             dilation: Spacing between kernel elements.
             groups: Number of blocked connections from input channels
-                to output channels.
+                to output channels. Defaults to 1.
             weights_distribution: The distribution for the weights.
             bias_distribution: The distribution for the bias.
         """
