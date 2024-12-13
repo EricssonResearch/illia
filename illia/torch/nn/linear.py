@@ -72,6 +72,7 @@ class Linear(BayesianModule):
             _description_
         """
 
+        # check if layer is frozen
         if not self.frozen:
             self.weights = self.weights_distribution.sample()
             self.bias = self.bias_distribution.sample()
@@ -80,6 +81,7 @@ class Linear(BayesianModule):
             if self.weights is None or self.bias is None:
                 raise ValueError("Module has been frozen with undefined weights")
 
+        # compute outputs
         outputs: torch.Tensor = F.linear(inputs, self.weights, self.bias)
 
         return outputs
@@ -101,7 +103,8 @@ class Linear(BayesianModule):
             self.weights = self.weights_distribution.sample()
 
         # sample bias is they are undefined
-        # if self.bias
+        if self.bias is None:
+            self.bias = self.bias_distribution.sample()
 
         # detach weights and bias
         self.weights = self.weights.detach()

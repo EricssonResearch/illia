@@ -6,6 +6,7 @@ import torch
 from illia.torch.distributions import GaussianDistribution
 
 
+@pytest.mark.order(1)
 @pytest.mark.parametrize(
     "shape, mu_prior, std_prior, mu_init, rho_init",
     [((32, 30, 20), 0.0, 0.1, 0.0, -0.7), ((64, 3, 32, 32), 0.1, 0.3, 0.1, -0.3)],
@@ -71,6 +72,7 @@ def test_gaussian_init(
     return None
 
 
+@pytest.mark.order(2)
 @pytest.mark.parametrize(
     "shape, mu_prior, std_prior, mu_init, rho_init",
     [((32, 30, 20), 0.0, 0.1, 0.0, -0.7), ((64, 3, 32, 32), 0.1, 0.3, 0.1, -0.3)],
@@ -136,6 +138,7 @@ def test_gaussian_sample(
     return None
 
 
+@pytest.mark.order(3)
 @pytest.mark.parametrize(
     "shape, mu_prior, std_prior, mu_init, rho_init",
     [((32, 30, 20), 0.0, 0.1, 0.0, -0.7), ((64, 3, 32, 32), 0.1, 0.3, 0.1, -0.3)],
@@ -182,8 +185,8 @@ def test_gaussian_log_prob(
 
         # check mu gradients
         assert distribution.mu.grad is not None, (
-            f"Incorrect backward, mu gradients still None after executing the backward "
-            f"pass, when input x is {type(x)}"
+            f"Incorrect backward, mu gradients still None after executing the "
+            f"backward pass, when input x is {type(x)}"
         )
 
         # check shape of mu gradients
@@ -207,11 +210,12 @@ def test_gaussian_log_prob(
     return None
 
 
+@pytest.mark.order(4)
 @pytest.mark.parametrize(
     "shape, mu_prior, std_prior, mu_init, rho_init",
     [((32, 30, 20), 0.0, 0.1, 0.0, -0.7), ((64, 3, 32, 32), 0.1, 0.3, 0.1, -0.3)],
 )
-def test_gaussian_script_jit(
+def test_gaussian_jit(
     shape: tuple[int, ...],
     mu_prior: float,
     std_prior: float,
