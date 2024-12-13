@@ -63,13 +63,13 @@ class Linear(BayesianModule):
         This method is the forward pass of the layer.
 
         Args:
-            inputs: input tensor. Dimensions: [*].
+            inputs: input tensor. Dimensions: [batch, *].
 
         Raises:
             ValueError: Module has been frozen with undefined weights.
 
         Returns:
-            _description_
+            outputs tensor. Dimensions: [batch, *].
         """
 
         # check if layer is frozen
@@ -116,7 +116,8 @@ class Linear(BayesianModule):
         This method is to compute the kl cost of the library.
 
         Returns:
-            _description_
+            kl cost. Dimensions: [].
+            number of parameters of the layer.
         """
 
         # compute log probs
