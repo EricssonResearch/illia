@@ -20,14 +20,14 @@ class Linear(BayesianModule):
     Attr:
         weights_distribution: distribution for the weights of the
             layer. Dimensions: [output size, input size].
-        bias_distribution: distribution of the bias layer. Dimensions: 
+        bias_distribution: distribution of the bias layer. Dimensions:
             [output size].
         weights: sampled weights of the layer. They are registered in
             the buffer. Dimensions: [output size, input size].
         bias: sampled bias of the layer. They are registered in
             the buffer. Dimensions: [output size].
     """
-    
+
     def __init__(
         self,
         input_size: int,

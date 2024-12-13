@@ -24,7 +24,7 @@ class Embedding(BayesianModule):
             the buffer. Dimensions: [number of embeddings,
             embedding dim].
         padding_idx: If specified, the entries at padding_idx do
-            not contribute to the gradient. 
+            not contribute to the gradient.
         max_norm: If given, each embedding vector with norm larger
             than max_norm is renormalized to have norm max_norm.
         norm_type: The p of the p-norm to compute for the max_norm

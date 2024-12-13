@@ -19,12 +19,12 @@ class Conv2d(BayesianModule):
 
     Attr:
         weights_distribution: distribution for the weights of the
-            layer. Dimensions: [output channels, 
+            layer. Dimensions: [output channels,
             input channels // groups, kernel size, kernel size].
-        bias_distribution: distribution of the bias layer. Dimensions: 
+        bias_distribution: distribution of the bias layer. Dimensions:
             [output channels].
         weights: sampled weights of the layer. They are registered in
-            the buffer. Dimensions: [output channels, 
+            the buffer. Dimensions: [output channels,
             input channels // groups, kernel size, kernel size].
         bias: sampled bias of the layer. They are registered in
             the buffer. Dimensions: [output channels].
@@ -38,7 +38,7 @@ class Conv2d(BayesianModule):
         groups: Number of blocked connections from input channels
             to output channels.
     """
-    
+
     def __init__(
         self,
         input_channels: int,

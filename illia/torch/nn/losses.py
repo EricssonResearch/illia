@@ -16,11 +16,11 @@ class KLDivergenceLoss(torch.nn.Module):
         This method is the KLDivergenceLoss class constructor.
 
         Args:
-            reduction: reduction function to use in the computation. 
+            reduction: reduction function to use in the computation.
                 Defaults to "mean".
             weight: weight to ponderate it. Defaults to 1.0.
         """
-        
+
         # call super class constructor
         super().__init__()
 
