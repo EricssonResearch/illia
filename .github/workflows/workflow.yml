@@ -1,0 +1,61 @@
+name: Illia Workflow
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: [ "main" ]
+
+  # Runs on PR targeting the default branch
+  pull_request:
+    branches: [ "main" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+# Create different jobs for each unit of work, in this case
+# one to build and test the project, and another to do the deployment
+# to GitHub Pages
+jobs:
+
+  # Name of the job
+  build-test:
+    # Operating system to be used in the job
+    runs-on: ubuntu-latest
+
+    # Sequence of steps to be used in the job
+    steps:
+      - name: Build Illia
+        uses: ./.github/actions/build-application
+
+      - name: Lint Illia
+        uses: ./.github/actions/lint
+
+      - name: Test Illia
+        uses: ./.github/actions/test
+
+  deploy:
+
+    # To do the deployment of the documentation we depend on creating
+    # and testing the library earlier
+    needs: build-test
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy Illia on GitHub Pages
+        uses: ./.github/actions/deployment

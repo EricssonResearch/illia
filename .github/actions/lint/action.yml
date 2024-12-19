@@ -1,0 +1,14 @@
+name: Lint Illia
+
+runs:
+  using: composite
+
+  steps:
+    - name: Check format with Black
+      run: black --check illia/
+
+    - name: Check Mypy
+      run: mypy --cache-dir=/dev/null illia/
+
+    - name: Lint with flake8
+      run: flake8 illia/

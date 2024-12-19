@@ -1,0 +1,12 @@
+name: Deploy Illia on GitHub Pages
+
+runs:
+  using: composite
+
+  steps:
+    # Realizar el deployment de MkDocs a GitHub Pages
+    - name: Deploy MkDocs
+      uses: mhausenblas/mkdocs-deploy-gh-pages@1.26
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        CONFIG_FILE: mkdocs.yml

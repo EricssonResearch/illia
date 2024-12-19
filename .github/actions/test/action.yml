@@ -1,0 +1,8 @@
+name: Test Illia
+
+runs:
+  using: composite
+
+  steps:
+    - name: Run tests with Pytest
+      run: pytest illia/
