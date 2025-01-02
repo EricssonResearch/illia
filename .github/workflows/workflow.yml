@@ -3,20 +3,16 @@ name: Illia Workflow
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: [ "main" ]
+    branches:
+      - main
 
   # Runs on PR targeting the default branch
   pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
 
-  # Allows you to run this workflow manually from the Actions tab
+  # Allows run this workflow manually from the Actions tab
   workflow_dispatch:
-
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
 
 # Allow one concurrent deployment
 concurrency:
@@ -29,7 +25,8 @@ concurrency:
 jobs:
 
   # Name of the job
-  build-test:
+  build:
+    name: Build Illia
     # Operating system to be used in the job
     runs-on: ubuntu-latest
 
@@ -38,6 +35,13 @@ jobs:
       - name: Build Illia
         uses: ./.github/actions/build-application
 
+  test:
+    name: Lint and Test Illia
+    needs: build
+    runs-on: ubuntu-latest
+
+    # Sequence of steps to be used in the job
+    steps:
       - name: Lint Illia
         uses: ./.github/actions/lint
 
@@ -46,9 +50,15 @@ jobs:
 
   deploy:
 
+    name: Deploy Illia MKDocs Wiki to GitHub pages
     # To do the deployment of the documentation we depend on creating
     # and testing the library earlier
-    needs: build-test
+    needs: test
+
+    # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+    permissions:
+      pages: write
+      id-token: write
 
     environment:
       name: github-pages
