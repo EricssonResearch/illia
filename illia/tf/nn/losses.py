@@ -17,7 +17,7 @@ class KLDivergenceLoss(tf.keras.Model):
         self.reduction = reduction
         self.weight = weight
 
-    def get_config(self):
+    def get_config(self) -> dict:
         """
         Get the configuration of the Gaussian Distribution object. This method retrieves the base
         configuration of the parent class and combines it with custom configurations specific to
@@ -98,7 +98,7 @@ class ELBOLoss(tf.keras.Model):
 
         return loss_value
 
-    def get_config(self):
+    def get_config(self) -> dict:
         """
         Get the configuration of the Gaussian Distribution object. This method retrieves the base
         configuration of the parent class and combines it with custom configurations specific to

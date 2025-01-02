@@ -10,15 +10,17 @@ TEST_FILE ?= ./tests
 
 # Allows the installation of project dependencies
 install: requirements.txt
-	@echo "Installing illia dependencies..."
+	@echo "Updating PIP..."
 	pip install --upgrade pip
+	@echo "Installing illia dependencies..."
 	pip install -r requirements.txt
 
 # Allows the installation of all dependencies for the project
 # This is for development
 install-all: requirements.txt requirements-dev.txt requirements-wiki.txt
-	@echo "Installing illia dependencies for development..."
+	@echo "Updating PIP..."
 	pip install --upgrade pip
+	@echo "Installing illia dependencies for development..."
 	pip install -r requirements.txt -r requirements-dev.txt -r requirements-wiki.txt
 
 # Check format of the code using Black

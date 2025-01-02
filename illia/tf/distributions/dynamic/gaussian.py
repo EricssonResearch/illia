@@ -43,7 +43,7 @@ class GaussianDistribution(DynamicDistribution):
             tf.random.normal(shape=self.shape, mean=self.rho_init, stddev=self.std)
         )
 
-    def get_config(self):
+    def get_config(self) -> dict:
         """
         Get the configuration of the Gaussian Distribution object. This method retrieves the base
         configuration of the parent class and combines it with custom configurations specific to

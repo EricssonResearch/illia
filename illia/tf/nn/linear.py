@@ -85,7 +85,7 @@ class Linear(BayesianModule):
             initial_value=tf.zeros((output_size,)), trainable=False, dtype=tf.float32
         )
 
-    def get_config(self):
+    def get_config(self) -> dict:
         """
         Get the configuration of the Gaussian Distribution object. This method retrieves the base
         configuration of the parent class and combines it with custom configurations specific to

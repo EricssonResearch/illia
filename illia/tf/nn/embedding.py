@@ -117,7 +117,7 @@ class Embedding(BayesianModule):
 
         return embeddings
 
-    def get_config(self):
+    def get_config(self) -> dict:
         """
         Get the configuration of the Gaussian Distribution object. This method retrieves the base
         configuration of the parent class and combines it with custom configurations specific to
