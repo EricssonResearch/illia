@@ -18,5 +18,5 @@ runs:
           mkdocs-material-
 
     - name: Upload content to GitHub on gh-deploy branch
-      run: poetry run mkdocs gh-deploy --config-file ./mkdocs.yml --force
+      run: mkdocs gh-deploy --config-file ./mkdocs.yml --force
       shell: bash
