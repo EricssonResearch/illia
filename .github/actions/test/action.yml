@@ -1,8 +1,9 @@
 name: Test Illia
-
 runs:
   using: composite
-
   steps:
-    - name: Run tests with Pytest
+    - name: Set up Python
+      uses: ./.github/actions/setup-python-env
+
+    - name: Run Pytests
       run: pytest illia/

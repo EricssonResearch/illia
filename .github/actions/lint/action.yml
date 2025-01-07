@@ -1,14 +1,18 @@
 name: Lint Illia
-
 runs:
   using: composite
-
   steps:
+    - name: Set up Python
+      uses: ./.github/actions/setup-python-env
+
     - name: Check format with Black
+      shell: bash
       run: black --check illia/
 
     - name: Check Mypy
+      shell: bash
       run: mypy --cache-dir=/dev/null illia/
 
     - name: Lint with flake8
+      shell: bash
       run: flake8 illia/
