@@ -53,10 +53,10 @@ theme:
     - navigation.indexes
     - search.suggest
     - toc.follow
-  logo: _images/logo.png
+  logo: assets/images/logo_black.png
   icon:
     repo: fontawesome/brands/github
-  favicon: _images/logo_small.png
+  favicon: assets/images/logo_black_small.png
 
 use_directory_urls: false
 
