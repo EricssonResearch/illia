@@ -14,19 +14,26 @@ runs:
     - name: Check format with Black
       run: |
         echo "Running Black formatter check..."  
-        poetry run black --check ${{ inputs.src-project-folder }}/
+        black --check ${{ inputs.src-project-folder }}/
       shell: bash
 
     # Step 2: Check type annotations with Mypy (type checker)
     - name: Check Mypy
       run: |
         echo "Running Mypy type checker..." 
-        poetry run mypy ${{ inputs.src-project-folder }}/
+        mypy ${{ inputs.src-project-folder }}/
       shell: bash
 
     # Step 3: Lint code with Flake8 (style checker)
     - name: Lint with flake8
       run: |
         echo "Running Flake8 linter..."
-        poetry run flake8 ${{ inputs.src-project-folder }}/
+        flake8 ${{ inputs.src-project-folder }}/
+      shell: bash
+
+    # Step 4: Check the Cognitive Complexity with complexipy
+    - name: Cognitive Complexity with complexipy
+      run: |
+        echo "Running complexipy..."
+        complexipy ${{ inputs.src-project-folder }}/
       shell: bash
