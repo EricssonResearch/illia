@@ -1,15 +1,19 @@
-name: Build MkDocs for GitHub Pages
-runs:
-  using: composite
-  steps:
-    - name: Set up Python
-      uses: ./.github/actions/setup-python-env
+name: Build MkDocs Artifacts
 
+# This action runs as a composite, which allows you to define a series of steps
+# that will be executed in sequence
+runs:
+  # Defines the type of the action as a composite action (multiple steps)
+  using: composite
+
+  steps:
+    # Step 1: Set a cache ID based on the current UTC week number
     - name: Set cache ID
       run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
       shell: bash
 
-    - name: Configure cache
+    # Step 2: Cache MkDocs dependencies and generated files to speed up future runs
+    - name: Cache
       uses: actions/cache@v4
       with:
         key: mkdocs-material-${{ env.cache_id }}
@@ -17,6 +21,7 @@ runs:
         restore-keys: |
           mkdocs-material-
 
-    - name: Upload content to GitHub on gh-deploy branch
+    # Step 3: Generate the GitHub Pages artifacts (the MkDocs site) and deploy it to the gh-deploy branch
+    - name: Create artifacts to gh-deploy branch
       run: mkdocs gh-deploy --config-file ./mkdocs.yml --force
       shell: bash

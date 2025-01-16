@@ -1,0 +1,32 @@
+name: Lint Illia Code
+
+# Define inputs for the action, such as the project folder to lint
+inputs:
+  src-project-folder:
+    description: "Directory where the project is located"
+    required: true
+    default: "src"
+
+runs:
+  using: composite
+  steps:
+    # Step 1: Check format with Black (code formatter)
+    - name: Check format with Black
+      run: |
+        echo "Running Black formatter check..."  
+        poetry run black --check ${{ inputs.src-project-folder }}/
+      shell: bash
+
+    # Step 2: Check type annotations with Mypy (type checker)
+    - name: Check Mypy
+      run: |
+        echo "Running Mypy type checker..." 
+        poetry run mypy ${{ inputs.src-project-folder }}/
+      shell: bash
+
+    # Step 3: Lint code with Flake8 (style checker)
+    - name: Lint with flake8
+      run: |
+        echo "Running Flake8 linter..."
+        poetry run flake8 ${{ inputs.src-project-folder }}/
+      shell: bash

@@ -1,18 +1,24 @@
 name: Setup Python Environment
 description: Sets up Python and dependencies
+
+# Define inputs for the action, such as the Python version and the dependencies
+# to install
+inputs:
+  src-python-version:
+    description: "Python version to set up for the project"
+    required: true
+
 runs:
   using: composite
   steps:
     - name: Install Python
       uses: actions/setup-python@v5
       with:
-        python-version: "3.11.9"
+        python-version: ${{ inputs.src-python-version }}
         # Caching pip dependencies
         cache: "pip"
 
     - name: Install dependencies
       shell: bash
       run: |
-        pip install -r requirements.txt
-        pip install -r requirements-dev.txt
-        pip install -r requirements-wiki.txt
+        pip install -r requirements.txt -r requirements-dev.txt -r requirements-wiki.txt

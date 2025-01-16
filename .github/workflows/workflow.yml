@@ -1,25 +1,23 @@
 name: Illia Workflow
 
+# This workflow is triggered when there is a push to the 'main' branch or when
+# it is called from another workflow
 on:
-  # Runs on pushes targeting the default branch
   push:
-    branches:
-      - main
-
-  # Runs on PR targeting the default branch
-  pull_request:
-    branches:
-      - main
+    branches: ["main"]
+  workflow_call:
 
   # Allows run this workflow manually from the Actions tab
   workflow_dispatch:
 
-permissions:
-  contents: write
-  checks: write
-  pull-requests: write
-  pages: write
-  id-token: write
+# Set up environment variables
+env:
+  # Folder where the project code is located
+  SRC_PROJECT_FOLDER: "illia"
+  # Folder where test files are located
+  SRC_PROJECT_TESTS: "tests"
+  # Python version to use
+  SRC_PYTHON_VERSION: "3.11.9"
 
 # Allow one concurrent deployment
 concurrency:
@@ -30,72 +28,92 @@ concurrency:
 # one to build and test the project, and another to do the deployment
 # to GitHub Pages
 jobs:
-  setup:
+  setup-lint-test:
     # Name of the job
-    name: Setup Python
+    name: Setup, Lint and Test Illia Code
     # Operating system to be used in the job
     runs-on: ubuntu-latest
     # Sequence of steps to be used in the job
     steps:
+      # Step 1: Checkout the repository code
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Setup Python Environment
+
+      # Step 2: Set up the Python environment and install dependencies for
+      # testing and linting
+      - name: Setup Python environment and dependencies
         uses: ./.github/actions/setup-python-env
+        with:
+          src-python-version: ${{ env.SRC_PYTHON_VERSION }}
 
-  lint:
-    name: Lint Code
+      # Step 3: Run code linting to check code style, syntax, and quality
+      # using Black, MyPy and Flake8
+      - name: Check code format, syntax and quality
+        uses: ./.github/actions/lint-code
+        with:
+          src-project-folder: ${{ env.SRC_PROJECT_FOLDER }}
+
+      # Step 4: Run tests using PyTest in the project
+      - name: Test code
+        uses: ./.github/actions/test-code
+        with:
+          src-tests-folder: ${{ env.SRC_PROJECT_TESTS }}
+
+  build-mkdocs:
+    name: Build MkDocs Illia Wiki
     runs-on: ubuntu-latest
-    needs: setup
+    needs: setup-lint-test
+
+    permissions:
+      contents: write
+
     steps:
+      # Step 1: Checkout the repository code
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Lint Illia Code
-        uses: ./.github/actions/lint
 
-  test:
-    name: Test Code
-    runs-on: ubuntu-latest
-    needs: lint
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Test Illia Code
-        uses: ./.github/actions/test
+      # Step 2: Set up the Python environment and install dependencies for
+      # documentation
+      - name: Setup Python environment and dependencies
+        uses: ./.github/actions/setup-python-env
+        with:
+          src-python-version: ${{ env.SRC_PYTHON_VERSION }}
 
-  build-wiki:
-    name: Build MkDocs Illia
-    runs-on: ubuntu-latest
-    needs: test
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      # Step 3: Build the MkDocs site
       - name: Build MkDocs
         uses: ./.github/actions/build-mkdocs
 
-  deploy-wiki:
-    name: Deploy Wiki to GitHub pages
+  deploy-mkdocs:
+    name: Deploy MkDocs Wiki to GitHub Pages
     runs-on: ubuntu-latest
-    needs: build-wiki
+    needs: build-mkdocs
 
-    # Deploy to the github-pages environment
+    permissions:
+      pages: write
+      id-token: write
+
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-      - name: Checkout
+      # Step 1: Checkout the repository code, specifically the 'gh-pages' branch
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           ref: gh-pages
 
+      # Step 2: Set up the GitHub Pages action
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
+      # Step 3: Upload the built documentation as an artifact
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: "."
 
+      # Step 4: Deploy the MkDocs site to GitHub Pages
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
