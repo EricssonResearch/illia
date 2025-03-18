@@ -4,7 +4,7 @@ name: Illia Workflow
 # it is called from another workflow
 on:
   push:
-    branches: ["main", "dev"]
+    branches: ["main"]
 
 # Set up environment variables
 env:

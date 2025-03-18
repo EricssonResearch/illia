@@ -1,5 +1,5 @@
 # Libraries
-from typing import Optional, Tuple, Union
+from typing import Optional, Union
 
 import torch
 import torch.nn.functional as F
@@ -32,10 +32,10 @@ class Conv2d(BayesianModule):
         self,
         input_channels: int,
         output_channels: int,
-        kernel_size: Union[int, Tuple[int, int]],
-        stride: Union[int, Tuple[int, int]],
-        padding: Union[int, Tuple[int, int], str]=0,
-        dilation: Union[int, Tuple[int, int]]=1,
+        kernel_size: Union[int, tuple[int, int]],
+        stride: Union[int, tuple[int, int]],
+        padding: Union[int, tuple[int, int], str] = 0,
+        dilation: Union[int, tuple[int, int]] = 1,
         groups: int = 1,
         weights_prior: Optional[StaticDistribution] = None,
         bias_prior: Optional[StaticDistribution] = None,
@@ -128,10 +128,9 @@ class Conv2d(BayesianModule):
         if not self.frozen:
             self.weights = self.weights_posterior.sample()
             self.bias = self.bias_posterior.sample()
-        else:
-            if self.weights is None or self.bias is None:
-                self.weights = self.weights_posterior.sample()
-                self.bias = self.bias_posterior.sample()
+        elif self.weights is None or self.bias is None:
+            self.weights = self.weights_posterior.sample()
+            self.bias = self.bias_posterior.sample()
 
         # Run torch forward
         return F.conv2d(
@@ -144,13 +143,13 @@ class Conv2d(BayesianModule):
             groups=self.groups,
         )
 
-    def kl_cost(self) -> Tuple[torch.Tensor, int]:
+    def kl_cost(self) -> tuple[torch.Tensor, int]:
         """
         Computes the Kullback-Leibler (KL) divergence cost for the
         layer's weights and bias.
 
         Returns:
-            Tuple containing KL divergence cost and total number of
+            tuple containing KL divergence cost and total number of
             parameters.
         """
 

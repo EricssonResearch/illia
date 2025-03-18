@@ -1,6 +1,6 @@
 # Libraries
 from abc import abstractmethod
-from typing import Tuple, Any
+from typing import Any
 
 from torch.nn import Module
 
@@ -59,7 +59,7 @@ class BayesianModule(Module):
                 continue
 
     @abstractmethod
-    def kl_cost(self) -> Tuple[Any, int]:
+    def kl_cost(self) -> tuple[Any, int]:
         """
         Abstract method to compute the KL divergence cost.
         Must be implemented by subclasses.

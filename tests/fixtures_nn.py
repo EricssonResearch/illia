@@ -5,6 +5,7 @@ import pytest
 import numpy as np
 import torch
 import tensorflow as tf
+from keras import layers
 
 from . import TorchBayesianModule, TFBayesianModule
 
@@ -38,7 +39,7 @@ def set_base_module() -> tuple:
     class TFTestModule(TFBayesianModule):
         def __init__(self):
             super().__init__()
-            self.linear = tf.keras.layers.Dense(5)
+            self.linear = layers.Dense(5)
 
         def call(self, x):
             return self.linear(x)

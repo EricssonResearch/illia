@@ -1,5 +1,5 @@
 # Libraries
-from typing import Tuple, Union
+from typing import Union
 
 import torch
 import torch.nn.functional as F
@@ -17,7 +17,7 @@ class CGConv(MessagePassing):
 
     def __init__(
         self,
-        channels: Union[int, Tuple[int, int]],
+        channels: Union[int, tuple[int, int]],
         dim: int = 0,
         aggr: str = "add",
         **kwargs,

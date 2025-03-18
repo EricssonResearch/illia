@@ -1,6 +1,5 @@
 # Libraries
 import math
-from typing import Tuple
 
 import torch
 
@@ -15,7 +14,7 @@ class GaussianDistribution(DynamicDistribution):
 
     def __init__(
         self,
-        shape: Tuple[int, ...],
+        shape: tuple[int, ...],
         mu_init: float = 0.0,
         rho_init: float = -7.0,
     ) -> None:

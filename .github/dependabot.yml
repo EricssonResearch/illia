@@ -5,10 +5,7 @@ updates:
     schedule:
       interval: "weekly"
 
-  # GitHub does not have direct support for Poetry, but it treats poetry.lock
-  # as a pip-compatible dependency file.
   - package-ecosystem: "pip"
-    # Adjust if `pyproject.toml` is in a subfolder
     directory: "/"
     schedule:
       interval: "monthly"

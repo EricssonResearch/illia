@@ -1,14 +1,13 @@
 # Libraries
 from typing import Literal
 
-import keras
 import tensorflow as tf
-from keras import Model, losses
+from keras import Model, saving, losses
 
 from . import BayesianModule
 
 
-@keras.saving.register_keras_serializable(package="KLDivergenceLoss")
+@saving.register_keras_serializable(package="illia_tf", name="KLDivergenceLoss")
 class KLDivergenceLoss(Model):
     """
     Computes the KL divergence loss for Bayesian modules within a model.
@@ -82,6 +81,7 @@ class KLDivergenceLoss(Model):
         return kl_global_cost
 
 
+@saving.register_keras_serializable(package="illia_tf", name="ELBOLoss")
 class ELBOLoss(Model):
     """
     Computes the Evidence Lower Bound (ELBO) loss, combining a

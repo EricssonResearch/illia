@@ -1,8 +1,8 @@
 # Libraries
 from typing import Optional
 
-import keras
 import tensorflow as tf
+from keras import saving
 
 from . import (
     StaticDistribution,
@@ -13,7 +13,7 @@ from . import (
 )
 
 
-@keras.saving.register_keras_serializable(package="Linear")
+@saving.register_keras_serializable(package="illia_tf", name="Linear")
 class Linear(BayesianModule):
     """
     Bayesian Linear layer with trainable weights and biases,
@@ -135,12 +135,11 @@ class Linear(BayesianModule):
         if not self.frozen:
             self.sampled_weights.assign(self.weights_posterior.sample())
             self.sampled_bias.assign(self.bias_posterior.sample())
-        else:
-            if tf.reduce_all(self.sampled_weights == 0) or tf.reduce_all(
-                self.sampled_bias == 0
-            ):
-                self.sampled_weights.assign(self.weights_posterior.sample())
-                self.sampled_bias.assign(self.bias_posterior.sample())
+        elif tf.reduce_all(self.sampled_weights == 0) or tf.reduce_all(
+            self.sampled_bias == 0
+        ):
+            self.sampled_weights.assign(self.weights_posterior.sample())
+            self.sampled_bias.assign(self.bias_posterior.sample())
 
         # Run tf forward
         return tf.linalg.matmul(inputs, self.sampled_weights) + self.sampled_bias

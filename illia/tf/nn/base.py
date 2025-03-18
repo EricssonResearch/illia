@@ -2,9 +2,10 @@
 from abc import abstractmethod
 from typing import Any
 
-from keras import Model
+from keras import Model, saving
 
 
+@saving.register_keras_serializable(package="illia_tf", name="BayesianModule")
 class BayesianModule(Model):
     """
     Base class for creating a Bayesian module, which can be frozen or

@@ -1,43 +1,40 @@
 # Declare all phony targets
-.PHONY: install lint type-check clean tests wiki-up all
+.PHONY: install lint clean tests wiki-up all
 
 # Default command
 .DEFAULT_GOAL := all
 
 # Variables
 SRC_PROJECT_NAME ?= illia
+SRC_NOTEBOOKS ?= docs/examples/
 TEST_FILE ?= tests
 
 # Allows the installation of project dependencies
 install:
-	@echo "Updating PIP..."
+	@echo "Upgrading pip..."
 	pip install --upgrade pip
-	@if [ "$(ALL)" = "1" ]; then \
-	    echo "Installing all dependencies..."; \
-	    pip install -r requirements.txt -r requirements-dev.txt -r requirements-wiki.txt; \
-	else \
-	    echo "Installing main dependencies..."; \
-	    pip install -r requirements.txt; \
-	fi
+	@echo "Installing requirements..."
+	pip install -r requirements.txt
 
 # Check format, quality and more, of the code
 lint:
-	@echo "Checking Code Format with Black..."
-	black --check $(SRC_PROJECT_NAME)/ $(TEST_FILE)/
-	@echo "Checking Code Style and Quality with Flake8..."
+	@echo "Apply code format with Black..."
+	black $(SRC_PROJECT_NAME)/ $(TEST_FILE)/ $(SRC_NOTEBOOKS)/
+	@echo "Checking code style and quality with Flake8..."
 	flake8 $(SRC_PROJECT_NAME)/
-	@echo "Checking Code Complexity with complexipy..."
+	@echo "Checking code complexity with complexipy..."
 	complexipy -d low $(SRC_PROJECT_NAME)/
-	@echo "Checking Code Annotations with Mypy..."
+	@echo "Checking code annotations with Mypy..."
 	mypy $(SRC_PROJECT_NAME)/ $(TEST_FILE)/
-	@echo "Checking Code Style and Quality with Pylint..."
-	pylint --fail-under=8 $(SRC_PROJECT_NAME)/ $(TEST_FILE)/
+	@echo "Checking code style and quality with Pylint..."
+	pylint --fail-under=8 $(SRC_PROJECT_NAME)/
 
 # Allows cache clearing
 clean:
-	@echo "Cleaning pycache..."
+	@echo "Cleaning cache..."
 	find . -type d -name __pycache__ -exec rm -rf {} +
 	find . -type d -name .pytest_cache -exec rm -rf {} +
+	find . -type d -name nohup.out -exec rm -rf {} +
 
 # Allows testing the code
 tests: clean lint

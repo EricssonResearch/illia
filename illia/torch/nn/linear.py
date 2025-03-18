@@ -1,5 +1,5 @@
 # Libraries
-from typing import Optional, Tuple
+from typing import Optional
 
 import torch
 import torch.nn.functional as F
@@ -118,7 +118,7 @@ class Linear(BayesianModule):
         # Run torch forward
         return F.linear(inputs, self.weights, self.bias)
 
-    def kl_cost(self) -> Tuple[torch.Tensor, int]:
+    def kl_cost(self) -> tuple[torch.Tensor, int]:
         """
         Calculate the Kullback-Leibler (KL) divergence cost for the
         weights and bias of the layer.

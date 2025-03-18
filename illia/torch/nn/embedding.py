@@ -1,5 +1,5 @@
 # Libraries
-from typing import Optional, Tuple
+from typing import Optional
 
 import torch
 import torch.nn.functional as F
@@ -120,7 +120,7 @@ class Embedding(BayesianModule):
             self.sparse,
         )
 
-    def kl_cost(self) -> Tuple[torch.Tensor, int]:
+    def kl_cost(self) -> tuple[torch.Tensor, int]:
         """
         Computes the Kullback-Leibler (KL) divergence cost for the
         layer's weights and bias.

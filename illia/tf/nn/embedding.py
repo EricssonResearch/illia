@@ -1,8 +1,8 @@
 # Libraries
 from typing import Optional, Tuple
 
-import keras
 import tensorflow as tf
+from keras import saving
 
 from . import (
     StaticDistribution,
@@ -13,7 +13,7 @@ from . import (
 )
 
 
-@keras.saving.register_keras_serializable(package="Embedding")
+@saving.register_keras_serializable(package="illia_tf", name="Embedding")
 class Embedding(BayesianModule):
     """
     Bayesian Embedding layer with trainable weights and biases,
@@ -177,10 +177,9 @@ class Embedding(BayesianModule):
         if not self.frozen:
             self.weights = self.weights_posterior.sample()
             self.bias = self.bias_posterior.sample()
-        else:
-            if self.weights is None or self.bias is None:
-                self.weights = self.weights_posterior.sample()
-                self.bias = self.bias_posterior.sample()
+        elif self.weights is None or self.bias is None:
+            self.weights = self.weights_posterior.sample()
+            self.bias = self.bias_posterior.sample()
 
         # Run tensorflow forward
         outputs: tf.Tensor = self._embedding(
