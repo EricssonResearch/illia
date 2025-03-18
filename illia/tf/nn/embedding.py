@@ -1,27 +1,21 @@
 # Libraries
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 
-import tensorflow as tf  # type: ignore
+import tensorflow as tf
 from tensorflow.keras.utils import register_keras_serializable  # type: ignore
 
 from . import (
-    StaticDistribution,
-    DynamicDistribution,
-    StaticGaussianDistribution,
-    DynamicGaussianDistribution,
+    Distribution,
+    GaussianDistribution,
     BayesianModule,
 )
-
 
 @register_keras_serializable(package="Embedding")
 class Embedding(BayesianModule):
 
     input_size: int
     output_size: int
-    weights_posterior: DynamicDistribution
-    weights_prior: StaticDistribution
-    bias_posterior: DynamicDistribution
-    bias_prior: StaticDistribution
+    weights_distribution: Distribution
     weights: tf.Tensor
     bias: tf.Tensor
 
@@ -29,8 +23,7 @@ class Embedding(BayesianModule):
         self,
         num_embeddings: int,
         embeddings_dim: int,
-        weights_prior: Optional[StaticDistribution] = None,
-        weights_posterior: Optional[DynamicDistribution] = None,
+        weights_distribution: Optional[Distribution] = None,
         padding_idx: Optional[int] = None,
         max_norm: Optional[float] = None,
         norm_type: float = 2.0,
@@ -71,23 +64,29 @@ class Embedding(BayesianModule):
         self.scale_grad_by_freq = scale_grad_by_freq
         self.sparse = sparse
 
-        # Set prior if they are None
-        if weights_prior is None:
-            self.weights_prior = StaticGaussianDistribution(
-                mu=parameters["mean"], std=parameters["std"]
+        weights_distribution_shape = (num_embeddings, embeddings_dim)
+        if weights_distribution is None:
+            self.weights_distribution: Distribution = GaussianDistribution(
+               weights_distribution_shape,
+               name="weights_distr"
             )
         else:
-            self.weights_prior = weights_prior
+            assert (
+                weights_distribution.sample().shape == weights_distribution_shape
+            ), f"""Expected shape  {weights_distribution_shape}, sampled shape {weights_distribution.sample().shape}"""
+            self.weights_distribution = weights_distribution
+        
+        # Sample initial distributions
+        self.kernel = self.add_weight(
+            name="kernel",
+            initializer=tf.constant_initializer(
+                self.weights_distribution.sample().numpy()
+            ),
+            shape=weights_distribution_shape,
+            trainable=False,
+        )
 
-        # Set posterior if they are None
-        if weights_posterior is None:
-            self.weights_posterior = DynamicGaussianDistribution(
-                (num_embeddings, embeddings_dim)
-            )
-        else:
-            self.weights_posterior = weights_posterior
-
-    @tf.fuction
+    @tf.function
     def _embedding(
         self,
         input: tf.Tensor,
@@ -97,11 +96,12 @@ class Embedding(BayesianModule):
         norm_type: Optional[float] = 2.0,
         sparse: bool = False,
     ) -> tf.Tensor:
-
+        
+        input = tf.cast(input, tf.int32)
         if sparse is not None:
-            embeddings = tf.nn.embedding_lookup(input, weight)
+            embeddings = tf.nn.embedding_lookup(weight, input)
         else:
-            embeddings = tf.nn.embedding_lookup_sparse(input, weight)
+            embeddings = tf.nn.embedding_lookup_sparse(weight, input)
 
         if padding_idx is not None:
             padding_mask = tf.not_equal(input, padding_idx)
@@ -134,8 +134,7 @@ class Embedding(BayesianModule):
         custom_config = {
             "num_embeddings": self.num_embeddings,
             "embeddings_dim": self.embeddings_dim,
-            "weights_prior": self.weights_prior,
-            "weights_posterior": self.weights_posterior,
+            "weights_distribution": self.weights_distribution,
             "padding_idx": self.padding_idx,
             "max_norm": self.max_norm,
             "norm_type": self.norm_type,
@@ -149,17 +148,21 @@ class Embedding(BayesianModule):
     def call(self, inputs: tf.Tensor) -> tf.Tensor:
         # Forward depeding of frozen state
         if not self.frozen:
-            self.weights = self.weights_posterior.sample()
-            self.bias = self.bias_posterior.sample()
+            self.kernel.assign(self.weights_distribution.sample())
         else:
-            if self.weights is None or self.bias is None:
-                self.weights = self.weights_posterior.sample()
-                self.bias = self.bias_posterior.sample()
+            if self.kernel is None:
+                w=self.weights_distribution.sample()
+                self.kernel = self.add_weight(
+                    name="kernel",
+                    initializer=tf.constant_initializer(w.numpy()),
+                    shape=w.shape,
+                    trainable=False,
+                )
 
         # Run tensorflow forward
         outputs: tf.Tensor = self._embedding(
             inputs,
-            self.weights,
+            self.kernel,
             self.padding_idx,
             self.max_norm,
             self.norm_type,
@@ -178,17 +181,11 @@ class Embedding(BayesianModule):
             A tuple containing the KL divergence cost for the weights and bias, and the total number of parameters.
         """
 
-        # Get log posterior and log prior
-        log_posterior: tf.Tensor = self.weights_posterior.log_prob(
-            self.weights
-        ) + self.bias_posterior.log_prob(self.bias)
-        log_prior: tf.Tensor = self.weights_prior.log_prob(
-            self.weights
-        ) + self.bias_prior.log_prob(self.bias)
-
-        # Get number of parameters
-        num_params: int = (
-            self.weights_posterior.num_params + self.bias_posterior.num_params
+        log_posterior: tf.Tensor = self.weights_distribution.log_prob(
+            self.kernel
         )
 
-        return log_posterior - log_prior, num_params
+        num_params: int = (
+            self.weights_distribution.num_params
+        )
+        return log_posterior, num_params
