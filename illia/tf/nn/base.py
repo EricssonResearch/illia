@@ -1,50 +1,51 @@
-# Libraries
-from abc import abstractmethod
-from typing import Tuple, Any
-
-from tensorflow.keras import Model  # type: ignore
+# 3pp
+import tensorflow as tf
 
 
-class BayesianModule(Model):
-    """
-    A base class for creating a Bayesion Module.
-    Each of the functions is subsequently override by the specific backend.
-    """
+# standard libraries
+class BayesianModule(tf.keras.Model):
+    def __init__(self) -> None:
+        """
+        This method is the constructor for BayesianModule.
+        """
 
-    frozen: bool
-
-    def __init__(self):
-
-        # Call super class constructor
+        # call super class constructor
         super().__init__()
 
-        # Set freeze false by default
-        self.frozen = False
+        # set state
+        self.frozen: bool = False
+
+        # create attribute to know is a bayesian layer
+        self.is_bayesian: bool = True
 
     def freeze(self) -> None:
+        """
+        This method freezes the layer.
 
-        # Set frozen indicator to true for current layer
+        Returns:
+            None.
+        """
+
         self.frozen = True
 
-        # Set forzen indicator to true for children
-        for layer in self.submodules:
-            if isinstance(layer, BayesianModule):
-                layer.freeze()
-            else:
-                continue
-
     def unfreeze(self) -> None:
+        """
+        This method unfreezes the layer.
 
-        # Set frozen indicator to false for current layer
+        Returns:
+            None.
+        """
+
         self.frozen = False
 
-        # Set frozen indicators to false for children
-        for layer in self.submodules:
-            if isinstance(layer, BayesianModule):
-                layer.unfreeze()
-            else:
-                continue
+    def kl_cost(self) -> tuple[tf.Tensor, int]:
+        """
+        This is a default implementation of the kl_cots function,
+        which computes
 
-    @abstractmethod
-    def kl_cost(self) -> Tuple[Any, int]:
-        pass
+        Returns:
+            tensor with the kl cost.
+            number of parameters of the layer.
+        """
+
+        return tf.Tensor([0.0]), 0

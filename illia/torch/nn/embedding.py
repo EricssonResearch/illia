@@ -1,35 +1,46 @@
-# Libraries
-from typing import Optional, Tuple
+# standard libraries
+from typing import Optional
 
+# 3pp
 import torch
-import torch.nn.functional as F  # type: ignore
+import torch.nn.functional as F
 
-from . import (
-    StaticDistribution,
-    DynamicDistribution,
-    StaticGaussianDistribution,
-    DynamicGaussianDistribution,
-    BayesianModule,
+# own modules
+from illia.torch.nn.base import BayesianModule
+from illia.torch.distributions import (
+    Distribution,
+    GaussianDistribution,
 )
 
 
 class Embedding(BayesianModule):
+    """
+    This class is the bayesian implementation of the Embedding class.
 
-    input_size: int
-    output_size: int
-    weights_posterior: DynamicDistribution
-    weights_prior: StaticDistribution
-    bias_posterior: DynamicDistribution
-    bias_prior: StaticDistribution
-    weights: torch.Tensor
-    bias: torch.Tensor
+    Attr:
+        weights_distribution: distribution for the weights of the
+            layer. Dimensions: [number of embeddings, embedding dim].
+        weights: sampled weights of the layer. They are registered in
+            the buffer. Dimensions: [number of embeddings,
+            embedding dim].
+        padding_idx: If specified, the entries at padding_idx do
+            not contribute to the gradient.
+        max_norm: If given, each embedding vector with norm larger
+            than max_norm is renormalized to have norm max_norm.
+        norm_type: The p of the p-norm to compute for the max_norm
+            option.
+        scale_grad_by_freq: If given, this will scale gradients by
+            the inverse of frequency of the words in the
+            mini-batch.
+        sparse: If True, gradient w.r.t. weight matrix will be a
+            sparse tensor.
+    """
 
     def __init__(
         self,
         num_embeddings: int,
         embeddings_dim: int,
-        weights_prior: Optional[StaticDistribution] = None,
-        weights_posterior: Optional[DynamicDistribution] = None,
+        weights_distribution: Optional[Distribution] = None,
         padding_idx: Optional[int] = None,
         max_norm: Optional[float] = None,
         norm_type: float = 2.0,
@@ -37,78 +48,76 @@ class Embedding(BayesianModule):
         sparse: bool = False,
     ) -> None:
         """
-        Definition of a Bayesian Embedding layer.
+        This method is the constructor of the embedding class.
 
         Args:
-            num_embeddings: Size of the dictionary of embeddings.
-            embeddings_dim: The size of each embedding vector
-            weights_prior: The prior distribution for the weights.
-            weights_posterior: The posterior distribution for the weights.
-            padding_idx: If padding_idx is specified, its entries do not affect the gradient, meaning the
-                            embedding vector at padding_idx stays constant during training. Initially, this
-                            embedding vector defaults to zeros but can be set to a different value to serve
-                            as the padding vector.
-            max_norm: If given, each embedding vector with norm larger than max_norm is renormalized to have
-                        norm max_norm.
-            norm_type: The p of the p-norm to compute for the max_norm option.
-            scale_grad_by_freq: If given, this will scale gradients by the inverse of frequency of the words in the
-                                mini-batch.
-            sparse: If True, gradient w.r.t. weight matrix will be a sparse tensor.
+            num_embeddings: size of the dictionary of embeddings.
+            embeddings_dim: the size of each embedding vector.
+            weights_distribution: distribution for the weights of the
+                layer. Defaults to None.
+            padding_idx: If specified, the entries at padding_idx do
+                not contribute to the gradient. Defaults to None.
+            max_norm: If given, each embedding vector with norm larger
+                than max_norm is renormalized to have norm max_norm.
+                Defaults to None.
+            norm_type: The p of the p-norm to compute for the max_norm
+                option. Defaults to 2.0.
+            scale_grad_by_freq: If given, this will scale gradients by
+                the inverse of frequency of the words in the
+                mini-batch. Defaults to False.
+            sparse: If True, gradient w.r.t. weight matrix will be a
+                sparse tensor. Defaults to False.
         """
 
-        # Call super class constructor
+        # call super class constructor
         super().__init__()
 
-        # Define default parameters
-        parameters = {"mean": 0, "std": 0.1}
-
-        # Set embeddings atributtes
+        # set embeddings atributtes
         self.padding_idx = padding_idx
         self.max_norm = max_norm
         self.norm_type = norm_type
         self.scale_grad_by_freq = scale_grad_by_freq
         self.sparse = sparse
 
-        # Set prior if they are None
-        if weights_prior is None:
-            self.weights_prior = StaticGaussianDistribution(
-                mu=parameters["mean"], std=parameters["std"]
-            )
-        else:
-            self.weights_prior = weights_prior
-
-        if weights_posterior is None:
-            self.weights_posterior = DynamicGaussianDistribution(
+        # set weights distribution
+        self.weights_distribution: Distribution
+        if weights_distribution is None:
+            self.weights_distribution = GaussianDistribution(
                 (num_embeddings, embeddings_dim)
             )
         else:
-            self.weights_posterior = weights_posterior
+            self.weights_distribution = weights_distribution
+
+        # sample initial weights
+        weights = self.weights_distribution.sample()
+
+        # register buffers
+        self.register_buffer("weights", weights)
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
-        Performs a forward pass through the Bayesian Embedding layer.
-
-        If the layer is not frozen, it samples weights and bias from their respective posterior distributions.
-        If the layer is frozen and the weights or bias are not initialized, it samples them from their respective posterior distributions.
+        This method is the forward pass of the layer.
 
         Args:
-            inputs: Input tensor to the layer.
+            inputs: input tensor. Dimensions: [*].
+
+        Raises:
+            ValueError: Module has been frozen with undefined weights.
 
         Returns:
-            Output tensor after passing through the layer.
+            outputs tensor. Dimension: [*, embedding dim].
         """
 
-        # Forward depeding of frozen state
+        # forward depeding of frozen state
         if not self.frozen:
-            self.weights = self.weights_posterior.sample()
-            self.bias = self.bias_posterior.sample()
-        else:
-            if self.weights is None or self.bias is None:
-                self.weights = self.weights_posterior.sample()
-                self.bias = self.bias_posterior.sample()
+            self.weights = self.weights_distribution.sample()
 
-        # Run torch forward
-        return F.embedding(
+        else:
+            if self.weights is None:
+                raise ValueError("Module has been frozen with undefined weights")
+
+        # run torch forward
+        outputs: torch.Tensor = F.embedding(
             inputs,
             self.weights,
             self.padding_idx,
@@ -118,25 +127,42 @@ class Embedding(BayesianModule):
             self.sparse,
         )
 
-    def kl_cost(self) -> Tuple[torch.Tensor, int]:
+        return outputs
+
+    @torch.jit.export
+    def freeze(self) -> None:
         """
-        Calculate the Kullback-Leibler (KL) divergence cost for the weights and bias of the layer.
+        This method freezes the layer.
 
         Returns:
-            A tuple containing the KL divergence cost for the weights and bias, and the total number of parameters.
+            None.
         """
 
-        # Get log posterior and log prior
-        log_posterior: torch.Tensor = self.weights_posterior.log_prob(
-            self.weights
-        ) + self.bias_posterior.log_prob(self.bias)
-        log_prior: torch.Tensor = self.weights_prior.log_prob(
-            self.weights
-        ) + self.bias_prior.log_prob(self.bias)
+        # set indicator
+        self.frozen = True
 
-        # Get number of parameters
-        num_params: int = (
-            self.weights_posterior.num_params + self.bias_posterior.num_params
-        )
+        # sample weights if they are undefined
+        if self.weights is None:
+            self.weights = self.weights_distribution.sample()
 
-        return log_posterior - log_prior, num_params
+        # detach weights
+        self.weights = self.weights.detach()
+
+    @torch.jit.export
+    def kl_cost(self) -> tuple[torch.Tensor, int]:
+        """
+        This method calculates the kl cost of the layer.
+
+        Returns:
+            kl cost. Dimensions: [].
+            number of parameters of the layer. It can be used to
+                average the kl cost.
+        """
+
+        # get log posterior and log prior
+        log_probs: torch.Tensor = self.weights_distribution.log_prob(self.weights)
+
+        # get number of parameters
+        num_params: int = self.weights_distribution.num_params
+
+        return log_probs, num_params
