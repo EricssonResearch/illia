@@ -22,7 +22,7 @@ setup(
     author="Oscar Llorente",
     author_email="oscar.llorente.gonzalez@ericsson.com",
     maintainer="Anubhab Samal, Daniel Bazo, Lucia Ferrer",
-    maintainer_email="anubhab.samal@ericsson.com, dani.bazo@ericsson.com, lucia.ferrer@ericsson.com",
+    maintainer_email="anubhab.samal@ericsson.com, daniel.bazo.correa@ericsson.com, lucia.ferrer@ericsson.com",
     packages=find_packages(),
     install_requires=parse_requirements("requirements.txt"),
     include_package_data=True,

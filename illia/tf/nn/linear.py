@@ -1,7 +1,8 @@
 # Libraries
-from typing import Optional, Tuple, Union
+from typing import Optional
 
-import tensorflow as tf  # type: ignore
+import keras
+import tensorflow as tf
 
 from . import (
     StaticDistribution,
@@ -12,7 +13,12 @@ from . import (
 )
 
 
+@keras.saving.register_keras_serializable(package="Linear")
 class Linear(BayesianModule):
+    """
+    Bayesian Linear layer with trainable weights and biases,
+    supporting prior and posterior distributions.
+    """
 
     def __init__(
         self,
@@ -24,15 +30,16 @@ class Linear(BayesianModule):
         bias_posterior: Optional[DynamicDistribution] = None,
     ) -> None:
         """
-        Definition of a Bayesian Linear layer.
+        Initializes a Bayesian Linear layer with specified dimensions
+        and distributions.
 
         Args:
-            input_size: Size of each input sample.
-            output_size: Size of each output sample.
-            weights_prior: The prior distribution for the weights.
-            bias_prior: The prior distribution for the bias.
-            weights_posterior: The posterior distribution for the weights.
-            bias_posterior: The posterior distribution for the bias.
+            input_size: Number of features in input.
+            output_size: Number of features in output.
+            weights_prior: Prior distribution for weights.
+            bias_prior: Prior distribution for bias.
+            weights_posterior: Posterior distribution for weights.
+            bias_posterior: Posterior distribution for bias.
         """
 
         # Call super class constructor
@@ -87,12 +94,10 @@ class Linear(BayesianModule):
 
     def get_config(self) -> dict:
         """
-        Get the configuration of the Gaussian Distribution object. This method retrieves the base
-        configuration of the parent class and combines it with custom configurations specific to
-        the Gaussian Distribution.
+        Retrieves the configuration of the Linear layer.
 
         Returns:
-            A dictionary containing the combined configuration of the Gaussian Distribution.
+            Dictionary containing layer configuration.
         """
 
         # Get the base configuration
@@ -115,14 +120,15 @@ class Linear(BayesianModule):
         """
         Performs a forward pass through the Bayesian Linear layer.
 
-        If the layer is not frozen, it samples weights and bias from their respective posterior distributions.
-        If the layer is frozen and the weights or bias are not initialized, it samples them from their respective posterior distributions.
+        Samples weights and bias from their posterior distributions if
+        the layer is not frozen. If frozen and not initialized, samples
+        them once.
 
         Args:
             inputs: Input tensor to the layer.
 
         Returns:
-            Output tensor after passing through the layer.
+            Output tensor after linear transformation.
         """
 
         # Forward depeding of frozen state
@@ -140,12 +146,14 @@ class Linear(BayesianModule):
         return tf.linalg.matmul(inputs, self.sampled_weights) + self.sampled_bias
 
     @tf.function
-    def kl_cost(self) -> Tuple[tf.Tensor, int]:
+    def kl_cost(self) -> tuple[tf.Tensor, int]:
         """
-        Calculate the Kullback-Leibler (KL) divergence cost for the weights and bias of the layer.
+        Computes the Kullback-Leibler (KL) divergence cost for the
+        layer's weights and bias.
 
         Returns:
-            A tuple containing the KL divergence cost for the weights and bias, and the total number of parameters.
+            Tuple containing KL divergence cost and total number of
+            parameters.
         """
 
         log_posterior: tf.Tensor = self.weights_posterior.log_prob(

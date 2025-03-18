@@ -1,8 +1,8 @@
 # Libraries
 from typing import Optional, Tuple
 
-import tensorflow as tf  # type: ignore
-from tensorflow.keras.utils import register_keras_serializable  # type: ignore
+import keras
+import tensorflow as tf
 
 from . import (
     StaticDistribution,
@@ -13,8 +13,12 @@ from . import (
 )
 
 
-@register_keras_serializable(package="Embedding")
+@keras.saving.register_keras_serializable(package="Embedding")
 class Embedding(BayesianModule):
+    """
+    Bayesian Embedding layer with trainable weights and biases,
+    supporting prior and posterior distributions.
+    """
 
     input_size: int
     output_size: int
@@ -38,22 +42,20 @@ class Embedding(BayesianModule):
         sparse: bool = False,
     ) -> None:
         """
-        Definition of a Bayesian Embedding layer.
+        Initializes a Bayesian Embedding layer with specified dimensions
+        and distributions.
 
         Args:
-            num_embeddings: Size of the dictionary of embeddings.
-            embeddings_dim: The size of each embedding vector
-            weights_prior: The prior distribution for the weights.
-            weights_posterior: The posterior distribution for the weights.
-            padding_idx: If padding_idx is specified, its entries do not affect the gradient, meaning the
-                            embedding vector at padding_idx stays constant during training. Initially, this
-                            embedding vector defaults to zeros but can be set to a different value to serve
-                            as the padding vector.
-            max_norm: If given, each embedding vector with norm larger than max_norm is renormalized to have
-                            norm max_norm.
-            norm_type: The p of the p-norm to compute for the max_norm option.
-            scale_grad_by_freq: If given, this will scale gradients by the inverse of frequency of the words in the mini-batch.
-            sparse: If True, gradient w.r.t. weight matrix will be a sparse tensor.
+            num_embeddings: Number of unique embeddings.
+            embeddings_dim: Dimension of each embedding vector.
+            weights_prior: Prior distribution for weights.
+            weights_posterior: Posterior distribution for weights.
+            padding_idx: Index for padding, which keeps gradient
+                constant.
+            max_norm: Maximum norm for embedding vectors.
+            norm_type: Norm type for max_norm computation.
+            scale_grad_by_freq: Scale gradients by word frequency.
+            sparse: Use sparse tensor for weight gradients.
         """
 
         # Call super class constructor
@@ -87,24 +89,39 @@ class Embedding(BayesianModule):
         else:
             self.weights_posterior = weights_posterior
 
-    @tf.fuction
+    @tf.function
     def _embedding(
         self,
-        input: tf.Tensor,
+        inputs: tf.Tensor,
         weight: tf.Tensor,
         padding_idx: Optional[int] = None,
         max_norm: Optional[float] = None,
         norm_type: Optional[float] = 2.0,
         sparse: bool = False,
     ) -> tf.Tensor:
+        """
+        Computes the embedding lookup with optional padding and
+        normalization.
+
+        Args:
+            inputs: Input tensor for lookup.
+            weight: Weight tensor for embeddings.
+            padding_idx: Index to pad embeddings.
+            max_norm: Maximum norm for embeddings.
+            norm_type: Norm type for normalization.
+            sparse: Use sparse lookup.
+
+        Returns:
+            Tensor containing the computed embeddings.
+        """
 
         if sparse is not None:
-            embeddings = tf.nn.embedding_lookup(input, weight)
+            embeddings = tf.nn.embedding_lookup(inputs, weight)
         else:
-            embeddings = tf.nn.embedding_lookup_sparse(input, weight)
+            embeddings = tf.nn.embedding_lookup_sparse(inputs, weight)
 
         if padding_idx is not None:
-            padding_mask = tf.not_equal(input, padding_idx)
+            padding_mask = tf.not_equal(inputs, padding_idx)
             embeddings = tf.where(
                 tf.expand_dims(padding_mask, -1), embeddings, tf.zeros_like(embeddings)
             )
@@ -119,12 +136,10 @@ class Embedding(BayesianModule):
 
     def get_config(self) -> dict:
         """
-        Get the configuration of the Gaussian Distribution object. This method retrieves the base
-        configuration of the parent class and combines it with custom configurations specific to
-        the Gaussian Distribution.
+        Retrieves the configuration of the Embedding layer.
 
         Returns:
-            A dictionary containing the combined configuration of the Gaussian Distribution.
+            Dictionary containing layer configuration.
         """
 
         # Get the base configuration
@@ -147,6 +162,17 @@ class Embedding(BayesianModule):
         return {**base_config, **custom_config}
 
     def call(self, inputs: tf.Tensor) -> tf.Tensor:
+        """
+        Performs forward pass to compute embeddings based on input
+        tensor.
+
+        Args:
+            inputs: Input tensor for the layer.
+
+        Returns:
+            Tensor containing the layer's output.
+        """
+
         # Forward depeding of frozen state
         if not self.frozen:
             self.weights = self.weights_posterior.sample()
@@ -172,10 +198,12 @@ class Embedding(BayesianModule):
     @tf.function
     def kl_cost(self) -> Tuple[tf.Tensor, int]:
         """
-        Calculate the Kullback-Leibler (KL) divergence cost for the weights and bias of the layer.
+        Computes the KL divergence cost for the layer's weights and
+        bias.
 
         Returns:
-            A tuple containing the KL divergence cost for the weights and bias, and the total number of parameters.
+            Tuple containing KL divergence cost and total number of
+            parameters.
         """
 
         # Get log posterior and log prior

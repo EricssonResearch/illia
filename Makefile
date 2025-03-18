@@ -4,8 +4,9 @@
 # Default command
 .DEFAULT_GOAL := all
 
-# Variable for the test file
-TEST_FILE ?= ./tests
+# Variables
+SRC_PROJECT_NAME ?= illia
+TEST_FILE ?= tests
 
 # Allows the installation of project dependencies
 install:
@@ -19,12 +20,18 @@ install:
 	    pip install -r requirements.txt; \
 	fi
 
-# Check format of the code using Black and Mypy to detect errors 
+# Check format, quality and more, of the code
 lint:
-	@echo "Checking format of the code using Black..."
-	black --check .
-	@echo "Checking errors of the code using Mypy..."
-	mypy --cache-dir=/dev/null .
+	@echo "Checking Code Format with Black..."
+	black --check $(SRC_PROJECT_NAME)/ $(TEST_FILE)/
+	@echo "Checking Code Style and Quality with Flake8..."
+	flake8 $(SRC_PROJECT_NAME)/
+	@echo "Checking Code Complexity with complexipy..."
+	complexipy -d low $(SRC_PROJECT_NAME)/
+	@echo "Checking Code Annotations with Mypy..."
+	mypy $(SRC_PROJECT_NAME)/ $(TEST_FILE)/
+	@echo "Checking Code Style and Quality with Pylint..."
+	pylint --fail-under=8 $(SRC_PROJECT_NAME)/ $(TEST_FILE)/
 
 # Allows cache clearing
 clean:

@@ -1,16 +1,26 @@
 # Libraries
 import math
 
-import tensorflow as tf  # type: ignore
+import tensorflow as tf
 
 from . import StaticDistribution
 
 
 class GaussianDistribution(StaticDistribution):
+    """
+    Gaussian distribution with fixed mean and standard deviation. This
+    class models a Gaussian distribution and allows for probability
+    calculations based on provided parameters.
+
+    Args:
+        mu: Mean of the Gaussian distribution.
+        std: Standard deviation of the Gaussian distribution.
+    """
 
     def __init__(self, mu: float, std: float) -> None:
         """
-        Initialize a Gaussian distribution with given mean (mu) and standard deviation (std).
+        Initialize a Gaussian distribution with given mean (mu) and
+        standard deviation (std).
 
         Args:
             mu: The mean of the Gaussian distribution.
@@ -26,12 +36,11 @@ class GaussianDistribution(StaticDistribution):
 
     def get_config(self) -> dict:
         """
-        Get the configuration of the Gaussian Distribution object. This method retrieves the base
-        configuration of the parent class and combines it with custom configurations specific to
-        the Gaussian Distribution.
+        Retrieve the configuration of the Gaussian distribution,
+        combining base and custom parameters.
 
         Returns:
-            A dictionary containing the combined configuration of the Gaussian Distribution.
+            Dictionary with the Gaussian distribution's configuration.
         """
 
         # Get the base configuration
@@ -48,17 +57,14 @@ class GaussianDistribution(StaticDistribution):
 
     def log_prob(self, x: tf.Tensor) -> tf.Tensor:
         """
-        Calculate the log probability density function (PDF) of the given input data.
-
-        If no input data is provided, a sample is generated using the current parameters.
-        The log PDF is calculated using the current parameters mu and rho, which represent
-        the mean and standard deviation of the Gaussian distribution, respectively.
+        Compute the log probability of provided input data based on the
+        Gaussian distribution.
 
         Args:
-            x: Input data for which the log PDF needs to be calculated.
+            x: Tensor of input data for log probability computation.
 
         Returns:
-            The log probability density function (PDF) of the input data or sample.
+            Tensor representing the log probability of the input data.
         """
 
         # Compute log probs

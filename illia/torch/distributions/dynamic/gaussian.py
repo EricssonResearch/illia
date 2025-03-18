@@ -8,6 +8,10 @@ from . import DynamicDistribution
 
 
 class GaussianDistribution(DynamicDistribution):
+    """
+    Gaussian distribution with trainable parameters for mean (mu) and
+    standard deviation (derived from rho).
+    """
 
     def __init__(
         self,
@@ -16,14 +20,14 @@ class GaussianDistribution(DynamicDistribution):
         rho_init: float = -7.0,
     ) -> None:
         """
-        Initialize a Gaussian Distribution object with trainable parameters mu and rho.
-        The parameters are initialized with a normal distribution with mean mu_init and rho_init,
-        and a standard deviation of 0.1.
+        Initializes a Gaussian distribution with trainable parameters
+        mu and rho. Parameters are initialized with normal
+        distributions.
 
         Args:
-            shape: The shape of the distribution parameters.
-            mu_init: The initial mean value for mu.
-            rho_init: The initial mean value for rho.
+            shape: Shape of the distribution parameters.
+            mu_init: Initial mean value for mu.
+            rho_init: Initial mean value for rho.
         """
 
         # Call super class constructor
@@ -45,12 +49,11 @@ class GaussianDistribution(DynamicDistribution):
 
     def sample(self) -> torch.Tensor:
         """
-        Generate a sample from the Gaussian distribution using the current parameters
-        mu and rho. The sample is obtained by adding a random noise (epsilon) to the mean (mu),
-        where the noise is scaled by the standard deviation (sigma).
+        Generates a sample from the Gaussian distribution using current
+        parameters mu and rho.
 
         Returns:
-            A tensor representing a sample from the Gaussian distribution.
+            Tensor representing a sample from the Gaussian distribution.
         """
 
         eps: torch.Tensor = torch.randn_like(self.rho)
@@ -60,18 +63,14 @@ class GaussianDistribution(DynamicDistribution):
 
     def log_prob(self, x: torch.Tensor) -> torch.Tensor:
         """
-        Calculate the log probability density function (PDF) of the given input data.
-
-        If no input data is provided, a sample is generated using the current parameters.
-        The log PDF is calculated using the current parameters mu and rho, which represent
-        the mean and standard deviation of the Gaussian distribution, respectively.
+        Calculates the log probability density of the given input data
+        based on current parameters.
 
         Args:
-            x: Input data for which the log PDF needs to be calculated.
-                If None, a sample is generated using the current parameters.
+            x: Input data for which to calculate the log PDF.
 
         Returns:
-            The log probability density function (PDF) of the input data or sample.
+            Log probability density of the input data.
         """
 
         if x is None:
@@ -91,11 +90,11 @@ class GaussianDistribution(DynamicDistribution):
     @property
     def num_params(self) -> int:
         """
-        Calculate the total number of parameters in the Gaussian Distribution, which is the product
-        of the dimensions of the mean (mu) parameter.
+        Returns the total number of parameters in the Gaussian
+        distribution.
 
         Returns:
-            The total number of parameters in the Gaussian Distribution.
+            Total number of parameters.
         """
 
         return len(self.mu.view(-1))

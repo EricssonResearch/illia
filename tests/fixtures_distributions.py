@@ -2,10 +2,10 @@
 import random
 from typing import Dict, Tuple
 
-import pytest  # type: ignore
-import numpy as np  # type: ignore
+import pytest
+import numpy as np
 import torch
-import tensorflow as tf  # type: ignore
+import tensorflow as tf
 
 # Specific libraries for each backend
 from . import (
@@ -25,15 +25,9 @@ tf.random.set_seed(0)
 @pytest.fixture
 def set_parameters() -> Dict:
     """
-    This function sets the parameters for the Gaussian distributions and the Bayesian neural network modules.
-
-    Returns:
-        Dict: A dictionary containing the following parameters:
-            shape: A tuple representing the shape of the Gaussian distribution.
-            mu_prior: A float representing the mean of the prior distribution.
-            std_prior: A float representing the standard deviation of the prior distribution.
-            mu_init: A float representing the initial mean for the Gaussian distribution.
-            rho_init: A float representing the initial rho (log standard deviation) for the Gaussian distribution.
+    Returns a dictionary of common parameters used for initializing
+    Gaussian distributions. The parameters include the shape, prior
+    mean and standard deviation, initial mean, and initial rho value.
     """
 
     shape = (3, 2)
@@ -54,21 +48,9 @@ def set_parameters() -> Dict:
 @pytest.fixture
 def set_dynamic_distributions(set_parameters) -> Tuple:
     """
-    This function initializes dynamic Gaussian distributions for both PyTorch and TensorFlow backends.
-
-    Args:
-        set_parameters : Dict
-            A dictionary containing the parameters for the Gaussian distributions.
-            The dictionary should contain the following keys:
-            - "shape" : A tuple representing the shape of the Gaussian distribution.
-            - "mu_init" : A float representing the initial mean for the Gaussian distribution.
-            - "rho_init" : A float representing the initial rho (log standard deviation) for the Gaussian distribution.
-
-    Returns:
-        Tuple
-            A tuple containing two initialized dynamic Gaussian distributions:
-            - torch_dynamic_dist : A dynamic Gaussian distribution for PyTorch backend.
-            - tf_dynamic_dist : A dynamic Gaussian distribution for TensorFlow backend.
+    Initializes dynamic Gaussian distributions using the parameters
+    provided by `set_parameters`. Returns a tuple containing both
+    PyTorch and TensorFlow dynamic Gaussian distribution instances.
     """
 
     # Access to the variables
@@ -90,20 +72,9 @@ def set_dynamic_distributions(set_parameters) -> Tuple:
 @pytest.fixture
 def set_static_distributions(set_parameters) -> Tuple:
     """
-    This function initializes static Gaussian distributions for both PyTorch and TensorFlow backends.
-
-    Args:
-        set_parameters : Dict
-            A dictionary containing the parameters for the Gaussian distributions.
-            The dictionary should contain the following keys:
-            - "mu_prior" : A float representing the mean of the prior distribution.
-            - "std_prior" : A float representing the standard deviation of the prior distribution.
-
-    Returns:
-        Tuple
-            A tuple containing two initialized static Gaussian distributions:
-            - torch_static_dist : A static Gaussian distribution for PyTorch backend.
-            - tf_static_dist : A static Gaussian distribution for TensorFlow backend.
+    Initializes static Gaussian distributions using the parameters
+    provided by `set_parameters`. Returns a tuple containing both
+    PyTorch and TensorFlow static Gaussian distribution instances.
     """
 
     # Access to the variables

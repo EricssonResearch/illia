@@ -1,2 +1,2 @@
 # Libraries
-from illia.torch.distributions.static.base import StaticDistribution
+from illia.torch.distributions.static.base import StaticDistribution  # noqa

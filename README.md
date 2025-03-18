@@ -6,7 +6,8 @@
 
 ### What is illia?
 
-illia is a library focused on Bayesian Neural Networks with support for multiple backends.
+illia is a library focused on Bayesian Neural Networks with support for multiple
+backends.
 
 ### Availables backends
 
@@ -46,16 +47,21 @@ A more extensive usage can be found in the respective backend reference.
 
 ### Contributing
 
-To simplify the process, we have created a Makefile that allows for a quick and easy installation. Follow these steps:
+To simplify the process, we have created a Makefile that allows for a quick and easy
+installation. Follow these steps:
 
-1. Clone the current repository, update your system packages, and install `make`. On Linux, though it may vary by operating system or distribution, the commands are typically:
+1. Clone the current repository, update your system packages, and install `make`. On
+   Linux, though it may vary by operating system or distribution, the commands are
+   typically:
 
    ```bash
    sudo apt-get update
    sudo apt-get install build-essential
    ```
 
-2. Once the repository has been downloaded locally, navigate to its location. Ensure you have created and activated a Python environment. Then, install all the required dependencies using the following command:
+2. Once the repository has been downloaded locally, navigate to its location. Ensure you
+   have created and activated a Python environment. Then, install all the required
+   dependencies using the following command:
 
    ```bash
    make install-all
@@ -69,4 +75,5 @@ python setup.py bdist_wheel
 
 ### License
 
-This project is licensed under the terms of the [MIT license](https://github.com/EricssonResearch/illia/blob/main/LICENSE).
+This project is licensed under the terms of the
+[MIT license](https://github.com/EricssonResearch/illia/blob/main/LICENSE).

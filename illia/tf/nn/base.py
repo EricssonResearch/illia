@@ -1,19 +1,24 @@
 # Libraries
 from abc import abstractmethod
-from typing import Tuple, Any
+from typing import Any
 
-from tensorflow.keras import Model  # type: ignore
+from keras import Model
 
 
 class BayesianModule(Model):
     """
-    A base class for creating a Bayesion Module.
-    Each of the functions is subsequently override by the specific backend.
+    Base class for creating a Bayesian module, which can be frozen or
+    unfrozen. This class is intended to be subclassed for specific
+    backend implementations.
     """
 
     frozen: bool
 
     def __init__(self):
+        """
+        Initializes the BayesianModule, setting the frozen state to
+        False.
+        """
 
         # Call super class constructor
         super().__init__()
@@ -22,29 +27,40 @@ class BayesianModule(Model):
         self.frozen = False
 
     def freeze(self) -> None:
+        """
+        Freezes the current layer and all submodules that are instances
+        of BayesianModule. Sets the frozen state to True.
+        """
 
         # Set frozen indicator to true for current layer
         self.frozen = True
 
         # Set forzen indicator to true for children
-        for layer in self.submodules:
+        for layer in self.layers:
             if isinstance(layer, BayesianModule):
                 layer.freeze()
-            else:
-                continue
 
     def unfreeze(self) -> None:
+        """
+        Unfreezes the current layer and all submodules that are
+        instances of BayesianModule. Sets the frozen state to False.
+        """
 
         # Set frozen indicator to false for current layer
         self.frozen = False
 
         # Set frozen indicators to false for children
-        for layer in self.submodules:
+        for layer in self.layers:
             if isinstance(layer, BayesianModule):
                 layer.unfreeze()
-            else:
-                continue
 
     @abstractmethod
-    def kl_cost(self) -> Tuple[Any, int]:
-        pass
+    def kl_cost(self) -> tuple[Any, int]:
+        """
+        Abstract method to compute the KL divergence cost.
+        Must be implemented by subclasses.
+
+        Returns:
+            A tuple containing the KL divergence cost and its
+            associated integer value.
+        """

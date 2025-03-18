@@ -2,7 +2,7 @@
 from typing import Optional, Tuple
 
 import torch
-import torch.nn.functional as F  # type: ignore
+import torch.nn.functional as F
 
 from . import (
     StaticDistribution,
@@ -14,6 +14,10 @@ from . import (
 
 
 class Linear(BayesianModule):
+    """
+    Represents a Bayesian Linear layer that models uncertainty in its
+    weights and biases using prior and posterior distributions.
+    """
 
     input_size: int
     output_size: int
@@ -41,7 +45,8 @@ class Linear(BayesianModule):
             output_size: Size of each output sample.
             weights_prior: The prior distribution for the weights.
             bias_prior: The prior distribution for the bias.
-            weights_posterior: The posterior distribution for the weights.
+            weights_posterior: The posterior distribution for the
+                weights.
             bias_posterior: The posterior distribution for the bias.
         """
 
@@ -89,8 +94,10 @@ class Linear(BayesianModule):
         """
         Performs a forward pass through the Bayesian Linear layer.
 
-        If the layer is not frozen, it samples weights and bias from their respective posterior distributions.
-        If the layer is frozen and the weights or bias are not initialized, it samples them from their respective posterior distributions.
+        If the layer is not frozen, it samples weights and bias from
+        their respective posterior distributions. If the layer is
+        frozen and the weights or bias are not initialized, it samples
+        them from their respective posterior distributions.
 
         Args:
             inputs: Input tensor to the layer.
@@ -113,10 +120,12 @@ class Linear(BayesianModule):
 
     def kl_cost(self) -> Tuple[torch.Tensor, int]:
         """
-        Calculate the Kullback-Leibler (KL) divergence cost for the weights and bias of the layer.
+        Calculate the Kullback-Leibler (KL) divergence cost for the
+        weights and bias of the layer.
 
         Returns:
-            A tuple containing the KL divergence cost for the weights and bias, and the total number of parameters.
+            A tuple containing the KL divergence cost for the weights
+            and bias, and the total number of parameters.
         """
 
         log_posterior: torch.Tensor = self.weights_posterior.log_prob(

@@ -2,7 +2,7 @@
 from typing import Optional, Tuple, Union
 
 import torch
-import torch.nn.functional as F  # type: ignore
+import torch.nn.functional as F
 
 from . import (
     StaticDistribution,
@@ -14,6 +14,10 @@ from . import (
 
 
 class Conv2d(BayesianModule):
+    """
+    Bayesian 2D Convolution layer with trainable weights and biases,
+    supporting prior and posterior distributions.
+    """
 
     input_channels: int
     output_channels: int
@@ -39,20 +43,23 @@ class Conv2d(BayesianModule):
         bias_posterior: Optional[DynamicDistribution] = None,
     ) -> None:
         """
-        Definition of a Bayesian Convolution 2D layer.
+        Initializes a Bayesian 2D Convolution layer with specified
+        parameters and distributions.
 
         Args:
             input_channels: Number of channels in the input image.
-            output_channels: Number of channels produced by the convolution.
+            output_channels: Number of channels produced by the
+                convolution.
             kernel_size: Size of the convolving kernel.
             stride: Stride of the convolution.
-            padding: Padding added to all four sides of the input.
+            padding: Padding added to all sides of the input.
             dilation: Spacing between kernel elements.
-            groups: Number of blocked connections from input channels to output channels.
-            weights_prior: The prior distribution for the weights.
-            bias_prior: The prior distribution for the bias.
-            weights_posterior: The posterior distribution for the weights.
-            bias_posterior: The posterior distribution for the bias.
+            groups: Number of blocked connections from input to output
+                channels.
+            weights_prior: Prior distribution for weights.
+            bias_prior: Prior distribution for bias.
+            weights_posterior: Posterior distribution for weights.
+            bias_posterior: Posterior distribution for bias.
         """
 
         # Call super class constructor
@@ -103,16 +110,18 @@ class Conv2d(BayesianModule):
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
-        Performs a forward pass through the Bayesian Convolution 2D layer.
+        Performs a forward pass through the Bayesian 2D Convolution
+        layer.
 
-        If the layer is not frozen, it samples weights and bias from their respective posterior distributions.
-        If the layer is frozen and the weights or bias are not initialized, it samples them from their respective posterior distributions.
+        Samples weights and bias from their posterior distributions if
+        the layer is not frozen. If frozen and not initialized, samples
+        them once.
 
         Args:
             inputs: Input tensor to the layer.
 
         Returns:
-            Output tensor after passing through the layer.
+            Output tensor after convolution operation.
         """
 
         # Forward depeding of frozen state
@@ -137,10 +146,12 @@ class Conv2d(BayesianModule):
 
     def kl_cost(self) -> Tuple[torch.Tensor, int]:
         """
-        Calculate the Kullback-Leibler (KL) divergence cost for the weights and bias of the layer.
+        Computes the Kullback-Leibler (KL) divergence cost for the
+        layer's weights and bias.
 
         Returns:
-            A tuple containing the KL divergence cost for the weights and bias, and the total number of parameters.
+            Tuple containing KL divergence cost and total number of
+            parameters.
         """
 
         log_posterior: torch.Tensor = self.weights_posterior.log_prob(

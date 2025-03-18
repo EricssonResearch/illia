@@ -2,10 +2,10 @@
 from typing import Tuple, Union
 
 import torch
-import torch.nn.functional as F  # type: ignore
+import torch.nn.functional as F
 from torch import Tensor
-from torch_geometric.nn import MessagePassing  # type: ignore
-from torch_geometric.typing import Adj, OptTensor, PairTensor  # type: ignore
+from torch_geometric.nn import MessagePassing
+from torch_geometric.typing import Adj, OptTensor, PairTensor
 
 from illia.torch.nn.linear import Linear
 
@@ -23,37 +23,47 @@ class CGConv(MessagePassing):
         **kwargs,
     ):
         r"""
-        "Crystal Graph Convolutional Neural Networks for an Accurate and Interpretable Prediction of Material Properties"
+        "Crystal Graph Convolutional Neural Networks for an Accurate
+        and Interpretable Prediction of Material Properties"
         (https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.120.145301).
 
         The operation is defined as:
 
         $$
-        \mathbf{x}^{\prime}_i = \mathbf{x}_i + \sum_{j \in \mathcal{N}(i)}\sigma ( \mathbf{z}_{i,j} \mathbf{W}_f + \mathbf{b}_f )
+        \mathbf{x}^{\prime}_i = \mathbf{x}_i + \sum_{j \in
+        \mathcal{N}(i)}\sigma ( \mathbf{z}_{i,j} \mathbf{W}_f +
+        \mathbf{b}_f )
         \odot g ( \mathbf{z}_{i,j} \mathbf{W}_s + \mathbf{b}_s )
         $$
 
-        where \(\mathbf{z}_{i,j} = [ \mathbf{x}_i, \mathbf{x}_j, \mathbf{e}_{i,j} ]\)
-        denotes the concatenation of central node features, neighboring node features,
-        and edge features. In addition, \(\sigma\) and \(g\) denote the sigmoid
-        and softplus functions, respectively.
+        where \(\mathbf{z}_{i,j} = [ \mathbf{x}_i, \mathbf{x}_j,
+        \mathbf{e}_{i,j} ]\)
+        denotes the concatenation of central node features, neighboring
+        node features, and edge features. In addition, \(\sigma\) and
+        \(g\) denote the sigmoid and softplus functions, respectively.
 
         Args:
-            channels (int or tuple): The size of each input sample. A tuple corresponds to the sizes of source and target dimensionalities.
-            dim (int, optional): The edge feature dimensionality. Defaults to 0.
-            aggr (str, optional): The aggregation operator to use ("add", "mean", "max"). Defaults to "add".
-            **kwargs (optional): Additional arguments for :class:`torch_geometric.nn.conv.MessagePassing`.
+            channels (int or tuple): The size of each input sample. A
+                tuple corresponds to the sizes of source and target
+                dimensionalities.
+            dim (int, optional): The edge feature dimensionality.
+            aggr (str, optional): The aggregation operator to use
+                ("add", "mean", "max").
+            **kwargs (optional): Additional arguments for
+                :class:`torch_geometric.nn.conv.MessagePassing`.
 
         Shapes:
             - **input:**
-            node features \((|\mathcal{V}|, F)\) or \(((|\mathcal{V_s}|, F_{s}), (|\mathcal{V_t}|, F_{t}))\) if bipartite,
+            node features \((|\mathcal{V}|, F)\) or \(((|\mathcal{V_s}|,
+            F_{s}), (|\mathcal{V_t}|, F_{t}))\) if bipartite,
             edge indices \((2, |\mathcal{E}|)\),
             edge features \((|\mathcal{E}|, D)\) *(optional)*
-            - **output:** node features \((|\mathcal{V}|, F)\) or \((|\mathcal{V_t}|, F_{t})\) if bipartite
+            - **output:** node features \((|\mathcal{V}|, F)\) or
+                \((|\mathcal{V_t}|, F_{t})\) if bipartite
         """
 
         # Call super class constructor
-        super(CGConv, self).__init__(aggr=aggr, **kwargs)
+        super().__init__(aggr=aggr, **kwargs)
 
         self.channels = channels
         self.dim = dim

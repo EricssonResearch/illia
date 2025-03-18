@@ -1,24 +1,32 @@
 # Libraries
 import math
-from typing import Tuple
 
-import tensorflow as tf  # type: ignore
+import tensorflow as tf
 
 from . import DynamicDistribution
 
 
 class GaussianDistribution(DynamicDistribution):
+    """
+    This class models a Gaussian distribution, allowing for sampling
+    and probability calculations based on learned mean and standard
+    deviation.
+
+    Args:
+        shape: Dimensions of the distribution parameters.
+        mu_init: Initial mean value for the distribution.
+        rho_init: Initial mean value for the log-standard deviation.
+    """
 
     def __init__(
         self,
-        shape: Tuple[int, ...],
+        shape: tuple[int, ...],
         mu_init: float = 0.0,
         rho_init: float = -7.0,
     ) -> None:
         """
-        Initialize a Gaussian Distribution object with trainable parameters mu and rho.
-        The parameters are initialized with a normal distribution with mean mu_init and rho_init,
-        and a standard deviation of 0.1.
+        Initialize a Gaussian Distribution object with trainable
+        parameters mu and rho.
 
         Args:
             shape: The shape of the distribution parameters.
@@ -30,27 +38,26 @@ class GaussianDistribution(DynamicDistribution):
         super().__init__()
 
         # Parameter for standard deviation
-        self.std = 0.1
+        self._std = 0.1
 
         # Set attributes
         self.shape = shape
         self.mu_init = mu_init
         self.rho_init = rho_init
         self.mu: tf.Variable = tf.Variable(
-            tf.random.normal(shape=self.shape, mean=self.mu_init, stddev=self.std)
+            tf.random.normal(shape=self.shape, mean=self.mu_init, stddev=self._std)
         )
         self.rho: tf.Variable = tf.Variable(
-            tf.random.normal(shape=self.shape, mean=self.rho_init, stddev=self.std)
+            tf.random.normal(shape=self.shape, mean=self.rho_init, stddev=self._std)
         )
 
     def get_config(self) -> dict:
         """
-        Get the configuration of the Gaussian Distribution object. This method retrieves the base
-        configuration of the parent class and combines it with custom configurations specific to
-        the Gaussian Distribution.
+        Retrieve the configuration of the Gaussian distribution,
+        combining base and custom parameters.
 
         Returns:
-            A dictionary containing the combined configuration of the Gaussian Distribution.
+            Dictionary with the Gaussian distribution's configuration.
         """
 
         # Get the base configuration
@@ -68,12 +75,11 @@ class GaussianDistribution(DynamicDistribution):
 
     def sample(self) -> tf.Tensor:
         """
-        Generate a sample from the Gaussian distribution using the current parameters
-        mu and rho. The sample is obtained by adding a random noise (epsilon) to the mean (mu),
-        where the noise is scaled by the standard deviation (sigma).
+        Generate a sample from the Gaussian distribution using current
+        parameters.
 
         Returns:
-            A tensor representing a sample from the Gaussian distribution.
+            Tensor representing a sample from the distribution.
         """
 
         eps: tf.Tensor = tf.random.normal(shape=self.rho.shape)
@@ -83,18 +89,14 @@ class GaussianDistribution(DynamicDistribution):
 
     def log_prob(self, x: tf.Tensor) -> tf.Tensor:
         """
-        Calculate the log probability density function (PDF) of the given input data.
-
-        If no input data is provided, a sample is generated using the current parameters.
-        The log PDF is calculated using the current parameters mu and rho, which represent
-        the mean and standard deviation of the Gaussian distribution, respectively.
+        Compute the log probability of provided input data based on the
+        Gaussian distribution.
 
         Args:
-            x: Input data for which the log PDF needs to be calculated.
-                If None, a sample is generated using the current parameters.
+            x: Input tensor for log probability computation.
 
         Returns:
-            The log probability density function (PDF) of the input data or sample.
+            Tensor representing the log probability of the input data.
         """
 
         if x is None:
@@ -114,11 +116,10 @@ class GaussianDistribution(DynamicDistribution):
     @property
     def num_params(self) -> int:
         """
-        Calculate the total number of parameters in the Gaussian Distribution, which is the product
-        of the dimensions of the mean (mu) parameter.
+        Get the total number of parameters in the Gaussian distribution.
 
         Returns:
-            The total number of parameters in the Gaussian Distribution.
+            Integer representing the number of distribution parameters.
         """
 
         return tf.size(tf.reshape(self.mu, [-1]))

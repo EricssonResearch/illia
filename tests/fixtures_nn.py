@@ -1,11 +1,10 @@
 # Libraries
 import random
-from typing import Dict, Tuple
 
-import pytest  # type: ignore
-import numpy as np  # type: ignore
+import pytest
+import numpy as np
 import torch
-import tensorflow as tf  # type: ignore
+import tensorflow as tf
 
 from . import TorchBayesianModule, TFBayesianModule
 
@@ -16,11 +15,13 @@ tf.random.set_seed(0)
 
 
 @pytest.fixture
-def set_base_module() -> Tuple:
+def set_base_module() -> tuple:
     """
-    This function initializes and returns instances of custom neural network modules.
-    These modules are designed to demonstrate the functionality of a base module
-    for a Bayesian neural network.
+    Creates test instances of Bayesian modules for both PyTorch and
+    TensorFlow frameworks. Each module includes a linear layer and
+    methods `forward` or `call` for passing data through the network,
+    as well as `kl_cost` for calculating the KL divergence cost.
+    Returns a tuple of PyTorch and TensorFlow module instances.
     """
 
     class TorchTestModule(TorchBayesianModule):

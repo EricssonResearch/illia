@@ -1,10 +1,10 @@
 # Libraries
 import random
 
-import pytest  # type: ignore
-import numpy as np  # type: ignore
+import pytest
+import numpy as np
 import torch
-import tensorflow as tf  # type: ignore
+import tensorflow as tf
 
 from tests.fixtures_nn import set_base_module
 
@@ -16,13 +16,6 @@ tf.random.set_seed(0)
 
 @pytest.mark.order(1)
 def test_base_freeze_unfreeze(set_base_module):
-    """
-    This function tests the freeze and unfreeze methods of a base module.
-    The base module is expected to have a 'frozen' attribute and 'freeze' and 'unfreeze' methods.
-
-    Args:
-        set_base_module: A tuple containing the base modules.
-    """
 
     # Obtain the base module
     torch_module, tf_module = set_base_module
@@ -51,13 +44,6 @@ def test_base_freeze_unfreeze(set_base_module):
 
 @pytest.mark.order(2)
 def test_base_kl_cost_function(set_base_module):
-    """
-    This function tests the KL cost function of a base module.
-    It compares the KL divergence and the number of samples (N) returned by both frameworks.
-
-    Args:
-        set_base_module: A tuple containing the base modules.
-    """
 
     # Obtain the base module
     torch_module, tf_module = set_base_module
@@ -75,13 +61,6 @@ def test_base_kl_cost_function(set_base_module):
 
 @pytest.mark.order(3)
 def test_base_forward_pass(set_base_module):
-    """
-    This function tests the forward pass of a base module.
-    It compares the outputs of both frameworks and prints a warning if the difference exceeds a certain threshold.
-
-    Args:
-        set_base_module: A tuple containing the base modules.
-    """
 
     # Obtain the base module
     torch_module, tf_module = set_base_module
@@ -107,8 +86,10 @@ def test_base_forward_pass(set_base_module):
     if max_diff > 1e-1:
         print(
             """
-            Warning-Ignore for now: Outputs differ slightly, this might be due to different initialization or computational 
-            differences between PyTorch and TensorFlow for torch.nn.Linear && tf.keras.layers.Dense
+            Warning-Ignore for now: Outputs differ slightly, this might
+            be due to different initialization or computational
+            differences between PyTorch and TensorFlow for
+            torch.nn.Linear && tf.keras.layers.Dense
             """
         )
         print("PyTorch output:", torch_np)

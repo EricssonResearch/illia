@@ -1,0 +1,39 @@
+[tool.black]
+line-length = 88
+exclude = '''
+/(
+   src/utils/torch_bayesian/
+)/
+'''
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = "E203, W503"
+exclude = '''
+/(
+    src/utils/torch_bayesian/
+)
+'''
+
+[tool.mypy]
+check_untyped_defs = true
+ignore_missing_imports = true
+exclude = '''
+/(
+    ^(build|dist|venv)/
+    | src/utils/torch_bayesian/
+)
+'''
+cache_dir = "/dev/null"
+
+[tool.pylint]
+max-line-length = 88
+disable = "W0221,R0901,W0223,R0801,R0912,R0913,R0914,R0915,R0917,R1711,R1732,W1203,R0902,W0707,C0114"
+
+[tool.pylint.MASTER]
+ignore-paths = [
+    "src/utils/torch_bayesian/"
+]
+
+[tool.pylint.typecheck]
+generated-members=["numpy.*", "torch.*"]

@@ -7,14 +7,19 @@ from . import StaticDistribution
 
 
 class GaussianDistribution(StaticDistribution):
+    """
+    Represents a static Gaussian distribution with specified mean (mu)
+    and standard deviation (std).
+    """
 
     def __init__(self, mu: float, std: float) -> None:
         """
-        Initialize a Gaussian distribution with given mean (mu) and standard deviation (std).
+        Initializes a Gaussian distribution with given mean and standard
+        deviation.
 
         Args:
-            mu: The mean of the Gaussian distribution.
-            std: The standard deviation of the Gaussian distribution.
+            mu: Mean of the Gaussian distribution.
+            std: Standard deviation of the Gaussian distribution.
         """
 
         # Call super class constructor
@@ -26,17 +31,15 @@ class GaussianDistribution(StaticDistribution):
 
     def log_prob(self, x: torch.Tensor) -> torch.Tensor:
         """
-        Calculate the log probability density function (PDF) of the given input data.
-
-        If no input data is provided, a sample is generated using the current parameters.
-        The log PDF is calculated using the current parameters mu and rho, which represent
-        the mean and standard deviation of the Gaussian distribution, respectively.
+        Calculates the log probability density function (PDF) of the
+        given input data based on the Gaussian distribution's
+        parameters.
 
         Args:
-            x: Input data for which the log PDF needs to be calculated.
+            x: Input data for which the log PDF is calculated.
 
         Returns:
-            The log probability density function (PDF) of the input data or sample.
+            Log probability density of the input data.
         """
 
         self.mu = self.mu.to(x.device)

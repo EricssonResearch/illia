@@ -1,14 +1,29 @@
 # Libraries
 from typing import Literal
 
-import tensorflow as tf  # type: ignore
+import keras
+import tensorflow as tf
+from keras import Model, losses
 
 from . import BayesianModule
 
 
-class KLDivergenceLoss(tf.keras.Model):
+@keras.saving.register_keras_serializable(package="KLDivergenceLoss")
+class KLDivergenceLoss(Model):
+    """
+    Computes the KL divergence loss for Bayesian modules within a model.
+    """
 
     def __init__(self, reduction: Literal["mean"] = "mean", weight: float = 1.0):
+        """
+        Initializes the KL divergence loss with specified reduction
+        method and weight.
+
+        Args:
+            reduction: Method to reduce the loss, currently only "mean"
+                is supported.
+            weight: Scaling factor for the KL divergence loss.
+        """
 
         # Call super class constructor
         super().__init__()
@@ -19,12 +34,10 @@ class KLDivergenceLoss(tf.keras.Model):
 
     def get_config(self) -> dict:
         """
-        Get the configuration of the Gaussian Distribution object. This method retrieves the base
-        configuration of the parent class and combines it with custom configurations specific to
-        the Gaussian Distribution.
+        Retrieves the configuration of the KL divergence loss.
 
         Returns:
-            A dictionary containing the combined configuration of the Gaussian Distribution.
+            Dictionary containing loss configuration.
         """
 
         # Get the base configuration
@@ -39,15 +52,16 @@ class KLDivergenceLoss(tf.keras.Model):
         # Combine both configurations
         return {**base_config, **custom_config}
 
-    def call(self, model: tf.keras.Model) -> tf.Tensor:
+    def call(self, model: Model) -> tf.Tensor:
         """
-        This method computes the forward for KLDivergenceLoss
+        Computes the KL divergence loss across all Bayesian layers in
+        the model.
 
         Args:
-            model: tensorflow model.
+            model: TensorFlow model containing Bayesian layers.
 
         Returns:
-            kl divergence cost
+            KL divergence cost scaled by the specified weight.
         """
 
         kl_global_cost = tf.constant(0.0, dtype=tf.float32)
@@ -68,14 +82,29 @@ class KLDivergenceLoss(tf.keras.Model):
         return kl_global_cost
 
 
-class ELBOLoss(tf.keras.Model):
+class ELBOLoss(Model):
+    """
+    Computes the Evidence Lower Bound (ELBO) loss, combining a
+    likelihood loss and KL divergence.
+    """
 
     def __init__(
         self,
-        loss_function: tf.keras.losses.Loss,
+        loss_function: losses.Loss,
         num_samples: int = 1,
         kl_weight: float = 1e-3,
     ):
+        """
+        Initializes the ELBO loss with specified likelihood loss
+        function, sample count, and KL weight.
+
+        Args:
+            loss_function: Loss function for computing likelihood loss.
+            num_samples: Number of samples for Monte Carlo
+                approximation.
+            kl_weight: Scaling factor for the KL divergence component.
+        """
+
         # Call super class constructor
         super().__init__()
 
@@ -85,9 +114,19 @@ class ELBOLoss(tf.keras.Model):
         self.kl_weight = kl_weight
         self.kl_loss = KLDivergenceLoss(weight=kl_weight)
 
-    def call(
-        self, y_true: tf.Tensor, y_pred: tf.Tensor, model: tf.keras.Model
-    ) -> tf.Tensor:
+    def call(self, y_true: tf.Tensor, y_pred: tf.Tensor, model: Model) -> tf.Tensor:
+        """
+        Computes the ELBO loss, averaging over multiple samples.
+
+        Args:
+            y_true: True labels.
+            y_pred: Predictions from the model.
+            model: TensorFlow model containing Bayesian layers.
+
+        Returns:
+            Average ELBO loss across samples.
+        """
+
         loss_value = tf.constant(0.0, dtype=tf.float32)
 
         for _ in range(self.num_samples):
@@ -100,12 +139,10 @@ class ELBOLoss(tf.keras.Model):
 
     def get_config(self) -> dict:
         """
-        Get the configuration of the Gaussian Distribution object. This method retrieves the base
-        configuration of the parent class and combines it with custom configurations specific to
-        the Gaussian Distribution.
+        Retrieves the configuration of the ELBO loss.
 
         Returns:
-            A dictionary containing the combined configuration of the Gaussian Distribution.
+            Dictionary containing ELBO loss configuration.
         """
 
         # Get the base configuration

@@ -1,10 +1,10 @@
 # Libraries
-from illia.torch.distributions.static.base import StaticDistribution
-from illia.torch.distributions.dynamic.base import DynamicDistribution
-from illia.torch.distributions.static.gaussian import (
+from illia.torch.distributions.static.base import StaticDistribution  # noqa
+from illia.torch.distributions.dynamic.base import DynamicDistribution  # noqa
+from illia.torch.distributions.static.gaussian import (  # noqa
     GaussianDistribution as StaticGaussianDistribution,
-)
-from illia.torch.distributions.dynamic.gaussian import (
+)  # noqa
+from illia.torch.distributions.dynamic.gaussian import (  # noqa
     GaussianDistribution as DynamicGaussianDistribution,
-)
-from illia.torch.nn.base import BayesianModule
+)  # noqa
+from illia.torch.nn.base import BayesianModule  # noqa
