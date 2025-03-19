@@ -5,11 +5,11 @@ This module contains the code for Linear Bayesian layer.
 # Standard libraries
 from typing import Optional
 
-# 3pp
+# 3pps
 import torch
 import torch.nn.functional as F
 
-# own modules
+# Own modules
 from illia.torch.nn.base import BayesianModule
 from illia.torch.distributions import (
     Distribution,
@@ -69,12 +69,12 @@ class Linear(BayesianModule):
             self.bias_distribution = bias_distribution
 
         # Sample initial weights
-        self.weights = self.weights_distribution.sample()
-        self.bias = self.bias_distribution.sample()
+        weights = self.weights_distribution.sample()
+        bias = self.bias_distribution.sample()
 
         # Register buffers
-        self.register_buffer("weights", self.weights)
-        self.register_buffer("bias", self.bias)
+        self.register_buffer("weights", weights)
+        self.register_buffer("bias", bias)
 
         return None
 
@@ -94,8 +94,8 @@ class Linear(BayesianModule):
 
         # Check if layer is frozen
         if not self.frozen:
-            self.weights = self.weights_distribution.sample()
-            self.bias = self.bias_distribution.sample()
+            self.weights = self.weights_distribution.sample()  # pylint: disable=W0201
+            self.bias = self.bias_distribution.sample()  # pylint: disable=W0201
 
         else:
             if self.weights is None or self.bias is None:
@@ -122,15 +122,15 @@ class Linear(BayesianModule):
 
         # sample weights if they are undefined
         if self.weights is None:
-            self.weights = self.weights_distribution.sample()
+            self.weights = self.weights_distribution.sample()  # pylint: disable=W0201
 
         # sample bias is they are undefined
         if self.bias is None:
-            self.bias = self.bias_distribution.sample()
+            self.bias = self.bias_distribution.sample()  # pylint: disable=W0201
 
         # detach weights and bias
-        self.weights = self.weights.detach()
-        self.bias = self.bias.detach()
+        self.weights = self.weights.detach()  # pylint: disable=W0201
+        self.bias = self.bias.detach()  # pylint: disable=W0201
 
         return None
 

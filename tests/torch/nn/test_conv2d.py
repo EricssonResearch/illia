@@ -1,5 +1,5 @@
 """
-This module contains the code to test the bayesian Linear layer.
+This module contains the tests for the bayesian Conv2d.
 """
 
 # 3pps
@@ -7,30 +7,30 @@ import torch
 from torch.jit import RecursiveScriptModule
 import pytest
 
-# own modules
-from illia.torch.nn import Linear
+# Own modules
+from illia.torch.nn import Conv2d
 
 
-class TestLinear:
+class TestConv2d:
     """
-    This class tests the Linear bayesian layer.
+    This class tests the bayesian Conv2d.
     """
 
     @pytest.mark.order(1)
-    def test_init(self, linear_fixture: tuple[Linear, torch.Tensor]) -> None:
+    def test_init(self, conv2d_fixture: tuple[Conv2d, torch.Tensor]) -> None:
         """
-        This method is the test for the Linear constructor.
+        This method is the test for the Conv2d constructor.
 
         Args:
-            linear_fixture: tuple of instance of Linear and inputs to
+            conv2d_fixture: tuple of instance of Conv2d and inputs to
                 use.
 
         Returns:
             None.
         """
 
-        model: Linear
-        model, _ = linear_fixture
+        model: Conv2d
+        model, _ = conv2d_fixture
 
         # Check parameters length
         len_parameters: int = len(list(model.parameters()))
@@ -41,12 +41,12 @@ class TestLinear:
         return None
 
     @pytest.mark.order(2)
-    def test_forward(self, linear_fixture: tuple[Linear, torch.Tensor]) -> None:
+    def test_forward(self, conv2d_fixture: tuple[Conv2d, torch.Tensor]) -> None:
         """
-        This method is the test for the Linear forward pass.
+        This method is the test for the Conv2d forward pass.
 
         Args:
-            linear_fixture: tuple of instance of Linear and inputs to
+            conv2d_fixture: tuple of instance of Conv2d and inputs to
                 use.
 
         Returns:
@@ -54,9 +54,9 @@ class TestLinear:
         """
 
         # Get model and inputs
-        model: Linear
+        model: Conv2d
         inputs: torch.Tensor
-        model, inputs = linear_fixture
+        model, inputs = conv2d_fixture
 
         # Check parameters length
         outputs: torch.Tensor = model(inputs)
@@ -67,7 +67,7 @@ class TestLinear:
         ), f"Incorrect outputs class, expected {torch.Tensor} and got {type(outputs)}"
 
         # Check outputs shape
-        assert outputs.shape == (inputs.shape[0], model.weights.shape[0]), (
+        assert outputs.shape[:2] == (inputs.shape[0], model.weights.shape[0]), (
             f"Incorrect outputs shape, expected "
             f"{(inputs.shape[0], model.weights.shape[0])} and got {outputs.shape}"
         )
@@ -75,12 +75,12 @@ class TestLinear:
         return None
 
     @pytest.mark.order(3)
-    def test_backward(self, linear_fixture: tuple[Linear, torch.Tensor]) -> None:
+    def test_backward(self, conv2d_fixture: tuple[Conv2d, torch.Tensor]) -> None:
         """
-        This method is the test for the Linear backward pass.
+        This method is the test for the Conv2d backward pass.
 
         Args:
-            linear_fixture: tuple of instance of Linear and inputs to
+            conv2d_fixture: tuple of instance of Conv2d and inputs to
                 use.
 
         Returns:
@@ -88,9 +88,9 @@ class TestLinear:
         """
 
         # Get model and inputs
-        model: Linear
+        model: Conv2d
         inputs: torch.Tensor
-        model, inputs = linear_fixture
+        model, inputs = conv2d_fixture
 
         # check parameters length
         outputs: torch.Tensor = model(inputs)
@@ -107,13 +107,13 @@ class TestLinear:
         return None
 
     @pytest.mark.order(4)
-    def test_freeze(self, linear_fixture: tuple[Linear, torch.Tensor]) -> None:
+    def test_freeze(self, conv2d_fixture: tuple[Conv2d, torch.Tensor]) -> None:
         """
         This method is the test for the freeze and unfreeze layers from
-        Linear layer.
+        Conv2d layer.
 
         Args:
-            linear_fixture: tuple of instance of Linear and inputs to
+            conv2d_fixture: tuple of instance of Conv2d and inputs to
                 use.
 
         Returns:
@@ -121,9 +121,9 @@ class TestLinear:
         """
 
         # Get model and inputs
-        model: Linear
+        model: Conv2d
         inputs: torch.Tensor
-        model, inputs = linear_fixture
+        model, inputs = conv2d_fixture
 
         # Compute outputs
         outputs_first: torch.Tensor = model(inputs)
@@ -164,12 +164,12 @@ class TestLinear:
         return None
 
     @pytest.mark.order(5)
-    def test_kl_cost(self, linear_fixture: tuple[Linear, torch.Tensor]) -> None:
+    def test_kl_cost(self, conv2d_fixture: tuple[Conv2d, torch.Tensor]) -> None:
         """
-        This method is the test for the kl_cost method of Linear layer.
+        This method is the test for the kl_cost method of Conv2d layer.
 
         Args:
-            linear_fixture: tuple of instance of Linear and inputs to
+            conv2d_fixture: tuple of instance of Conv2d and inputs to
                 use.
 
         Returns:
@@ -177,8 +177,8 @@ class TestLinear:
         """
 
         # Get model and inputs
-        model: Linear
-        model, _ = linear_fixture
+        model: Conv2d
+        model, _ = conv2d_fixture
 
         # Compute outputs
         outputs: tuple[torch.Tensor, int] = model.kl_cost()
@@ -209,12 +209,12 @@ class TestLinear:
         return None
 
     @pytest.mark.order(6)
-    def test_jit(self, linear_fixture: tuple[Linear, torch.Tensor]) -> None:
+    def test_jit(self, conv2d_fixture: tuple[Conv2d, torch.Tensor]) -> None:
         """
         This method tests the scripting of the layer.
 
         Args:
-            linear_fixture: tuple of instance of Linear and inputs to
+            conv2d_fixture: tuple of instance of Conv2d and inputs to
                 use.
 
         Returns:
@@ -222,9 +222,9 @@ class TestLinear:
         """
 
         # Get model and inputs
-        model: Linear
+        model: Conv2d
         inputs: torch.Tensor
-        model, inputs = linear_fixture
+        model, inputs = conv2d_fixture
 
         # Script
         model_scripted: RecursiveScriptModule = torch.jit.script(model)
