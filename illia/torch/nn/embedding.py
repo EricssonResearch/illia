@@ -4,12 +4,10 @@ from typing import Optional
 import torch
 import torch.nn.functional as F
 
-from . import (
-    StaticDistribution,
-    DynamicDistribution,
-    StaticGaussianDistribution,
-    DynamicGaussianDistribution,
-    BayesianModule,
+from illia.torch.nn.base import BayesianModule
+from illia.torch.distributions import (
+    Distribution,
+    GaussianDistribution,
 )
 
 
@@ -19,21 +17,11 @@ class Embedding(BayesianModule):
     supporting prior and posterior distributions.
     """
 
-    input_size: int
-    output_size: int
-    weights_posterior: DynamicDistribution
-    weights_prior: StaticDistribution
-    bias_posterior: DynamicDistribution
-    bias_prior: StaticDistribution
-    weights: torch.Tensor
-    bias: torch.Tensor
-
     def __init__(
         self,
         num_embeddings: int,
         embeddings_dim: int,
-        weights_prior: Optional[StaticDistribution] = None,
-        weights_posterior: Optional[DynamicDistribution] = None,
+        weights_distribution: Optional[Distribution] = None,
         padding_idx: Optional[int] = None,
         max_norm: Optional[float] = None,
         norm_type: float = 2.0,
@@ -47,8 +35,8 @@ class Embedding(BayesianModule):
         Args:
             num_embeddings: Number of unique embeddings.
             embeddings_dim: Dimension of each embedding vector.
-            weights_prior: Prior distribution for weights.
-            weights_posterior: Posterior distribution for weights.
+            weights_distribution: Distribution for the weights of the
+                layer.
             padding_idx: Index for padding, which keeps gradient
                 constant.
             max_norm: Maximum norm for embedding vectors.
@@ -60,9 +48,6 @@ class Embedding(BayesianModule):
         # Call super class constructor
         super().__init__()
 
-        # Define default parameters
-        parameters = {"mean": 0, "std": 0.1}
-
         # Set embeddings atributtes
         self.padding_idx = padding_idx
         self.max_norm = max_norm
@@ -70,20 +55,20 @@ class Embedding(BayesianModule):
         self.scale_grad_by_freq = scale_grad_by_freq
         self.sparse = sparse
 
-        # Set prior if they are None
-        if weights_prior is None:
-            self.weights_prior = StaticGaussianDistribution(
-                mu=parameters["mean"], std=parameters["std"]
-            )
-        else:
-            self.weights_prior = weights_prior
-
-        if weights_posterior is None:
-            self.weights_posterior = DynamicGaussianDistribution(
+        # Set weights distribution
+        self.weights_distribution: Distribution
+        if weights_distribution is None:
+            self.weights_distribution = GaussianDistribution(
                 (num_embeddings, embeddings_dim)
             )
         else:
-            self.weights_posterior = weights_posterior
+            self.weights_distribution = weights_distribution
+
+        # Sample initial weights
+        weights = self.weights_distribution.sample()
+
+        # Register buffers
+        self.register_buffer("weights", weights)
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
@@ -102,15 +87,12 @@ class Embedding(BayesianModule):
 
         # Forward depeding of frozen state
         if not self.frozen:
-            self.weights = self.weights_posterior.sample()
-            self.bias = self.bias_posterior.sample()
-        else:
-            if self.weights is None or self.bias is None:
-                self.weights = self.weights_posterior.sample()
-                self.bias = self.bias_posterior.sample()
+            self.weights = self.weights_distribution.sample()
+        elif self.weights is None:
+            raise ValueError("Module has been frozen with undefined weights")
 
         # Run torch forward
-        return F.embedding(
+        outputs: torch.Tensor = F.embedding(
             inputs,
             self.weights,
             self.padding_idx,
@@ -120,6 +102,27 @@ class Embedding(BayesianModule):
             self.sparse,
         )
 
+        return outputs
+
+    @torch.jit.export
+    def freeze(self) -> None:
+        """
+        This method freezes the layer.
+
+        Returns:
+            None.
+        """
+
+        # set indicator
+        self.frozen = True
+
+        # sample weights if they are undefined
+        if self.weights is None:
+            self.weights = self.weights_distribution.sample()
+
+        # detach weights
+        self.weights = self.weights.detach()
+        
     def kl_cost(self) -> tuple[torch.Tensor, int]:
         """
         Computes the Kullback-Leibler (KL) divergence cost for the
@@ -131,16 +134,9 @@ class Embedding(BayesianModule):
         """
 
         # Get log posterior and log prior
-        log_posterior: torch.Tensor = self.weights_posterior.log_prob(
-            self.weights
-        ) + self.bias_posterior.log_prob(self.bias)
-        log_prior: torch.Tensor = self.weights_prior.log_prob(
-            self.weights
-        ) + self.bias_prior.log_prob(self.bias)
+        log_probs: torch.Tensor = self.weights_distribution.log_prob(self.weights)
 
         # Get number of parameters
-        num_params: int = (
-            self.weights_posterior.num_params + self.bias_posterior.num_params
-        )
+        num_params: int = self.weights_distribution.num_params
 
-        return log_posterior - log_prior, num_params
+        return log_probs, num_params

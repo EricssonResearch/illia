@@ -4,12 +4,10 @@ from typing import Optional
 import torch
 import torch.nn.functional as F
 
-from . import (
-    StaticDistribution,
-    DynamicDistribution,
-    StaticGaussianDistribution,
-    DynamicGaussianDistribution,
-    BayesianModule,
+from illia.torch.nn.base import BayesianModule
+from illia.torch.distributions import (
+    Distribution,
+    GaussianDistribution,
 )
 
 
@@ -19,23 +17,12 @@ class Linear(BayesianModule):
     weights and biases using prior and posterior distributions.
     """
 
-    input_size: int
-    output_size: int
-    weights_posterior: DynamicDistribution
-    weights_prior: StaticDistribution
-    bias_posterior: DynamicDistribution
-    bias_prior: StaticDistribution
-    weights: torch.Tensor
-    bias: torch.Tensor
-
     def __init__(
         self,
         input_size: int,
         output_size: int,
-        weights_prior: Optional[StaticDistribution] = None,
-        bias_prior: Optional[StaticDistribution] = None,
-        weights_posterior: Optional[DynamicDistribution] = None,
-        bias_posterior: Optional[DynamicDistribution] = None,
+        weights_distribution: Optional[Distribution] = None,
+        bias_distribution: Optional[Distribution] = None,
     ) -> None:
         """
         Definition of a Bayesian Linear layer.
@@ -43,52 +30,35 @@ class Linear(BayesianModule):
         Args:
             input_size: Size of each input sample.
             output_size: Size of each output sample.
-            weights_prior: The prior distribution for the weights.
-            bias_prior: The prior distribution for the bias.
-            weights_posterior: The posterior distribution for the
-                weights.
-            bias_posterior: The posterior distribution for the bias.
+            weights_distribution: Distribution for the weights of the
+                layer.
+            bias_distribution: Distribution for the bias of the layer.
         """
 
-        # Call super class constructor
+        # Call super-class constructor
         super().__init__()
 
-        # Set attributes
-        self.input_size = input_size
-        self.output_size = output_size
-
-        # Define default parameters
-        parameters = {"mean": 0, "std": 0.1}
-
-        # Set weights prior
-        if weights_prior is None:
-            self.weights_prior = StaticGaussianDistribution(
-                parameters["mean"], parameters["std"]
-            )
-        else:
-            self.weights_prior = weights_prior
-
-        # Set bias prior
-        if bias_prior is None:
-            self.bias_prior = StaticGaussianDistribution(
-                parameters["mean"], parameters["std"]
-            )
-        else:
-            self.bias_prior = bias_prior
-
-        # Set weights posterior
-        if weights_posterior is None:
-            self.weights_posterior = DynamicGaussianDistribution(
+        # Set weights distribution
+        if weights_distribution is None:
+            self.weights_distribution: Distribution = GaussianDistribution(
                 (output_size, input_size)
             )
         else:
-            self.weights_posterior = weights_posterior
+            self.weights_distribution = weights_distribution
 
-        # Set bias posterior
-        if bias_posterior is None:
-            self.bias_posterior = DynamicGaussianDistribution((output_size,))
+        # Set bias distribution
+        if bias_distribution is None:
+            self.bias_distribution: Distribution = GaussianDistribution((output_size,))
         else:
-            self.bias_posterior = bias_posterior
+            self.bias_distribution = bias_distribution
+
+        # Sample initial weights
+        weights = self.weights_distribution.sample()
+        bias = self.bias_distribution.sample()
+
+        # Register buffers
+        self.register_buffer("weights", weights)
+        self.register_buffer("bias", bias)
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
@@ -110,14 +80,39 @@ class Linear(BayesianModule):
         if not self.frozen:
             self.weights = self.weights_posterior.sample()
             self.bias = self.bias_posterior.sample()
-        else:
-            if self.weights is None or self.bias is None:
-                self.weights = self.weights_posterior.sample()
-                self.bias = self.bias_posterior.sample()
+        elif self.weights is None or self.bias is None:
+            raise ValueError("Module has been frozen with undefined weights")
 
         # Run torch forward
-        return F.linear(inputs, self.weights, self.bias)
+        outputs: torch.Tensor = F.linear(inputs, self.weights, self.bias)
 
+        return outputs
+
+    @torch.jit.export
+    def freeze(self) -> None:
+        """
+        This method is to freeze the layer.
+
+        Returns:
+            None.
+        """
+
+        # set indicator
+        self.frozen = True
+
+        # sample weights if they are undefined
+        if self.weights is None:
+            self.weights = self.weights_distribution.sample()
+
+        # sample bias is they are undefined
+        if self.bias is None:
+            self.bias = self.bias_distribution.sample()
+
+        # detach weights and bias
+        self.weights = self.weights.detach()
+        self.bias = self.bias.detach()
+        
+    @torch.jit.export
     def kl_cost(self) -> tuple[torch.Tensor, int]:
         """
         Calculate the Kullback-Leibler (KL) divergence cost for the
@@ -128,15 +123,14 @@ class Linear(BayesianModule):
             and bias, and the total number of parameters.
         """
 
-        log_posterior: torch.Tensor = self.weights_posterior.log_prob(
+        # Compute log probs
+        log_probs: torch.Tensor = self.weights_distribution.log_prob(
             self.weights
-        ) + self.bias_posterior.log_prob(self.bias)
-        log_prior: torch.Tensor = self.weights_prior.log_prob(
-            self.weights
-        ) + self.bias_prior.log_prob(self.bias)
+        ) + self.bias_distribution.log_prob(self.bias)
 
+        # Compute the number of parameters
         num_params: int = (
-            self.weights_posterior.num_params + self.bias_posterior.num_params
+            self.weights_distribution.num_params + self.bias_distribution.num_params
         )
 
-        return log_posterior - log_prior, num_params
+        return log_probs, num_params

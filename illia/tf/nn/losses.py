@@ -7,7 +7,7 @@ from keras import Model, saving, losses
 from . import BayesianModule
 
 
-@saving.register_keras_serializable(package="illia_tf", name="KLDivergenceLoss")
+@saving.register_keras_serializable(package="BayesianModule", name="KLDivergenceLoss")
 class KLDivergenceLoss(Model):
     """
     Computes the KL divergence loss for Bayesian modules within a model.

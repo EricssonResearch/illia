@@ -5,15 +5,13 @@ import tensorflow as tf
 from keras import saving
 
 from . import (
-    StaticDistribution,
-    DynamicDistribution,
-    StaticGaussianDistribution,
-    DynamicGaussianDistribution,
+    Distribution,
+    GaussianDistribution,
     BayesianModule,
 )
 
 
-@saving.register_keras_serializable(package="illia_tf", name="Linear")
+@saving.register_keras_serializable(package="BayesianModule", name="Linear")
 class Linear(BayesianModule):
     """
     Bayesian Linear layer with trainable weights and biases,
@@ -24,10 +22,8 @@ class Linear(BayesianModule):
         self,
         input_size: int,
         output_size: int,
-        weights_prior: Optional[StaticDistribution] = None,
-        bias_prior: Optional[StaticDistribution] = None,
-        weights_posterior: Optional[DynamicDistribution] = None,
-        bias_posterior: Optional[DynamicDistribution] = None,
+        weights_distribution: Optional[Distribution] = None,
+        bias_distribution: Optional[Distribution] = None,
     ) -> None:
         """
         Initializes a Bayesian Linear layer with specified dimensions
@@ -36,60 +32,48 @@ class Linear(BayesianModule):
         Args:
             input_size: Number of features in input.
             output_size: Number of features in output.
-            weights_prior: Prior distribution for weights.
-            bias_prior: Prior distribution for bias.
-            weights_posterior: Posterior distribution for weights.
-            bias_posterior: Posterior distribution for bias.
+            weights_distribution: distribution for the weights of the
+                layer.
+            bias_distribution: distribution for the bias of the layer.
         """
 
-        # Call super class constructor
+        # Call super-class constructor
         super().__init__()
 
-        # Set attributes
-        self.input_size = input_size
-        self.output_size = output_size
-
-        # Define default parameters
-        parameters = {"mean": 0, "std": 0.1}
-
-        # Set weights prior
-        if weights_prior is None:
-            self.weights_prior = StaticGaussianDistribution(
-                parameters["mean"], parameters["std"]
+        # Set weights distribution
+        if weights_distribution is None:
+            self.weights_distribution: Distribution = GaussianDistribution(
+                 (input_size, output_size),
+                 name="weights_distr"
             )
         else:
-            self.weights_prior = weights_prior
+            self.weights_distribution = weights_distribution
 
-        # Set bias prior
-        if bias_prior is None:
-            self.bias_prior = StaticGaussianDistribution(
-                parameters["mean"], parameters["std"]
+        # Set bias distribution
+        if bias_distribution is None:
+            self.bias_distribution: Distribution = GaussianDistribution(
+                (output_size,),
+                name="bias_distr"
             )
         else:
-            self.bias_prior = bias_prior
+            self.bias_distribution = bias_distribution
 
-        # Set weights posterior
-        if weights_posterior is None:
-            self.weights_posterior = DynamicGaussianDistribution(
-                (input_size, output_size)
-            )
-        else:
-            self.weights_posterior = weights_posterior
-
-        # Set bias posterior
-        if bias_posterior is None:
-            self.bias_posterior = DynamicGaussianDistribution((output_size,))
-        else:
-            self.bias_posterior = bias_posterior
-
-        # Initialize weight and bias variables
-        self.sampled_weights = tf.Variable(
-            initial_value=tf.zeros((input_size, output_size)),
+        # Register non-trainable variables
+        self.kernel = self.add_weight(
+            name="kernel",
+            initializer=tf.constant_initializer(
+                self.weights_distribution.sample().numpy()
+            ),
+            shape= (input_size, output_size),
             trainable=False,
-            dtype=tf.float32,
         )
-        self.sampled_bias = tf.Variable(
-            initial_value=tf.zeros((output_size,)), trainable=False, dtype=tf.float32
+        self.bias = self.add_weight(
+            name="bias",
+            initializer=tf.constant_initializer(
+                self.bias_distribution.sample().numpy()
+            ),
+            shape=(output_size,),
+            trainable=False,
         )
 
     def get_config(self) -> dict:
@@ -107,10 +91,8 @@ class Linear(BayesianModule):
         custom_config = {
             "input_size": self.input_size,
             "output_size": self.output_size,
-            "weights_prior": self.weights_prior,
-            "weights_posterior": self.weights_posterior,
-            "bias_prior": self.bias_prior,
-            "bias_posterior": self.bias_posterior,
+            "weights_distribution": self.weights_distribution,
+            "bias_distribution": self.bias_distribution
         }
 
         # Combine both configurations
@@ -131,18 +113,18 @@ class Linear(BayesianModule):
             Output tensor after linear transformation.
         """
 
-        # Forward depeding of frozen state
+        # Check if layer is frozen
         if not self.frozen:
-            self.sampled_weights.assign(self.weights_posterior.sample())
-            self.sampled_bias.assign(self.bias_posterior.sample())
-        elif tf.reduce_all(self.sampled_weights == 0) or tf.reduce_all(
-            self.sampled_bias == 0
-        ):
-            self.sampled_weights.assign(self.weights_posterior.sample())
-            self.sampled_bias.assign(self.bias_posterior.sample())
+            self.kernel.assign(self.weights_distribution.sample())
+            self.bias.assign(self.bias_distribution.sample())
+        elif self.kernel is None or self.bias is None:
+            raise ValueError("Module has been frozen with undefined weights")
 
-        # Run tf forward
-        return tf.linalg.matmul(inputs, self.sampled_weights) + self.sampled_bias
+        # Compute outputs
+        lin_output = tf.linalg.matmul(inputs, self.kernel) 
+        outputs: tf.Tensor = tf.nn.bias_add(lin_output, self.bias)
+        
+        return outputs
 
     @tf.function
     def kl_cost(self) -> tuple[tf.Tensor, int]:
@@ -155,15 +137,12 @@ class Linear(BayesianModule):
             parameters.
         """
 
-        log_posterior: tf.Tensor = self.weights_posterior.log_prob(
-            self.sampled_weights
-        ) + self.bias_posterior.log_prob(self.sampled_bias)
-        log_prior: tf.Tensor = self.weights_prior.log_prob(
-            self.sampled_weights
-        ) + self.bias_prior.log_prob(self.sampled_bias)
+        log_posterior: tf.Tensor = self.weights_distribution.log_prob(
+            self.kernel
+        ) + self.bias_distribution.log_prob(self.bias)
 
         num_params: int = (
-            self.weights_posterior.num_params + self.bias_posterior.num_params
+            self.weights_distribution.num_params + self.bias_distribution.num_params
         )
-
-        return log_posterior - log_prior, num_params
+        
+        return log_posterior, num_params

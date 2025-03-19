@@ -5,29 +5,18 @@ import tensorflow as tf
 from keras import saving
 
 from . import (
-    StaticDistribution,
-    DynamicDistribution,
-    StaticGaussianDistribution,
-    DynamicGaussianDistribution,
+    Distribution,
+    GaussianDistribution,
     BayesianModule,
 )
 
 
-@saving.register_keras_serializable(package="illia_tf", name="Embedding")
+@saving.register_keras_serializable(package="BayesianModule", name="Embedding")
 class Embedding(BayesianModule):
     """
     Bayesian Embedding layer with trainable weights and biases,
     supporting prior and posterior distributions.
     """
-
-    input_size: int
-    output_size: int
-    weights_posterior: DynamicDistribution
-    weights_prior: StaticDistribution
-    bias_posterior: DynamicDistribution
-    bias_prior: StaticDistribution
-    weights: tf.Tensor
-    bias: tf.Tensor
 
     def __init__(
         self,
@@ -73,26 +62,32 @@ class Embedding(BayesianModule):
         self.scale_grad_by_freq = scale_grad_by_freq
         self.sparse = sparse
 
-        # Set prior if they are None
-        if weights_prior is None:
-            self.weights_prior = StaticGaussianDistribution(
-                mu=parameters["mean"], std=parameters["std"]
+        weights_distribution_shape = (num_embeddings, embeddings_dim)
+        if weights_distribution is None:
+            self.weights_distribution: Distribution = GaussianDistribution(
+               weights_distribution_shape,
+               name="weights_distr"
             )
         else:
-            self.weights_prior = weights_prior
-
-        # Set posterior if they are None
-        if weights_posterior is None:
-            self.weights_posterior = DynamicGaussianDistribution(
-                (num_embeddings, embeddings_dim)
-            )
-        else:
-            self.weights_posterior = weights_posterior
+            assert (
+                weights_distribution.sample().shape == weights_distribution_shape
+            ), f"""Expected shape  {weights_distribution_shape}, sampled shape {weights_distribution.sample().shape}"""
+            self.weights_distribution = weights_distribution
+        
+        # Sample initial distributions
+        self.kernel = self.add_weight(
+            name="kernel",
+            initializer=tf.constant_initializer(
+                self.weights_distribution.sample().numpy()
+            ),
+            shape=weights_distribution_shape,
+            trainable=False,
+        )
 
     @tf.function
     def _embedding(
         self,
-        inputs: tf.Tensor,
+        input: tf.Tensor,
         weight: tf.Tensor,
         padding_idx: Optional[int] = None,
         max_norm: Optional[float] = None,
@@ -115,13 +110,14 @@ class Embedding(BayesianModule):
             Tensor containing the computed embeddings.
         """
 
+        input = tf.cast(input, tf.int32)
         if sparse is not None:
-            embeddings = tf.nn.embedding_lookup(inputs, weight)
+            embeddings = tf.nn.embedding_lookup(weight, input)
         else:
-            embeddings = tf.nn.embedding_lookup_sparse(inputs, weight)
+            embeddings = tf.nn.embedding_lookup_sparse(weight, input)
 
         if padding_idx is not None:
-            padding_mask = tf.not_equal(inputs, padding_idx)
+            padding_mask = tf.not_equal(input, padding_idx)
             embeddings = tf.where(
                 tf.expand_dims(padding_mask, -1), embeddings, tf.zeros_like(embeddings)
             )
@@ -149,8 +145,7 @@ class Embedding(BayesianModule):
         custom_config = {
             "num_embeddings": self.num_embeddings,
             "embeddings_dim": self.embeddings_dim,
-            "weights_prior": self.weights_prior,
-            "weights_posterior": self.weights_posterior,
+            "weights_distribution": self.weights_distribution,
             "padding_idx": self.padding_idx,
             "max_norm": self.max_norm,
             "norm_type": self.norm_type,
@@ -175,16 +170,21 @@ class Embedding(BayesianModule):
 
         # Forward depeding of frozen state
         if not self.frozen:
-            self.weights = self.weights_posterior.sample()
-            self.bias = self.bias_posterior.sample()
-        elif self.weights is None or self.bias is None:
-            self.weights = self.weights_posterior.sample()
-            self.bias = self.bias_posterior.sample()
+            self.kernel.assign(self.weights_distribution.sample())
+        else:
+            if self.kernel is None:
+                w=self.weights_distribution.sample()
+                self.kernel = self.add_weight(
+                    name="kernel",
+                    initializer=tf.constant_initializer(w.numpy()),
+                    shape=w.shape,
+                    trainable=False,
+                )
 
         # Run tensorflow forward
         outputs: tf.Tensor = self._embedding(
             inputs,
-            self.weights,
+            self.kernel,
             self.padding_idx,
             self.max_norm,
             self.norm_type,
@@ -205,17 +205,12 @@ class Embedding(BayesianModule):
             parameters.
         """
 
-        # Get log posterior and log prior
-        log_posterior: tf.Tensor = self.weights_posterior.log_prob(
-            self.weights
-        ) + self.bias_posterior.log_prob(self.bias)
-        log_prior: tf.Tensor = self.weights_prior.log_prob(
-            self.weights
-        ) + self.bias_prior.log_prob(self.bias)
-
-        # Get number of parameters
-        num_params: int = (
-            self.weights_posterior.num_params + self.bias_posterior.num_params
+        log_posterior: tf.Tensor = self.weights_distribution.log_prob(
+            self.kernel
         )
 
-        return log_posterior - log_prior, num_params
+        num_params: int = (
+            self.weights_distribution.num_params
+        )
+        
+        return log_posterior, num_params

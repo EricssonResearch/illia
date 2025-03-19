@@ -1,20 +1,15 @@
 # Libraries
-from abc import abstractmethod
-from typing import Any
-
+import tensorflow as tf
 from keras import Model, saving
 
 
-@saving.register_keras_serializable(package="illia_tf", name="BayesianModule")
 class BayesianModule(Model):
     """
     Base class for creating a Bayesian module, which can be frozen or
     unfrozen. This class is intended to be subclassed for specific
     backend implementations.
     """
-
-    frozen: bool
-
+    
     def __init__(self):
         """
         Initializes the BayesianModule, setting the frozen state to
@@ -25,7 +20,10 @@ class BayesianModule(Model):
         super().__init__()
 
         # Set freeze false by default
-        self.frozen = False
+        self.frozen: bool = False
+        
+        # Create attribute to know is a bayesian layer
+        self.is_bayesian: bool = True
 
     def freeze(self) -> None:
         """
@@ -36,11 +34,6 @@ class BayesianModule(Model):
         # Set frozen indicator to true for current layer
         self.frozen = True
 
-        # Set forzen indicator to true for children
-        for layer in self.layers:
-            if isinstance(layer, BayesianModule):
-                layer.freeze()
-
     def unfreeze(self) -> None:
         """
         Unfreezes the current layer and all submodules that are
@@ -50,13 +43,7 @@ class BayesianModule(Model):
         # Set frozen indicator to false for current layer
         self.frozen = False
 
-        # Set frozen indicators to false for children
-        for layer in self.layers:
-            if isinstance(layer, BayesianModule):
-                layer.unfreeze()
-
-    @abstractmethod
-    def kl_cost(self) -> tuple[Any, int]:
+    def kl_cost(self) -> tuple[tf.Tensor, int]:
         """
         Abstract method to compute the KL divergence cost.
         Must be implemented by subclasses.
@@ -65,3 +52,5 @@ class BayesianModule(Model):
             A tuple containing the KL divergence cost and its
             associated integer value.
         """
+
+        return tf.Tensor([0.0]), 0

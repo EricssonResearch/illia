@@ -1,11 +1,8 @@
 # Libraries
-from abc import abstractmethod
-from typing import Any
-
-from torch.nn import Module
+import torch
 
 
-class BayesianModule(Module):
+class BayesianModule(torch.nn.Module):
     """
     Base class for creating a Bayesian module, which can be frozen or
     unfrozen. This class is intended to be subclassed for specific
@@ -24,8 +21,12 @@ class BayesianModule(Module):
         super().__init__()
 
         # Set freeze false by default
-        self.frozen = False
+        self.frozen: bool = False
+        
+        # Create attribute to know is a bayesian layer
+        self.is_bayesian: bool = True
 
+    @torch.jit.export
     def freeze(self) -> None:
         """
         Freezes the current module and all submodules that are instances
@@ -35,13 +36,7 @@ class BayesianModule(Module):
         # Set frozen indicator to true for current layer
         self.frozen = True
 
-        # Set frozen indicator to true for children
-        for module in self.modules():
-            if self != module and isinstance(module, BayesianModule):
-                module.freeze()
-            else:
-                continue
-
+    @torch.jit.export
     def unfreeze(self) -> None:
         """
         Unfreezes the current module and all submodules that are
@@ -51,15 +46,8 @@ class BayesianModule(Module):
         # Set frozen indicator to false for current layer
         self.frozen = False
 
-        # Set frozen indicators to false for children
-        for module in self.modules():
-            if self != module and isinstance(module, BayesianModule):
-                module.unfreeze()
-            else:
-                continue
-
-    @abstractmethod
-    def kl_cost(self) -> tuple[Any, int]:
+    @torch.jit.export
+    def kl_cost(self) -> tuple[torch.Tensor, int]:
         """
         Abstract method to compute the KL divergence cost.
         Must be implemented by subclasses.
@@ -68,3 +56,5 @@ class BayesianModule(Module):
             A tuple containing the KL divergence cost and its
             associated integer value.
         """
+
+        return torch.tensor([0.0]), 0

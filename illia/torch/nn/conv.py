@@ -4,12 +4,10 @@ from typing import Optional, Union
 import torch
 import torch.nn.functional as F
 
-from . import (
-    StaticDistribution,
-    DynamicDistribution,
-    StaticGaussianDistribution,
-    DynamicGaussianDistribution,
-    BayesianModule,
+from illia.torch.nn.base import BayesianModule
+from illia.torch.distributions import (
+    Distribution,
+    GaussianDistribution,
 )
 
 
@@ -18,15 +16,6 @@ class Conv2d(BayesianModule):
     Bayesian 2D Convolution layer with trainable weights and biases,
     supporting prior and posterior distributions.
     """
-
-    input_channels: int
-    output_channels: int
-    weights_posterior: DynamicDistribution
-    weights_prior: StaticDistribution
-    bias_posterior: DynamicDistribution
-    bias_prior: StaticDistribution
-    weights: torch.Tensor
-    bias: torch.Tensor
 
     def __init__(
         self,
@@ -37,10 +26,8 @@ class Conv2d(BayesianModule):
         padding: Union[int, tuple[int, int], str] = 0,
         dilation: Union[int, tuple[int, int]] = 1,
         groups: int = 1,
-        weights_prior: Optional[StaticDistribution] = None,
-        bias_prior: Optional[StaticDistribution] = None,
-        weights_posterior: Optional[DynamicDistribution] = None,
-        bias_posterior: Optional[DynamicDistribution] = None,
+        weights_distribution: Optional[Distribution] = None,
+        bias_distribution: Optional[Distribution] = None,
     ) -> None:
         """
         Initializes a Bayesian 2D Convolution layer with specified
@@ -56,10 +43,8 @@ class Conv2d(BayesianModule):
             dilation: Spacing between kernel elements.
             groups: Number of blocked connections from input to output
                 channels.
-            weights_prior: Prior distribution for weights.
-            bias_prior: Prior distribution for bias.
-            weights_posterior: Posterior distribution for weights.
-            bias_posterior: Posterior distribution for bias.
+            weights_distribution: The distribution for the weights.
+            bias_distribution: The distribution for the bias.
         """
 
         # Call super class constructor
@@ -74,39 +59,35 @@ class Conv2d(BayesianModule):
         self.dilation = dilation
         self.groups = groups
 
-        # Set parameters
-        parameters = {"mean": 0, "std": 0.1}
-
-        if weights_prior is None:
-            self.weights_prior = StaticGaussianDistribution(
-                mu=parameters["mean"], std=parameters["std"]
-            )
-        else:
-            self.weights_prior = weights_prior
-
-        if bias_prior is None:
-            self.bias_prior = StaticGaussianDistribution(
-                mu=parameters["mean"], std=parameters["std"]
-            )
-        else:
-            self.bias_prior = bias_prior
-
-        if weights_posterior is None:
+        # Set weights distribution
+        if weights_distribution is None:
+            # Extend kernel if we only have 1 value
             if isinstance(kernel_size, int):
-                self.weights_posterior = DynamicGaussianDistribution(
-                    (output_channels, input_channels // groups, kernel_size)
-                )
-            else:
-                self.weights_posterior = DynamicGaussianDistribution(
-                    (output_channels, input_channels // groups, *kernel_size)
-                )
-        else:
-            self.weights_posterior = weights_posterior
+                kernel_size = (kernel_size, kernel_size)
 
-        if bias_posterior is None:
-            self.bias_posterior = DynamicGaussianDistribution((output_channels,))
+            # Define weights distribution
+            self.weights_distribution: Distribution = GaussianDistribution(
+                (output_channels, input_channels // groups, *kernel_size)
+            )
         else:
-            self.bias_posterior = bias_posterior
+            self.weights_distribution = weights_distribution
+
+        # Set bias distribution
+        if bias_distribution is None:
+            # Define weights distribution
+            self.bias_distribution: Distribution = GaussianDistribution(
+                (output_channels,)
+            )
+        else:
+            self.bias_distribution = bias_distribution
+
+        # Sample initial weights
+        weights = self.weights_distribution.sample()
+        bias = self.bias_distribution.sample()
+
+        # Register buffers
+        self.register_buffer("weights", weights)
+        self.register_buffer("bias", bias)
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
@@ -126,11 +107,11 @@ class Conv2d(BayesianModule):
 
         # Forward depeding of frozen state
         if not self.frozen:
-            self.weights = self.weights_posterior.sample()
-            self.bias = self.bias_posterior.sample()
+            self.weights = self.weights_distribution.sample()
+            self.bias = self.bias_distribution.sample()
         elif self.weights is None or self.bias is None:
-            self.weights = self.weights_posterior.sample()
-            self.bias = self.bias_posterior.sample()
+            self.weights = self.weights_distribution.sample()
+            self.bias = self.bias_distribution.sample()
 
         # Run torch forward
         return F.conv2d(
@@ -142,7 +123,32 @@ class Conv2d(BayesianModule):
             dilation=self.dilation,
             groups=self.groups,
         )
+    
+    @torch.jit.export
+    def freeze(self) -> None:
+        """
+        This method is to freeze the layer.
 
+        Returns:
+            None.
+        """
+
+        # set indicator
+        self.frozen = True
+
+        # sample weights if they are undefined
+        if self.weights is None:
+            self.weights = self.weights_distribution.sample()
+
+        # sample bias is they are undefined
+        if self.bias is None:
+            self.bias = self.bias_distribution.sample()
+
+        # detach weights and bias
+        self.weights = self.weights.detach()
+        self.bias = self.bias.detach()
+
+    @torch.jit.export
     def kl_cost(self) -> tuple[torch.Tensor, int]:
         """
         Computes the Kullback-Leibler (KL) divergence cost for the
@@ -153,15 +159,14 @@ class Conv2d(BayesianModule):
             parameters.
         """
 
-        log_posterior: torch.Tensor = self.weights_posterior.log_prob(
+        # Compute log probs
+        log_probs: torch.Tensor = self.weights_distribution.log_prob(
             self.weights
-        ) + self.bias_posterior.log_prob(self.bias)
-        log_prior: torch.Tensor = self.weights_prior.log_prob(
-            self.weights
-        ) + self.bias_prior.log_prob(self.bias)
+        ) + self.bias_distribution.log_prob(self.bias)
 
+        # Compute number of parameters
         num_params: int = (
-            self.weights_posterior.num_params + self.bias_posterior.num_params
+            self.weights_distribution.num_params + self.bias_distribution.num_params
         )
 
-        return log_posterior - log_prior, num_params
+        return log_probs, num_params
