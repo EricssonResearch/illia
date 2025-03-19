@@ -6,7 +6,7 @@ from typing import Optional
 import tensorflow as tf
 
 
-class Distribution(ABC, tf.keras.Model):
+class Distribution(ABC, tf.keras.layers.Layer):
     @abstractmethod
     def sample(self) -> tf.Tensor:
         pass
