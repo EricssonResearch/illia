@@ -1,7 +1,5 @@
-# standard libraries
 from typing import Optional
 
-# 3pp
 import jax
 import jax.numpy as jnp
 from flax import nnx
@@ -9,14 +7,13 @@ from jax import lax
 from flax.nnx import rnglib
 from flax.nnx.nn import dtypes
 from flax.typing import (
-  Dtype,
-  PrecisionLike,
-  DotGeneralT,
+    Dtype,
+    PrecisionLike,
+    DotGeneralT,
 )
 
-# own modules
-from illia.distributions.jax import GaussianDistribution
-from illia.nn.jax.base import BayesianModule
+from illia.jax.distributions.gaussian import GaussianDistribution
+from illia.jax.nn.base import BayesianModule
 
 
 class Linear(BayesianModule):
@@ -114,9 +111,7 @@ class Linear(BayesianModule):
         # compute log probs
         log_probs: jax.Array = self.weights_distribution.log_prob(
             self.weights
-        ) + self.bias_distribution.log_prob(
-            self.bias
-        )
+        ) + self.bias_distribution.log_prob(self.bias)
 
         # compute the number of parameters
         num_params: int = (

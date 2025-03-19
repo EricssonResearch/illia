@@ -1,4 +1,3 @@
-# Libraries
 import random
 
 import pytest

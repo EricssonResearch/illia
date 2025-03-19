@@ -1,4 +1,3 @@
-# Libraries
 from typing import Optional
 
 import torch
@@ -65,10 +64,10 @@ class Embedding(BayesianModule):
             self.weights_distribution = weights_distribution
 
         # Sample initial weights
-        weights = self.weights_distribution.sample()
+        self.weights = self.weights_distribution.sample()
 
         # Register buffers
-        self.register_buffer("weights", weights)
+        self.register_buffer("weights", self.weights)
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
@@ -122,7 +121,7 @@ class Embedding(BayesianModule):
 
         # detach weights
         self.weights = self.weights.detach()
-        
+
     def kl_cost(self) -> tuple[torch.Tensor, int]:
         """
         Computes the Kullback-Leibler (KL) divergence cost for the

@@ -1,4 +1,3 @@
-# Libraries
 from typing import Optional
 
 import torch
@@ -53,12 +52,12 @@ class Linear(BayesianModule):
             self.bias_distribution = bias_distribution
 
         # Sample initial weights
-        weights = self.weights_distribution.sample()
-        bias = self.bias_distribution.sample()
+        self.weights = self.weights_distribution.sample()
+        self.bias = self.bias_distribution.sample()
 
         # Register buffers
-        self.register_buffer("weights", weights)
-        self.register_buffer("bias", bias)
+        self.register_buffer("weights", self.weights)
+        self.register_buffer("bias", self.bias)
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
@@ -111,7 +110,7 @@ class Linear(BayesianModule):
         # detach weights and bias
         self.weights = self.weights.detach()
         self.bias = self.bias.detach()
-        
+
     @torch.jit.export
     def kl_cost(self) -> tuple[torch.Tensor, int]:
         """

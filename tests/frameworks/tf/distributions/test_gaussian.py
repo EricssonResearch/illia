@@ -1,8 +1,6 @@
-# 3pp
 import pytest
 import tensorflow as tf
 
-# own modules
 from illia.tf.distributions import GaussianDistribution
 
 
@@ -37,12 +35,13 @@ def test_gaussian_init(
     """
 
     # define model
-    model: GaussianDistribution = GaussianDistribution(shape=shape,
+    model: GaussianDistribution = GaussianDistribution(
+        shape=shape,
         mu_prior=mu_prior,
         std_prior=std_prior,
         mu_init=mu_init,
-        rho_init=rho_init
-        )
+        rho_init=rho_init,
+    )
 
     # check mu prior type
     assert isinstance(model.mu_prior, tf.Tensor), (
@@ -104,8 +103,8 @@ def test_gaussian_sample(
         mu_prior=mu_prior,
         std_prior=std_prior,
         mu_init=mu_init,
-        rho_init=rho_init
-        )
+        rho_init=rho_init,
+    )
 
     # execute backward pass
     with tf.GradientTape() as tape:
@@ -162,12 +161,13 @@ def test_gaussian_log_prob(
     """
 
     # define model
-    model: GaussianDistribution = GaussianDistribution(shape=shape,
+    model: GaussianDistribution = GaussianDistribution(
+        shape=shape,
         mu_prior=mu_prior,
         std_prior=std_prior,
         mu_init=mu_init,
-        rho_init=rho_init
-        )
+        rho_init=rho_init,
+    )
 
     # iter over possible x values
     for x in [None, model.sample()]:

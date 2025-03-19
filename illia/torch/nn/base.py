@@ -1,15 +1,12 @@
-# Libraries
 import torch
 
 
 class BayesianModule(torch.nn.Module):
     """
-    Base class for creating a Bayesian module, which can be frozen or
-    unfrozen. This class is intended to be subclassed for specific
-    backend implementations.
+    This class serves as the base class for Bayesian modules.
+    Any module designed to function as a Bayesian layer should inherit
+    from this class.
     """
-
-    frozen: bool
 
     def __init__(self):
         """
@@ -22,7 +19,7 @@ class BayesianModule(torch.nn.Module):
 
         # Set freeze false by default
         self.frozen: bool = False
-        
+
         # Create attribute to know is a bayesian layer
         self.is_bayesian: bool = True
 

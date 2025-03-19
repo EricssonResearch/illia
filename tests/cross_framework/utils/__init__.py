@@ -1,2 +1,1 @@
-# Libraries
-from tests.utils.utils import compare_tensors  # noqa
+from tests.cross_framework.utils.utils import compare_tensors  # noqa

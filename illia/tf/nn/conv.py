@@ -1,8 +1,7 @@
-# Libraries
 from typing import Optional, Tuple, Union
 
 import tensorflow as tf
-from tensorflow.keras.utils import register_keras_serializable  # type: ignore
+from keras import saving
 
 from . import (
     Distribution,
@@ -11,33 +10,11 @@ from . import (
 )
 
 
-@register_keras_serializable(package="BayesianModule", name="Conv2d")
+@saving.register_keras_serializable(package="BayesianModule", name="Conv2d")
 class Conv2d(BayesianModule):
     """
-    This class is the bayesian implementation of the Conv2d class with backend TF.
-
-    Attr:
-        weights_distribution: distribution for the weights of the
-            layer.
-            Dimensions: [output channels, input channels // groups, kernel size, kernel size].
-        bias_distribution: distribution of the bias layer.
-            Dimensions: [output channels].
-        weights: sampled weights of the layer. They are registered in
-            the buffer.
-            Dimensions: [output channels, input channels // groups, kernel size, kernel size].
-        bias: sampled bias of the layer. They are registered in
-            the buffer.
-            Dimensions: [output channels].
-
-        input_channels: Number of channels in the input image.
-        output_channels: Number of channels produced by the convolution.
-        kernel_size: Size of the convolving kernel.
-        stride: Stride of the convolution.
-        padding: Padding added to all four sides of the input.
-        dilation_rate: Spacing between kernel elements.
-        groups: Number of blocked connections from input channels
-            to output channels.
-        channel_first: Structure of data to train with. If True, NCHW. Else, NHWC.
+    Bayesian 2D Convolution layer with trainable weights and biases,
+    supporting prior and posterior distributions.
     """
 
     def __init__(
@@ -64,7 +41,7 @@ class Conv2d(BayesianModule):
             stride (Union[int, Tuple[int, int]]):
                 Stride of the convolution.
             padding (Union[int, Tuple[int, int], str]):
-                Either the `string` `"SAME"` or `"VALID"` or explicity padding. 
+                Either the `string` `"SAME"` or `"VALID"` or explicity padding.
                 When explicit padding is used and data_format is
                 `"NHWC"`, this should be in the form `[[0, 0], [pad_top, pad_bottom],
                 [pad_left, pad_right], [0, 0]]`
@@ -85,9 +62,8 @@ class Conv2d(BayesianModule):
                 Defaults to False.
 
         Note:
-            Data format internally will always operate with channel last (default in TF).
+            Data format internally will always operate with channel last
             https://www.tensorflow.org/api_docs/python/tf/nn/convolution
-
         """
 
         super().__init__()
@@ -99,10 +75,10 @@ class Conv2d(BayesianModule):
 
         if isinstance(kernel_size, int):
             self.kernel_size = (kernel_size, kernel_size)
-        else: 
+        else:
             self.kernel_size = kernel_size
         self.dilation_rate = dilation_rate
-        self.stride = stride 
+        self.stride = stride
         self.groups = groups
         self.data_format = data_format
 
@@ -112,51 +88,55 @@ class Conv2d(BayesianModule):
             ), "Input channels must be divisible by groups"
 
             # ## IF PASSED DISTRIBUTION (BY DEFAULT THE SHAPE IS ALREADY DIVIDED)
-            # if weights_distribution is None: 
-            assert (
-                self.filters % groups == 0
-            ), "Filters must be divisible by groups"
+            # if weights_distribution is None:
+            assert self.filters % groups == 0, "Filters must be divisible by groups"
 
         if isinstance(padding, int):
-            self.padding = [[0, 0], [0, 0], [padding, padding], [padding, padding]]
+            self.padding_explicit: list[list[int]] = [
+                [0, 0],
+                [0, 0],
+                [padding, padding],
+                [padding, padding],
+            ]
+            self.padding = "EXPLICIT"
         elif isinstance(padding, tuple):
-            padH, padW = padding
-            self.padding = [[0, 0], [0, 0], [padH, padH], [padW, padW]]
+            pad_h, pad_w = padding
+            self.padding_explicit = [[0, 0], [0, 0], [pad_h, pad_h], [pad_w, pad_w]]
+            self.padding = "EXPLICIT"
         else:
             assert padding.upper() in (
                 "SAME",
                 "VALID",
-            ), f'Padding arg must be either "SAME" or "VALID"'
+            ), 'Padding arg must be either "SAME" or "VALID"'
             self.padding = padding.upper()
 
         # Distribution Initialization (parameters by default)
         weights_distribution_shape = (
-                    *self.kernel_size,
-                    input_channels // groups,
-                    output_channels 
-                )
+            *self.kernel_size,
+            input_channels // groups,
+            output_channels,
+        )
         if weights_distribution is None:
             self.weights_distribution: Distribution = GaussianDistribution(
-               weights_distribution_shape,
-               name="weights_distr"
+                weights_distribution_shape, name="weights_distr"
             )
         else:
-            assert (
-                weights_distribution.sample().shape == weights_distribution_shape
-            ), f"""Expected shape  {weights_distribution_shape}, sampled shape {weights_distribution.sample().shape}"""
+            assert weights_distribution.sample().shape == weights_distribution_shape, (
+                f"Expected shape  {weights_distribution_shape}, "
+                f"sampled shape {weights_distribution.sample().shape}"
+            )
             self.weights_distribution = weights_distribution
-        
+
         bias_distribution_shape = (output_channels,)
         if bias_distribution is None:
             self.bias_distribution: Distribution = GaussianDistribution(
-                bias_distribution_shape,
-                name="bias_distr"
+                bias_distribution_shape, name="bias_distr"
             )
         else:
-            assert (
-                bias_distribution.sample().shape == bias_distribution_shape
-            ),f"""Expected shape  {bias_distribution_shape}, sampled shape {bias_distribution.sample().shape}"""
-            
+            assert bias_distribution.sample().shape == bias_distribution_shape, (
+                f"Expected shape  {bias_distribution_shape}, "
+                f"sampled shape {bias_distribution.sample().shape}"
+            )
             self.bias_distribution = bias_distribution
 
         # Sample initial distributions
@@ -178,7 +158,7 @@ class Conv2d(BayesianModule):
         )
 
     @staticmethod
-    def channels_first_to_last(shape:list):
+    def channels_first_to_last(shape: list):
         """
         Given a shape with channels first, returns a shape with channels last.
         Args:
@@ -187,31 +167,31 @@ class Conv2d(BayesianModule):
             The transposed shape.
         """
         return shape[:1] + shape[2:] + shape[1:2]
-    
+
     @staticmethod
-    def channels_last_to_first(shape:list):
+    def channels_last_to_first(shape: list):
         """
         Given a shape with channels last, returns a shape with channels first.
-        Args: 
-            shape: 
-        Return: 
+        Args:
+            shape:
+        Return:
             The transposed shape.
         """
         return shape[:1] + shape[-1:] + shape[1:-1]
 
-    def maybe_transpose_tensor(self, tensor:tf.Tensor):
+    def maybe_transpose_tensor(self, tensor: tf.Tensor):
         """Transpose if data format does not start with NC (channel-first).
         Args:
             Tensor of 4D
-        Returns: 
-            Channel last tensor. 
+        Returns:
+            Channel last tensor.
         """
         if self.data_format in ("NCHW", "channel_first"):
             order = self.channels_last_to_first(list(range(tensor.shape.rank)))
             return tf.transpose(a=tensor, perm=order)
-        else:
-            return tensor
-        
+
+        return tensor
+
     def __conv__(self, inputs: tf.Tensor) -> tf.Tensor:
         # Unfortunately 'channels_first' data format is not implemented on the CPU
         inputs = self.maybe_transpose_tensor(inputs)
@@ -234,7 +214,7 @@ class Conv2d(BayesianModule):
             self.bias.assign(self.bias_distribution.sample())
         else:
             if self.kernels is None:
-                w=self.weights_distribution.sample()
+                w = self.weights_distribution.sample()
                 self.kernels = self.add_weight(
                     name="kernel",
                     initializer=tf.constant_initializer(w.numpy()),

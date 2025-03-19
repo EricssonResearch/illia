@@ -1,8 +1,6 @@
-# 3pp
 import jax
 
-# own modules
-from illia.nn.jax import Linear
+from illia.jax.nn import Linear
 
 
 def test_linear_call() -> None:

@@ -1,4 +1,3 @@
-# Libraries
 from typing import Literal
 
 import torch

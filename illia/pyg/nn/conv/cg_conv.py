@@ -1,4 +1,3 @@
-# Libraries
 from typing import Union
 
 import torch
@@ -73,9 +72,12 @@ class CGConv(MessagePassing):
 
         self.lin_f = Linear(sum(channels) + dim, channels[1])
         self.lin_s = Linear(sum(channels) + dim, channels[1])
-        # self.reset_parameters()
 
     def reset_parameters(self):
+        """
+        Resets the parameters of the linear layers.
+        """
+
         self.lin_f.reset_parameters()
         self.lin_s.reset_parameters()
         if self.bn is not None:
@@ -84,15 +86,40 @@ class CGConv(MessagePassing):
     def forward(
         self, x: Union[Tensor, PairTensor], edge_index: Adj, edge_attr: OptTensor = None
     ) -> Tensor:
+        """
+        Performs a forward pass of the convolutional layer.
+
+        Args:
+            x: Input node features, either as a single tensor or a pair
+                of tensors if bipartite.
+            edge_index: Edge indices.
+            edge_attr: Optional edge features.
+
+        Returns:
+            The output node features.
+        """
+
         if isinstance(x, Tensor):
             x = (x, x)
 
-        # propagate_type: (x: PairTensor, edge_attr: OptTensor)
+        # Propagate_type: (x: PairTensor, edge_attr: OptTensor)
         out = self.propagate(edge_index, x=x, edge_attr=edge_attr, size=None)
         out = out + x[1]
         return out
 
     def message(self, x_i, x_j, edge_attr: OptTensor) -> Tensor:
+        """
+        Constructs messages to be passed to neighboring nodes.
+
+        Args:
+            x_i: Central node features.
+            x_j: Neighboring node features.
+            edge_attr: Optional edge features.
+
+        Returns:
+            The messages to be aggregated.
+        """
+
         if edge_attr is None:
             z = torch.cat([x_i, x_j], dim=-1)
         else:
@@ -100,4 +127,8 @@ class CGConv(MessagePassing):
         return self.lin_f(z).sigmoid() * F.softplus(self.lin_s(z))
 
     def __repr__(self) -> str:
+        """
+        Returns a string representation of the module.
+        """
+
         return f"{self.__class__.__name__}({self.channels}, dim={self.dim})"

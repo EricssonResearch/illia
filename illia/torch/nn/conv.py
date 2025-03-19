@@ -1,4 +1,3 @@
-# Libraries
 from typing import Optional, Union
 
 import torch
@@ -82,12 +81,12 @@ class Conv2d(BayesianModule):
             self.bias_distribution = bias_distribution
 
         # Sample initial weights
-        weights = self.weights_distribution.sample()
-        bias = self.bias_distribution.sample()
+        self.weights = self.weights_distribution.sample()
+        self.bias = self.bias_distribution.sample()
 
         # Register buffers
-        self.register_buffer("weights", weights)
-        self.register_buffer("bias", bias)
+        self.register_buffer("weights", self.weights)
+        self.register_buffer("bias", self.bias)
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
@@ -114,7 +113,7 @@ class Conv2d(BayesianModule):
             self.bias = self.bias_distribution.sample()
 
         # Run torch forward
-        return F.conv2d(
+        outputs: torch.Tensor = F.conv2d(
             inputs,
             weight=self.weights,
             bias=self.bias,
@@ -123,7 +122,9 @@ class Conv2d(BayesianModule):
             dilation=self.dilation,
             groups=self.groups,
         )
-    
+
+        return outputs
+
     @torch.jit.export
     def freeze(self) -> None:
         """

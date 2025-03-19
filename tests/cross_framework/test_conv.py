@@ -1,4 +1,3 @@
-# Libraries
 import random
 
 import pytest
@@ -6,7 +5,7 @@ import numpy as np
 import torch
 import tensorflow as tf
 
-from tests.fixtures_nn import set_base_module
+from .fixtures_nn import set_base_module
 
 RNG = np.random.default_rng(seed=0)
 random.seed(0)
@@ -33,7 +32,5 @@ def test_conv_fordward(set_base_module):
         err_msg="Torch and TensorFlow output are different by relative error (1) and absolute error (1)",
         verbose=True,
     )
-    # torch_output = torch_module(torch_input)
-    # tf_output = tf_module(tf_input)
 
     assert True

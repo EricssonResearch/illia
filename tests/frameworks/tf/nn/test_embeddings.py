@@ -10,45 +10,47 @@ from illia.tf.nn import Embedding
 from illia.tf.distributions import Distribution, GaussianDistribution
 
 embedding_test_keys = [
-        "num_embeddings",
-        "embeddings_dim",
-        "weights_distribution",
-        "padding_idx",
-        "max_norm",
-        "norm_type",
-        "scale_grad_by_freq",
-        "sparse",
-        "batch_size"]
-combos_ids = ['normal_default',
-"normal_distr"]
+    "num_embeddings",
+    "embeddings_dim",
+    "weights_distribution",
+    "padding_idx",
+    "max_norm",
+    "norm_type",
+    "scale_grad_by_freq",
+    "sparse",
+    "batch_size",
+]
+combos_ids = ["normal_default", "normal_distr"]
 COMBOS_WOMBOS = (
-    {   "num_embeddings":8,
-        "embeddings_dim":64,
-        "weights_distribution":None,
-        "padding_idx":None,
-        "max_norm":None,
-        "norm_type":2.0,
-        "scale_grad_by_freq":False,
-        "sparse":False,
-        "batch_size":64
+    {
+        "num_embeddings": 8,
+        "embeddings_dim": 64,
+        "weights_distribution": None,
+        "padding_idx": None,
+        "max_norm": None,
+        "norm_type": 2.0,
+        "scale_grad_by_freq": False,
+        "sparse": False,
+        "batch_size": 64,
     },
     {
-        "num_embeddings":10,
-        "embeddings_dim":32,
-        "weights_distribution":GaussianDistribution((10, 32)),
-        "padding_idx":0,
-        "max_norm":2.0,
-        "norm_type":2.0,
-        "scale_grad_by_freq":True,
-        "sparse":False,
-        "batch_size":64
-    }
+        "num_embeddings": 10,
+        "embeddings_dim": 32,
+        "weights_distribution": GaussianDistribution((10, 32)),
+        "padding_idx": 0,
+        "max_norm": 2.0,
+        "norm_type": 2.0,
+        "scale_grad_by_freq": True,
+        "sparse": False,
+        "batch_size": 64,
+    },
 )
+
+
 @pytest.mark.order(1)
 @pytest.mark.parametrize(
-    embedding_test_keys, 
-    [tuple(d.values()) for d in COMBOS_WOMBOS], 
-    ids=combos_ids)
+    embedding_test_keys, [tuple(d.values()) for d in COMBOS_WOMBOS], ids=combos_ids
+)
 def test_embedding_init(
     num_embeddings: int,
     embeddings_dim: int,
@@ -58,7 +60,7 @@ def test_embedding_init(
     norm_type: float,
     scale_grad_by_freq: bool,
     sparse: bool,
-    batch_size:int
+    batch_size: int,
 ) -> None:
     """
     This function is the test for the constructor of the Embedding
@@ -110,9 +112,7 @@ def test_embedding_init(
 
 @pytest.mark.order(2)
 @pytest.mark.parametrize(
-    embedding_test_keys,
-    [tuple(d.values()) for d in COMBOS_WOMBOS],
-    ids=combos_ids
+    embedding_test_keys, [tuple(d.values()) for d in COMBOS_WOMBOS], ids=combos_ids
 )
 def test_embedding_forward(
     num_embeddings: int,
@@ -166,11 +166,8 @@ def test_embedding_forward(
 
     # get inputs
     inputs = tf.random.stateless_uniform(
-        (batch_size,),
-        minval=0,
-        maxval=num_embeddings,
-        dtype=tf.int32,
-        seed=(0,0))
+        (batch_size,), minval=0, maxval=num_embeddings, dtype=tf.int32, seed=(0, 0)
+    )
 
     # check parameters length
     outputs: tf.Tensor = model(inputs)
@@ -191,9 +188,7 @@ def test_embedding_forward(
 
 @pytest.mark.order(3)
 @pytest.mark.parametrize(
-    embedding_test_keys,
-    [tuple(d.values()) for d in COMBOS_WOMBOS],
-    ids=combos_ids
+    embedding_test_keys, [tuple(d.values()) for d in COMBOS_WOMBOS], ids=combos_ids
 )
 def test_embedding_backward(
     num_embeddings: int,
@@ -247,11 +242,8 @@ def test_embedding_backward(
 
     # get inputs
     inputs = tf.random.stateless_uniform(
-        (batch_size,),
-        minval=0,
-        maxval=num_embeddings,
-        dtype=tf.int32,
-        seed=(0,0))
+        (batch_size,), minval=0, maxval=num_embeddings, dtype=tf.int32, seed=(0, 0)
+    )
 
     # No need for a scripted version in TensorFlow
     with tf.GradientTape() as tape:
@@ -261,19 +253,18 @@ def test_embedding_backward(
 
     # Compute the gradients
     grads = tape.gradient(loss, model.trainable_variables)
-    
+
     # Check gradients
     for name, grad in zip([v.name for v in model.trainable_variables], grads):
-        assert grad is not None, f"Incorrect backward computation, gradient of {name} shouldn't be None"
+        assert (
+            grad is not None
+        ), f"Incorrect backward computation, gradient of {name} shouldn't be None"
         print(f"Gradient for {name}: {grad}")
-
 
 
 @pytest.mark.order(4)
 @pytest.mark.parametrize(
-    embedding_test_keys,
-    [tuple(d.values()) for d in COMBOS_WOMBOS],
-    ids=combos_ids
+    embedding_test_keys, [tuple(d.values()) for d in COMBOS_WOMBOS], ids=combos_ids
 )
 def test_embedding_freeze(
     num_embeddings: int,
@@ -327,20 +318,17 @@ def test_embedding_freeze(
 
     # get inputs
     inputs = tf.random.stateless_uniform(
-        (batch_size,),
-        minval=0,
-        maxval=num_embeddings,
-        dtype=tf.int32,
-        seed=(0,0))
+        (batch_size,), minval=0, maxval=num_embeddings, dtype=tf.int32, seed=(0, 0)
+    )
 
     # compute outputs
     outputs_first: tf.Tensor = model(inputs)
     outputs_second: tf.Tensor = model(inputs)
 
     # check if both outputs are equal
-    assert outputs_first.numpy() != pytest.approx(outputs_second.numpy(), rel=1e-8, nan_ok=False), (
-        "Incorrect outputs, different forwards are equal when at the initialization the layer should be unfrozen"
-    )
+    assert outputs_first.numpy() != pytest.approx(
+        outputs_second.numpy(), rel=1e-8, nan_ok=False
+    ), "Incorrect outputs, different forwards are equal when at the initialization the layer should be unfrozen"
 
     # freeze layer
     model.freeze()
@@ -350,9 +338,9 @@ def test_embedding_freeze(
     outputs_second = model(inputs)
 
     # check if both outputs are equal
-    assert outputs_first.numpy() == pytest.approx(outputs_second.numpy(), rel=1e-8, nan_ok=False), (
-        "Incorrect freezing, when layer is frozen outputs are not the same in different forward passes"
-    )
+    assert outputs_first.numpy() == pytest.approx(
+        outputs_second.numpy(), rel=1e-8, nan_ok=False
+    ), "Incorrect freezing, when layer is frozen outputs are not the same in different forward passes"
 
     # unfreeze layer
     model.unfreeze()
@@ -361,18 +349,16 @@ def test_embedding_freeze(
     outputs_first = model(inputs)
     outputs_second = model(inputs)
 
-    assert outputs_first.numpy() != pytest.approx(outputs_second.numpy(), rel=1e-8, nan_ok=False), (
-        "Incorrect unfreezing, when layer is unfrozen outputs are the same in different forward passes"
-    )
+    assert outputs_first.numpy() != pytest.approx(
+        outputs_second.numpy(), rel=1e-8, nan_ok=False
+    ), "Incorrect unfreezing, when layer is unfrozen outputs are the same in different forward passes"
 
     return None
 
 
 @pytest.mark.order(5)
 @pytest.mark.parametrize(
-    embedding_test_keys,
-    [tuple(d.values()) for d in COMBOS_WOMBOS],
-    ids=combos_ids
+    embedding_test_keys, [tuple(d.values()) for d in COMBOS_WOMBOS], ids=combos_ids
 )
 def test_linear_kl_cost(
     num_embeddings: int,
@@ -425,12 +411,8 @@ def test_linear_kl_cost(
 
     # get inputs
     inputs = tf.random.stateless_uniform(
-        (batch_size,),
-        minval=0,
-        maxval=num_embeddings,
-        dtype=tf.int32,
-        seed=(0,0))
-
+        (batch_size,), minval=0, maxval=num_embeddings, dtype=tf.int32, seed=(0, 0)
+    )
 
     outputs: tuple[tf.Tensor, int] = model.kl_cost()
 
@@ -447,10 +429,12 @@ def test_linear_kl_cost(
 
     # work around 'tensorflow.python.framework.ops.EagerTensor'
     nparams = outputs[1]
-    assert tf.int32 == nparams.dtype, (
-        f"Incorrect output type in the second element, expected {int} and got "
-        f"{outputs[1].dtype}"
-    )
+    assert isinstance(
+        nparams, int
+    ), "Expected an integer for the second element of outputs."
+    assert isinstance(nparams, int) and nparams == int(
+        nparams
+    ), f"Incorrect output type in the second element, expected {int} and got {type(nparams)}"
 
     # check shape of kl cost
     assert outputs[0].shape == (), (

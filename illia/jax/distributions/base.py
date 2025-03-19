@@ -1,25 +1,26 @@
 from abc import abstractmethod
 from typing import Optional
 
-import torch
+import jax.numpy as jnp
+from flax import nnx
 
 
-class Distribution(torch.nn.Module):
+class Distribution(nnx.Module):
     """
     Abstract base class for probability distributions.
     """
 
     @abstractmethod
-    def sample(self) -> torch.Tensor:
+    def sample(self) -> jnp.ndarray:
         """
         Generates a random sample from the distribution.
 
         Returns:
-            A random sample as a tensor.
+            A random sample as a JAX NumPy array.
         """
 
     @abstractmethod
-    def log_prob(self, x: Optional[torch.Tensor] = None) -> torch.Tensor:
+    def log_prob(self, x: Optional[jnp.ndarray] = None) -> jnp.ndarray:
         """
         Computes the log probability of a given sample.
 
@@ -29,7 +30,7 @@ class Distribution(torch.nn.Module):
                 the log probability for an internally stored sample.
 
         Returns:
-            The log probability of the sample as a tensor.
+            The log probability of the sample as a JAX NumPy array.
         """
 
     @property

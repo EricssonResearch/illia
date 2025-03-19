@@ -1,7 +1,6 @@
-# Libraries
 from typing import Any
 
-import numpy as np  # type: ignore
+import numpy as np
 
 
 def compare_tensors(

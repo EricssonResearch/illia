@@ -6,7 +6,7 @@
 
 # Variables
 SRC_PROJECT_NAME ?= illia
-SRC_NOTEBOOKS ?= docs/examples/
+SRC_NOTEBOOKS_DL ?= docs/deep_learning_frameworks/examples
 TEST_FILE ?= tests
 
 # Allows the installation of project dependencies
@@ -19,7 +19,7 @@ install:
 # Check format, quality and more, of the code
 lint:
 	@echo "Apply code format with Black..."
-	black $(SRC_PROJECT_NAME)/ $(TEST_FILE)/ $(SRC_NOTEBOOKS)/
+	black $(SRC_PROJECT_NAME)/ $(TEST_FILE)/ $(SRC_NOTEBOOKS_DL)/
 	@echo "Checking code style and quality with Flake8..."
 	flake8 $(SRC_PROJECT_NAME)/
 	@echo "Checking code complexity with complexipy..."

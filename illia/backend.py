@@ -1,4 +1,3 @@
-# Available backends for illia
 _AVAILABLE_DNN_BACKENDS = ["torch", "tf", "jax"]
 _AVAILABLE_GNN_BACKENDS = ["torch_geometric", "dgl", "spektral"]
 

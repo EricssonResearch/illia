@@ -1,11 +1,8 @@
-# standard libraries
 from typing import Optional
 
-# 3pp
 import pytest
 import torch
 
-# own modules
 from illia.torch.nn import Linear
 from illia.torch.distributions import Distribution, GaussianDistribution
 

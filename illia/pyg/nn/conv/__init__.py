@@ -1,1 +1,1 @@
-from torch_bayesian.nn_geom.conv.cg_conv import CGConv
+from illia.pyg.nn.conv.cg_conv import CGConv  # noqa

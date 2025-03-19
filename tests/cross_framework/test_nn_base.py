@@ -1,4 +1,3 @@
-# Libraries
 import random
 
 import pytest
@@ -6,7 +5,7 @@ import numpy as np
 import torch
 import tensorflow as tf
 
-from tests.fixtures_nn import set_base_module
+from .fixtures_nn import set_base_module
 
 random.seed(0)
 np.random.seed(0)

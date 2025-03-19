@@ -1,20 +1,12 @@
-# Libraries
 import random
 from typing import Dict, Tuple
 
 import pytest
-import numpy as np
 import torch
+import numpy as np
 import tensorflow as tf
 
-# Specific libraries for each backend
-from . import (
-    TFStaticGaussianDistribution,
-    TorchStaticGaussianDistribution,
-    TFDynamicGaussianDistribution,
-    TorchDynamicGaussianDistribution,
-)
-
+from . import TFGaussianDistribution, TorchGaussianDistribution
 
 random.seed(0)
 np.random.seed(0)
@@ -46,7 +38,7 @@ def set_parameters() -> Dict:
 
 
 @pytest.fixture
-def set_dynamic_distributions(set_parameters) -> Tuple:
+def set_distributions(set_parameters) -> Tuple:
     """
     Initializes dynamic Gaussian distributions using the parameters
     provided by `set_parameters`. Returns a tuple containing both
@@ -59,30 +51,9 @@ def set_dynamic_distributions(set_parameters) -> Tuple:
     rho_init = set_parameters["rho_init"]
 
     # Initialize dynamic distributions
-    torch_dynamic_dist = TorchDynamicGaussianDistribution(
+    torch_dist = TorchGaussianDistribution(
         shape=shape, mu_init=mu_init, rho_init=rho_init
     )
-    tf_dynamic_dist = TFDynamicGaussianDistribution(
-        shape=shape, mu_init=mu_init, rho_init=rho_init
-    )
+    tf_dist = TFGaussianDistribution(shape=shape, mu_init=mu_init, rho_init=rho_init)
 
-    return torch_dynamic_dist, tf_dynamic_dist
-
-
-@pytest.fixture
-def set_static_distributions(set_parameters) -> Tuple:
-    """
-    Initializes static Gaussian distributions using the parameters
-    provided by `set_parameters`. Returns a tuple containing both
-    PyTorch and TensorFlow static Gaussian distribution instances.
-    """
-
-    # Access to the variables
-    mu_prior = set_parameters["mu_prior"]
-    std_prior = set_parameters["std_prior"]
-
-    # Initialize static distributions
-    torch_static_dist = TorchStaticGaussianDistribution(mu=mu_prior, std=std_prior)
-    tf_static_dist = TFStaticGaussianDistribution(mu=mu_prior, std=std_prior)
-
-    return torch_static_dist, tf_static_dist
+    return torch_dist, tf_dist

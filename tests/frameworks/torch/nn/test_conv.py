@@ -1,11 +1,8 @@
-# standard libraries
 from typing import Optional, Union
 
-# 3pp
 import pytest
 import torch
 
-# own modules
 from illia.torch.nn import Conv2d
 from illia.torch.distributions import Distribution, GaussianDistribution
 
@@ -540,7 +537,7 @@ def get_outputs_shape(
     padding: Union[int, tuple[int, int]],
     dilation: Union[int, tuple[int, int]],
     groups: int,
-    **kwargs
+    **kwargs,
 ) -> tuple[int, int, int, int]:
     """
     This function returns the output shape

@@ -1,4 +1,3 @@
-# Libraries
 import random
 
 import pytest
@@ -6,11 +5,7 @@ import numpy as np
 import torch
 import tensorflow as tf
 
-from tests.fixtures_distributions import (
-    set_parameters,
-    set_dynamic_distributions,
-    set_static_distributions,
-)
+from .fixtures_distributions import set_parameters, set_distributions
 
 from .utils import compare_tensors
 
@@ -22,7 +17,7 @@ tf.random.set_seed(0)
 
 @pytest.mark.order(1)
 @pytest.mark.parametrize("n_samples", [10000])
-def test_dynamic_sampling(n_samples, set_dynamic_distributions) -> None:
+def test_dynamic_sampling(n_samples, set_distributions) -> None:
     """
     This function samples data from both PyTorch and TensorFlow dynamic
     distributions and compares their means and standard deviations to
@@ -30,7 +25,7 @@ def test_dynamic_sampling(n_samples, set_dynamic_distributions) -> None:
 
     Args:
         n_samples: Number of samples to draw.
-        set_dynamic_distributions: Fixture to provide dynamic
+        set_distributions: Fixture to provide dynamic
             distributions.
 
     Raises:
@@ -39,7 +34,7 @@ def test_dynamic_sampling(n_samples, set_dynamic_distributions) -> None:
     """
 
     # Obtain the dynamic distributions
-    torch_dist, tf_dist = set_dynamic_distributions
+    torch_dist, tf_dist = set_distributions
 
     # Sampling the data
     torch_samples = np.array(
@@ -64,9 +59,7 @@ def test_dynamic_sampling(n_samples, set_dynamic_distributions) -> None:
 
 @pytest.mark.order(2)
 @pytest.mark.parametrize("rtol, atol", [(1e-1, 1e-1)])
-def test_dynamic_log_probs(
-    rtol, atol, set_parameters, set_dynamic_distributions
-) -> None:
+def test_dynamic_log_probs(rtol, atol, set_parameters, set_distributions) -> None:
     """
     This function computes the log probabilities of samples from both
     PyTorch and TensorFlow dynamic distributions and compares them for
@@ -76,7 +69,7 @@ def test_dynamic_log_probs(
         rtol: Relative tolerance for comparison.
         atol: Absolute tolerance for comparison.
         set_parameters: Fixture to provide parameters including shape.
-        set_dynamic_distributions: Fixture to provide dynamic
+        set_distributions: Fixture to provide dynamic
             distributions.
 
     Raises:
@@ -88,7 +81,7 @@ def test_dynamic_log_probs(
     shape = set_parameters["shape"]
 
     # Obtain the dynamic distributions
-    torch_dist, tf_dist = set_dynamic_distributions
+    torch_dist, tf_dist = set_distributions
 
     # Sampling the data, computing log probability and compare it
     x = np.random.randn(*shape).astype(np.float32)
@@ -102,13 +95,13 @@ def test_dynamic_log_probs(
 
 
 @pytest.mark.order(3)
-def test_dynamic_num_params(set_dynamic_distributions) -> None:
+def test_dynamic_num_params(set_distributions) -> None:
     """
     This function compares the number of parameters between PyTorch and
     TensorFlow dynamic distributions to ensure they are similar.
 
     Args:
-        set_dynamic_distributions: Fixture to provide dynamic
+        set_distributions: Fixture to provide dynamic
             distributions.
 
     Raises:
@@ -117,7 +110,7 @@ def test_dynamic_num_params(set_dynamic_distributions) -> None:
     """
 
     # Obtain the dynamic distributions
-    torch_dist, tf_dist = set_dynamic_distributions
+    torch_dist, tf_dist = set_distributions
 
     # Compare the number of parameters
     assert (

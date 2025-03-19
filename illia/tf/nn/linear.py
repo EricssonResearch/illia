@@ -1,4 +1,3 @@
-# Libraries
 from typing import Optional
 
 import tensorflow as tf
@@ -43,8 +42,7 @@ class Linear(BayesianModule):
         # Set weights distribution
         if weights_distribution is None:
             self.weights_distribution: Distribution = GaussianDistribution(
-                 (input_size, output_size),
-                 name="weights_distr"
+                (input_size, output_size), name="weights_distr"
             )
         else:
             self.weights_distribution = weights_distribution
@@ -52,8 +50,7 @@ class Linear(BayesianModule):
         # Set bias distribution
         if bias_distribution is None:
             self.bias_distribution: Distribution = GaussianDistribution(
-                (output_size,),
-                name="bias_distr"
+                (output_size,), name="bias_distr"
             )
         else:
             self.bias_distribution = bias_distribution
@@ -64,7 +61,7 @@ class Linear(BayesianModule):
             initializer=tf.constant_initializer(
                 self.weights_distribution.sample().numpy()
             ),
-            shape= (input_size, output_size),
+            shape=(input_size, output_size),
             trainable=False,
         )
         self.bias = self.add_weight(
@@ -92,7 +89,7 @@ class Linear(BayesianModule):
             "input_size": self.input_size,
             "output_size": self.output_size,
             "weights_distribution": self.weights_distribution,
-            "bias_distribution": self.bias_distribution
+            "bias_distribution": self.bias_distribution,
         }
 
         # Combine both configurations
@@ -121,9 +118,9 @@ class Linear(BayesianModule):
             raise ValueError("Module has been frozen with undefined weights")
 
         # Compute outputs
-        lin_output = tf.linalg.matmul(inputs, self.kernel) 
+        lin_output = tf.linalg.matmul(inputs, self.kernel)
         outputs: tf.Tensor = tf.nn.bias_add(lin_output, self.bias)
-        
+
         return outputs
 
     @tf.function
@@ -144,5 +141,5 @@ class Linear(BayesianModule):
         num_params: int = (
             self.weights_distribution.num_params + self.bias_distribution.num_params
         )
-        
+
         return log_posterior, num_params

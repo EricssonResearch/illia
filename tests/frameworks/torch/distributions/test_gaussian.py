@@ -1,8 +1,6 @@
-# 3pp
 import pytest
 import torch
 
-# own modules
 from illia.torch.distributions import GaussianDistribution
 
 

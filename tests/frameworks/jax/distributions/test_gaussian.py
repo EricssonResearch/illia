@@ -1,9 +1,7 @@
-# 3pp
 import pytest
 import jax
 
-# own modules
-from illia.distributions.jax import GaussianDistribution
+from illia.jax.distributions.gaussian import GaussianDistribution
 
 
 @pytest.mark.parametrize("shape, seed", [((20, 10), 42), ((64, 3, 32, 32), 0)])

@@ -10,28 +10,35 @@ from illia.tf.nn import Linear
 from illia.tf.distributions import Distribution, GaussianDistribution
 
 linear_test_keys = [
-    "input_size", "output_size", "weights_distribution", "bias_distribution", "batch_size"]
-combos_ids = ['normal_default', "normal_distr"]
+    "input_size",
+    "output_size",
+    "weights_distribution",
+    "bias_distribution",
+    "batch_size",
+]
+combos_ids = ["normal_default", "normal_distr"]
 COMBOS_WOMBOS = (
-            {"input_size":30, 
-             "output_size":20, 
-             "weights_distribution":None, 
-             "bias_distribution":None,
-             "batch_size": 1,
-             },
+    {
+        "input_size": 30,
+        "output_size": 20,
+        "weights_distribution": None,
+        "bias_distribution": None,
+        "batch_size": 1,
+    },
+    {
+        "input_size": 30,
+        "output_size": 20,
+        "weights_distribution": GaussianDistribution((30, 20)),
+        "bias_distribution": GaussianDistribution((20,)),
+        "batch_size": 1,
+    },
+)
 
-            {"input_size":30, 
-             "output_size":20, 
-             "weights_distribution":GaussianDistribution((30, 20)), 
-             "bias_distribution":GaussianDistribution((20,)),
-             "batch_size": 1,
-            },
-    )
+
 @pytest.mark.order(1)
 @pytest.mark.parametrize(
-    linear_test_keys, 
-    [tuple(d.values()) for d in COMBOS_WOMBOS], 
-    ids=combos_ids)
+    linear_test_keys, [tuple(d.values()) for d in COMBOS_WOMBOS], ids=combos_ids
+)
 def test_linear_init(
     input_size: int,
     output_size: int,
@@ -70,9 +77,8 @@ def test_linear_init(
 
 @pytest.mark.order(2)
 @pytest.mark.parametrize(
-    linear_test_keys, 
-    [tuple(d.values()) for d in COMBOS_WOMBOS],
-    ids=combos_ids)
+    linear_test_keys, [tuple(d.values()) for d in COMBOS_WOMBOS], ids=combos_ids
+)
 def test_linear_forward(
     input_size: int,
     output_size: int,
@@ -102,12 +108,14 @@ def test_linear_forward(
     )
 
     # get scripted version
-    model_scripted = tf.function(original_model, )
+    model_scripted = tf.function(
+        original_model,
+    )
     # get inputs
     inputs = tf.random.uniform((batch_size, input_size))
 
     # iter over models
-    for model in (original_model, original_model): #, model_scripted):
+    for model in (original_model, original_model):  # , model_scripted):
         # check parameters length
         outputs: tf.Tensor = model(inputs)
 
@@ -127,9 +135,8 @@ def test_linear_forward(
 
 @pytest.mark.order(3)
 @pytest.mark.parametrize(
-    linear_test_keys, 
-    [tuple(d.values()) for d in COMBOS_WOMBOS],
-    ids=combos_ids)
+    linear_test_keys, [tuple(d.values()) for d in COMBOS_WOMBOS], ids=combos_ids
+)
 def test_linear_backward(
     input_size: int,
     output_size: int,
@@ -159,7 +166,9 @@ def test_linear_backward(
     )
 
     # get scripted version
-    model_scripted = tf.function(model, )
+    model_scripted = tf.function(
+        model,
+    )
 
     # get inputs
     inputs = tf.random.uniform((batch_size, input_size))
@@ -174,7 +183,9 @@ def test_linear_backward(
 
     # Check gradients
     for name, grad in zip([v.name for v in model.trainable_variables], grads):
-        assert grad is not None, f"Incorrect backward computation, gradient of {name} shouldn't be None"
+        assert (
+            grad is not None
+        ), f"Incorrect backward computation, gradient of {name} shouldn't be None"
         print(f"Gradient for {name}: {grad}")
 
     return None
@@ -182,9 +193,8 @@ def test_linear_backward(
 
 @pytest.mark.order(4)
 @pytest.mark.parametrize(
-    linear_test_keys, 
-    [tuple(d.values()) for d in COMBOS_WOMBOS],
-    ids=combos_ids)
+    linear_test_keys, [tuple(d.values()) for d in COMBOS_WOMBOS], ids=combos_ids
+)
 def test_linear_freeze(
     input_size: int,
     output_size: int,
@@ -215,7 +225,9 @@ def test_linear_freeze(
     )
 
     # get scripted version
-    model_scripted = tf.function(model, )
+    model_scripted = tf.function(
+        model,
+    )
 
     # get inputs
     inputs = tf.random.uniform((batch_size, input_size))
@@ -225,9 +237,9 @@ def test_linear_freeze(
     outputs_second: tf.Tensor = model(inputs)
 
     # check if both outputs are equal
-    assert outputs_first.numpy() != pytest.approx(outputs_second.numpy(), rel=1e-8, nan_ok=False), (
-        "Incorrect outputs, different forwards are equal when at the initialization the layer should be unfrozen"
-    )
+    assert outputs_first.numpy() != pytest.approx(
+        outputs_second.numpy(), rel=1e-8, nan_ok=False
+    ), "Incorrect outputs, different forwards are equal when at the initialization the layer should be unfrozen"
 
     # freeze layer
     model.freeze()
@@ -237,9 +249,9 @@ def test_linear_freeze(
     outputs_second = model(inputs)
 
     # check if both outputs are equal
-    assert outputs_first.numpy() == pytest.approx(outputs_second.numpy(), rel=1e-8, nan_ok=False), (
-        "Incorrect freezing, when layer is frozen outputs are not the same in different forward passes"
-    )
+    assert outputs_first.numpy() == pytest.approx(
+        outputs_second.numpy(), rel=1e-8, nan_ok=False
+    ), "Incorrect freezing, when layer is frozen outputs are not the same in different forward passes"
 
     # unfreeze layer
     model.unfreeze()
@@ -248,18 +260,17 @@ def test_linear_freeze(
     outputs_first = model(inputs)
     outputs_second = model(inputs)
 
-    assert outputs_first.numpy() != pytest.approx(outputs_second.numpy(), rel=1e-8, nan_ok=False), (
-        "Incorrect unfreezing, when layer is unfrozen outputs are the same in different forward passes"
-    )
+    assert outputs_first.numpy() != pytest.approx(
+        outputs_second.numpy(), rel=1e-8, nan_ok=False
+    ), "Incorrect unfreezing, when layer is unfrozen outputs are the same in different forward passes"
 
     return None
 
 
 @pytest.mark.order(5)
 @pytest.mark.parametrize(
-    linear_test_keys, 
-    [tuple(d.values()) for d in COMBOS_WOMBOS],
-    ids=combos_ids)
+    linear_test_keys, [tuple(d.values()) for d in COMBOS_WOMBOS], ids=combos_ids
+)
 def test_linear_kl_cost(
     input_size: int,
     output_size: int,
@@ -310,10 +321,12 @@ def test_linear_kl_cost(
 
     # work around 'tensorflow.python.framework.ops.EagerTensor'
     nparams = outputs[1]
-    assert tf.int32 == nparams.dtype, (
-        f"Incorrect output type in the second element, expected {int} and got "
-        f"{outputs[1].dtype}"
-    )
+    assert isinstance(
+        nparams, int
+    ), "Expected an integer for the second element of outputs."
+    assert isinstance(nparams, int) and nparams == int(
+        nparams
+    ), f"Incorrect output type in the second element, expected {int} and got {type(nparams)}"
 
     # check shape of kl cost
     assert outputs[0].shape == (), (

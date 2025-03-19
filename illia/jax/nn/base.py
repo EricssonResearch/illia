@@ -1,32 +1,41 @@
-# standard libraries
 from abc import abstractmethod
 
-# 3pp
 import jax
 from flax import nnx
 
 
 class BayesianModule(nnx.Module):
     """
-    This class is the base class for BayesianModule for jax. Every
-    module that should behave as a bayesian layer should inherit from
-    this class.
-
-    Attr:
-        frozen: indicator if this module if frozen or not.
+    This class serves as the base class for Bayesian modules.
+    Any module designed to function as a Bayesian layer should inherit
+    from this class.
     """
 
-    frozen: bool
-
     def __init__(self) -> None:
-        # set freeze false by default
-        self.frozen = False
+        """
+        Initializes the BayesianModule, setting the frozen state to
+        False.
+        """
+
+        # Call super class constructor
+        super().__init__()
+
+        # Set freeze false by default
+        self.frozen: bool = False
+
+        # Create attribute to know is a bayesian layer
+        self.is_bayesian: bool = True
 
     def freeze(self) -> None:
-        # set frozen indicator to true for current layer
+        """
+        Freezes the current layer and all submodules that are instances
+        of BayesianModule. Sets the frozen state to True.
+        """
+
+        # Set frozen indicator to true for current layer
         self.frozen = True
 
-        # set forzen indicator to true for children
+        # Set forzen indicator to true for children
         for _, module in self.iter_modules():
             if self != module and isinstance(module, BayesianModule):
                 module.freeze()
@@ -34,14 +43,26 @@ class BayesianModule(nnx.Module):
                 continue
 
     def unfreeze(self) -> None:
-        # set frozen indicator to false for current layer
+        """
+        Unfreezes the current layer and all submodules that are
+        instances of BayesianModule. Sets the frozen state to False.
+        """
+
+        # Set frozen indicator to false for current layer
         self.frozen = False
 
-        # set forzen indicators to false for children
+        # Set forzen indicators to false for children
         for _, module in self.iter_modules():
             if module != self and isinstance(module, BayesianModule):
                 module.unfreeze()
 
     @abstractmethod
     def kl_cost(self) -> tuple[jax.Array, int]:
-        pass
+        """
+        Abstract method to compute the KL divergence cost.
+        Must be implemented by subclasses.
+
+        Returns:
+            A tuple containing the KL divergence cost and its
+            associated integer value.
+        """

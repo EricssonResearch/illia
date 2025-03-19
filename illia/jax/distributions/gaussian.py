@@ -1,40 +1,17 @@
-# standard libraries
 from typing import Optional
 
-# 3pp
 import jax
 import jax.numpy as jnp
 from flax import nnx
 
-# own modules
-from ..base import (
-    Distribution,
-)
+from .base import Distribution
 
 
-class GaussianDistribution(Distribution, nnx.Module):
+class GaussianDistribution(Distribution):
     """
-    This is the class to implement a learnable gausssian distribution
-    in jax and flax.
-
-    Attr:
-        shape: shape of the distribution.
-        mu_prior_value: mu prior value.
-        std_prior_value: float = 0.1
-        mu_init: float = 0.0
-        rho_init: float = -7.0
-
-    Returns:
-        _description_
+    This is the class to implement a learnable gausssian distribution.
     """
 
-    # shape: tuple[int, ...]
-    # mu_prior: float = 0.0
-    # std_prior: float = 0.1
-    # mu_init: float = 0.0
-    # rho_init: float = -7.0
-
-    # overriding method
     def __init__(
         self,
         shape: tuple[int, ...],
@@ -43,33 +20,48 @@ class GaussianDistribution(Distribution, nnx.Module):
         mu_init: float = 0.0,
         rho_init: float = -7.0,
     ) -> None:
-        # call super-class constructor
+        """
+        Initializes the GaussianDistribution with given priors and
+        initial parameters.
+
+        Args:
+            shape: The shape of the parameters.
+            mu_prior: The mean prior value.
+            std_prior: The standard deviation prior value.
+            mu_init: The initial mean value.
+            rho_init: The initial rho value, which affects the initial
+                standard deviation.
+        """
+
+        # Call super-class constructor
         super().__init__()
 
-        # define priors
+        # Define priors
         self.mu_prior = mu_prior
         self.std_prior = std_prior
 
-        # get key
+        # Get key
         key = jax.random.key(0)
 
-        # define initial mu and rho
+        # Define initial mu and rho
         self.mu = nnx.Param(mu_init + rho_init * jax.random.normal(key, shape))
         self.rho = nnx.Param(mu_init + rho_init * jax.random.normal(key, shape))
 
-    # overriding method
-    def sample(self, seed: int = 0, **kwargs) -> jax.Array:
+    def sample(self, seed: int = 0) -> jax.Array:
         """
-        This method is to sample from parameters.
+        Samples from the distribution using the current parameters.
+
+        Args:
+            seed: A random seed for generating the sample.
 
         Returns:
-            sampled jax array.
+            A sampled JAX array.
         """
 
-        # get key
+        # Get key
         key = jax.random.key(seed)
 
-        # compute epsilon and sigma
+        # Compute epsilon and sigma
         eps: jax.Array = jax.random.normal(key, self.rho.shape)
         sigma: jax.Array = jnp.log1p(jnp.exp(self.rho))  # type: ignore
 
@@ -77,35 +69,34 @@ class GaussianDistribution(Distribution, nnx.Module):
 
     def __call__(self) -> jax.Array:
         """
-        This method if the forward pass of the module.
+        Performs the forward pass of the module.
 
         Returns:
-            sampled jax array.
+            A sampled JAX array.
         """
 
         return self.sample()
 
-    # overriding method
     def log_prob(self, x: Optional[jax.Array] = None) -> jax.Array:
         """
-        This function computes the log probabilities.
+        Computes the log probability of a given sample.
 
         Args:
-            x: sampled array. Dimensions: [*]. If it is none the tensor
-                is sampled. Defaults to None.
+            x: An optional sampled array. If None, a sample is
+                generated.
 
         Returns:
-            log probs.
+            The log probability of the sample as a JAX array.
         """
 
-        # sample if x is None
+        # Sample if x is None
         if x is None:
             x = self.sample()
 
-        # define pi variable
+        # Define pi variable
         pi: jax.Array = jnp.acos(jnp.zeros(1)) * 2
 
-        # compute log priors
+        # Compute log priors
         log_prior = (
             -jnp.log(jnp.sqrt(2 * pi))
             - jnp.log(self.std_prior)
@@ -113,10 +104,10 @@ class GaussianDistribution(Distribution, nnx.Module):
             - 0.5
         )
 
-        # compute sigma
+        # Compute sigma
         sigma: jax.Array = jnp.log1p(jnp.exp(self.rho))  # type: ignore
 
-        # compute log posteriors
+        # Compute log posteriors
         log_posteriors = (
             -jnp.log(jnp.sqrt(2 * pi))
             - jnp.log(sigma)
@@ -124,7 +115,7 @@ class GaussianDistribution(Distribution, nnx.Module):
             - 0.5
         )
 
-        # compute final log probs
+        # Compute final log probs
         log_probs = log_posteriors.sum() - log_prior.sum()
 
         return log_probs
@@ -132,10 +123,10 @@ class GaussianDistribution(Distribution, nnx.Module):
     @property
     def num_params(self) -> int:
         """
-        This method returns the number of parameters in the module.
+        Returns the number of parameters in the module.
 
         Returns:
-            number of parameters.
+            The number of parameters as an integer.
         """
 
         return len(self.mu.view(-1))

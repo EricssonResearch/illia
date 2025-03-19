@@ -1,15 +1,14 @@
-# Libraries
 import tensorflow as tf
-from keras import Model, saving
+from keras import Model
 
 
 class BayesianModule(Model):
     """
-    Base class for creating a Bayesian module, which can be frozen or
-    unfrozen. This class is intended to be subclassed for specific
-    backend implementations.
+    This class serves as the base class for Bayesian modules.
+    Any module designed to function as a Bayesian layer should inherit
+    from this class.
     """
-    
+
     def __init__(self):
         """
         Initializes the BayesianModule, setting the frozen state to
@@ -21,7 +20,7 @@ class BayesianModule(Model):
 
         # Set freeze false by default
         self.frozen: bool = False
-        
+
         # Create attribute to know is a bayesian layer
         self.is_bayesian: bool = True
 

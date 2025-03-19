@@ -1,4 +1,3 @@
-# Libraries
 from typing import Optional, Tuple
 
 import tensorflow as tf
@@ -22,8 +21,7 @@ class Embedding(BayesianModule):
         self,
         num_embeddings: int,
         embeddings_dim: int,
-        weights_prior: Optional[StaticDistribution] = None,
-        weights_posterior: Optional[DynamicDistribution] = None,
+        weights_distribution: Optional[Distribution] = None,
         padding_idx: Optional[int] = None,
         max_norm: Optional[float] = None,
         norm_type: float = 2.0,
@@ -50,9 +48,6 @@ class Embedding(BayesianModule):
         # Call super class constructor
         super().__init__()
 
-        # Define parameters
-        parameters = {"mean": 0, "std": 0.1}
-
         # Set atributtes
         self.num_embeddings = num_embeddings
         self.embeddings_dim = embeddings_dim
@@ -65,15 +60,15 @@ class Embedding(BayesianModule):
         weights_distribution_shape = (num_embeddings, embeddings_dim)
         if weights_distribution is None:
             self.weights_distribution: Distribution = GaussianDistribution(
-               weights_distribution_shape,
-               name="weights_distr"
+                weights_distribution_shape, name="weights_distr"
             )
         else:
-            assert (
-                weights_distribution.sample().shape == weights_distribution_shape
-            ), f"""Expected shape  {weights_distribution_shape}, sampled shape {weights_distribution.sample().shape}"""
+            assert weights_distribution.sample().shape == weights_distribution_shape, (
+                f"Expected shape  {weights_distribution_shape}, "
+                f"sampled shape {weights_distribution.sample().shape}"
+            )
             self.weights_distribution = weights_distribution
-        
+
         # Sample initial distributions
         self.kernel = self.add_weight(
             name="kernel",
@@ -87,7 +82,7 @@ class Embedding(BayesianModule):
     @tf.function
     def _embedding(
         self,
-        input: tf.Tensor,
+        inputs: tf.Tensor,
         weight: tf.Tensor,
         padding_idx: Optional[int] = None,
         max_norm: Optional[float] = None,
@@ -110,14 +105,14 @@ class Embedding(BayesianModule):
             Tensor containing the computed embeddings.
         """
 
-        input = tf.cast(input, tf.int32)
+        inputs = tf.cast(inputs, tf.int32)
         if sparse is not None:
-            embeddings = tf.nn.embedding_lookup(weight, input)
+            embeddings = tf.nn.embedding_lookup(weight, inputs)
         else:
-            embeddings = tf.nn.embedding_lookup_sparse(weight, input)
+            embeddings = tf.nn.embedding_lookup_sparse(weight, inputs)
 
         if padding_idx is not None:
-            padding_mask = tf.not_equal(input, padding_idx)
+            padding_mask = tf.not_equal(inputs, padding_idx)
             embeddings = tf.where(
                 tf.expand_dims(padding_mask, -1), embeddings, tf.zeros_like(embeddings)
             )
@@ -173,7 +168,7 @@ class Embedding(BayesianModule):
             self.kernel.assign(self.weights_distribution.sample())
         else:
             if self.kernel is None:
-                w=self.weights_distribution.sample()
+                w = self.weights_distribution.sample()
                 self.kernel = self.add_weight(
                     name="kernel",
                     initializer=tf.constant_initializer(w.numpy()),
@@ -188,7 +183,6 @@ class Embedding(BayesianModule):
             self.padding_idx,
             self.max_norm,
             self.norm_type,
-            # TODO: self.scale_grad_by_freq,
             self.sparse,
         )
 
@@ -205,12 +199,8 @@ class Embedding(BayesianModule):
             parameters.
         """
 
-        log_posterior: tf.Tensor = self.weights_distribution.log_prob(
-            self.kernel
-        )
+        log_posterior: tf.Tensor = self.weights_distribution.log_prob(self.kernel)
 
-        num_params: int = (
-            self.weights_distribution.num_params
-        )
-        
+        num_params: int = self.weights_distribution.num_params
+
         return log_posterior, num_params
