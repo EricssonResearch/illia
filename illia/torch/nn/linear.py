@@ -1,4 +1,8 @@
-# other libraries
+"""
+This module contains the code for Linear Bayesian layer.
+"""
+
+# Standard libraries
 from typing import Optional
 
 # 3pp
@@ -17,7 +21,7 @@ class Linear(BayesianModule):
     """
     This class is the bayesian implementation of the torch Linear layer.
 
-    Attr:
+    Attributes:
         weights_distribution: distribution for the weights of the
             layer. Dimensions: [output size, input size].
         bias_distribution: distribution of the bias layer. Dimensions:
@@ -39,18 +43,18 @@ class Linear(BayesianModule):
         This is the constructor of the Linear class.
 
         Args:
-            input_size: input size of the linear layer.
-            output_size: output size of the linear layer.
-            weights_distribution: distribution for the weights of the
+            input_size: Input size of the linear layer.
+            output_size: Output size of the linear layer.
+            weights_distribution: Distribution for the weights of the
                 layer. Defaults to None.
-            bias_distribution: distribution for the bias of the layer.
+            bias_distribution: Distribution for the bias of the layer.
                 Defaults to None.
         """
 
-        # call super-class constructor
+        # Call super-class constructor
         super().__init__()
 
-        # set weights distribution
+        # Set weights distribution
         if weights_distribution is None:
             self.weights_distribution: Distribution = GaussianDistribution(
                 (output_size, input_size)
@@ -58,19 +62,21 @@ class Linear(BayesianModule):
         else:
             self.weights_distribution = weights_distribution
 
-        # set bias distribution
+        # Set bias distribution
         if bias_distribution is None:
             self.bias_distribution: Distribution = GaussianDistribution((output_size,))
         else:
             self.bias_distribution = bias_distribution
 
-        # sample initial weights
-        weights = self.weights_distribution.sample()
-        bias = self.bias_distribution.sample()
+        # Sample initial weights
+        self.weights = self.weights_distribution.sample()
+        self.bias = self.bias_distribution.sample()
 
-        # register buffers
-        self.register_buffer("weights", weights)
-        self.register_buffer("bias", bias)
+        # Register buffers
+        self.register_buffer("weights", self.weights)
+        self.register_buffer("bias", self.bias)
+
+        return None
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
@@ -86,7 +92,7 @@ class Linear(BayesianModule):
             outputs tensor. Dimensions: [batch, *].
         """
 
-        # check if layer is frozen
+        # Check if layer is frozen
         if not self.frozen:
             self.weights = self.weights_distribution.sample()
             self.bias = self.bias_distribution.sample()
@@ -96,7 +102,9 @@ class Linear(BayesianModule):
                 raise ValueError("Module has been frozen with undefined weights")
 
         # compute outputs
-        outputs: torch.Tensor = F.linear(inputs, self.weights, self.bias)
+        outputs: torch.Tensor = F.linear(  # pylint: disable=E1102
+            inputs, self.weights, self.bias
+        )
 
         return outputs
 
@@ -124,14 +132,16 @@ class Linear(BayesianModule):
         self.weights = self.weights.detach()
         self.bias = self.bias.detach()
 
+        return None
+
     @torch.jit.export
     def kl_cost(self) -> tuple[torch.Tensor, int]:
         """
         This method is to compute the kl cost of the library.
 
         Returns:
-            kl cost. Dimensions: [].
-            number of parameters of the layer.
+            Kl cost. Dimensions: [].
+            Number of parameters of the layer.
         """
 
         # compute log probs
@@ -141,7 +151,7 @@ class Linear(BayesianModule):
 
         # compute the number of parameters
         num_params: int = (
-            self.weights_distribution.num_params + self.bias_distribution.num_params
+            self.weights_distribution.num_params() + self.bias_distribution.num_params()
         )
 
         return log_probs, num_params

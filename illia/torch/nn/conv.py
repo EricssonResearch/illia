@@ -1,11 +1,15 @@
-# standard libraries
-from typing import Optional, Union, Tuple
+"""
+This module contains the code for the bayesian Conv2d.
+"""
 
-# 3pp
+# Standard libraries
+from typing import Optional, Union
+
+# 3pps
 import torch
 import torch.nn.functional as F
 
-# own modules
+# Own modules
 from illia.torch.nn.base import BayesianModule
 from illia.torch.distributions import (
     Distribution,
@@ -17,7 +21,7 @@ class Conv2d(BayesianModule):
     """
     This class is the bayesian implementation of the Conv2d class.
 
-    Attr:
+    Attributes:
         weights_distribution: distribution for the weights of the
             layer. Dimensions: [output channels,
             input channels // groups, kernel size, kernel size].
@@ -43,10 +47,10 @@ class Conv2d(BayesianModule):
         self,
         input_channels: int,
         output_channels: int,
-        kernel_size: Union[int, Tuple[int, int]],
-        stride: Union[int, Tuple[int, int]],
-        padding: Union[int, Tuple[int, int], str] = 0,
-        dilation: Union[int, Tuple[int, int]] = 1,
+        kernel_size: Union[int, tuple[int, int]],
+        stride: Union[int, tuple[int, int]],
+        padding: Union[int, tuple[int, int], str] = 0,
+        dilation: Union[int, tuple[int, int]] = 1,
         groups: int = 1,
         weights_distribution: Optional[Distribution] = None,
         bias_distribution: Optional[Distribution] = None,

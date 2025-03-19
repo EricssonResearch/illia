@@ -1,168 +1,102 @@
-# standard libraries
-from typing import Optional
+"""
+This module contains the code to test the bayesian Linear layer.
+"""
 
-# 3pp
-import pytest
+# 3pps
 import torch
+from torch.jit import RecursiveScriptModule
+import pytest
 
 # own modules
 from illia.torch.nn import Linear
-from illia.torch.distributions import Distribution, GaussianDistribution
 
 
-@pytest.mark.order(1)
-@pytest.mark.parametrize(
-    "input_size, output_size, weights_distribution, bias_distribution",
-    [
-        (30, 20, None, None),
-        (20, 30, GaussianDistribution((20, 30)), GaussianDistribution((20, 30))),
-    ],
-)
-def test_linear_init(
-    input_size: int,
-    output_size: int,
-    weights_distribution: Optional[Distribution],
-    bias_distribution: Optional[Distribution],
-) -> None:
+class TestLinear:
     """
-    This function is the test for the Linear constructor.
-
-    Args:
-        input_size: input size of the linear layer.
-        output_size: output size of the linear layer.
-        weights_distribution: distribution for the weights of the
-            layer. Defaults to None.
-        bias_distribution: distribution for the bias of the layer.
-            Defaults to None.
-
-    Returns:
-        None.
+    This class tests the Linear bayesian layer.
     """
 
-    # define linear layer
-    model: Linear = Linear(
-        input_size, output_size, weights_distribution, bias_distribution
-    )
+    @pytest.mark.order(1)
+    def test_init(self, linear_fixture: tuple[Linear, torch.Tensor]) -> None:
+        """
+        This method is the test for the Linear constructor.
 
-    # check parameters length
-    len_parameters: int = len(list(model.parameters()))
-    assert (
-        len_parameters == 4
-    ), f"Incorrect parameters length, expected 4 and got {len_parameters}"
+        Args:
+            linear_fixture: tuple of instance of Linear and inputs to
+                use.
 
-    return None
+        Returns:
+            None.
+        """
 
+        model: Linear
+        model, _ = linear_fixture
 
-@pytest.mark.order(2)
-@pytest.mark.parametrize(
-    "input_size, output_size, weights_distribution, bias_distribution, batch_size",
-    [
-        (30, 20, None, None, 64),
-        (20, 30, GaussianDistribution((30, 20)), GaussianDistribution((30,)), 32),
-    ],
-)
-def test_linear_forward(
-    input_size: int,
-    output_size: int,
-    weights_distribution: Optional[Distribution],
-    bias_distribution: Optional[Distribution],
-    batch_size: int,
-) -> None:
-    """
-    This function is the test for the Linear forward pass.
+        # Check parameters length
+        len_parameters: int = len(list(model.parameters()))
+        assert (
+            len_parameters == 4
+        ), f"Incorrect parameters length, expected 4 and got {len_parameters}"
 
-    Args:
-        input_size: input size of the linear layer.
-        output_size: output size of the linear layer.
-        weights_distribution: distribution for the weights of the
-            layer. Defaults to None.
-        bias_distribution: distribution for the bias of the layer.
-            Defaults to None.
-        batch_size: batch size to use in the tests.
+        return None
 
-    Returns:
-        None.
-    """
+    @pytest.mark.order(2)
+    def test_forward(self, linear_fixture: tuple[Linear, torch.Tensor]) -> None:
+        """
+        This method is the test for the Linear forward pass.
 
-    # define linear layer
-    original_model: Linear = Linear(
-        input_size, output_size, weights_distribution, bias_distribution
-    )
+        Args:
+            linear_fixture: tuple of instance of Linear and inputs to
+                use.
 
-    # get scripted version
-    model_scripted = torch.jit.script(original_model)
+        Returns:
+            None.
+        """
 
-    # get inputs
-    inputs = torch.rand((batch_size, input_size))
+        # Get model and inputs
+        model: Linear
+        inputs: torch.Tensor
+        model, inputs = linear_fixture
 
-    # iter over models
-    for model in (original_model, model_scripted):
-        # check parameters length
+        # Check parameters length
         outputs: torch.Tensor = model(inputs)
 
-        # check type of outputs
+        # Check type of outputs
         assert isinstance(
             outputs, torch.Tensor
         ), f"Incorrect outputs class, expected {torch.Tensor} and got {type(outputs)}"
 
-        # check outputs shape
-        assert outputs.shape == (batch_size, output_size), (
-            f"Incorrect outputs shape, expected {(batch_size, output_size)} and got "
-            f"{outputs.shape}"
+        # Check outputs shape
+        assert outputs.shape == (inputs.shape[0], model.weights.shape[0]), (
+            f"Incorrect outputs shape, expected "
+            f"{(inputs.shape[0], model.weights.shape[0])} and got {outputs.shape}"
         )
 
-    return None
+        return None
 
+    @pytest.mark.order(3)
+    def test_backward(self, linear_fixture: tuple[Linear, torch.Tensor]) -> None:
+        """
+        This method is the test for the Linear backward pass.
 
-@pytest.mark.order(3)
-@pytest.mark.parametrize(
-    "input_size, output_size, weights_distribution, bias_distribution, batch_size",
-    [
-        (30, 20, None, None, 64),
-        (20, 30, GaussianDistribution((30, 20)), GaussianDistribution((30,)), 32),
-    ],
-)
-def test_linear_backward(
-    input_size: int,
-    output_size: int,
-    weights_distribution: Optional[Distribution],
-    bias_distribution: Optional[Distribution],
-    batch_size: int,
-) -> None:
-    """
-    This function is the test for the Linear backward pass.
+        Args:
+            linear_fixture: tuple of instance of Linear and inputs to
+                use.
 
-    Args:
-        input_size: input size of the linear layer.
-        output_size: output size of the linear layer.
-        weights_distribution: distribution for the weights of the
-            layer. Defaults to None.
-        bias_distribution: distribution for the bias of the layer.
-            Defaults to None.
-        batch_size: batch size to use in the tests.
+        Returns:
+            None.
+        """
 
-    Returns:
-        None.
-    """
+        # Get model and inputs
+        model: Linear
+        inputs: torch.Tensor
+        model, inputs = linear_fixture
 
-    # define linear layer
-    original_model: Linear = Linear(
-        input_size, output_size, weights_distribution, bias_distribution
-    )
-
-    # get scripted version
-    model_scripted = torch.jit.script(original_model)
-
-    # get inputs
-    inputs = torch.rand((batch_size, input_size))
-
-    # iter over models
-    for model in (original_model, model_scripted):
         # check parameters length
         outputs: torch.Tensor = model(inputs)
         outputs.sum().backward()
 
-        # check type of outputs
+        # Check type of outputs
         for name, parameter in model.named_parameters():
             # check if parameter is none
             assert parameter.grad is not None, (
@@ -170,157 +104,165 @@ def test_linear_backward(
                 f"None"
             )
 
-    return None
+        return None
 
+    @pytest.mark.order(4)
+    def test_freeze(self, linear_fixture: tuple[Linear, torch.Tensor]) -> None:
+        """
+        This method is the test for the freeze and unfreeze layers from
+        Linear layer.
 
-@pytest.mark.order(4)
-@pytest.mark.parametrize(
-    "input_size, output_size, weights_distribution, bias_distribution, batch_size",
-    [
-        (30, 20, None, None, 64),
-        (20, 30, GaussianDistribution((30, 20)), GaussianDistribution((30,)), 32),
-    ],
-)
-def test_linear_freeze(
-    input_size: int,
-    output_size: int,
-    weights_distribution: Optional[Distribution],
-    bias_distribution: Optional[Distribution],
-    batch_size: int,
-) -> None:
-    """
-    This function is the test for the freeze and unfreeze layers from
-    Linear layer.
+        Args:
+            linear_fixture: tuple of instance of Linear and inputs to
+                use.
 
-    Args:
-        input_size: input size of the linear layer.
-        output_size: output size of the linear layer.
-        weights_distribution: distribution for the weights of the
-            layer. Defaults to None.
-        bias_distribution: distribution for the bias of the layer.
-            Defaults to None.
-        batch_size: batch size to use in the tests.
+        Returns:
+            None.
+        """
 
-    Returns:
-        None.
-    """
+        # Get model and inputs
+        model: Linear
+        inputs: torch.Tensor
+        model, inputs = linear_fixture
 
-    # define linear layer
-    original_model: Linear = Linear(
-        input_size, output_size, weights_distribution, bias_distribution
-    )
-
-    # get scripted version
-    model_scripted = torch.jit.script(original_model)
-
-    # get inputs
-    inputs = torch.rand((batch_size, input_size))
-
-    # iter over models
-    for model in (original_model, model_scripted):
-        # compute outputs
+        # Compute outputs
         outputs_first: torch.Tensor = model(inputs)
         outputs_second: torch.Tensor = model(inputs)
 
-        # check if both outputs are equal
+        # Check if both outputs are equal
         assert not torch.allclose(outputs_first, outputs_second, 1e-8), (
             "Incorrect outputs, different forwards are equal when at the "
             "initialization the layer should be unfrozen"
         )
 
-        # freeze layer
+        # Freeze layer
         model.freeze()
 
-        # compute outputs
+        # Compute outputs
         outputs_first = model(inputs)
         outputs_second = model(inputs)
 
-        # check if both outputs are equal
+        # Check if both outputs are equal
         assert torch.allclose(outputs_first, outputs_second, 1e-8), (
             "Incorrect freezing, when layer is frozen outputs are not the same in "
             "different forward passes"
         )
 
-        # unfreeze layer
+        # Unfreeze layer
         model.unfreeze()
 
-        # compute outputs
+        # Compute outputs
         outputs_first = model(inputs)
         outputs_second = model(inputs)
 
+        # Check if both outputs are equal
         assert not torch.allclose(outputs_first, outputs_second, 1e-8), (
             "Incorrect unfreezing, when layer is unfrozen outputs are the same in "
             "different forward passes"
         )
 
-    return None
+        return None
 
+    @pytest.mark.order(5)
+    def test_linear_kl_cost(self, linear_fixture: tuple[Linear, torch.Tensor]) -> None:
+        """
+        This method is the test for the kl_cost method of Linear layer.
 
-@pytest.mark.order(5)
-@pytest.mark.parametrize(
-    "input_size, output_size, weights_distribution, bias_distribution, batch_size",
-    [
-        (30, 20, None, None, 64),
-        (20, 30, GaussianDistribution((30, 20)), GaussianDistribution((30,)), 32),
-    ],
-)
-def test_linear_kl_cost(
-    input_size: int,
-    output_size: int,
-    weights_distribution: Optional[Distribution],
-    bias_distribution: Optional[Distribution],
-    batch_size: int,
-) -> None:
-    """
-    This function is the test for the kl_cost method of Linear layer.
+        Args:
+            linear_fixture: tuple of instance of Linear and inputs to
+                use.
 
-    Args:
-        input_size: input size of the linear layer.
-        output_size: output size of the linear layer.
-        weights_distribution: distribution for the weights of the
-            layer. Defaults to None.
-        bias_distribution: distribution for the bias of the layer.
-            Defaults to None.
-        batch_size: batch size to use in the tests.
+        Returns:
+            None.
+        """
 
-    Returns:
-        None.
-    """
+        # Get model and inputs
+        model: Linear
+        model, _ = linear_fixture
 
-    # define linear layer
-    original_model: Linear = Linear(
-        input_size, output_size, weights_distribution, bias_distribution
-    )
-
-    # get scripted version
-    model_scripted = torch.jit.script(original_model)
-
-    # iter over models
-    for model in (original_model, model_scripted):
-        # compute outputs
+        # Compute outputs
         outputs: tuple[torch.Tensor, int] = model.kl_cost()
 
-        # check type of output
+        # Check type of output
         assert isinstance(
             outputs, tuple
         ), f"Incorrect output type, expected {tuple} and got {type(outputs)}"
 
-        # check type of kl cost
+        # Check type of kl cost
         assert isinstance(outputs[0], torch.Tensor), (
             f"Incorrect output type in the first element, expected {torch.Tensor} and "
             f"got {type(outputs[0])}"
         )
 
-        # check type of num params
+        # Check type of num params
         assert isinstance(outputs[1], int), (
             f"Incorrect output type in the second element, expected {int} and got "
             f"{type(outputs[1])}"
         )
 
-        # check shape of kl cost
+        # Check shape of kl cost
         assert outputs[0].shape == (), (
             f"Incorrect shape of outputs first element, expected () and got "
             f"{outputs[0].shape}"
         )
 
-    return None
+        return None
+
+    @pytest.mark.order(6)
+    def test_jit(self, linear_fixture: tuple[Linear, torch.Tensor]) -> None:
+        """
+        This method tests the scripting of the layer.
+
+        Args:
+            linear_fixture: tuple of instance of Linear and inputs to
+                use.
+
+        Returns:
+            None.
+        """
+
+        # Get model and inputs
+        model: Linear
+        inputs: torch.Tensor
+        model, inputs = linear_fixture
+
+        # Script
+        model_scripted: RecursiveScriptModule = torch.jit.script(model)
+
+        # Compute outputs
+        outputs_first: torch.Tensor = model_scripted(inputs)
+        outputs_second: torch.Tensor = model_scripted(inputs)
+
+        # Check if both outputs are equal
+        assert not torch.allclose(
+            outputs_first, outputs_second, 1e-8
+        ), "Incorrect default freeze with torchscript."
+
+        # Freeze layer
+        model_scripted.freeze()
+
+        # Compute outputs
+        outputs_first = model_scripted(inputs)
+        outputs_second = model_scripted(inputs)
+
+        # Check if both outputs are equal
+        assert torch.allclose(
+            outputs_first, outputs_second, 1e-8
+        ), "Incorrect freezing with torchscript."
+
+        # Unfreeze layer
+        model_scripted.unfreeze()
+
+        # Compute outputs
+        outputs_first = model_scripted(inputs)
+        outputs_second = model_scripted(inputs)
+
+        # Check if both outputs are equal
+        assert not torch.allclose(
+            outputs_first, outputs_second, 1e-8
+        ), "Incorrect unfreezing with torchscript."
+
+        # Compute kl cost
+        kl_cost, num_params = model_scripted.kl_cost()
+
+        return None

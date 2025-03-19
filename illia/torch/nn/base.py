@@ -1,21 +1,42 @@
-# 3pp
+"""
+This module contains the code for the BayesianModule.
+"""
+
+# Standard libraries
+from abc import ABC
+
+# 3pps
 import torch
 
 
-class BayesianModule(torch.nn.Module):
+class BayesianModule(ABC, torch.nn.Module):
+    """
+    This class implements a BayesianModule. This is still an abstract
+    class since it does not implement the forward method.
+
+    Attributes:
+        frozen: Indicator if this layer is frozen or not.
+        is_bayesian: Indicator if this layer is bayesian or not.
+    """
+
     def __init__(self) -> None:
         """
         This method is the constructor for BayesianModule.
+
+        Returns:
+            None.
         """
 
-        # call super class constructor
+        # Call super class constructor
         super().__init__()
 
-        # set state
+        # Set state
         self.frozen: bool = False
 
-        # create attribute to know is a bayesian layer
+        # Create attribute to know is a bayesian layer
         self.is_bayesian: bool = True
+
+        return None
 
     @torch.jit.export
     def freeze(self) -> None:
@@ -26,7 +47,10 @@ class BayesianModule(torch.nn.Module):
             None.
         """
 
+        # Change state
         self.frozen = True
+
+        return None
 
     @torch.jit.export
     def unfreeze(self) -> None:
@@ -37,17 +61,20 @@ class BayesianModule(torch.nn.Module):
             None.
         """
 
+        # Change state
         self.frozen = False
+
+        return None
 
     @torch.jit.export
     def kl_cost(self) -> tuple[torch.Tensor, int]:
         """
         This is a default implementation of the kl_cots function,
-        which computes
+        which computes.
 
         Returns:
-            tensor with the kl cost.
-            number of parameters of the layer.
+            Tensor with the kl cost.
+            Number of parameters of the layer.
         """
 
         return torch.tensor([0.0]), 0
