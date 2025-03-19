@@ -3,15 +3,16 @@ from typing import Optional
 
 # 3pp
 import tensorflow as tf
+from tensorflow.keras.utils import register_keras_serializable  # type: ignore
 
 # own modules
-from illia.tf.nn.base import BayesianModule
-from illia.tf.distributions import (
+from . import (
     Distribution,
     GaussianDistribution,
+    BayesianModule,
 )
 
-
+@register_keras_serializable(package="BayesianModule", name="Linear")
 class Linear(BayesianModule):
     """
     This class is the bayesian implementation of the tensorflow Linear
@@ -53,26 +54,40 @@ class Linear(BayesianModule):
         # set weights distribution
         if weights_distribution is None:
             self.weights_distribution: Distribution = GaussianDistribution(
-                (output_size, input_size)
+                 (input_size, output_size),
+                 name="weights_distr"
             )
         else:
             self.weights_distribution = weights_distribution
 
         # set bias distribution
         if bias_distribution is None:
-            self.bias_distribution: Distribution = GaussianDistribution((output_size,))
+            self.bias_distribution: Distribution = GaussianDistribution(
+                (output_size,),
+                name="bias_distr"
+)
         else:
             self.bias_distribution = bias_distribution
 
-        # sample initial weights
-        weights = self.weights_distribution.sample()
-        bias = self.bias_distribution.sample()
-
         # register non-trainable variables
-        self.weights = tf.keras.Variable(weights, trainable=False)
-        self.bias = tf.keras.Variable(bias, trainable=False)
+        self.kernel = self.add_weight(
+            name="kernel",
+            initializer=tf.constant_initializer(
+                self.weights_distribution.sample().numpy()
+            ),
+            shape= (input_size, output_size),
+            trainable=False,
+        )
+        self.bias = self.add_weight(
+            name="bias",
+            initializer=tf.constant_initializer(
+                self.bias_distribution.sample().numpy()
+            ),
+            shape=(output_size,),
+            trainable=False,
+        )
 
-    def forward(self, inputs: tf.Tensor) -> tf.Tensor:
+    def call(self, inputs: tf.Tensor) -> tf.Tensor:
         """
         This method is the forward pass of the layer.
 
@@ -88,41 +103,19 @@ class Linear(BayesianModule):
 
         # check if layer is frozen
         if not self.frozen:
-            self.weights = self.weights_distribution.sample()
-            self.bias = self.bias_distribution.sample()
+            self.kernel.assign(self.weights_distribution.sample())
+            self.bias.assign(self.bias_distribution.sample())
 
         else:
-            if self.weights is None or self.bias is None:
+            if self.kernel is None or self.bias is None:
                 raise ValueError("Module has been frozen with undefined weights")
 
         # compute outputs
-        outputs: tf.Tensor = tf.linalg.matmul(inputs, self.weights) + self.bias
-
+        lin_output = tf.linalg.matmul(inputs, self.kernel) 
+        outputs: tf.Tensor = tf.nn.bias_add(lin_output, self.bias)
         return outputs
-
-    def freeze(self) -> None:
-        """
-        This method is to freeze the layer.
-
-        Returns:
-            None.
-        """
-
-        # set indicator
-        self.frozen = True
-
-        # sample weights if they are undefined
-        if self.weights is None:
-            self.weights = self.weights_distribution.sample()
-
-        # sample bias is they are undefined
-        if self.bias is None:
-            self.bias = self.bias_distribution.sample()
-
-        # detach weights and bias
-        # self.weights = self.weights.detach()
-        # self.bias = self.bias.detach()
-
+    
+    @tf.function
     def kl_cost(self) -> tuple[tf.Tensor, int]:
         """
         This method is to compute the kl cost of the library.
@@ -132,14 +125,18 @@ class Linear(BayesianModule):
             number of parameters of the layer.
         """
 
-        # compute log probs
-        log_probs: tf.Tensor = self.weights_distribution.log_prob(
-            self.weights
+        log_posterior: tf.Tensor = self.weights_distribution.log_prob(
+            self.kernel
         ) + self.bias_distribution.log_prob(self.bias)
 
-        # compute the number of parameters
         num_params: int = (
             self.weights_distribution.num_params + self.bias_distribution.num_params
         )
-
-        return log_probs, num_params
+        return log_posterior, num_params
+    
+    # def get_config():
+    #     super.get_config()
+    
+    # @classmethod
+    # def from_config():
+    #     return 

@@ -540,6 +540,7 @@ def get_outputs_shape(
     padding: Union[int, tuple[int, int]],
     dilation: Union[int, tuple[int, int]],
     groups: int,
+    **kwargs
 ) -> tuple[int, int, int, int]:
     """
     This function returns the output shape
