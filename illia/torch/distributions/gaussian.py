@@ -1,17 +1,28 @@
-# standard libraries
+"""
+This module contains the code for the gaussian distribution.
+"""
+
+# Standard libraries
 from typing import Optional
 
-# 3pp
+# 3pps
 import torch
 
-# own modules
-from illia.torch.distributions.base import (
-    Distribution,
-)
+# Own modules
+from illia.torch.distributions.base import Distribution
 
 
 class GaussianDistribution(Distribution):
-    # overriding method
+    """
+    This class implements a gaussian distribution.
+
+    Attributes:
+        mu_prior: Initial value for the mu.
+        std_prior: Initial value for the std.
+        mu: Trainable parameter for the posterior mu.
+        std: Trainable parameter for the posterior std.
+    """
+
     def __init__(
         self,
         shape: tuple[int, ...],
@@ -35,14 +46,14 @@ class GaussianDistribution(Distribution):
                 the parameter specified here. Defaults to -7.0.
         """
 
-        # call super-class constructor
+        # Call super-class constructor
         super().__init__()
 
-        # define priors
-        self.mu_prior: torch.Tensor = torch.tensor([mu_prior])
-        self.std_prior: torch.Tensor = torch.tensor([std_prior])
+        # Define priors
+        self.register_buffer("mu_prior", torch.tensor([mu_prior]))
+        self.register_buffer("std_prior", torch.tensor([std_prior]))
 
-        # define initial mu and rho
+        # Define initial mu and rho
         self.mu: torch.Tensor = torch.nn.Parameter(
             torch.randn(shape).normal_(mu_init, 0.1)
         )
@@ -50,14 +61,14 @@ class GaussianDistribution(Distribution):
             torch.randn(shape).normal_(rho_init, 0.1)
         )
 
-    # overriding method
+    # Overriding method
     @torch.jit.export
     def sample(self) -> torch.Tensor:
         """
         This method samples a tensor from the distribution.
 
         Returns:
-            sampled tensor. Dimensions: [*] (same ones as the mu and
+            Sampled tensor. Dimensions: [*] (same ones as the mu and
                 std parameters).
         """
 
@@ -74,12 +85,12 @@ class GaussianDistribution(Distribution):
         This function computes the log probability.
 
         Args:
-            x: output already sampled. If no output is introduced,
+            x: Output already sampled. If no output is introduced,
                 first we will sample a tensor from the current
                 distribution. Defaults to None.
 
         Returns:
-            log probs. Dimensions: [].
+            Log probs. Dimensions: [].
         """
 
         # sample if x is None
@@ -113,8 +124,15 @@ class GaussianDistribution(Distribution):
 
         return log_probs
 
-    @property
     @torch.jit.export
     @torch.no_grad()
     def num_params(self) -> int:
+        """
+        This method computes the number of parameters of the
+        distribution.
+
+        Returns:
+            Number of parameters.
+        """
+
         return len(self.mu.view(-1))

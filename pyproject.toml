@@ -1,0 +1,36 @@
+[tool.black]
+# Set the maximum allowed line length.
+line-length = 88
+
+[tool.flake8]
+# Maximum allowed line length for the code.
+max-line-length = 88
+# Ignore specific warnings and errors:
+# - E203: Whitespace before ':', conflicts with Black formatter.
+# - W503: Line break before a binary operator, conflicts with Black formatter.
+extend-ignore = "E203, W503"
+
+[tool.mypy]
+# Check the bodies of functions even if they lack type hints.
+check_untyped_defs = true
+# Ignore missing imports for third-party modules not explicitly typed.
+ignore_missing_imports = true
+# Exclude the directories that match the given pattern.
+exclude = "^(build|dist|venv)/"
+# Sets the cache directory.
+cache_dir = "/dev/null"
+
+[tool.pylint]
+# Maximum allowed line length for the code.
+max-line-length = 88
+# Disable specific warnings or errors:
+# - R0801: Duplicate code.
+# - R0912: Too many branches in a function.
+# - R0913: Too many arguments in a function.
+# - R0914: Too many local variables.
+# - R0915: Too many statements in a function.
+# - R0917: Too many positional arguments.
+# - R1711: Useless return statement.
+# - R1732: Consider using 'with' for resource-allocating operations.
+# - W1203: Using f-strings or string interpolation within logging methods.
+disable = "R0801,R0912,R0913,R0914,R0915,R0917,R1711,R1732,W1203"
