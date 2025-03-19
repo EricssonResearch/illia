@@ -3,7 +3,7 @@ import tensorflow as tf
 
 
 # standard libraries
-class BayesianModule(tf.keras.Module):
+class BayesianModule(tf.keras.Model):
     def __init__(self) -> None:
         """
         This method is the constructor for BayesianModule.

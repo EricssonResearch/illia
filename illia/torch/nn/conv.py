@@ -1,5 +1,5 @@
 # standard libraries
-from typing import Optional, Union
+from typing import Optional, Union, Tuple
 
 # 3pp
 import torch
@@ -43,10 +43,10 @@ class Conv2d(BayesianModule):
         self,
         input_channels: int,
         output_channels: int,
-        kernel_size: Union[int, tuple[int, int]],
-        stride: Union[int, tuple[int, int]],
-        padding: Union[int, tuple[int, int]],
-        dilation: Union[int, tuple[int, int]],
+        kernel_size: Union[int, Tuple[int, int]],
+        stride: Union[int, Tuple[int, int]],
+        padding: Union[int, Tuple[int, int], str] = 0,
+        dilation: Union[int, Tuple[int, int]] = 1,
         groups: int = 1,
         weights_distribution: Optional[Distribution] = None,
         bias_distribution: Optional[Distribution] = None,

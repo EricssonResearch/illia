@@ -35,6 +35,7 @@ class GaussianDistribution(Distribution):
         std_prior: float = 0.1,
         mu_init: float = 0.0,
         rho_init: float = -7.0,
+        name: str = "param",
     ) -> None:
         """
         This class is the constructor for GaussianDistribution.
@@ -55,15 +56,21 @@ class GaussianDistribution(Distribution):
         super().__init__()
 
         # define priors
-        self.mu_prior: tf.Tensor = tf.constant(mu_prior, dtype=tf.float32)
-        self.std_prior: tf.Tensor = tf.constant(std_prior, dtype=tf.float32)
+        self.mu_prior: tf.Tensor = tf.convert_to_tensor(mu_prior, dtype=tf.float32)
+        self.std_prior: tf.Tensor = tf.convert_to_tensor(std_prior, dtype=tf.float32)
 
         # define initial mu and rho
-        self.mu: tf.Variable = tf.keras.Variable(
-            tf.random.normal(shape=shape, mean=mu_init, stddev=0.1), trainable=True
+        self.mu: tf.Variable = tf.Variable(
+            tf.random.normal(shape=shape, mean=mu_init, stddev=0.1),
+            name=f"{self.name}_mu",
+            trainable=True,
+            dtype=tf.float32,
         )
-        self.rho: tf.Variable = tf.keras.Variable(
-            tf.random.normal(shape=shape, mean=rho_init, stddev=0.1), trainable=True
+        self.rho: tf.Variable = tf.Variable(
+            tf.random.normal(shape=shape, mean=rho_init, stddev=0.1),
+            name=f"{self.name}_rho",
+            trainable=True,
+            dtype=tf.float32,
         )
 
     # overriding method
@@ -84,7 +91,7 @@ class GaussianDistribution(Distribution):
         eps: tf.Tensor = tf.random.normal(shape=self.rho.shape)
         sigma: tf.Tensor = tf.math.log1p(tf.math.exp(self.rho))
 
-        return self.mu + sigma * eps
+        return self.mu + tf.multiply(sigma, eps)
 
     # overriding method
     def log_prob(self, x: Optional[tf.Tensor] = None) -> tf.Tensor:
@@ -112,7 +119,7 @@ class GaussianDistribution(Distribution):
             x = self.sample()
 
         # define pi
-        pi: tf.Tensor = tf.constant(math.pi)
+        pi: tf.Tensor = tf.convert_to_tensor(math.pi)
 
         # compute log priors
         log_prior = (
@@ -149,4 +156,4 @@ class GaussianDistribution(Distribution):
             The total number of parameters in the Gaussian Distribution.
         """
 
-        return tf.size(tf.reshape(self.mu, [-1]))
+        return tf.reshape(self.mu, [-1]).shape[0]
