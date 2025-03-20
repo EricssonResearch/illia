@@ -84,6 +84,8 @@ class Conv2d(BayesianModule):
         self.stride = stride
         self.groups = groups
         self.data_format = data_format
+        self.w: tf.Variable
+        self.b: tf.Variable
 
         # Set kernel size
         if isinstance(kernel_size, int):
@@ -160,14 +162,14 @@ class Conv2d(BayesianModule):
 
         # Register non-trainable variables
         self.w = self.add_weight(
-            initial_value=tf.constant_initializer(self.weights_distribution.sample()),
+            initializer=tf.constant_initializer(self.weights_distribution.sample()),
             trainable=False,
             name="weights",
             shape=self._weights_distribution_shape,
         )
 
         self.b = self.add_weight(
-            initial_value=tf.constant_initializer(self.bias_distribution.sample()),
+            initializer=tf.constant_initializer(self.bias_distribution.sample()),
             trainable=False,
             name="bias",
             shape=self._bias_distribution_shape,
@@ -218,27 +220,29 @@ class Conv2d(BayesianModule):
         inputs = self.maybe_transpose_tensor(inputs)
         conv_output = tf.nn.convolution(
             inputs,
-            filters=self.kernels,
+            filters=self.w,
             strides=self.stride,
             padding=self.padding,
             data_format=self.data_format,
             dilations=self.dilation,
         )
 
-        outputs: tf.Tensor = tf.nn.bias_add(conv_output, self.bias)
+        outputs: tf.Tensor = tf.nn.bias_add(conv_output, self.b)
 
         return outputs
 
     @tf.function
     def kl_cost(self) -> tuple[tf.Tensor, int]:
-        log_posterior: tf.Tensor = self.weights_distribution.log_prob(
-            self.kernels
-        ) + self.bias_distribution.log_prob(self.bias)
+
+        log_probs: tf.Tensor = self.weights_distribution.log_prob(
+            self.w
+        ) + self.bias_distribution.log_prob(self.b)
 
         num_params: int = (
             self.weights_distribution.num_params + self.bias_distribution.num_params
         )
-        return log_posterior, num_params
+
+        return log_probs, num_params
 
     def get_config(self):
 
@@ -277,9 +281,9 @@ class Conv2d(BayesianModule):
         """
 
         if not self.frozen:
-            self.kernels.assign(self.weights_distribution.sample())
-            self.bias.assign(self.bias_distribution.sample())
-        elif self.kernels is None or self.bias is None:
+            self.w.assign(self.weights_distribution.sample())
+            self.b.assign(self.bias_distribution.sample())
+        elif self.w is None or self.b is None:
             raise ValueError("Module has been frozen with undefined weights")
 
         return self.__conv__(inputs)

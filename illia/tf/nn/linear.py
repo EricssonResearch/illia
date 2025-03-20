@@ -48,11 +48,13 @@ class Linear(BayesianModule):
         # Set parameters
         self.input_size = input_size
         self.output_size = output_size
+        self.w: tf.Variable
+        self.b: tf.Variable
 
         # Set weights distribution
         if weights_distribution is None:
             self.weights_distribution: Distribution = GaussianDistribution(
-                (output_size, input_size)
+                (input_size, output_size)
             )
         else:
             self.weights_distribution = weights_distribution
@@ -75,7 +77,7 @@ class Linear(BayesianModule):
         self.w = self.add_weight(
             name="weights",
             initializer=tf.constant_initializer(self.weights_distribution.sample()),
-            shape=(self.output_size, self.input_size),
+            shape=(self.input_size, self.output_size),
             trainable=False,
         )
 

@@ -46,6 +46,8 @@ class GaussianDistribution(Distribution):
         self.shape = shape
         self.mu_init = mu_init
         self.rho_init = rho_init
+        self.mu: tf.Variable
+        self.rho: tf.Variable
 
         # Define priors
         self.mu_prior: tf.Tensor = tf.convert_to_tensor(mu_prior, dtype=tf.float32)
@@ -60,7 +62,7 @@ class GaussianDistribution(Distribution):
         """
 
         # Define initial mu and rho
-        self.mu: tf.Variable = tf.Variable(
+        self.mu = tf.Variable(
             initial_value=tf.random.normal(
                 shape=self.shape, mean=self.mu_init, stddev=0.1
             ),
@@ -70,7 +72,7 @@ class GaussianDistribution(Distribution):
             dtype=tf.float32,
         )
 
-        self.rho: tf.Variable = tf.Variable(
+        self.rho = tf.Variable(
             initial_value=tf.random.normal(
                 shape=self.shape, mean=self.rho_init, stddev=0.1
             ),

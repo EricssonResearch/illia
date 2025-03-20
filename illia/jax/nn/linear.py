@@ -8,9 +8,7 @@ from typing import Optional
 # 3pps
 import jax
 import jax.numpy as jnp
-from flax import nnx
 from jax import lax
-from flax.nnx import rnglib
 from flax.nnx.nn import dtypes
 from flax.typing import (
     Dtype,
@@ -48,29 +46,29 @@ class Linear(BayesianModule):
         param_dtype: Dtype = jnp.float32,
         precision: PrecisionLike = None,
         dot_general: DotGeneralT = lax.dot_general,
-        rngs: rnglib.Rngs = nnx.Rngs(0),
     ) -> None:
-        # call super class constructor
+
+        # Call super class constructor
         super().__init__()
 
-        # set attributes
+        # Set attributes
         self.use_bias = use_bias
         self.dtype = dtype
         self.param_dtype = param_dtype
         self.precision = precision
         self.dot_general = dot_general
+        self.weights: jax.Array
+        self.bias: jax.Array
 
-        # set weights prior
+        # Set weights prior
         if weights_distribution is None:
             self.weights_distribution = GaussianDistribution((input_size, output_size))
-
         else:
             self.weights_distribution = weights_distribution
 
-        # set bias prior
+        # Set bias prior
         if bias_distribution is None:
             self.bias_distribution = GaussianDistribution((output_size,))
-
         else:
             self.bias_distribution = self.bias_distribution
 
@@ -85,14 +83,13 @@ class Linear(BayesianModule):
             output tensor. Dimension: [*, output size].
         """
 
-        # sample if model not frozen
+        # Sample if model not frozen
         if not self.frozen:
-            # sample
-            self.weights: jax.Array = self.weights_distribution.sample()
-            self.bias: jax.Array = self.bias_distribution.sample()
+            self.weights = self.weights_distribution.sample()
+            self.bias = self.bias_distribution.sample()
 
-        # compute ouputs
-        inputs, kernel, bias = dtypes.promote_dtype(
+        # Compute ouputs
+        inputs, _, _ = dtypes.promote_dtype(
             (inputs, self.weights, self.bias), dtype=self.dtype
         )
         outputs = self.dot_general(
@@ -115,12 +112,12 @@ class Linear(BayesianModule):
             number of parameters of the layer.
         """
 
-        # compute log probs
+        # Compute log probs
         log_probs: jax.Array = self.weights_distribution.log_prob(
             self.weights
         ) + self.bias_distribution.log_prob(self.bias)
 
-        # compute the number of parameters
+        # Compute the number of parameters
         num_params: int = (
             self.weights_distribution.num_params + self.bias_distribution.num_params
         )

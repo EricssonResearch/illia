@@ -63,6 +63,7 @@ class Embedding(BayesianModule):
         self.norm_type = norm_type
         self.scale_grad_by_freq = scale_grad_by_freq
         self.sparse = sparse
+        self.w: tf.Variable
 
         # Set weights distribution
         self.weights_distribution: Distribution
@@ -83,7 +84,7 @@ class Embedding(BayesianModule):
 
         # Create a variable for weights
         self.w = self.add_weight(
-            initial_value=tf.constant_initializer(self.weights_distribution.sample()),
+            initializer=tf.constant_initializer(self.weights_distribution.sample()),
             trainable=False,
             name="weights",
             shape=(self.num_embeddings, self.embeddings_dim),
@@ -121,7 +122,7 @@ class Embedding(BayesianModule):
         if sparse is not None:
             embeddings = tf.nn.embedding_lookup(weight, inputs)
         else:
-            embeddings = tf.nn.embedding_lookup_sparse(weight, inputs)
+            embeddings = tf.nn.embedding_lookup_sparse(weight, inputs, sp_weights=None)
 
         if padding_idx is not None:
             padding_mask = tf.not_equal(inputs, padding_idx)
