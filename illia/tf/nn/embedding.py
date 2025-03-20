@@ -1,14 +1,19 @@
-from typing import Optional, Tuple
+"""
+This module contains the code for Embedding Bayesian layer.
+"""
 
+# Standard libraries
+from typing import Optional
+
+# 3pps
 import tensorflow as tf
 from keras import saving
 
-from . import (
+# Own modules
+from illia.tf.nn import BayesianModule
+from illia.tf.distributions import (
     Distribution,
     GaussianDistribution,
-    Distribution,
-    GaussianDistribution,
-    BayesianModule,
 )
 
 
@@ -24,7 +29,6 @@ class Embedding(BayesianModule):
         num_embeddings: int,
         embeddings_dim: int,
         weights_distribution: Optional[Distribution] = None,
-        weights_distribution: Optional[Distribution] = None,
         padding_idx: Optional[int] = None,
         max_norm: Optional[float] = None,
         norm_type: float = 2.0,
@@ -38,8 +42,8 @@ class Embedding(BayesianModule):
         Args:
             num_embeddings: Number of unique embeddings.
             embeddings_dim: Dimension of each embedding vector.
-            weights_prior: Prior distribution for weights.
-            weights_posterior: Posterior distribution for weights.
+            weights_distribution: Distribution for the weights of the
+                layer.
             padding_idx: Index for padding, which keeps gradient
                 constant.
             max_norm: Maximum norm for embedding vectors.
@@ -60,31 +64,32 @@ class Embedding(BayesianModule):
         self.scale_grad_by_freq = scale_grad_by_freq
         self.sparse = sparse
 
-        weights_distribution_shape = (num_embeddings, embeddings_dim)
+        # Set weights distribution
+        self.weights_distribution: Distribution
         if weights_distribution is None:
-            self.weights_distribution: Distribution = GaussianDistribution(
-                weights_distribution_shape, name="weights_distr"
-        weights_distribution_shape = (num_embeddings, embeddings_dim)
-        if weights_distribution is None:
-            self.weights_distribution: Distribution = GaussianDistribution(
-                weights_distribution_shape, name="weights_distr"
+            self.weights_distribution = GaussianDistribution(
+                (num_embeddings, embeddings_dim)
             )
         else:
-            assert weights_distribution.sample().shape == weights_distribution_shape, (
-                f"Expected shape  {weights_distribution_shape}, "
-                f"sampled shape {weights_distribution.sample().shape}"
-            )
             self.weights_distribution = weights_distribution
 
-        # Sample initial distributions
-        self.kernel = self.add_weight(
-            name="kernel",
-            initializer=tf.constant_initializer(
-                self.weights_distribution.sample().numpy()
-            ),
-            shape=weights_distribution_shape,
+    def build(self, input_shape: tf.TensorShape) -> None:
+        """
+        Builds the Embedding layer.
+
+        Args:
+            input_shape: The shape of the input tensor.
+        """
+
+        # Create a variable for weights
+        self.w = self.add_weight(
+            initial_value=tf.constant_initializer(self.weights_distribution.sample()),
             trainable=False,
+            name="weights",
+            shape=(self.num_embeddings, self.embeddings_dim),
         )
+
+        super().build(input_shape)
 
     @tf.function
     def _embedding(
@@ -133,7 +138,6 @@ class Embedding(BayesianModule):
         return embeddings
 
     def get_config(self) -> dict:
-    def get_config(self) -> dict:
         """
         Retrieves the configuration of the Embedding layer.
 
@@ -145,10 +149,9 @@ class Embedding(BayesianModule):
         base_config = super().get_config()
 
         # Add the custom configurations
-        custom_config = {
+        config = {
             "num_embeddings": self.num_embeddings,
             "embeddings_dim": self.embeddings_dim,
-            "weights_distribution": self.weights_distribution,
             "weights_distribution": self.weights_distribution,
             "padding_idx": self.padding_idx,
             "max_norm": self.max_norm,
@@ -158,57 +161,28 @@ class Embedding(BayesianModule):
         }
 
         # Combine both configurations
-        return {**base_config, **custom_config}
+        return {**base_config, **config}
 
-    def call(self, inputs: tf.Tensor) -> tf.Tensor:
+    def freeze(self) -> None:
         """
-        Performs forward pass to compute embeddings based on input
-        tensor.
-
-        Args:
-            inputs: Input tensor for the layer.
+        This method freezes the layer.
 
         Returns:
-            Tensor containing the layer's output.
+            None.
         """
 
-        # Forward depeding of frozen state
-        if not self.frozen:
-            self.kernel.assign(self.weights_distribution.sample())
-            self.kernel.assign(self.weights_distribution.sample())
-        else:
-            if self.kernel is None:
-                w = self.weights_distribution.sample()
-                self.kernel = self.add_weight(
-                    name="kernel",
-                    initializer=tf.constant_initializer(w.numpy()),
-                    shape=w.shape,
-                    trainable=False,
-                )
-            if self.kernel is None:
-                w = self.weights_distribution.sample()
-                self.kernel = self.add_weight(
-                    name="kernel",
-                    initializer=tf.constant_initializer(w.numpy()),
-                    shape=w.shape,
-                    trainable=False,
-                )
+        # Set indicator
+        self.frozen = True
 
-        # Run tensorflow forward
-        outputs: tf.Tensor = self._embedding(
-            inputs,
-            self.kernel,
-            self.kernel,
-            self.padding_idx,
-            self.max_norm,
-            self.norm_type,
-            self.sparse,
-        )
+        # Sample weights if they are undefined
+        if self.w is None:
+            self.w.assign(self.weights_distribution.sample())  # type: ignore
 
-        return outputs
+        # Detach weights stopping training updates
+        self.w.assign(tf.stop_gradient(self.w))
 
     @tf.function
-    def kl_cost(self) -> Tuple[tf.Tensor, int]:
+    def kl_cost(self) -> tuple[tf.Tensor, int]:
         """
         Computes the KL divergence cost for the layer's weights and
         bias.
@@ -218,9 +192,10 @@ class Embedding(BayesianModule):
             parameters.
         """
 
-        log_posterior: tf.Tensor = self.weights_distribution.log_prob(self.kernel)
-        log_posterior: tf.Tensor = self.weights_distribution.log_prob(self.kernel)
+        # Get log probs
+        log_probs: tf.Tensor = self.weights_distribution.log_prob(self.w)
 
+        # Get number of parameters
         num_params: int = self.weights_distribution.num_params
 
-        return log_posterior, num_params
+        return log_probs, num_params

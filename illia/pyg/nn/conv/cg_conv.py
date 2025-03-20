@@ -1,11 +1,19 @@
+"""
+This module contains the code for the Crystal Graph Convolutional
+operator.
+"""
+
+# Standard libraries
 from typing import Union
 
+# 3pps
 import torch
 import torch.nn.functional as F
 from torch import Tensor
 from torch_geometric.nn import MessagePassing
 from torch_geometric.typing import Adj, OptTensor, PairTensor
 
+# Own modules
 from illia.torch.nn.linear import Linear
 
 
@@ -124,6 +132,7 @@ class CGConv(MessagePassing):
             z = torch.cat([x_i, x_j], dim=-1)
         else:
             z = torch.cat([x_i, x_j, edge_attr], dim=-1)
+
         return self.lin_f(z).sigmoid() * F.softplus(self.lin_s(z))
 
     def __repr__(self) -> str:

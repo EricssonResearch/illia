@@ -1,10 +1,17 @@
+"""
+This module contains the code for the gaussian distribution.
+"""
+
+# Standard libraries
 from typing import Optional
 
+# 3pps
 import jax
 import jax.numpy as jnp
 from flax import nnx
 
-from .base import Distribution
+# Own modules
+from illia.jax.distributions import Distribution
 
 
 class GaussianDistribution(Distribution):

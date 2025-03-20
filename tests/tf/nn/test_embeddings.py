@@ -429,10 +429,9 @@ def test_linear_kl_cost(
 
     # work around 'tensorflow.python.framework.ops.EagerTensor'
     nparams = outputs[1]
-    assert tf.int32 == nparams.dtype, (
-        f"Incorrect output type in the second element, expected {int} and got "
-        f"{outputs[1].dtype}"
-    )
+    assert isinstance(
+        nparams, int
+    ), f"Incorrect output type in the second element, expected {int}"
 
     # check shape of kl cost
     assert outputs[0].shape == (), (

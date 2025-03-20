@@ -1,12 +1,19 @@
-from typing import Optional, Tuple, Union
+"""
+This module contains the code for the bayesian Conv2d.
+"""
 
+# Standard libraries
+from typing import Optional, Union
+
+# 3pps
 import tensorflow as tf
 from keras import saving
 
-from . import (
+# Own modules
+from illia.tf.nn import BayesianModule
+from illia.tf.distributions import (
     Distribution,
     GaussianDistribution,
-    BayesianModule,
 )
 
 
@@ -21,10 +28,10 @@ class Conv2d(BayesianModule):
         self,
         input_channels: int,
         output_channels: int,
-        kernel_size: Union[int, Tuple[int, int]],
-        stride: Union[int, Tuple[int, int]],
-        padding: Union[int, Tuple[int, int], str] = "valid",
-        dilation_rate: Union[int, Tuple[int, int]] = 1,
+        kernel_size: Union[int, tuple[int, int]],
+        stride: Union[int, tuple[int, int]],
+        padding: Union[int, tuple[int, int], str] = "valid",
+        dilation: Union[int, tuple[int, int]] = 1,
         groups: int = 1,
         weights_distribution: Optional[Distribution] = None,
         bias_distribution: Optional[Distribution] = None,
@@ -36,17 +43,17 @@ class Conv2d(BayesianModule):
         Args:
             input_channels (int): Number of channels in the input image.
             output_channels (int): Number of channels produced by the convolution.
-            kernel_size (Union[int, Tuple[int, int]]):
+            kernel_size (Union[int, tuple[int, int]]):
                 Size of the convolving kernel.
-            stride (Union[int, Tuple[int, int]]):
+            stride (Union[int, tuple[int, int]]):
                 Stride of the convolution.
-            padding (Union[int, Tuple[int, int], str]):
+            padding (Union[int, tuple[int, int], str]):
                 Either the `string` `"SAME"` or `"VALID"` or explicity padding.
                 When explicit padding is used and data_format is
                 `"NHWC"`, this should be in the form `[[0, 0], [pad_top, pad_bottom],
                 [pad_left, pad_right], [0, 0]]`
                 Default configuration valid.
-            dilation_rate (Union[int, Tuple[int, int]]):
+            dilation (Union[int, tuple[int, int]]):
                 Spacing between kernel elements.
             groups (int, optional):
                 Number of blocked connections from input channels to output channels.
@@ -66,31 +73,32 @@ class Conv2d(BayesianModule):
             https://www.tensorflow.org/api_docs/python/tf/nn/convolution
         """
 
+        # Call super class constructor
         super().__init__()
 
         # Set attributes
         self.input_channels = input_channels
         self.output_channels = output_channels
         self.filters = self.output_channels
-
-        if isinstance(kernel_size, int):
-            self.kernel_size = (kernel_size, kernel_size)
-        else:
-            self.kernel_size = kernel_size
-        self.dilation_rate = dilation_rate
+        self.dilation = dilation
         self.stride = stride
         self.groups = groups
         self.data_format = data_format
 
+        # Set kernel size
+        if isinstance(kernel_size, int):
+            self.kernel_size = (kernel_size, kernel_size)
+        else:
+            self.kernel_size = kernel_size
+
+        # Check if groups are valid
         if groups > 1:
             assert (
                 input_channels % groups == 0
             ), "Input channels must be divisible by groups"
-
-            # ## IF PASSED DISTRIBUTION (BY DEFAULT THE SHAPE IS ALREADY DIVIDED)
-            # if weights_distribution is None:
             assert self.filters % groups == 0, "Filters must be divisible by groups"
 
+        # Check padding type
         if isinstance(padding, int):
             self.padding_explicit: list[list[int]] = [
                 [0, 0],
@@ -110,52 +118,62 @@ class Conv2d(BayesianModule):
             ), 'Padding arg must be either "SAME" or "VALID"'
             self.padding = padding.upper()
 
-        # Distribution Initialization (parameters by default)
-        weights_distribution_shape = (
+        # Distribution initialization
+        self._weights_distribution_shape = (
             *self.kernel_size,
             input_channels // groups,
             output_channels,
         )
+
         if weights_distribution is None:
             self.weights_distribution: Distribution = GaussianDistribution(
-                weights_distribution_shape, name="weights_distr"
+                self._weights_distribution_shape
             )
         else:
-            assert weights_distribution.sample().shape == weights_distribution_shape, (
-                f"Expected shape  {weights_distribution_shape}, "
+            assert (
+                weights_distribution.sample().shape == self._weights_distribution_shape
+            ), (
+                f"Expected shape  {self._weights_distribution_shape}, "
                 f"sampled shape {weights_distribution.sample().shape}"
             )
             self.weights_distribution = weights_distribution
 
-        bias_distribution_shape = (output_channels,)
+        self._bias_distribution_shape = (output_channels,)
         if bias_distribution is None:
             self.bias_distribution: Distribution = GaussianDistribution(
-                bias_distribution_shape, name="bias_distr"
+                self._bias_distribution_shape
             )
         else:
-            assert bias_distribution.sample().shape == bias_distribution_shape, (
-                f"Expected shape  {bias_distribution_shape}, "
+            assert bias_distribution.sample().shape == self._bias_distribution_shape, (
+                f"Expected shape  {self._bias_distribution_shape}, "
                 f"sampled shape {bias_distribution.sample().shape}"
             )
             self.bias_distribution = bias_distribution
 
-        # Sample initial distributions
-        self.kernels = self.add_weight(
-            name="kernels",
-            initializer=tf.constant_initializer(
-                self.weights_distribution.sample().numpy()
-            ),
-            shape=weights_distribution_shape,
+    def build(self, input_shape: tf.TensorShape) -> None:
+        """
+        Builds the conv2d layer.
+
+        Args:
+            input_shape: The shape of the input tensor.
+        """
+
+        # Register non-trainable variables
+        self.w = self.add_weight(
+            initial_value=tf.constant_initializer(self.weights_distribution.sample()),
             trainable=False,
+            name="weights",
+            shape=self._weights_distribution_shape,
         )
-        self.bias = self.add_weight(
+
+        self.b = self.add_weight(
+            initial_value=tf.constant_initializer(self.bias_distribution.sample()),
+            trainable=False,
             name="bias",
-            initializer=tf.constant_initializer(
-                self.bias_distribution.sample().numpy()
-            ),
-            shape=bias_distribution_shape,
-            trainable=False,
+            shape=self._bias_distribution_shape,
         )
+
+        super().build(input_shape)
 
     @staticmethod
     def channels_first_to_last(shape: list):
@@ -166,6 +184,7 @@ class Conv2d(BayesianModule):
         Returns:
             The transposed shape.
         """
+
         return shape[:1] + shape[2:] + shape[1:2]
 
     @staticmethod
@@ -177,6 +196,7 @@ class Conv2d(BayesianModule):
         Return:
             The transposed shape.
         """
+
         return shape[:1] + shape[-1:] + shape[1:-1]
 
     def maybe_transpose_tensor(self, tensor: tf.Tensor):
@@ -186,6 +206,7 @@ class Conv2d(BayesianModule):
         Returns:
             Channel last tensor.
         """
+
         if self.data_format in ("NCHW", "channel_first"):
             order = self.channels_last_to_first(list(range(tensor.shape.rank)))
             return tf.transpose(a=tensor, perm=order)
@@ -201,38 +222,15 @@ class Conv2d(BayesianModule):
             strides=self.stride,
             padding=self.padding,
             data_format=self.data_format,
-            dilations=self.dilation_rate,
+            dilations=self.dilation,
         )
 
         outputs: tf.Tensor = tf.nn.bias_add(conv_output, self.bias)
 
         return outputs
 
-    def call(self, inputs: tf.Tensor) -> tf.Tensor:
-        if not self.frozen:
-            self.kernels.assign(self.weights_distribution.sample())
-            self.bias.assign(self.bias_distribution.sample())
-        else:
-            if self.kernels is None:
-                w = self.weights_distribution.sample()
-                self.kernels = self.add_weight(
-                    name="kernel",
-                    initializer=tf.constant_initializer(w.numpy()),
-                    shape=w.shape,
-                    trainable=False,
-                )
-            if self.bias is None:
-                b = self.bias_distribution.sample()
-                self.add_weight(
-                    name="bias",
-                    initializer=tf.constant_initializer(b.numpy()),
-                    shape=b.shape,
-                    trainable=False,
-                )
-        return self.__conv__(inputs)
-
     @tf.function
-    def kl_cost(self) -> Tuple[tf.Tensor, int]:
+    def kl_cost(self) -> tuple[tf.Tensor, int]:
         log_posterior: tf.Tensor = self.weights_distribution.log_prob(
             self.kernels
         ) + self.bias_distribution.log_prob(self.bias)
@@ -243,21 +241,45 @@ class Conv2d(BayesianModule):
         return log_posterior, num_params
 
     def get_config(self):
-        """
-        TODO: Review what are the necessary parameters (appart from init)
-        """
+
         base_config = super().get_config()
-        custom_config = {
+
+        config = {
             "input_channels": self.input_channels,
             "output_channels": self.output_channels,
-            "weights_distribution": self.weights_distribution,
-            "bias_distribution": self.bias_distribution,
             "kernel_size": self.kernel_size,
             "stride": self.stride,
             "padding": self.padding,
-            "dilation_rate": self.dilation_rate,
+            "dilation": self.dilation,
             "groups": self.groups,
+            "weights_distribution": self.weights_distribution,
+            "bias_distribution": self.bias_distribution,
             "data_format": self.data_format,
         }
+
         # Combine both configurations
-        return {**base_config, **custom_config}
+        return {**base_config, **config}
+
+    def call(self, inputs: tf.Tensor) -> tf.Tensor:
+        """
+        The call function is responsible for performing a forward pass
+        through the Bayesian Convolutional layer.
+
+        Args:
+            inputs: The input tensor to the layer.
+
+        Returns:
+            The output tensor after the convolution operation.
+
+        Raises:
+            ValueError: If the layer is frozen and the weights or bias
+                are not initialized.
+        """
+
+        if not self.frozen:
+            self.kernels.assign(self.weights_distribution.sample())
+            self.bias.assign(self.bias_distribution.sample())
+        elif self.kernels is None or self.bias is None:
+            raise ValueError("Module has been frozen with undefined weights")
+
+        return self.__conv__(inputs)

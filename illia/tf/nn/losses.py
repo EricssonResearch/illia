@@ -1,9 +1,16 @@
+"""
+This module contains the code for the Losses.
+"""
+
+# Standard libraries
 from typing import Literal
 
+# 3pps
 import tensorflow as tf
 from keras import Model, saving, losses
 
-from . import BayesianModule
+# Own modules
+from illia.tf.nn import BayesianModule
 
 
 @saving.register_keras_serializable(package="BayesianModule", name="KLDivergenceLoss")
@@ -65,7 +72,7 @@ class KLDivergenceLoss(Model):
         kl_global_cost = tf.constant(0.0, dtype=tf.float32)
         num_params_global = 0
 
-        # iterate through the model's layers
+        # Iterate through the model's layers
         for layer in model.layers:
             if isinstance(layer, BayesianModule):
                 kl_cost, num_params = layer.kl_cost()

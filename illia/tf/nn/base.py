@@ -1,18 +1,25 @@
+"""
+This module contains the code for the BayesianModule.
+"""
+
+# Standard libraries
+from abc import ABC
+
+# 3pps
 import tensorflow as tf
-from keras import Model
+from keras import Model, saving
 
 
-class BayesianModule(Model):
+@saving.register_keras_serializable(package="BayesianModule", name="BayesianModule")
+class BayesianModule(ABC, Model):
     """
-    This class serves as the base class for Bayesian modules.
-    Any module designed to function as a Bayesian layer should inherit
-    from this class.
+    This class implements a BayesianModule. This is still an abstract
+    class since it does not implement the forward method.
     """
 
     def __init__(self):
         """
-        Initializes the BayesianModule, setting the frozen state to
-        False.
+        This method is the constructor for BayesianModule.
         """
 
         # Call super class constructor
@@ -26,8 +33,7 @@ class BayesianModule(Model):
 
     def freeze(self) -> None:
         """
-        Freezes the current layer and all submodules that are instances
-        of BayesianModule. Sets the frozen state to True.
+        This method freezes the layer.
         """
 
         # Set frozen indicator to true for current layer
@@ -35,8 +41,7 @@ class BayesianModule(Model):
 
     def unfreeze(self) -> None:
         """
-        Unfreezes the current layer and all submodules that are
-        instances of BayesianModule. Sets the frozen state to False.
+        This method unfreezes the layer.
         """
 
         # Set frozen indicator to false for current layer

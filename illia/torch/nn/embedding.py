@@ -1,10 +1,16 @@
+"""
+This module contains the code for Embedding Bayesian layer.
+"""
+
+# Standard libraries
 from typing import Optional
 
 # 3pp
 import torch
 import torch.nn.functional as F
 
-from illia.torch.nn.base import BayesianModule
+# Own modules
+from illia.torch.nn import BayesianModule
 from illia.torch.distributions import (
     Distribution,
     GaussianDistribution,
@@ -21,7 +27,6 @@ class Embedding(BayesianModule):
         self,
         num_embeddings: int,
         embeddings_dim: int,
-        weights_distribution: Optional[Distribution] = None,
         weights_distribution: Optional[Distribution] = None,
         padding_idx: Optional[int] = None,
         max_norm: Optional[float] = None,
@@ -141,7 +146,6 @@ class Embedding(BayesianModule):
         log_probs: torch.Tensor = self.weights_distribution.log_prob(self.weights)
 
         # Get number of parameters
-        num_params: int = self.weights_distribution.num_params
+        num_params: int = self.weights_distribution.num_params()
 
-        return log_probs, num_params
         return log_probs, num_params

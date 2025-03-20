@@ -1,8 +1,12 @@
-from illia.tf.distributions.base import Distribution  # noqa
-from illia.tf.distributions.gaussian import GaussianDistribution  # noqa
-from illia.tf.nn.base import BayesianModule  # noqa
-from illia.tf.nn.linear import Linear  # noqa
-from illia.tf.nn.embedding import Embedding  # noqa
-from illia.tf.nn.conv import Conv2d  # noqa
+"""
+This module defines the imports for illia.tf.nn.
+"""
 
-__all__: list[str] = ["BayesianModule", "Linear", "Embedding", "Conv2d"]
+# Own modules
+from illia.tf.nn.base import BayesianModule
+from illia.tf.nn.conv2d import Conv2d
+from illia.tf.nn.embedding import Embedding
+from illia.tf.nn.linear import Linear
+
+# Define all names to be imported
+__all__: list[str] = ["BayesianModule", "Conv2d", "Embedding", "Linear"]

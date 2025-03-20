@@ -1,5 +1,11 @@
+"""
+This module contains the code for the BayesianModule.
+"""
+
+# Standard libraries
 from abc import abstractmethod
 
+# 3pps
 import jax
 from flax import nnx
 
@@ -36,7 +42,7 @@ class BayesianModule(nnx.Module):
         self.frozen = True
 
         # Set forzen indicator to true for children
-        for _, module in self.iter_modules():
+        for _, module in self.iter_modules():  # type: ignore
             if self != module and isinstance(module, BayesianModule):
                 module.freeze()
             else:
@@ -52,7 +58,7 @@ class BayesianModule(nnx.Module):
         self.frozen = False
 
         # Set forzen indicators to false for children
-        for _, module in self.iter_modules():
+        for _, module in self.iter_modules():  # type: ignore
             if module != self and isinstance(module, BayesianModule):
                 module.unfreeze()
 

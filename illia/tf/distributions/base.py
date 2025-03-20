@@ -1,44 +1,52 @@
-from abc import abstractmethod
+"""
+This module contains the base class for the Distributions.
+"""
+
+# Standard libraries
+from abc import ABC, abstractmethod
 from typing import Optional
 
+# 3pps
 import tensorflow as tf
 from keras import Model
 
 
-class Distribution(Model):
+class Distribution(ABC, Model):
     """
-    Abstract base class for probability distributions.
+    This class is the base class for distributions.
     """
 
     @abstractmethod
     def sample(self) -> tf.Tensor:
         """
-        Generates a random sample from the distribution.
+        This method samples a tensor from the distribution.
 
         Returns:
-            A random sample as a tensor.
+            Sampled tensor. Dimensions: [*] (same ones as the mu and
+                std parameters).
         """
 
     @abstractmethod
     def log_prob(self, x: Optional[tf.Tensor] = None) -> tf.Tensor:
         """
-        Computes the log probability of a given sample.
+        This method computes the log prob of the distribution.
 
         Args:
-            x: An optional sample for which to compute the log
-                probability. If not provided, the method may compute
-                the log probability for an internally stored sample.
+            x: Output already sampled. If no output is introduced,
+                first we will sample a tensor from the current
+                distribution. Defaults to None.
 
         Returns:
-            The log probability of the sample as a tensor.
+            Log prob calculated as a tensor. Dimensions: [].
         """
 
     @property
     @abstractmethod
     def num_params(self) -> int:
         """
-        Number of parameters of the distribution.
+        This method computes the number of parameters of the
+        distribution.
 
         Returns:
-            The number of parameters as an integer.
+            Number of parameters.
         """

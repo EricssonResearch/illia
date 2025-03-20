@@ -1,9 +1,15 @@
+"""
+This module contains the code for the Losses.
+"""
+
+# Standard libraries
 from typing import Literal
 
 # 3pp
 import torch
 
-from illia.torch.nn.base import BayesianModule
+# Own modules
+from illia.torch.nn import BayesianModule
 
 
 class KLDivergenceLoss(torch.nn.Module):
@@ -22,10 +28,10 @@ class KLDivergenceLoss(torch.nn.Module):
             weight: Scaling factor for the KL divergence loss.
         """
 
-        # call super class constructor
+        # Call super class constructor
         super().__init__()
 
-        # set parameters
+        # Set parameters
         self.reduction = reduction
         self.weight = weight
 

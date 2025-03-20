@@ -1,9 +1,16 @@
+"""
+This module contains the code for the gaussian distribution.
+"""
+
+# Standard libraries
 import math
 from typing import Optional
 
+# 3pps
 import tensorflow as tf
 
-from .base import Distribution
+# Own modules
+from . import Distribution
 
 
 class GaussianDistribution(Distribution):
@@ -11,7 +18,6 @@ class GaussianDistribution(Distribution):
     This is the class to implement a learnable gausssian distribution.
     """
 
-    # overriding method
     def __init__(
         self,
         shape: tuple[int, ...],
@@ -19,7 +25,6 @@ class GaussianDistribution(Distribution):
         std_prior: float = 0.1,
         mu_init: float = 0.0,
         rho_init: float = -7.0,
-        name: str = "param",
     ) -> None:
         """
         Initializes the GaussianDistribution with given priors and
@@ -37,23 +42,45 @@ class GaussianDistribution(Distribution):
         # Call super-class constructor
         super().__init__()
 
+        # Set parameters
+        self.shape = shape
+        self.mu_init = mu_init
+        self.rho_init = rho_init
+
         # Define priors
         self.mu_prior: tf.Tensor = tf.convert_to_tensor(mu_prior, dtype=tf.float32)
         self.std_prior: tf.Tensor = tf.convert_to_tensor(std_prior, dtype=tf.float32)
 
+    def build(self, input_shape: tf.TensorShape) -> None:
+        """
+        Builds the GaussianDistribution layer.
+
+        Args:
+            input_shape: The shape of the input tensor.
+        """
+
         # Define initial mu and rho
         self.mu: tf.Variable = tf.Variable(
-            tf.random.normal(shape=shape, mean=mu_init, stddev=0.1),
-            name=f"{self.name}_mu",
+            initial_value=tf.random.normal(
+                shape=self.shape, mean=self.mu_init, stddev=0.1
+            ),
             trainable=True,
+            name="mu",
+            shape=(),
             dtype=tf.float32,
         )
+
         self.rho: tf.Variable = tf.Variable(
-            tf.random.normal(shape=shape, mean=rho_init, stddev=0.1),
-            name=f"{self.name}_rho",
+            initial_value=tf.random.normal(
+                shape=self.shape, mean=self.rho_init, stddev=0.1
+            ),
             trainable=True,
+            name="rho",
+            shape=(),
             dtype=tf.float32,
         )
+
+        super().build(input_shape)
 
     def sample(self) -> tf.Tensor:
         """

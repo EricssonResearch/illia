@@ -6,19 +6,11 @@ This module contains the code for Linear Bayesian layer.
 from typing import Optional
 
 # 3pps
-from typing import Optional
-
 import torch
 import torch.nn.functional as F
 
 # Own modules
-from illia.torch.nn.base import BayesianModule
-from illia.torch.distributions import (
-    Distribution,
-    GaussianDistribution,
-import torch.nn.functional as F
-
-from illia.torch.nn.base import BayesianModule
+from illia.torch.nn import BayesianModule
 from illia.torch.distributions import (
     Distribution,
     GaussianDistribution,
@@ -37,8 +29,6 @@ class Linear(BayesianModule):
         output_size: int,
         weights_distribution: Optional[Distribution] = None,
         bias_distribution: Optional[Distribution] = None,
-        weights_distribution: Optional[Distribution] = None,
-        bias_distribution: Optional[Distribution] = None,
     ) -> None:
         """
         This is the constructor of the Linear class.
@@ -52,12 +42,8 @@ class Linear(BayesianModule):
         """
 
         # Call super-class constructor
-        # Call super-class constructor
         super().__init__()
 
-        # Set weights distribution
-        if weights_distribution is None:
-            self.weights_distribution: Distribution = GaussianDistribution(
         # Set weights distribution
         if weights_distribution is None:
             self.weights_distribution: Distribution = GaussianDistribution(
@@ -65,11 +51,7 @@ class Linear(BayesianModule):
             )
         else:
             self.weights_distribution = weights_distribution
-            self.weights_distribution = weights_distribution
 
-        # Set bias distribution
-        if bias_distribution is None:
-            self.bias_distribution: Distribution = GaussianDistribution((output_size,))
         # Set bias distribution
         if bias_distribution is None:
             self.bias_distribution: Distribution = GaussianDistribution((output_size,))
@@ -77,12 +59,12 @@ class Linear(BayesianModule):
             self.bias_distribution = bias_distribution
 
         # Sample initial weights
-        self.weights = self.weights_distribution.sample()
-        self.bias = self.bias_distribution.sample()
+        weights = self.weights_distribution.sample()
+        bias = self.bias_distribution.sample()
 
         # Register buffers
-        self.register_buffer("weights", self.weights)
-        self.register_buffer("bias", self.bias)
+        self.register_buffer("weights", weights)
+        self.register_buffer("bias", bias)
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
@@ -154,12 +136,10 @@ class Linear(BayesianModule):
         log_probs: torch.Tensor = self.weights_distribution.log_prob(
             self.weights
         ) + self.bias_distribution.log_prob(self.bias)
-        ) + self.bias_distribution.log_prob(self.bias)
 
         # Compute the number of parameters
         num_params: int = (
-            self.weights_distribution.num_params + self.bias_distribution.num_params
+            self.weights_distribution.num_params() + self.bias_distribution.num_params()
         )
 
-        return log_probs, num_params
         return log_probs, num_params

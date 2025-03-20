@@ -1,6 +1,12 @@
+"""
+This module contains the base class for the Distributions.
+"""
+
+# Standard libraries
 from abc import abstractmethod
 from typing import Optional
 
+# 3pps
 import jax.numpy as jnp
 from flax import nnx
 
