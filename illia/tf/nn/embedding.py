@@ -60,7 +60,6 @@ class Embedding(BayesianModule):
         self.norm_type = norm_type
         self.scale_grad_by_freq = scale_grad_by_freq
         self.sparse = sparse
-        self.w: tf.Variable
 
         # Set weights distribution
         self.weights_distribution: GaussianDistribution
@@ -71,23 +70,15 @@ class Embedding(BayesianModule):
         else:
             self.weights_distribution = weights_distribution
 
-    def build(self, input_shape: tf.TensorShape) -> None:
-        """
-        Builds the Embedding layer.
-
-        Args:
-            input_shape: The shape of the input tensor.
-        """
-
         # Create a variable for weights
-        self.w = self.add_weight(
-            initializer=tf.constant_initializer(self.weights_distribution.sample()),
+        self.w: tf.Variable = self.add_weight(
+            initializer=tf.constant_initializer(
+                self.weights_distribution.sample().numpy()
+            ),
             trainable=False,
             name="weights",
             shape=(self.num_embeddings, self.embeddings_dim),
         )
-
-        super().build(input_shape)
 
     @tf.function
     def _embedding(
@@ -197,3 +188,23 @@ class Embedding(BayesianModule):
         num_params: int = self.weights_distribution.num_params
 
         return log_probs, num_params
+
+    def call(self, inputs: tf.Tensor) -> tf.Tensor:
+
+        # Forward depeding of frozen state
+        if not self.frozen:
+            self.w.assign(self.weights_distribution.sample())
+        else:
+            raise ValueError("Module has been frozen with undefined weights")
+
+        # Run tensorflow forward
+        outputs: tf.Tensor = self._embedding(
+            inputs,
+            self.w,
+            self.padding_idx,
+            self.max_norm,
+            self.norm_type,
+            self.sparse,
+        )
+
+        return outputs

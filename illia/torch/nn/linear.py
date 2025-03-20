@@ -43,27 +43,19 @@ class Linear(BayesianModule):
 
         # Set weights distribution
         if weights_distribution is None:
-            self.weights_distribution: GaussianDistribution = GaussianDistribution(
-                (output_size, input_size)
-            )
+            self.weights_distribution = GaussianDistribution((output_size, input_size))
         else:
             self.weights_distribution = weights_distribution
 
         # Set bias distribution
         if bias_distribution is None:
-            self.bias_distribution: GaussianDistribution = GaussianDistribution(
-                (output_size,)
-            )
+            self.bias_distribution = GaussianDistribution((output_size,))
         else:
             self.bias_distribution = bias_distribution
 
-        # Sample initial weights
-        self.weights = self.weights_distribution.sample()
-        self.bias = self.bias_distribution.sample()
-
-        # Register buffers
-        self.register_buffer("weights", self.weights)
-        self.register_buffer("bias", self.bias)
+        # Sample initial weights, bias and register buffers
+        self.register_buffer("weights", self.weights_distribution.sample())
+        self.register_buffer("bias", self.bias_distribution.sample())
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
@@ -105,18 +97,18 @@ class Linear(BayesianModule):
             None.
         """
 
-        # set indicator
+        # Set indicator
         self.frozen = True
 
-        # sample weights if they are undefined
+        # Sample weights if they are undefined
         if self.weights is None:
             self.weights = self.weights_distribution.sample()
 
-        # sample bias is they are undefined
+        # Sample bias is they are undefined
         if self.bias is None:
             self.bias = self.bias_distribution.sample()
 
-        # detach weights and bias
+        # Detach weights and bias
         self.weights = self.weights.detach()
         self.bias = self.bias.detach()
 

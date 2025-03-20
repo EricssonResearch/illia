@@ -45,8 +45,6 @@ class Linear(BayesianModule):
         # Set parameters
         self.input_size = input_size
         self.output_size = output_size
-        self.w: tf.Variable
-        self.b: tf.Variable
 
         # Set weights distribution
         if weights_distribution is None:
@@ -64,30 +62,23 @@ class Linear(BayesianModule):
         else:
             self.bias_distribution = bias_distribution
 
-    def build(self, input_shape: tf.TensorShape) -> None:
-        """
-        Builds the linear layer.
-
-        Args:
-            input_shape: The shape of the input tensor.
-        """
-
         # Register non-trainable variables
-        self.w = self.add_weight(
+        self.w: tf.Variable = self.add_weight(
             name="weights",
-            initializer=tf.constant_initializer(self.weights_distribution.sample()),
+            initializer=tf.constant_initializer(
+                self.weights_distribution.sample().numpy()
+            ),
             shape=(self.input_size, self.output_size),
             trainable=False,
         )
-
-        self.b = self.add_weight(
+        self.b: tf.Variable = self.add_weight(
             name="bias",
-            initializer=tf.constant_initializer(self.bias_distribution.sample()),
+            initializer=tf.constant_initializer(
+                self.bias_distribution.sample().numpy()
+            ),
             shape=(self.output_size,),
             trainable=False,
         )
-
-        super().build(input_shape)
 
     def get_config(self) -> dict:
         """
@@ -110,6 +101,27 @@ class Linear(BayesianModule):
 
         # Combine both configurations
         return {**base_config, **custom_config}
+
+    @tf.function
+    def kl_cost(self) -> tuple[tf.Tensor, int]:
+        """
+        Computes the Kullback-Leibler (KL) divergence cost for the
+        layer's weights and bias.
+
+        Returns:
+            Tuple containing KL divergence cost and total number of
+            parameters.
+        """
+
+        log_probs: tf.Tensor = self.weights_distribution.log_prob(
+            self.w
+        ) + self.bias_distribution.log_prob(self.b)
+
+        num_params: int = (
+            self.weights_distribution.num_params + self.bias_distribution.num_params
+        )
+
+        return log_probs, num_params
 
     def call(self, inputs: tf.Tensor) -> tf.Tensor:
         """
@@ -141,24 +153,3 @@ class Linear(BayesianModule):
         outputs: tf.Tensor = tf.nn.bias_add(lin_output, self.b)
 
         return outputs
-
-    @tf.function
-    def kl_cost(self) -> tuple[tf.Tensor, int]:
-        """
-        Computes the Kullback-Leibler (KL) divergence cost for the
-        layer's weights and bias.
-
-        Returns:
-            Tuple containing KL divergence cost and total number of
-            parameters.
-        """
-
-        log_probs: tf.Tensor = self.weights_distribution.log_prob(
-            self.w
-        ) + self.bias_distribution.log_prob(self.b)
-
-        num_params: int = (
-            self.weights_distribution.num_params + self.bias_distribution.num_params
-        )
-
-        return log_probs, num_params

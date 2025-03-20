@@ -61,7 +61,6 @@ class Embedding(BayesianModule):
         )
 
         # Set weights distribution
-        self.weights_distribution: GaussianDistribution
         if weights_distribution is None:
             self.weights_distribution = GaussianDistribution(
                 (num_embeddings, embeddings_dim)
@@ -70,12 +69,10 @@ class Embedding(BayesianModule):
             self.weights_distribution = weights_distribution
 
         # Sample initial weights
-        self.weights = self.weights_distribution.sample()
+        weights = self.weights_distribution.sample()
 
-        # Register buffers
-        self.register_buffer("weights", self.weights)
-
-        return None
+        # Sample initial weights and register buffers
+        self.register_buffer("weights", weights)
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
@@ -97,15 +94,13 @@ class Embedding(BayesianModule):
 
         # forward depeding of frozen state
         if not self.frozen:
-            self.weights = self.weights_distribution.sample()  # pylint: disable=W0201
+            self.weights = self.weights_distribution.sample()
+        elif self.weights is None:
+            raise ValueError("Module has been frozen with undefined weights")
 
-        else:
-            if self.weights is None:
-                raise ValueError("Module has been frozen with undefined weights")
-
-        # run torch forward
-        outputs: torch.Tensor = F.embedding(  # # pylint: disable=E1102
-            inputs, self.weights, *self.embedding_params  # type: ignore
+        # Run torch forward
+        outputs: torch.Tensor = F.embedding(
+            inputs, self.weights, *self.embedding_params
         )
 
         return outputs
@@ -119,15 +114,15 @@ class Embedding(BayesianModule):
             None.
         """
 
-        # set indicator
+        # Set indicator
         self.frozen = True
 
-        # sample weights if they are undefined
+        # Sample weights if they are undefined
         if self.weights is None:
-            self.weights = self.weights_distribution.sample()  # pylint: disable=W0201
+            self.weights = self.weights_distribution.sample()
 
-        # detach weights
-        self.weights = self.weights.detach()  # pylint: disable=W0201
+        # Detach weights
+        self.weights = self.weights.detach()
 
     def kl_cost(self) -> tuple[torch.Tensor, int]:
         """
@@ -142,7 +137,7 @@ class Embedding(BayesianModule):
         # Get log posterior and log prior
         log_probs: torch.Tensor = self.weights_distribution.log_prob(self.weights)
 
-        # get number of parameters
+        # Get number of parameters
         num_params: int = self.weights_distribution.num_params()
 
         return log_probs, num_params

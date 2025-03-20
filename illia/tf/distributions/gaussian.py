@@ -44,45 +44,26 @@ class GaussianDistribution(Distribution):
 
         # Set parameters
         self.shape = shape
-        self.mu_init = mu_init
-        self.rho_init = rho_init
-        self.mu: tf.Variable
-        self.rho: tf.Variable
-
-        # Define priors
-        self.mu_prior: tf.Tensor = tf.convert_to_tensor(mu_prior, dtype=tf.float32)
-        self.std_prior: tf.Tensor = tf.convert_to_tensor(std_prior, dtype=tf.float32)
-
-    def build(self, input_shape: tf.TensorShape) -> None:
-        """
-        Builds the GaussianDistribution layer.
-
-        Args:
-            input_shape: The shape of the input tensor.
-        """
-
-        # Define initial mu and rho
-        self.mu = tf.Variable(
-            initial_value=tf.random.normal(
+        self.mu_init = tf.constant(mu_init)
+        self.rho_init = tf.constant(rho_init)
+        self.mu: tf.Variable = self.add_weight(
+            initializer=tf.random.normal(
                 shape=self.shape, mean=self.mu_init, stddev=0.1
             ),
             trainable=True,
             name="mu",
-            shape=(),
-            dtype=tf.float32,
         )
-
-        self.rho = tf.Variable(
-            initial_value=tf.random.normal(
+        self.rho: tf.Variable = self.add_weight(
+            initializer=tf.random.normal(
                 shape=self.shape, mean=self.rho_init, stddev=0.1
             ),
             trainable=True,
             name="rho",
-            shape=(),
-            dtype=tf.float32,
         )
 
-        super().build(input_shape)
+        # Define priors
+        self.mu_prior: tf.Tensor = tf.convert_to_tensor(mu_prior, dtype=tf.float32)
+        self.std_prior: tf.Tensor = tf.convert_to_tensor(std_prior, dtype=tf.float32)
 
     def sample(self) -> tf.Tensor:
         """

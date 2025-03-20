@@ -3,7 +3,7 @@ import pytest
 import tensorflow as tf
 
 # own modules
-from illia.tf.distributions import GaussianDistribution
+from illia.tf.distributions.gaussian import GaussianDistribution
 
 
 @pytest.mark.order(1)
