@@ -1,244 +1,102 @@
-# standard libraries
-from typing import Optional
+"""
+This module contains the tests for the Embedding layer.
+"""
 
-# 3pp
-import pytest
+# 3pps
 import torch
+from torch.jit import RecursiveScriptModule
+import pytest
 
 # own modules
 from illia.torch.nn import Embedding
-from illia.torch.distributions import Distribution, GaussianDistribution
 
 
-@pytest.mark.order(1)
-@pytest.mark.parametrize(
-    (
-        "num_embeddings, embeddings_dim, weights_distribution, padding_idx, max_norm, "
-        "norm_type, scale_grad_by_freq, sparse"
-    ),
-    [
-        (8, 64, None, None, None, 2.0, False, False),
-        (10, 32, GaussianDistribution((10, 32)), 0, 2.0, 2.0, True, False),
-    ],
-)
-def test_embedding_init(
-    num_embeddings: int,
-    embeddings_dim: int,
-    weights_distribution: Optional[Distribution],
-    padding_idx: Optional[int],
-    max_norm: Optional[float],
-    norm_type: float,
-    scale_grad_by_freq: bool,
-    sparse: bool,
-) -> None:
+class TestEmbedding:
     """
-    This function is the test for the constructor of the Embedding
-    layer.
-
-    Args:
-        num_embeddings: size of the dictionary of embeddings.
-        embeddings_dim: the size of each embedding vector.
-        weights_distribution: distribution for the weights of the
-            layer. Defaults to None.
-        padding_idx: If specified, the entries at padding_idx do
-            not contribute to the gradient. Defaults to None.
-        max_norm: If given, each embedding vector with norm larger
-            than max_norm is renormalized to have norm max_norm.
-            Defaults to None.
-        norm_type: The p of the p-norm to compute for the max_norm
-            option. Defaults to 2.0.
-        scale_grad_by_freq: If given, this will scale gradients by
-            the inverse of frequency of the words in the
-            mini-batch. Defaults to False.
-        sparse: If True, gradient w.r.t. weight matrix will be a
-            sparse tensor. Defaults to False.
-        batch_size: batch size for the inputs.
-
-    Returns:
-        None.
+    This class tests the bayesian Embedding.
     """
 
-    # define embedding layer
-    model: Embedding = Embedding(
-        num_embeddings,
-        embeddings_dim,
-        weights_distribution,
-        padding_idx,
-        max_norm,
-        norm_type,
-        scale_grad_by_freq,
-        sparse,
-    )
+    @pytest.mark.order(1)
+    def test_init(self, embedding_fixture: tuple[Embedding, torch.Tensor]) -> None:
+        """
+        This method is the test for the Embedding constructor.
 
-    # check parameters length
-    len_parameters: int = len(list(model.parameters()))
-    assert (
-        len_parameters == 2
-    ), f"Incorrect parameters length, expected 2 and got {len_parameters}"
+        Args:
+            embedding_fixture: tuple of instance of Embedding and inputs to
+                use.
 
-    return None
+        Returns:
+            None.
+        """
 
+        model: Embedding
+        model, _ = embedding_fixture
 
-@pytest.mark.order(2)
-@pytest.mark.parametrize(
-    (
-        "num_embeddings, embeddings_dim, weights_distribution, padding_idx, max_norm, "
-        "norm_type, scale_grad_by_freq, sparse, batch_size"
-    ),
-    [
-        (8, 64, None, None, None, 2.0, False, False, 64),
-        (10, 32, GaussianDistribution((10, 32)), 0, 2.0, 2.0, True, False, 128),
-    ],
-)
-def test_embedding_forward(
-    num_embeddings: int,
-    embeddings_dim: int,
-    weights_distribution: Optional[Distribution],
-    padding_idx: Optional[int],
-    max_norm: Optional[float],
-    norm_type: float,
-    scale_grad_by_freq: bool,
-    sparse: bool,
-    batch_size: int,
-) -> None:
-    """
-    This function is the test for the forward pass of the Embedding
-    layer.
+        # Check parameters length
+        len_parameters: int = len(list(model.parameters()))
+        assert (
+            len_parameters == 2
+        ), f"Incorrect parameters length, expected 4 and got {len_parameters}"
 
-    Args:
-        num_embeddings: size of the dictionary of embeddings.
-        embeddings_dim: the size of each embedding vector.
-        weights_distribution: distribution for the weights of the
-            layer. Defaults to None.
-        padding_idx: If specified, the entries at padding_idx do
-            not contribute to the gradient. Defaults to None.
-        max_norm: If given, each embedding vector with norm larger
-            than max_norm is renormalized to have norm max_norm.
-            Defaults to None.
-        norm_type: The p of the p-norm to compute for the max_norm
-            option. Defaults to 2.0.
-        scale_grad_by_freq: If given, this will scale gradients by
-            the inverse of frequency of the words in the
-            mini-batch. Defaults to False.
-        sparse: If True, gradient w.r.t. weight matrix will be a
-            sparse tensor. Defaults to False.
-        batch_size: batch size for the inputs.
+        return None
 
-    Returns:
-        None.
-    """
+    @pytest.mark.order(2)
+    def test_forward(self, embedding_fixture: tuple[Embedding, torch.Tensor]) -> None:
+        """
+        This method is the test for the Embedding forward pass.
 
-    # define embedding layer
-    original_model: Embedding = Embedding(
-        num_embeddings,
-        embeddings_dim,
-        weights_distribution,
-        padding_idx,
-        max_norm,
-        norm_type,
-        scale_grad_by_freq,
-        sparse,
-    )
+        Args:
+            embedding_fixture: tuple of instance of Embedding and inputs to
+                use.
 
-    # get scripted model
-    model_scripted = torch.jit.script(original_model)
+        Returns:
+            None.
+        """
 
-    # get inputs
-    inputs: torch.Tensor = torch.randint(0, num_embeddings, (batch_size,))
+        # Get model and inputs
+        model: Embedding
+        inputs: torch.Tensor
+        model, inputs = embedding_fixture
 
-    # iter over models
-    for model in (original_model, model_scripted):
-        # compute outputs
+        # Check parameters length
         outputs: torch.Tensor = model(inputs)
 
-        # check type
+        # Check type of outputs
         assert isinstance(
             outputs, torch.Tensor
-        ), f"Incorrect type of outputs, expected {torch.Tensor} and got {type(outputs)}"
+        ), f"Incorrect outputs class, expected {torch.Tensor} and got {type(outputs)}"
 
-        # check shape
-        assert outputs.shape == (batch_size, embeddings_dim), (
-            f"Incorrect outputs shape, expected {(batch_size, embeddings_dim)} and got "
-            f"{outputs.shape}"
+        # Check outputs shape
+        assert outputs.shape == (inputs.shape[0], model.weights.shape[1]), (
+            f"Incorrect outputs shape, expected "
+            f"{(inputs.shape[0], model.weights.shape[1])} and got {outputs.shape}"
         )
 
-    return None
+        return None
 
+    @pytest.mark.order(3)
+    def test_backward(self, embedding_fixture: tuple[Embedding, torch.Tensor]) -> None:
+        """
+        This method is the test for the Embedding backward pass.
 
-@pytest.mark.order(3)
-@pytest.mark.parametrize(
-    (
-        "num_embeddings, embeddings_dim, weights_distribution, padding_idx, max_norm, "
-        "norm_type, scale_grad_by_freq, sparse, batch_size"
-    ),
-    [
-        (8, 64, None, None, None, 2.0, False, False, 64),
-        (10, 32, GaussianDistribution((10, 32)), 0, 2.0, 2.0, True, False, 128),
-    ],
-)
-def test_embedding_backward(
-    num_embeddings: int,
-    embeddings_dim: int,
-    weights_distribution: Optional[Distribution],
-    padding_idx: Optional[int],
-    max_norm: Optional[float],
-    norm_type: float,
-    scale_grad_by_freq: bool,
-    sparse: bool,
-    batch_size: int,
-) -> None:
-    """
-    This function is the test for the backward pass of the Embedding
-    layer.
+        Args:
+            embedding_fixture: tuple of instance of Embedding and inputs to
+                use.
 
-    Args:
-        num_embeddings: size of the dictionary of embeddings.
-        embeddings_dim: the size of each embedding vector.
-        weights_distribution: distribution for the weights of the
-            layer. Defaults to None.
-        padding_idx: If specified, the entries at padding_idx do
-            not contribute to the gradient. Defaults to None.
-        max_norm: If given, each embedding vector with norm larger
-            than max_norm is renormalized to have norm max_norm.
-            Defaults to None.
-        norm_type: The p of the p-norm to compute for the max_norm
-            option. Defaults to 2.0.
-        scale_grad_by_freq: If given, this will scale gradients by
-            the inverse of frequency of the words in the
-            mini-batch. Defaults to False.
-        sparse: If True, gradient w.r.t. weight matrix will be a
-            sparse tensor. Defaults to False.
-        batch_size: batch size for the inputs.
+        Returns:
+            None.
+        """
 
-    Returns:
-        None.
-    """
+        # Get model and inputs
+        model: Embedding
+        inputs: torch.Tensor
+        model, inputs = embedding_fixture
 
-    # define embedding layer
-    original_model: Embedding = Embedding(
-        num_embeddings,
-        embeddings_dim,
-        weights_distribution,
-        padding_idx,
-        max_norm,
-        norm_type,
-        scale_grad_by_freq,
-        sparse,
-    )
-
-    # get scripted model
-    model_scripted = torch.jit.script(original_model)
-
-    # get inputs
-    inputs: torch.Tensor = torch.randint(0, num_embeddings, (batch_size,))
-
-    # iter over models
-    for model in (original_model, model_scripted):
-        # compute outputs
+        # check parameters length
         outputs: torch.Tensor = model(inputs)
         outputs.sum().backward()
 
-        # check type of outputs
+        # Check type of outputs
         for name, parameter in model.named_parameters():
             # check if parameter is none
             assert parameter.grad is not None, (
@@ -246,205 +104,165 @@ def test_embedding_backward(
                 f"None"
             )
 
-    return None
+        return None
 
+    @pytest.mark.order(4)
+    def test_freeze(self, embedding_fixture: tuple[Embedding, torch.Tensor]) -> None:
+        """
+        This method is the test for the freeze and unfreeze layers from
+        Embedding layer.
 
-@pytest.mark.order(4)
-@pytest.mark.parametrize(
-    (
-        "num_embeddings, embeddings_dim, weights_distribution, padding_idx, max_norm, "
-        "norm_type, scale_grad_by_freq, sparse, batch_size"
-    ),
-    [
-        (8, 64, None, None, None, 2.0, False, False, 64),
-        (10, 32, GaussianDistribution((10, 32)), 0, 2.0, 2.0, True, False, 128),
-    ],
-)
-def test_embedding_freeze(
-    num_embeddings: int,
-    embeddings_dim: int,
-    weights_distribution: Optional[Distribution],
-    padding_idx: Optional[int],
-    max_norm: Optional[float],
-    norm_type: float,
-    scale_grad_by_freq: bool,
-    sparse: bool,
-    batch_size: int,
-) -> None:
-    """
-    This function is the test for the freeze and unfreeze layers from
-    Embedding layer.
+        Args:
+            embedding_fixture: tuple of instance of Embedding and inputs to
+                use.
 
-    Args:
-        num_embeddings: size of the dictionary of embeddings.
-        embeddings_dim: the size of each embedding vector.
-        weights_distribution: distribution for the weights of the
-            layer. Defaults to None.
-        padding_idx: If specified, the entries at padding_idx do
-            not contribute to the gradient. Defaults to None.
-        max_norm: If given, each embedding vector with norm larger
-            than max_norm is renormalized to have norm max_norm.
-            Defaults to None.
-        norm_type: The p of the p-norm to compute for the max_norm
-            option. Defaults to 2.0.
-        scale_grad_by_freq: If given, this will scale gradients by
-            the inverse of frequency of the words in the
-            mini-batch. Defaults to False.
-        sparse: If True, gradient w.r.t. weight matrix will be a
-            sparse tensor. Defaults to False.
-        batch_size: batch size for the inputs.
+        Returns:
+            None.
+        """
 
-    Returns:
-        None.
-    """
+        # Get model and inputs
+        model: Embedding
+        inputs: torch.Tensor
+        model, inputs = embedding_fixture
 
-    # define embedding layer
-    original_model: Embedding = Embedding(
-        num_embeddings,
-        embeddings_dim,
-        weights_distribution,
-        padding_idx,
-        max_norm,
-        norm_type,
-        scale_grad_by_freq,
-        sparse,
-    )
-
-    # get scripted version
-    model_scripted = torch.jit.script(original_model)
-
-    # get inputs
-    inputs: torch.Tensor = torch.randint(0, num_embeddings, (batch_size,))
-
-    # iter over models
-    for model in (original_model, model_scripted):
-        # compute outputs
+        # Compute outputs
         outputs_first: torch.Tensor = model(inputs)
         outputs_second: torch.Tensor = model(inputs)
 
-        # check if both outputs are equal
+        # Check if both outputs are equal
         assert not torch.allclose(outputs_first, outputs_second, 1e-8), (
             "Incorrect outputs, different forwards are equal when at the "
             "initialization the layer should be unfrozen"
         )
 
-        # freeze layer
+        # Freeze layer
         model.freeze()
 
-        # compute outputs
+        # Compute outputs
         outputs_first = model(inputs)
         outputs_second = model(inputs)
 
-        # check if both outputs are equal
+        # Check if both outputs are equal
         assert torch.allclose(outputs_first, outputs_second, 1e-8), (
             "Incorrect freezing, when layer is frozen outputs are not the same in "
             "different forward passes"
         )
 
-        # unfreeze layer
+        # Unfreeze layer
         model.unfreeze()
 
-        # compute outputs
+        # Compute outputs
         outputs_first = model(inputs)
         outputs_second = model(inputs)
 
+        # Check if both outputs are equal
         assert not torch.allclose(outputs_first, outputs_second, 1e-8), (
             "Incorrect unfreezing, when layer is unfrozen outputs are the same in "
             "different forward passes"
         )
 
-    return None
+        return None
 
+    @pytest.mark.order(5)
+    def test_kl_cost(self, embedding_fixture: tuple[Embedding, torch.Tensor]) -> None:
+        """
+        This method is the test for the kl_cost method of Embedding layer.
 
-@pytest.mark.order(5)
-@pytest.mark.parametrize(
-    (
-        "num_embeddings, embeddings_dim, weights_distribution, padding_idx, max_norm, "
-        "norm_type, scale_grad_by_freq, sparse, batch_size"
-    ),
-    [
-        (8, 64, None, None, None, 2.0, False, False, 64),
-        (10, 32, GaussianDistribution((10, 32)), 0, 2.0, 2.0, True, False, 128),
-    ],
-)
-def test_linear_kl_cost(
-    num_embeddings: int,
-    embeddings_dim: int,
-    weights_distribution: Optional[Distribution],
-    padding_idx: Optional[int],
-    max_norm: Optional[float],
-    norm_type: float,
-    scale_grad_by_freq: bool,
-    sparse: bool,
-    batch_size: int,
-) -> None:
-    """
-    This function is the test for the kl_cost method of Embedding layer.
+        Args:
+            embedding_fixture: tuple of instance of Embedding and inputs to
+                use.
 
-    Args:
-        num_embeddings: size of the dictionary of embeddings.
-        embeddings_dim: the size of each embedding vector.
-        weights_distribution: distribution for the weights of the
-            layer. Defaults to None.
-        padding_idx: If specified, the entries at padding_idx do
-            not contribute to the gradient. Defaults to None.
-        max_norm: If given, each embedding vector with norm larger
-            than max_norm is renormalized to have norm max_norm.
-            Defaults to None.
-        norm_type: The p of the p-norm to compute for the max_norm
-            option. Defaults to 2.0.
-        scale_grad_by_freq: If given, this will scale gradients by
-            the inverse of frequency of the words in the
-            mini-batch. Defaults to False.
-        sparse: If True, gradient w.r.t. weight matrix will be a
-            sparse tensor. Defaults to False.
-        batch_size: batch size for the inputs.
+        Returns:
+            None.
+        """
 
-    Returns:
-        None.
-    """
+        # Get model and inputs
+        model: Embedding
+        model, _ = embedding_fixture
 
-    # define embedding layer
-    original_model: Embedding = Embedding(
-        num_embeddings,
-        embeddings_dim,
-        weights_distribution,
-        padding_idx,
-        max_norm,
-        norm_type,
-        scale_grad_by_freq,
-        sparse,
-    )
-
-    # get scripted version
-    model_scripted = torch.jit.script(original_model)
-
-    # iter over models
-    for model in (original_model, model_scripted):
-        # compute outputs
+        # Compute outputs
         outputs: tuple[torch.Tensor, int] = model.kl_cost()
 
-        # check type of output
+        # Check type of output
         assert isinstance(
             outputs, tuple
         ), f"Incorrect output type, expected {tuple} and got {type(outputs)}"
 
-        # check type of kl cost
+        # Check type of kl cost
         assert isinstance(outputs[0], torch.Tensor), (
             f"Incorrect output type in the first element, expected {torch.Tensor} and "
             f"got {type(outputs[0])}"
         )
 
-        # check type of num params
+        # Check type of num params
         assert isinstance(outputs[1], int), (
             f"Incorrect output type in the second element, expected {int} and got "
             f"{type(outputs[1])}"
         )
 
-        # check shape of kl cost
+        # Check shape of kl cost
         assert outputs[0].shape == (), (
             f"Incorrect shape of outputs first element, expected () and got "
             f"{outputs[0].shape}"
         )
 
-    return None
+        return None
+
+    @pytest.mark.order(6)
+    def test_jit(self, embedding_fixture: tuple[Embedding, torch.Tensor]) -> None:
+        """
+        This method tests the scripting of the layer.
+
+        Args:
+            embedding_fixture: tuple of instance of Embedding and inputs to
+                use.
+
+        Returns:
+            None.
+        """
+
+        # Get model and inputs
+        model: Embedding
+        inputs: torch.Tensor
+        model, inputs = embedding_fixture
+
+        # Script
+        model_scripted: RecursiveScriptModule = torch.jit.script(model)
+
+        # Compute outputs
+        outputs_first: torch.Tensor = model_scripted(inputs)
+        outputs_second: torch.Tensor = model_scripted(inputs)
+
+        # Check if both outputs are equal
+        assert not torch.allclose(
+            outputs_first, outputs_second, 1e-8
+        ), "Incorrect default freeze with torchscript."
+
+        # Freeze layer
+        model_scripted.freeze()
+
+        # Compute outputs
+        outputs_first = model_scripted(inputs)
+        outputs_second = model_scripted(inputs)
+
+        # Check if both outputs are equal
+        assert torch.allclose(
+            outputs_first, outputs_second, 1e-8
+        ), "Incorrect freezing with torchscript."
+
+        # Unfreeze layer
+        model_scripted.unfreeze()
+
+        # Compute outputs
+        outputs_first = model_scripted(inputs)
+        outputs_second = model_scripted(inputs)
+
+        # Check if both outputs are equal
+        assert not torch.allclose(
+            outputs_first, outputs_second, 1e-8
+        ), "Incorrect unfreezing with torchscript."
+
+        # Compute kl cost
+        kl_cost, num_params = model_scripted.kl_cost()
+
+        return None

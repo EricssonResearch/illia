@@ -1,11 +1,15 @@
-# standard libraries
-from typing import Optional
+"""
+This module contains the code for bayesian Embedding layer.
+"""
 
-# 3pp
+# Standard libraries
+from typing import Optional, Any
+
+# 3pps
 import torch
 import torch.nn.functional as F
 
-# own modules
+# Own modules
 from illia.torch.nn.base import BayesianModule
 from illia.torch.distributions import (
     Distribution,
@@ -40,12 +44,12 @@ class Embedding(BayesianModule):
         self,
         num_embeddings: int,
         embeddings_dim: int,
-        weights_distribution: Optional[Distribution] = None,
         padding_idx: Optional[int] = None,
         max_norm: Optional[float] = None,
         norm_type: float = 2.0,
         scale_grad_by_freq: bool = False,
         sparse: bool = False,
+        weights_distribution: Optional[Distribution] = None,
     ) -> None:
         """
         This method is the constructor of the embedding class.
@@ -69,15 +73,17 @@ class Embedding(BayesianModule):
                 sparse tensor. Defaults to False.
         """
 
-        # call super class constructor
+        # Call super class constructor
         super().__init__()
 
-        # set embeddings atributtes
-        self.padding_idx = padding_idx
-        self.max_norm = max_norm
-        self.norm_type = norm_type
-        self.scale_grad_by_freq = scale_grad_by_freq
-        self.sparse = sparse
+        # Set embeddings atributtes
+        self.embedding_params: tuple[Any, ...] = (
+            padding_idx,
+            max_norm,
+            norm_type,
+            scale_grad_by_freq,
+            sparse,
+        )
 
         # set weights distribution
         self.weights_distribution: Distribution
@@ -93,6 +99,8 @@ class Embedding(BayesianModule):
 
         # register buffers
         self.register_buffer("weights", weights)
+
+        return None
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
@@ -110,21 +118,15 @@ class Embedding(BayesianModule):
 
         # forward depeding of frozen state
         if not self.frozen:
-            self.weights = self.weights_distribution.sample()
+            self.weights = self.weights_distribution.sample()  # pylint: disable=W0201
 
         else:
             if self.weights is None:
                 raise ValueError("Module has been frozen with undefined weights")
 
         # run torch forward
-        outputs: torch.Tensor = F.embedding(
-            inputs,
-            self.weights,
-            self.padding_idx,
-            self.max_norm,
-            self.norm_type,
-            self.scale_grad_by_freq,
-            self.sparse,
+        outputs: torch.Tensor = F.embedding(  # # pylint: disable=E1102
+            inputs, self.weights, *self.embedding_params  # type: ignore
         )
 
         return outputs
@@ -143,10 +145,10 @@ class Embedding(BayesianModule):
 
         # sample weights if they are undefined
         if self.weights is None:
-            self.weights = self.weights_distribution.sample()
+            self.weights = self.weights_distribution.sample()  # pylint: disable=W0201
 
         # detach weights
-        self.weights = self.weights.detach()
+        self.weights = self.weights.detach()  # pylint: disable=W0201
 
     @torch.jit.export
     def kl_cost(self) -> tuple[torch.Tensor, int]:
@@ -163,6 +165,6 @@ class Embedding(BayesianModule):
         log_probs: torch.Tensor = self.weights_distribution.log_prob(self.weights)
 
         # get number of parameters
-        num_params: int = self.weights_distribution.num_params
+        num_params: int = self.weights_distribution.num_params()
 
         return log_probs, num_params
