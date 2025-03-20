@@ -1,51 +1,60 @@
-# 3pp
+"""
+This module contains the code for the BayesianModule.
+"""
+
+# Standard libraries
+from abc import ABC
+
+# 3pps
 import tensorflow as tf
+from keras import Model, saving
 
 
-# standard libraries
-class BayesianModule(tf.keras.Model):
-    def __init__(self) -> None:
+@saving.register_keras_serializable(package="BayesianModule", name="BayesianModule")
+class BayesianModule(ABC, Model):
+    """
+    This class implements a BayesianModule. This is still an abstract
+    class since it does not implement the forward method.
+    """
+
+    def __init__(self):
         """
         This method is the constructor for BayesianModule.
         """
 
-        # call super class constructor
+        # Call super class constructor
         super().__init__()
 
-        # set state
+        # Set freeze false by default
         self.frozen: bool = False
 
-        # create attribute to know is a bayesian layer
+        # Create attribute to know is a bayesian layer
         self.is_bayesian: bool = True
 
     def freeze(self) -> None:
         """
         This method freezes the layer.
-
-        Returns:
-            None.
         """
 
+        # Set frozen indicator to true for current layer
         self.frozen = True
 
     def unfreeze(self) -> None:
         """
         This method unfreezes the layer.
-
-        Returns:
-            None.
         """
 
+        # Set frozen indicator to false for current layer
         self.frozen = False
 
     def kl_cost(self) -> tuple[tf.Tensor, int]:
         """
-        This is a default implementation of the kl_cots function,
-        which computes
+        Abstract method to compute the KL divergence cost.
+        Must be implemented by subclasses.
 
         Returns:
-            tensor with the kl cost.
-            number of parameters of the layer.
+            A tuple containing the KL divergence cost and its
+            associated integer value.
         """
 
         return tf.Tensor([0.0]), 0

@@ -9,7 +9,7 @@ from typing import Optional
 import torch
 
 # Own modules
-from illia.torch.distributions.base import Distribution
+from illia.torch.distributions import Distribution
 
 
 class GaussianDistribution(Distribution):

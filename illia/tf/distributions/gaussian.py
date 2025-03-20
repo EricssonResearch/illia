@@ -1,33 +1,23 @@
-# standard libraries
+"""
+This module contains the code for the gaussian distribution.
+"""
+
+# Standard libraries
 import math
 from typing import Optional
 
-# 3pp
+# 3pps
 import tensorflow as tf
 
-# own modules
-from illia.tf.distributions.base import (
-    Distribution,
-)
+# Own modules
+from . import Distribution
 
 
 class GaussianDistribution(Distribution):
     """
-    This class is the implementation of GaussianDistribution in
-    tensorflow.
-
-    Attr:
-        mu_prior: mu for the prior distribution.
-        std_prior: std for the prior distribution.
-        mu_init: init value for mu. This tensor will be initialized
-            with a normal distribution with std 0.1 and the mean is
-            the parameter specified here.
-        rho_init: init value for rho. This tensor will be initialized
-            with a normal distribution with std 0.1 and the mean is
-            the parameter specified here.
+    This is the class to implement a learnable gausssian distribution.
     """
 
-    # overriding method
     def __init__(
         self,
         shape: tuple[int, ...],
@@ -35,93 +25,100 @@ class GaussianDistribution(Distribution):
         std_prior: float = 0.1,
         mu_init: float = 0.0,
         rho_init: float = -7.0,
-        name: str = "param",
     ) -> None:
         """
-        This class is the constructor for GaussianDistribution.
+        Initializes the GaussianDistribution with given priors and
+        initial parameters.
 
         Args:
-            shape: shape of the distribution.
-            mu_prior: mu for the prior distribution. Defaults to 0.0.
-            std_prior: std for the prior distribution. Defaults to 0.1.
-            mu_init: init value for mu. This tensor will be initialized
-                with a normal distribution with std 0.1 and the mean is
-                the parameter specified here. Defaults to 0.0.
-            rho_init: init value for rho. This tensor will be initialized
-                with a normal distribution with std 0.1 and the mean is
-                the parameter specified here. Defaults to -7.0.
+            shape: The shape of the parameters.
+            mu_prior: The mean prior value.
+            std_prior: The standard deviation prior value.
+            mu_init: The initial mean value.
+            rho_init: The initial rho value, which affects the initial
+                standard deviation.
         """
 
-        # call super-class constructor
+        # Call super-class constructor
         super().__init__()
 
-        # define priors
+        # Set parameters
+        self.shape = shape
+        self.mu_init = mu_init
+        self.rho_init = rho_init
+
+        # Define priors
         self.mu_prior: tf.Tensor = tf.convert_to_tensor(mu_prior, dtype=tf.float32)
         self.std_prior: tf.Tensor = tf.convert_to_tensor(std_prior, dtype=tf.float32)
 
-        # define initial mu and rho
+    def build(self, input_shape: tf.TensorShape) -> None:
+        """
+        Builds the GaussianDistribution layer.
+
+        Args:
+            input_shape: The shape of the input tensor.
+        """
+
+        # Define initial mu and rho
         self.mu: tf.Variable = tf.Variable(
-            tf.random.normal(shape=shape, mean=mu_init, stddev=0.1),
-            name=f"{self.name}_mu",
+            initial_value=tf.random.normal(
+                shape=self.shape, mean=self.mu_init, stddev=0.1
+            ),
             trainable=True,
-            dtype=tf.float32,
-        )
-        self.rho: tf.Variable = tf.Variable(
-            tf.random.normal(shape=shape, mean=rho_init, stddev=0.1),
-            name=f"{self.name}_rho",
-            trainable=True,
+            name="mu",
+            shape=(),
             dtype=tf.float32,
         )
 
-    # overriding method
+        self.rho: tf.Variable = tf.Variable(
+            initial_value=tf.random.normal(
+                shape=self.shape, mean=self.rho_init, stddev=0.1
+            ),
+            trainable=True,
+            name="rho",
+            shape=(),
+            dtype=tf.float32,
+        )
+
+        super().build(input_shape)
+
     def sample(self) -> tf.Tensor:
         """
-        This method generates a sample from the Gaussian distribution
-        using the current parameters mu and rho. The sample is obtained
-        by adding a random noise (epsilon) to the mean (mu), where the
-        noise is scaled by the standard deviation (sigma).
+        Samples from the distribution using the current parameters.
+
+        Args:
+            seed: A random seed for generating the sample.
 
         Returns:
-            sampled tensor from the Gaussian distribution.
-                Dimensions: [*] (same ones as the mu and std
-                parameters).
+            A sampled tensor.
         """
 
-        # sampling with reparametrization trick
+        # Sampling with reparametrization trick
         eps: tf.Tensor = tf.random.normal(shape=self.rho.shape)
         sigma: tf.Tensor = tf.math.log1p(tf.math.exp(self.rho))
 
         return self.mu + tf.multiply(sigma, eps)
 
-    # overriding method
     def log_prob(self, x: Optional[tf.Tensor] = None) -> tf.Tensor:
         """
-        This method calculates the log probability density function
-        (PDF) of the given input data.
-
-        If no input data is provided, a sample is generated using the
-        current parameters. The log PDF is calculated using the current
-        parameters mu and rho, which represent the mean and standard
-        deviation of the Gaussian distribution, respectively.
+        Computes the log probability of a given sample.
 
         Args:
-            x: output already sampled. If no output is introduced,
-                first we will sample a tensor from the current
-                distribution. Defaults to None.
+            x: An optional sampled array. If None, a sample is
+                generated.
 
         Returns:
-            The log probability density function (PDF) of the input
-                data or sample.. Dimensions: [].
+            The log probability of the sample as a tensor.
         """
 
-        # sample if x is None
+        # Sample if x is None
         if x is None:
             x = self.sample()
 
-        # define pi
+        # Define pi
         pi: tf.Tensor = tf.convert_to_tensor(math.pi)
 
-        # compute log priors
+        # Compute log priors
         log_prior = (
             -tf.math.log(tf.math.sqrt(2 * pi))
             - tf.math.log(self.std_prior)
@@ -129,10 +126,10 @@ class GaussianDistribution(Distribution):
             - 0.5
         )
 
-        # compute sigma
+        # Compute sigma
         sigma: tf.Tensor = tf.math.log1p(tf.math.exp(self.rho))
 
-        # compute log posteriors
+        # Compute log posteriors
         log_posteriors: tf.Tensor = (
             -tf.math.log(tf.math.sqrt(2 * pi))
             - tf.math.log(sigma)
@@ -140,7 +137,7 @@ class GaussianDistribution(Distribution):
             - 0.5
         )
 
-        # compute final log probs
+        # Compute final log probs
         log_probs = tf.math.reduce_sum(log_posteriors) - tf.math.reduce_sum(log_prior)
 
         return log_probs
@@ -148,12 +145,10 @@ class GaussianDistribution(Distribution):
     @property
     def num_params(self) -> int:
         """
-        Calculate the total number of parameters in the Gaussian
-        Distribution, which is the product of the dimensions of the
-        mean (mu) parameter.
+        Returns the number of parameters in the module.
 
         Returns:
-            The total number of parameters in the Gaussian Distribution.
+            The number of parameters as an integer.
         """
 
         return tf.reshape(self.mu, [-1]).shape[0]

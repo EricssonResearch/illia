@@ -1,0 +1,18 @@
+name: Test Illia Code
+
+# Define inputs for the action, such as the project folder and the tests folder
+inputs:
+  src-tests-folder:
+    description: "Directory where the project tests are located"
+    required: true
+    default: "tests"
+
+runs:
+  using: composite
+  steps:
+    # Step 1: Run tests using Pytest
+    - name: Pytest
+      run: |
+        echo "Running tests with Pytest..."
+        pytest ${{ inputs.src-tests-folder }}/
+      shell: bash

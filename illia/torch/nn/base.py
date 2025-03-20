@@ -11,70 +11,55 @@ import torch
 
 class BayesianModule(ABC, torch.nn.Module):
     """
-    This class implements a BayesianModule. This is still an abstract
-    class since it does not implement the forward method.
-
-    Attributes:
-        frozen: Indicator if this layer is frozen or not.
-        is_bayesian: Indicator if this layer is bayesian or not.
+    This class serves as the base class for Bayesian modules.
+    Any module designed to function as a Bayesian layer should inherit
+    from this class.
     """
 
-    def __init__(self) -> None:
+    def __init__(self):
         """
-        This method is the constructor for BayesianModule.
-
-        Returns:
-            None.
+        Initializes the BayesianModule, setting the frozen state to
+        False.
         """
 
         # Call super class constructor
         super().__init__()
 
-        # Set state
+        # Set freeze false by default
         self.frozen: bool = False
 
         # Create attribute to know is a bayesian layer
         self.is_bayesian: bool = True
 
-        return None
-
     @torch.jit.export
     def freeze(self) -> None:
         """
-        This method freezes the layer.
-
-        Returns:
-            None.
+        Freezes the current module and all submodules that are instances
+        of BayesianModule. Sets the frozen state to True.
         """
 
-        # Change state
+        # Set frozen indicator to true for current layer
         self.frozen = True
-
-        return None
 
     @torch.jit.export
     def unfreeze(self) -> None:
         """
-        This method unfreezes the layer.
-
-        Returns:
-            None.
+        Unfreezes the current module and all submodules that are
+        instances of BayesianModule. Sets the frozen state to False.
         """
 
-        # Change state
+        # Set frozen indicator to false for current layer
         self.frozen = False
-
-        return None
 
     @torch.jit.export
     def kl_cost(self) -> tuple[torch.Tensor, int]:
         """
-        This is a default implementation of the kl_cots function,
-        which computes.
+        Abstract method to compute the KL divergence cost.
+        Must be implemented by subclasses.
 
         Returns:
-            Tensor with the kl cost.
-            Number of parameters of the layer.
+            A tuple containing the KL divergence cost and its
+            associated integer value.
         """
 
         return torch.tensor([0.0]), 0
