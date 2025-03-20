@@ -84,7 +84,11 @@ class Embedding(BayesianModule):
 
         # Create a variable for weights
         self.w = self.add_weight(
+<<<<<<< HEAD
             initializer=tf.constant_initializer(self.weights_distribution.sample()),
+=======
+            initial_value=tf.constant_initializer(self.weights_distribution.sample()),
+>>>>>>> a35cacedeb886576177f41ba9f3036a57f842e42
             trainable=False,
             name="weights",
             shape=(self.num_embeddings, self.embeddings_dim),
@@ -122,7 +126,11 @@ class Embedding(BayesianModule):
         if sparse is not None:
             embeddings = tf.nn.embedding_lookup(weight, inputs)
         else:
+<<<<<<< HEAD
             embeddings = tf.nn.embedding_lookup_sparse(weight, inputs, sp_weights=None)
+=======
+            embeddings = tf.nn.embedding_lookup_sparse(weight, inputs)
+>>>>>>> a35cacedeb886576177f41ba9f3036a57f842e42
 
         if padding_idx is not None:
             padding_mask = tf.not_equal(inputs, padding_idx)

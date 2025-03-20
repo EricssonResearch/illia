@@ -84,8 +84,11 @@ class Conv2d(BayesianModule):
         self.stride = stride
         self.groups = groups
         self.data_format = data_format
+<<<<<<< HEAD:illia/tf/nn/conv2d.py
         self.w: tf.Variable
         self.b: tf.Variable
+=======
+>>>>>>> a35cacedeb886576177f41ba9f3036a57f842e42:illia/tf/nn/conv.py
 
         # Set kernel size
         if isinstance(kernel_size, int):
@@ -162,14 +165,22 @@ class Conv2d(BayesianModule):
 
         # Register non-trainable variables
         self.w = self.add_weight(
+<<<<<<< HEAD:illia/tf/nn/conv2d.py
             initializer=tf.constant_initializer(self.weights_distribution.sample()),
+=======
+            initial_value=tf.constant_initializer(self.weights_distribution.sample()),
+>>>>>>> a35cacedeb886576177f41ba9f3036a57f842e42:illia/tf/nn/conv.py
             trainable=False,
             name="weights",
             shape=self._weights_distribution_shape,
         )
 
         self.b = self.add_weight(
+<<<<<<< HEAD:illia/tf/nn/conv2d.py
             initializer=tf.constant_initializer(self.bias_distribution.sample()),
+=======
+            initial_value=tf.constant_initializer(self.bias_distribution.sample()),
+>>>>>>> a35cacedeb886576177f41ba9f3036a57f842e42:illia/tf/nn/conv.py
             trainable=False,
             name="bias",
             shape=self._bias_distribution_shape,
@@ -233,10 +244,16 @@ class Conv2d(BayesianModule):
 
     @tf.function
     def kl_cost(self) -> tuple[tf.Tensor, int]:
+<<<<<<< HEAD:illia/tf/nn/conv2d.py
 
         log_probs: tf.Tensor = self.weights_distribution.log_prob(
             self.w
         ) + self.bias_distribution.log_prob(self.b)
+=======
+        log_posterior: tf.Tensor = self.weights_distribution.log_prob(
+            self.kernels
+        ) + self.bias_distribution.log_prob(self.bias)
+>>>>>>> a35cacedeb886576177f41ba9f3036a57f842e42:illia/tf/nn/conv.py
 
         num_params: int = (
             self.weights_distribution.num_params + self.bias_distribution.num_params
@@ -281,9 +298,15 @@ class Conv2d(BayesianModule):
         """
 
         if not self.frozen:
+<<<<<<< HEAD:illia/tf/nn/conv2d.py
             self.w.assign(self.weights_distribution.sample())
             self.b.assign(self.bias_distribution.sample())
         elif self.w is None or self.b is None:
+=======
+            self.kernels.assign(self.weights_distribution.sample())
+            self.bias.assign(self.bias_distribution.sample())
+        elif self.kernels is None or self.bias is None:
+>>>>>>> a35cacedeb886576177f41ba9f3036a57f842e42:illia/tf/nn/conv.py
             raise ValueError("Module has been frozen with undefined weights")
 
         return self.__conv__(inputs)

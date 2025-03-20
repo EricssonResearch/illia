@@ -1,16 +1,28 @@
 """
+<<<<<<< HEAD
 This module contains the code for Embedding Bayesian layer.
 """
 
 # Standard libraries
 from typing import Optional
+=======
+This module contains the code for bayesian Embedding layer.
+"""
+>>>>>>> a35cacedeb886576177f41ba9f3036a57f842e42
 
-# 3pp
+# Standard libraries
+from typing import Optional, Any
+
+# 3pps
 import torch
 import torch.nn.functional as F
 
 # Own modules
+<<<<<<< HEAD
 from illia.torch.nn import BayesianModule
+=======
+from illia.torch.nn.base import BayesianModule
+>>>>>>> a35cacedeb886576177f41ba9f3036a57f842e42
 from illia.torch.distributions import (
     Distribution,
     GaussianDistribution,
@@ -27,12 +39,12 @@ class Embedding(BayesianModule):
         self,
         num_embeddings: int,
         embeddings_dim: int,
-        weights_distribution: Optional[Distribution] = None,
         padding_idx: Optional[int] = None,
         max_norm: Optional[float] = None,
         norm_type: float = 2.0,
         scale_grad_by_freq: bool = False,
         sparse: bool = False,
+        weights_distribution: Optional[Distribution] = None,
     ) -> None:
         """
         Initializes a Bayesian Embedding layer with specified dimensions
@@ -51,15 +63,25 @@ class Embedding(BayesianModule):
             sparse: Use sparse tensor for weight gradients.
         """
 
-        # call super class constructor
+        # Call super class constructor
         super().__init__()
 
         # Set embeddings atributtes
+<<<<<<< HEAD
         self.padding_idx = padding_idx
         self.max_norm = max_norm
         self.norm_type = norm_type
         self.scale_grad_by_freq = scale_grad_by_freq
         self.sparse = sparse
+=======
+        self.embedding_params: tuple[Any, ...] = (
+            padding_idx,
+            max_norm,
+            norm_type,
+            scale_grad_by_freq,
+            sparse,
+        )
+>>>>>>> a35cacedeb886576177f41ba9f3036a57f842e42
 
         # Set weights distribution
         self.weights_distribution: Distribution
@@ -75,6 +97,11 @@ class Embedding(BayesianModule):
 
         # Register buffers
         self.register_buffer("weights", self.weights)
+<<<<<<< HEAD
+=======
+
+        return None
+>>>>>>> a35cacedeb886576177f41ba9f3036a57f842e42
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
@@ -96,6 +123,7 @@ class Embedding(BayesianModule):
 
         # forward depeding of frozen state
         if not self.frozen:
+<<<<<<< HEAD
             self.weights = self.weights_distribution.sample()
         elif self.weights is None:
             raise ValueError("Module has been frozen with undefined weights")
@@ -109,6 +137,17 @@ class Embedding(BayesianModule):
             self.norm_type,
             self.scale_grad_by_freq,
             self.sparse,
+=======
+            self.weights = self.weights_distribution.sample()  # pylint: disable=W0201
+
+        else:
+            if self.weights is None:
+                raise ValueError("Module has been frozen with undefined weights")
+
+        # run torch forward
+        outputs: torch.Tensor = F.embedding(  # # pylint: disable=E1102
+            inputs, self.weights, *self.embedding_params  # type: ignore
+>>>>>>> a35cacedeb886576177f41ba9f3036a57f842e42
         )
 
         return outputs
@@ -127,10 +166,10 @@ class Embedding(BayesianModule):
 
         # sample weights if they are undefined
         if self.weights is None:
-            self.weights = self.weights_distribution.sample()
+            self.weights = self.weights_distribution.sample()  # pylint: disable=W0201
 
         # detach weights
-        self.weights = self.weights.detach()
+        self.weights = self.weights.detach()  # pylint: disable=W0201
 
     def kl_cost(self) -> tuple[torch.Tensor, int]:
         """
@@ -145,7 +184,11 @@ class Embedding(BayesianModule):
         # Get log posterior and log prior
         log_probs: torch.Tensor = self.weights_distribution.log_prob(self.weights)
 
+<<<<<<< HEAD
         # Get number of parameters
+=======
+        # get number of parameters
+>>>>>>> a35cacedeb886576177f41ba9f3036a57f842e42
         num_params: int = self.weights_distribution.num_params()
 
         return log_probs, num_params

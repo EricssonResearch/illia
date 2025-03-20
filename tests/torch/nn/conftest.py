@@ -10,7 +10,7 @@ import torch
 import pytest
 
 # Own modules
-from illia.torch.nn import Linear, Conv1d, Conv2d
+from illia.torch.nn import Linear, Conv1d, Conv2d, Embedding
 from illia.torch.distributions import Distribution, GaussianDistribution
 
 
@@ -202,5 +202,61 @@ def conv1d_fixture(request: pytest.FixtureRequest) -> tuple[Conv1d, torch.Tensor
         bias_distribution,
     )
     inputs: torch.Tensor = torch.rand((batch_size, input_channels, embedding_dim))
+
+    return model, inputs
+
+
+@pytest.fixture(
+    params=[
+        (64, 100, 16, None, None, 2.0, True, False, None),
+        (32, 50, 32, 0, 5.0, 1.0, False, True, GaussianDistribution((50, 32))),
+    ]
+)
+def embedding_fixture(request: pytest.FixtureRequest) -> tuple[Embedding, torch.Tensor]:
+    """
+    This function is the fixture for bayesian Embedding layer.
+
+    Args:
+        request: Pytest fixture request.
+
+    Returns:
+        Embedding instance.
+        Inputs compatible with Embedding instance.
+    """
+
+    # Get parameters
+    batch_size: int
+    num_embeddings: int
+    embeddings_dim: int
+    padding_idx: Optional[int]
+    max_norm: Optional[float]
+    norm_type: float
+    scale_grad_by_freq: bool
+    sparse: bool
+    weights_distribution: Optional[Distribution]
+    (
+        batch_size,
+        num_embeddings,
+        embeddings_dim,
+        padding_idx,
+        max_norm,
+        norm_type,
+        scale_grad_by_freq,
+        sparse,
+        weights_distribution,
+    ) = request.param
+
+    # Define model and inputs
+    model: Embedding = Embedding(
+        num_embeddings,
+        embeddings_dim,
+        padding_idx,
+        max_norm,
+        norm_type,
+        scale_grad_by_freq,
+        sparse,
+        weights_distribution,
+    )
+    inputs: torch.Tensor = torch.randint(0, num_embeddings, (batch_size,))
 
     return model, inputs

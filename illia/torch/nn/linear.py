@@ -63,8 +63,13 @@ class Linear(BayesianModule):
         self.bias = self.bias_distribution.sample()
 
         # Register buffers
+<<<<<<< HEAD
         self.register_buffer("weights", self.weights)
         self.register_buffer("bias", self.bias)
+=======
+        self.register_buffer("weights", weights)
+        self.register_buffer("bias", bias)
+>>>>>>> a35cacedeb886576177f41ba9f3036a57f842e42
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
@@ -87,8 +92,13 @@ class Linear(BayesianModule):
 
         # Check if layer is frozen
         if not self.frozen:
+<<<<<<< HEAD
             self.weights = self.weights_distribution.sample()
             self.bias = self.bias_distribution.sample()
+=======
+            self.weights = self.weights_posterior.sample()
+            self.bias = self.bias_posterior.sample()
+>>>>>>> a35cacedeb886576177f41ba9f3036a57f842e42
         elif self.weights is None or self.bias is None:
             raise ValueError("Module has been frozen with undefined weights")
 
