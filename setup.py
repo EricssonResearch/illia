@@ -19,7 +19,7 @@ setup(
     description="__THIS_IS_USED_FOR_DEVELOPMENT_ONLY__",
     long_description=readme(),
     url="",
-    author="Oscar Llorente",
+    author="Oscar Llorente Gonzalez",
     author_email="oscar.llorente.gonzalez@ericsson.com",
     maintainer="Anubhab Samal, Daniel Bazo, Lucia Ferrer",
     maintainer_email="anubhab.samal@ericsson.com, daniel.bazo.correa@ericsson.com, lucia.ferrer@ericsson.com",

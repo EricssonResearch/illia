@@ -6,6 +6,8 @@ from keras import saving
 from . import (
     Distribution,
     GaussianDistribution,
+    Distribution,
+    GaussianDistribution,
     BayesianModule,
 )
 
@@ -21,6 +23,7 @@ class Embedding(BayesianModule):
         self,
         num_embeddings: int,
         embeddings_dim: int,
+        weights_distribution: Optional[Distribution] = None,
         weights_distribution: Optional[Distribution] = None,
         padding_idx: Optional[int] = None,
         max_norm: Optional[float] = None,
@@ -57,6 +60,10 @@ class Embedding(BayesianModule):
         self.scale_grad_by_freq = scale_grad_by_freq
         self.sparse = sparse
 
+        weights_distribution_shape = (num_embeddings, embeddings_dim)
+        if weights_distribution is None:
+            self.weights_distribution: Distribution = GaussianDistribution(
+                weights_distribution_shape, name="weights_distr"
         weights_distribution_shape = (num_embeddings, embeddings_dim)
         if weights_distribution is None:
             self.weights_distribution: Distribution = GaussianDistribution(
@@ -126,6 +133,7 @@ class Embedding(BayesianModule):
         return embeddings
 
     def get_config(self) -> dict:
+    def get_config(self) -> dict:
         """
         Retrieves the configuration of the Embedding layer.
 
@@ -140,6 +148,7 @@ class Embedding(BayesianModule):
         custom_config = {
             "num_embeddings": self.num_embeddings,
             "embeddings_dim": self.embeddings_dim,
+            "weights_distribution": self.weights_distribution,
             "weights_distribution": self.weights_distribution,
             "padding_idx": self.padding_idx,
             "max_norm": self.max_norm,
@@ -166,7 +175,16 @@ class Embedding(BayesianModule):
         # Forward depeding of frozen state
         if not self.frozen:
             self.kernel.assign(self.weights_distribution.sample())
+            self.kernel.assign(self.weights_distribution.sample())
         else:
+            if self.kernel is None:
+                w = self.weights_distribution.sample()
+                self.kernel = self.add_weight(
+                    name="kernel",
+                    initializer=tf.constant_initializer(w.numpy()),
+                    shape=w.shape,
+                    trainable=False,
+                )
             if self.kernel is None:
                 w = self.weights_distribution.sample()
                 self.kernel = self.add_weight(
@@ -179,6 +197,7 @@ class Embedding(BayesianModule):
         # Run tensorflow forward
         outputs: tf.Tensor = self._embedding(
             inputs,
+            self.kernel,
             self.kernel,
             self.padding_idx,
             self.max_norm,
@@ -199,6 +218,7 @@ class Embedding(BayesianModule):
             parameters.
         """
 
+        log_posterior: tf.Tensor = self.weights_distribution.log_prob(self.kernel)
         log_posterior: tf.Tensor = self.weights_distribution.log_prob(self.kernel)
 
         num_params: int = self.weights_distribution.num_params

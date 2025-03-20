@@ -1,6 +1,21 @@
+"""
+This module contains the code for Linear Bayesian layer.
+"""
+
+# Standard libraries
+from typing import Optional
+
+# 3pps
 from typing import Optional
 
 import torch
+import torch.nn.functional as F
+
+# Own modules
+from illia.torch.nn.base import BayesianModule
+from illia.torch.distributions import (
+    Distribution,
+    GaussianDistribution,
 import torch.nn.functional as F
 
 from illia.torch.nn.base import BayesianModule
@@ -22,9 +37,11 @@ class Linear(BayesianModule):
         output_size: int,
         weights_distribution: Optional[Distribution] = None,
         bias_distribution: Optional[Distribution] = None,
+        weights_distribution: Optional[Distribution] = None,
+        bias_distribution: Optional[Distribution] = None,
     ) -> None:
         """
-        Definition of a Bayesian Linear layer.
+        This is the constructor of the Linear class.
 
         Args:
             input_size: Size of each input sample.
@@ -35,8 +52,12 @@ class Linear(BayesianModule):
         """
 
         # Call super-class constructor
+        # Call super-class constructor
         super().__init__()
 
+        # Set weights distribution
+        if weights_distribution is None:
+            self.weights_distribution: Distribution = GaussianDistribution(
         # Set weights distribution
         if weights_distribution is None:
             self.weights_distribution: Distribution = GaussianDistribution(
@@ -44,7 +65,11 @@ class Linear(BayesianModule):
             )
         else:
             self.weights_distribution = weights_distribution
+            self.weights_distribution = weights_distribution
 
+        # Set bias distribution
+        if bias_distribution is None:
+            self.bias_distribution: Distribution = GaussianDistribution((output_size,))
         # Set bias distribution
         if bias_distribution is None:
             self.bias_distribution: Distribution = GaussianDistribution((output_size,))
@@ -69,13 +94,16 @@ class Linear(BayesianModule):
         them from their respective posterior distributions.
 
         Args:
-            inputs: Input tensor to the layer.
+            inputs: input tensor. Dimensions: [batch, *].
+
+        Raises:
+            ValueError: Module has been frozen with undefined weights.
 
         Returns:
-            Output tensor after passing through the layer.
+            outputs tensor. Dimensions: [batch, *].
         """
 
-        # Forward depeding of frozen state
+        # Check if layer is frozen
         if not self.frozen:
             self.weights = self.weights_posterior.sample()
             self.bias = self.bias_posterior.sample()
@@ -126,10 +154,12 @@ class Linear(BayesianModule):
         log_probs: torch.Tensor = self.weights_distribution.log_prob(
             self.weights
         ) + self.bias_distribution.log_prob(self.bias)
+        ) + self.bias_distribution.log_prob(self.bias)
 
         # Compute the number of parameters
         num_params: int = (
             self.weights_distribution.num_params + self.bias_distribution.num_params
         )
 
+        return log_probs, num_params
         return log_probs, num_params

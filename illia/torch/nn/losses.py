@@ -1,5 +1,6 @@
 from typing import Literal
 
+# 3pp
 import torch
 
 from illia.torch.nn.base import BayesianModule
@@ -21,10 +22,10 @@ class KLDivergenceLoss(torch.nn.Module):
             weight: Scaling factor for the KL divergence loss.
         """
 
-        # Call super class constructor
+        # call super class constructor
         super().__init__()
 
-        # Set attributes
+        # set parameters
         self.reduction = reduction
         self.weight = weight
 
@@ -50,7 +51,7 @@ class KLDivergenceLoss(torch.nn.Module):
                 kl_global_cost += kl_cost
                 num_params_global += num_params
 
-        kl_global_cost /= num_params_global
+        kl_global_cost /= num_params
         kl_global_cost *= self.weight
 
         return kl_global_cost
@@ -83,14 +84,13 @@ class ELBOLoss(torch.nn.Module):
         # Call super class constructor
         super().__init__()
 
-        # Set attributes
         self.loss_function = loss_function
         self.num_samples = num_samples
         self.kl_weight = kl_weight
         self.kl_loss = KLDivergenceLoss(weight=kl_weight)
 
     def forward(
-        self, y_true: torch.Tensor, y_pred: torch.Tensor, model: torch.nn.Module
+        self, outputs: torch.Tensor, targets: torch.Tensor, model: torch.nn.Module
     ) -> torch.Tensor:
         """
         Computes the ELBO loss, averaging over multiple samples.
@@ -107,9 +107,8 @@ class ELBOLoss(torch.nn.Module):
         loss_value = torch.tensor(
             0, device=next(model.parameters()).device, dtype=torch.float32
         )
-
         for _ in range(self.num_samples):
-            loss_value += self.loss_function(y_true, y_pred) + self.kl_loss(model)
+            loss_value += self.loss_function(outputs, targets) + self.kl_loss(model)
 
         loss_value /= self.num_samples
 

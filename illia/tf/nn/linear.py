@@ -3,7 +3,10 @@ from typing import Optional
 import tensorflow as tf
 from keras import saving
 
+# own modules
 from . import (
+    Distribution,
+    GaussianDistribution,
     Distribution,
     GaussianDistribution,
     BayesianModule,
@@ -21,6 +24,8 @@ class Linear(BayesianModule):
         self,
         input_size: int,
         output_size: int,
+        weights_distribution: Optional[Distribution] = None,
+        bias_distribution: Optional[Distribution] = None,
         weights_distribution: Optional[Distribution] = None,
         bias_distribution: Optional[Distribution] = None,
     ) -> None:
@@ -45,6 +50,7 @@ class Linear(BayesianModule):
                 (input_size, output_size), name="weights_distr"
             )
         else:
+            self.weights_distribution = weights_distribution
             self.weights_distribution = weights_distribution
 
         # Set bias distribution
@@ -104,7 +110,10 @@ class Linear(BayesianModule):
         them once.
 
         Args:
-            inputs: Input tensor to the layer.
+            inputs: input tensor. Dimensions: [batch, *].
+
+        Raises:
+            ValueError: Module has been frozen with undefined weights.
 
         Returns:
             Output tensor after linear transformation.
@@ -125,6 +134,7 @@ class Linear(BayesianModule):
 
     @tf.function
     def kl_cost(self) -> tuple[tf.Tensor, int]:
+    def kl_cost(self) -> tuple[tf.Tensor, int]:
         """
         Computes the Kullback-Leibler (KL) divergence cost for the
         layer's weights and bias.
@@ -137,9 +147,17 @@ class Linear(BayesianModule):
         log_posterior: tf.Tensor = self.weights_distribution.log_prob(
             self.kernel
         ) + self.bias_distribution.log_prob(self.bias)
+        log_posterior: tf.Tensor = self.weights_distribution.log_prob(
+            self.kernel
+        ) + self.bias_distribution.log_prob(self.bias)
 
         num_params: int = (
             self.weights_distribution.num_params + self.bias_distribution.num_params
+            self.weights_distribution.num_params + self.bias_distribution.num_params
         )
+        return log_posterior, num_params
+
+    # def get_config():
+    #     super.get_config()
 
         return log_posterior, num_params

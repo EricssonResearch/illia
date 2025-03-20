@@ -1,5 +1,6 @@
 from typing import Optional
 
+# 3pp
 import torch
 import torch.nn.functional as F
 
@@ -20,6 +21,7 @@ class Embedding(BayesianModule):
         self,
         num_embeddings: int,
         embeddings_dim: int,
+        weights_distribution: Optional[Distribution] = None,
         weights_distribution: Optional[Distribution] = None,
         padding_idx: Optional[int] = None,
         max_norm: Optional[float] = None,
@@ -44,7 +46,7 @@ class Embedding(BayesianModule):
             sparse: Use sparse tensor for weight gradients.
         """
 
-        # Call super class constructor
+        # call super class constructor
         super().__init__()
 
         # Set embeddings atributtes
@@ -78,13 +80,16 @@ class Embedding(BayesianModule):
         them once.
 
         Args:
-            inputs: Input tensor to the layer.
+            inputs: input tensor. Dimensions: [*].
+
+        Raises:
+            ValueError: Module has been frozen with undefined weights.
 
         Returns:
             Output tensor after embedding lookup.
         """
 
-        # Forward depeding of frozen state
+        # forward depeding of frozen state
         if not self.frozen:
             self.weights = self.weights_distribution.sample()
         elif self.weights is None:
@@ -138,4 +143,5 @@ class Embedding(BayesianModule):
         # Get number of parameters
         num_params: int = self.weights_distribution.num_params
 
+        return log_probs, num_params
         return log_probs, num_params

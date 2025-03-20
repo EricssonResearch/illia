@@ -1,16 +1,28 @@
+"""
+This module contains the code for the gaussian distribution.
+"""
+
+# Standard libraries
 from typing import Optional
 
+# 3pps
 import torch
 
-from .base import Distribution
+# Own modules
+from illia.torch.distributions.base import Distribution
 
 
 class GaussianDistribution(Distribution):
     """
-    This is the class to implement a learnable gausssian distribution.
+    This class implements a gaussian distribution.
+
+    Attributes:
+        mu_prior: Initial value for the mu.
+        std_prior: Initial value for the std.
+        mu: Trainable parameter for the posterior mu.
+        std: Trainable parameter for the posterior std.
     """
 
-    # overriding method
     def __init__(
         self,
         shape: tuple[int, ...],
@@ -20,24 +32,26 @@ class GaussianDistribution(Distribution):
         rho_init: float = -7.0,
     ) -> None:
         """
-        Initializes the GaussianDistribution with given priors and
-        initial parameters.
+        This class is the constructor for GaussianDistribution.
 
         Args:
-            shape: The shape of the parameters.
-            mu_prior: The mean prior value.
-            std_prior: The standard deviation prior value.
-            mu_init: The initial mean value.
-            rho_init: The initial rho value, which affects the initial
-                standard deviation.
+            shape: shape of the distribution.
+            mu_prior: mu for the prior distribution. Defaults to 0.0.
+            std_prior: std for the prior distribution. Defaults to 0.1.
+            mu_init: init value for mu. This tensor will be initialized
+                with a normal distribution with std 0.1 and the mean is
+                the parameter specified here. Defaults to 0.0.
+            rho_init: init value for rho. This tensor will be initialized
+                with a normal distribution with std 0.1 and the mean is
+                the parameter specified here. Defaults to -7.0.
         """
 
         # Call super-class constructor
         super().__init__()
 
         # Define priors
-        self.mu_prior: torch.Tensor = torch.tensor([mu_prior])
-        self.std_prior: torch.Tensor = torch.tensor([std_prior])
+        self.register_buffer("mu_prior", torch.tensor([mu_prior]))
+        self.register_buffer("std_prior", torch.tensor([std_prior]))
 
         # Define initial mu and rho
         self.mu: torch.Tensor = torch.nn.Parameter(
@@ -47,16 +61,15 @@ class GaussianDistribution(Distribution):
             torch.randn(shape).normal_(rho_init, 0.1)
         )
 
+    # Overriding method
     @torch.jit.export
     def sample(self) -> torch.Tensor:
         """
-        Samples from the distribution using the current parameters.
-
-        Args:
-            seed: A random seed for generating the sample.
+        This method samples a tensor from the distribution.
 
         Returns:
-            A sampled tensor.
+            Sampled tensor. Dimensions: [*] (same ones as the mu and
+                std parameters).
         """
 
         # sampling with reparametrization trick
@@ -65,27 +78,29 @@ class GaussianDistribution(Distribution):
 
         return self.mu + sigma * eps
 
+    # overriding method
     @torch.jit.export
     def log_prob(self, x: Optional[torch.Tensor] = None) -> torch.Tensor:
         """
-        Computes the log probability of a given sample.
+        This function computes the log probability.
 
         Args:
-            x: An optional sampled array. If None, a sample is
-                generated.
+            x: Output already sampled. If no output is introduced,
+                first we will sample a tensor from the current
+                distribution. Defaults to None.
 
         Returns:
-            The log probability of the sample as a tensor.
+            Log probs. Dimensions: [].
         """
 
-        # Sample if x is None
+        # sample if x is None
         if x is None:
             x = self.sample()
 
-        # Define pi variable
+        # define pi variable
         pi: torch.Tensor = torch.acos(torch.zeros(1)) * 2
 
-        # Compute log priors
+        # compute log priors
         log_prior = (
             -torch.log(torch.sqrt(2 * pi)).to(x.device)
             - torch.log(self.std_prior)
@@ -93,10 +108,10 @@ class GaussianDistribution(Distribution):
             - 0.5
         )
 
-        # Compute sigma
+        # compute sigma
         sigma: torch.Tensor = torch.log1p(torch.exp(self.rho)).to(x.device)
 
-        # Compute log posteriors
+        # compute log posteriors
         log_posteriors = (
             -torch.log(torch.sqrt(2 * pi)).to(x.device)
             - torch.log(sigma)
@@ -104,20 +119,20 @@ class GaussianDistribution(Distribution):
             - 0.5
         )
 
-        # Compute final log probs
+        # compute final log probs
         log_probs = log_posteriors.sum() - log_prior.sum()
 
         return log_probs
 
-    @property
     @torch.jit.export
     @torch.no_grad()
     def num_params(self) -> int:
         """
-        Returns the number of parameters in the module.
+        This method computes the number of parameters of the
+        distribution.
 
         Returns:
-            The number of parameters as an integer.
+            Number of parameters.
         """
 
         return len(self.mu.view(-1))

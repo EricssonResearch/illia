@@ -1,7 +1,15 @@
+"""
+This module contains the code for the BayesianModule.
+"""
+
+# Standard libraries
+from abc import ABC
+
+# 3pps
 import torch
 
 
-class BayesianModule(torch.nn.Module):
+class BayesianModule(ABC, torch.nn.Module):
     """
     This class serves as the base class for Bayesian modules.
     Any module designed to function as a Bayesian layer should inherit
