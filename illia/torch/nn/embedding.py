@@ -19,25 +19,8 @@ from illia.torch.distributions import (
 
 class Embedding(BayesianModule):
     """
-    This class is the bayesian implementation of the Embedding class.
-
-    Attr:
-        weights_distribution: distribution for the weights of the
-            layer. Dimensions: [number of embeddings, embedding dim].
-        weights: sampled weights of the layer. They are registered in
-            the buffer. Dimensions: [number of embeddings,
-            embedding dim].
-        padding_idx: If specified, the entries at padding_idx do
-            not contribute to the gradient.
-        max_norm: If given, each embedding vector with norm larger
-            than max_norm is renormalized to have norm max_norm.
-        norm_type: The p of the p-norm to compute for the max_norm
-            option.
-        scale_grad_by_freq: If given, this will scale gradients by
-            the inverse of frequency of the words in the
-            mini-batch.
-        sparse: If True, gradient w.r.t. weight matrix will be a
-            sparse tensor.
+    Bayesian Embedding layer with trainable weights and biases,
+    supporting prior and posterior distributions.
     """
 
     def __init__(
@@ -52,25 +35,20 @@ class Embedding(BayesianModule):
         weights_distribution: Optional[Distribution] = None,
     ) -> None:
         """
-        This method is the constructor of the embedding class.
+        Initializes a Bayesian Embedding layer with specified dimensions
+        and distributions.
 
         Args:
-            num_embeddings: size of the dictionary of embeddings.
-            embeddings_dim: the size of each embedding vector.
-            weights_distribution: distribution for the weights of the
-                layer. Defaults to None.
-            padding_idx: If specified, the entries at padding_idx do
-                not contribute to the gradient. Defaults to None.
-            max_norm: If given, each embedding vector with norm larger
-                than max_norm is renormalized to have norm max_norm.
-                Defaults to None.
-            norm_type: The p of the p-norm to compute for the max_norm
-                option. Defaults to 2.0.
-            scale_grad_by_freq: If given, this will scale gradients by
-                the inverse of frequency of the words in the
-                mini-batch. Defaults to False.
-            sparse: If True, gradient w.r.t. weight matrix will be a
-                sparse tensor. Defaults to False.
+            num_embeddings: Number of unique embeddings.
+            embeddings_dim: Dimension of each embedding vector.
+            weights_distribution: Distribution for the weights of the
+                layer.
+            padding_idx: Index for padding, which keeps gradient
+                constant.
+            max_norm: Maximum norm for embedding vectors.
+            norm_type: Norm type for max_norm computation.
+            scale_grad_by_freq: Scale gradients by word frequency.
+            sparse: Use sparse tensor for weight gradients.
         """
 
         # Call super class constructor
@@ -85,7 +63,7 @@ class Embedding(BayesianModule):
             sparse,
         )
 
-        # set weights distribution
+        # Set weights distribution
         self.weights_distribution: Distribution
         if weights_distribution is None:
             self.weights_distribution = GaussianDistribution(
@@ -94,17 +72,21 @@ class Embedding(BayesianModule):
         else:
             self.weights_distribution = weights_distribution
 
-        # sample initial weights
-        weights = self.weights_distribution.sample()
+        # Sample initial weights
+        self.weights = self.weights_distribution.sample()
 
-        # register buffers
-        self.register_buffer("weights", weights)
+        # Register buffers
+        self.register_buffer("weights", self.weights)
 
         return None
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
-        This method is the forward pass of the layer.
+        Performs a forward pass through the Bayesian Embedding layer.
+
+        Samples weights and bias from their posterior distributions if
+        the layer is not frozen. If frozen and not initialized, samples
+        them once.
 
         Args:
             inputs: input tensor. Dimensions: [*].
@@ -113,7 +95,7 @@ class Embedding(BayesianModule):
             ValueError: Module has been frozen with undefined weights.
 
         Returns:
-            outputs tensor. Dimension: [*, embedding dim].
+            Output tensor after embedding lookup.
         """
 
         # forward depeding of frozen state
@@ -150,18 +132,17 @@ class Embedding(BayesianModule):
         # detach weights
         self.weights = self.weights.detach()  # pylint: disable=W0201
 
-    @torch.jit.export
     def kl_cost(self) -> tuple[torch.Tensor, int]:
         """
-        This method calculates the kl cost of the layer.
+        Computes the Kullback-Leibler (KL) divergence cost for the
+        layer's weights and bias.
 
         Returns:
-            kl cost. Dimensions: [].
-            number of parameters of the layer. It can be used to
-                average the kl cost.
+            Tuple containing KL divergence cost and total number of
+            parameters.
         """
 
-        # get log posterior and log prior
+        # Get log posterior and log prior
         log_probs: torch.Tensor = self.weights_distribution.log_prob(self.weights)
 
         # get number of parameters

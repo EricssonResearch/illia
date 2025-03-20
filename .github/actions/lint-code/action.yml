@@ -1,0 +1,39 @@
+name: Lint Illia Code
+
+# Define inputs for the action, such as the project folder to lint
+inputs:
+  src-project-folder:
+    description: "Directory where the project is located"
+    required: true
+    default: "src"
+
+runs:
+  using: composite
+  steps:
+    # Step 1: Check format with Black (code formatter)
+    - name: Check format with Black
+      run: |
+        echo "Running Black formatter check..."  
+        black --check ${{ inputs.src-project-folder }}/
+      shell: bash
+
+    # Step 2: Check type annotations with Mypy (type checker)
+    - name: Check Mypy
+      run: |
+        echo "Running Mypy type checker..." 
+        mypy ${{ inputs.src-project-folder }}/
+      shell: bash
+
+    # Step 3: Lint code with Flake8 (style checker)
+    - name: Lint with flake8
+      run: |
+        echo "Running Flake8 linter..."
+        flake8 ${{ inputs.src-project-folder }}/
+      shell: bash
+
+    # Step 4: Check the Cognitive Complexity with complexipy
+    - name: Cognitive Complexity with complexipy
+      run: |
+        echo "Running complexipy..."
+        complexipy ${{ inputs.src-project-folder }}/
+      shell: bash
