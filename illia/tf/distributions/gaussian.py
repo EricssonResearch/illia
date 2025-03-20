@@ -10,7 +10,7 @@ from typing import Optional
 import tensorflow as tf
 
 # Own modules
-from . import Distribution
+from illia.tf.distributions.base import Distribution
 
 
 class GaussianDistribution(Distribution):
@@ -46,11 +46,8 @@ class GaussianDistribution(Distribution):
         self.shape = shape
         self.mu_init = mu_init
         self.rho_init = rho_init
-<<<<<<< HEAD
         self.mu: tf.Variable
         self.rho: tf.Variable
-=======
->>>>>>> a35cacedeb886576177f41ba9f3036a57f842e42
 
         # Define priors
         self.mu_prior: tf.Tensor = tf.convert_to_tensor(mu_prior, dtype=tf.float32)
@@ -65,11 +62,7 @@ class GaussianDistribution(Distribution):
         """
 
         # Define initial mu and rho
-<<<<<<< HEAD
         self.mu = tf.Variable(
-=======
-        self.mu: tf.Variable = tf.Variable(
->>>>>>> a35cacedeb886576177f41ba9f3036a57f842e42
             initial_value=tf.random.normal(
                 shape=self.shape, mean=self.mu_init, stddev=0.1
             ),
@@ -79,11 +72,7 @@ class GaussianDistribution(Distribution):
             dtype=tf.float32,
         )
 
-<<<<<<< HEAD
         self.rho = tf.Variable(
-=======
-        self.rho: tf.Variable = tf.Variable(
->>>>>>> a35cacedeb886576177f41ba9f3036a57f842e42
             initial_value=tf.random.normal(
                 shape=self.shape, mean=self.rho_init, stddev=0.1
             ),

@@ -10,11 +10,8 @@ import tensorflow as tf
 from keras import saving
 
 # Own modules
-from illia.tf.nn import BayesianModule
-from illia.tf.distributions import (
-    Distribution,
-    GaussianDistribution,
-)
+from illia.tf.nn.base import BayesianModule
+from illia.tf.distributions import GaussianDistribution
 
 
 @saving.register_keras_serializable(package="BayesianModule", name="Linear")
@@ -28,8 +25,8 @@ class Linear(BayesianModule):
         self,
         input_size: int,
         output_size: int,
-        weights_distribution: Optional[Distribution] = None,
-        bias_distribution: Optional[Distribution] = None,
+        weights_distribution: Optional[GaussianDistribution] = None,
+        bias_distribution: Optional[GaussianDistribution] = None,
     ) -> None:
         """
         This is the constructor of the Linear class.
@@ -37,9 +34,9 @@ class Linear(BayesianModule):
         Args:
             input_size: Input size of the linear layer.
             output_size: Output size of the linear layer.
-            weights_distribution: Distribution for the weights of the
+            weights_distribution: GaussianDistribution for the weights of the
                 layer.
-            bias_distribution: Distribution for the bias of the layer.
+            bias_distribution: GaussianDistribution for the bias of the layer.
         """
 
         # Call super-class constructor
@@ -48,27 +45,22 @@ class Linear(BayesianModule):
         # Set parameters
         self.input_size = input_size
         self.output_size = output_size
-<<<<<<< HEAD
         self.w: tf.Variable
         self.b: tf.Variable
-=======
->>>>>>> a35cacedeb886576177f41ba9f3036a57f842e42
 
         # Set weights distribution
         if weights_distribution is None:
-            self.weights_distribution: Distribution = GaussianDistribution(
-<<<<<<< HEAD
+            self.weights_distribution: GaussianDistribution = GaussianDistribution(
                 (input_size, output_size)
-=======
-                (output_size, input_size)
->>>>>>> a35cacedeb886576177f41ba9f3036a57f842e42
             )
         else:
             self.weights_distribution = weights_distribution
 
         # Set bias distribution
         if bias_distribution is None:
-            self.bias_distribution: Distribution = GaussianDistribution((output_size,))
+            self.bias_distribution: GaussianDistribution = GaussianDistribution(
+                (output_size,)
+            )
         else:
             self.bias_distribution = bias_distribution
 
@@ -84,11 +76,7 @@ class Linear(BayesianModule):
         self.w = self.add_weight(
             name="weights",
             initializer=tf.constant_initializer(self.weights_distribution.sample()),
-<<<<<<< HEAD
             shape=(self.input_size, self.output_size),
-=======
-            shape=(self.output_size, self.input_size),
->>>>>>> a35cacedeb886576177f41ba9f3036a57f842e42
             trainable=False,
         )
 

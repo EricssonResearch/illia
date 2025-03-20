@@ -9,7 +9,7 @@ from typing import Literal
 import torch
 
 # Own modules
-from illia.torch.nn import BayesianModule
+from illia.torch.nn.base import BayesianModule
 
 
 class KLDivergenceLoss(torch.nn.Module):

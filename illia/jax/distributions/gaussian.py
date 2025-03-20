@@ -11,7 +11,7 @@ import jax.numpy as jnp
 from flax import nnx
 
 # Own modules
-from illia.jax.distributions import Distribution
+from illia.jax.distributions.base import Distribution
 
 
 class GaussianDistribution(Distribution):

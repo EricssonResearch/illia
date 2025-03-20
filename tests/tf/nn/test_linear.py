@@ -7,7 +7,8 @@ import pytest
 
 # own modules
 from illia.tf.nn import Linear
-from illia.tf.distributions import Distribution, GaussianDistribution
+from illia.tf.distributions import GaussianDistribution
+
 
 linear_test_keys = [
     "input_size",
@@ -42,8 +43,8 @@ COMBOS_WOMBOS = (
 def test_linear_init(
     input_size: int,
     output_size: int,
-    weights_distribution: Optional[Distribution],
-    bias_distribution: Optional[Distribution],
+    weights_distribution: Optional[GaussianDistribution],
+    bias_distribution: Optional[GaussianDistribution],
     batch_size: Optional[int],
 ) -> None:
     """
@@ -82,8 +83,8 @@ def test_linear_init(
 def test_linear_forward(
     input_size: int,
     output_size: int,
-    weights_distribution: Optional[Distribution],
-    bias_distribution: Optional[Distribution],
+    weights_distribution: Optional[GaussianDistribution],
+    bias_distribution: Optional[GaussianDistribution],
     batch_size: int,
 ) -> None:
     """
@@ -140,8 +141,8 @@ def test_linear_forward(
 def test_linear_backward(
     input_size: int,
     output_size: int,
-    weights_distribution: Optional[Distribution],
-    bias_distribution: Optional[Distribution],
+    weights_distribution: Optional[GaussianDistribution],
+    bias_distribution: Optional[GaussianDistribution],
     batch_size: int,
 ) -> None:
     """
@@ -198,8 +199,8 @@ def test_linear_backward(
 def test_linear_freeze(
     input_size: int,
     output_size: int,
-    weights_distribution: Optional[Distribution],
-    bias_distribution: Optional[Distribution],
+    weights_distribution: Optional[GaussianDistribution],
+    bias_distribution: Optional[GaussianDistribution],
     batch_size: int,
 ) -> None:
     """
@@ -274,8 +275,8 @@ def test_linear_freeze(
 def test_linear_kl_cost(
     input_size: int,
     output_size: int,
-    weights_distribution: Optional[Distribution],
-    bias_distribution: Optional[Distribution],
+    weights_distribution: Optional[GaussianDistribution],
+    bias_distribution: Optional[GaussianDistribution],
     batch_size: int,
 ) -> None:
     """

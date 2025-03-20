@@ -7,7 +7,7 @@ import pytest
 
 # own modules
 from illia.tf.nn import Embedding
-from illia.tf.distributions import Distribution, GaussianDistribution
+from illia.tf.distributions import GaussianDistribution
 
 embedding_test_keys = [
     "num_embeddings",
@@ -54,7 +54,7 @@ COMBOS_WOMBOS = (
 def test_embedding_init(
     num_embeddings: int,
     embeddings_dim: int,
-    weights_distribution: Optional[Distribution],
+    weights_distribution: Optional[GaussianDistribution],
     padding_idx: Optional[int],
     max_norm: Optional[float],
     norm_type: float,
@@ -117,7 +117,7 @@ def test_embedding_init(
 def test_embedding_forward(
     num_embeddings: int,
     embeddings_dim: int,
-    weights_distribution: Optional[Distribution],
+    weights_distribution: Optional[GaussianDistribution],
     padding_idx: Optional[int],
     max_norm: Optional[float],
     norm_type: float,
@@ -193,7 +193,7 @@ def test_embedding_forward(
 def test_embedding_backward(
     num_embeddings: int,
     embeddings_dim: int,
-    weights_distribution: Optional[Distribution],
+    weights_distribution: Optional[GaussianDistribution],
     padding_idx: Optional[int],
     max_norm: Optional[float],
     norm_type: float,
@@ -269,7 +269,7 @@ def test_embedding_backward(
 def test_embedding_freeze(
     num_embeddings: int,
     embeddings_dim: int,
-    weights_distribution: Optional[Distribution],
+    weights_distribution: Optional[GaussianDistribution],
     padding_idx: Optional[int],
     max_norm: Optional[float],
     norm_type: float,
@@ -363,7 +363,7 @@ def test_embedding_freeze(
 def test_linear_kl_cost(
     num_embeddings: int,
     embeddings_dim: int,
-    weights_distribution: Optional[Distribution],
+    weights_distribution: Optional[GaussianDistribution],
     padding_idx: Optional[int],
     max_norm: Optional[float],
     norm_type: float,

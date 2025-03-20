@@ -10,11 +10,8 @@ import torch
 import torch.nn.functional as F
 
 # Own modules
-from illia.torch.nn import BayesianModule
-from illia.torch.distributions import (
-    Distribution,
-    GaussianDistribution,
-)
+from illia.torch.nn.base import BayesianModule
+from illia.torch.distributions import GaussianDistribution
 
 
 class Linear(BayesianModule):
@@ -27,8 +24,8 @@ class Linear(BayesianModule):
         self,
         input_size: int,
         output_size: int,
-        weights_distribution: Optional[Distribution] = None,
-        bias_distribution: Optional[Distribution] = None,
+        weights_distribution: Optional[GaussianDistribution] = None,
+        bias_distribution: Optional[GaussianDistribution] = None,
     ) -> None:
         """
         This is the constructor of the Linear class.
@@ -36,9 +33,9 @@ class Linear(BayesianModule):
         Args:
             input_size: Size of each input sample.
             output_size: Size of each output sample.
-            weights_distribution: Distribution for the weights of the
+            weights_distribution: GaussianDistribution for the weights of the
                 layer.
-            bias_distribution: Distribution for the bias of the layer.
+            bias_distribution: GaussianDistribution for the bias of the layer.
         """
 
         # Call super-class constructor
@@ -46,7 +43,7 @@ class Linear(BayesianModule):
 
         # Set weights distribution
         if weights_distribution is None:
-            self.weights_distribution: Distribution = GaussianDistribution(
+            self.weights_distribution: GaussianDistribution = GaussianDistribution(
                 (output_size, input_size)
             )
         else:
@@ -54,7 +51,9 @@ class Linear(BayesianModule):
 
         # Set bias distribution
         if bias_distribution is None:
-            self.bias_distribution: Distribution = GaussianDistribution((output_size,))
+            self.bias_distribution: GaussianDistribution = GaussianDistribution(
+                (output_size,)
+            )
         else:
             self.bias_distribution = bias_distribution
 
@@ -63,13 +62,8 @@ class Linear(BayesianModule):
         self.bias = self.bias_distribution.sample()
 
         # Register buffers
-<<<<<<< HEAD
         self.register_buffer("weights", self.weights)
         self.register_buffer("bias", self.bias)
-=======
-        self.register_buffer("weights", weights)
-        self.register_buffer("bias", bias)
->>>>>>> a35cacedeb886576177f41ba9f3036a57f842e42
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
@@ -92,13 +86,8 @@ class Linear(BayesianModule):
 
         # Check if layer is frozen
         if not self.frozen:
-<<<<<<< HEAD
             self.weights = self.weights_distribution.sample()
             self.bias = self.bias_distribution.sample()
-=======
-            self.weights = self.weights_posterior.sample()
-            self.bias = self.bias_posterior.sample()
->>>>>>> a35cacedeb886576177f41ba9f3036a57f842e42
         elif self.weights is None or self.bias is None:
             raise ValueError("Module has been frozen with undefined weights")
 

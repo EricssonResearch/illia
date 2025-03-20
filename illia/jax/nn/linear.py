@@ -8,13 +8,7 @@ from typing import Optional
 # 3pps
 import jax
 import jax.numpy as jnp
-<<<<<<< HEAD
 from jax import lax
-=======
-from flax import nnx
-from jax import lax
-from flax.nnx import rnglib
->>>>>>> a35cacedeb886576177f41ba9f3036a57f842e42
 from flax.nnx.nn import dtypes
 from flax.typing import (
     Dtype,
@@ -23,7 +17,7 @@ from flax.typing import (
 )
 
 # Own modules
-from illia.jax.nn import BayesianModule
+from illia.jax.nn.base import BayesianModule
 from illia.jax.distributions import GaussianDistribution
 
 
@@ -52,27 +46,17 @@ class Linear(BayesianModule):
         param_dtype: Dtype = jnp.float32,
         precision: PrecisionLike = None,
         dot_general: DotGeneralT = lax.dot_general,
-<<<<<<< HEAD
     ) -> None:
 
         # Call super class constructor
         super().__init__()
 
         # Set attributes
-=======
-        rngs: rnglib.Rngs = nnx.Rngs(0),
-    ) -> None:
-        # call super class constructor
-        super().__init__()
-
-        # set attributes
->>>>>>> a35cacedeb886576177f41ba9f3036a57f842e42
         self.use_bias = use_bias
         self.dtype = dtype
         self.param_dtype = param_dtype
         self.precision = precision
         self.dot_general = dot_general
-<<<<<<< HEAD
         self.weights: jax.Array
         self.bias: jax.Array
 
@@ -85,20 +69,6 @@ class Linear(BayesianModule):
         # Set bias prior
         if bias_distribution is None:
             self.bias_distribution = GaussianDistribution((output_size,))
-=======
-
-        # set weights prior
-        if weights_distribution is None:
-            self.weights_distribution = GaussianDistribution((input_size, output_size))
-
-        else:
-            self.weights_distribution = weights_distribution
-
-        # set bias prior
-        if bias_distribution is None:
-            self.bias_distribution = GaussianDistribution((output_size,))
-
->>>>>>> a35cacedeb886576177f41ba9f3036a57f842e42
         else:
             self.bias_distribution = self.bias_distribution
 
@@ -113,7 +83,6 @@ class Linear(BayesianModule):
             output tensor. Dimension: [*, output size].
         """
 
-<<<<<<< HEAD
         # Sample if model not frozen
         if not self.frozen:
             self.weights = self.weights_distribution.sample()
@@ -121,16 +90,6 @@ class Linear(BayesianModule):
 
         # Compute ouputs
         inputs, _, _ = dtypes.promote_dtype(
-=======
-        # sample if model not frozen
-        if not self.frozen:
-            # sample
-            self.weights: jax.Array = self.weights_distribution.sample()
-            self.bias: jax.Array = self.bias_distribution.sample()
-
-        # compute ouputs
-        inputs, kernel, bias = dtypes.promote_dtype(
->>>>>>> a35cacedeb886576177f41ba9f3036a57f842e42
             (inputs, self.weights, self.bias), dtype=self.dtype
         )
         outputs = self.dot_general(
@@ -153,20 +112,12 @@ class Linear(BayesianModule):
             number of parameters of the layer.
         """
 
-<<<<<<< HEAD
         # Compute log probs
-=======
-        # compute log probs
->>>>>>> a35cacedeb886576177f41ba9f3036a57f842e42
         log_probs: jax.Array = self.weights_distribution.log_prob(
             self.weights
         ) + self.bias_distribution.log_prob(self.bias)
 
-<<<<<<< HEAD
         # Compute the number of parameters
-=======
-        # compute the number of parameters
->>>>>>> a35cacedeb886576177f41ba9f3036a57f842e42
         num_params: int = (
             self.weights_distribution.num_params + self.bias_distribution.num_params
         )

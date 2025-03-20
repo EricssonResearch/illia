@@ -10,7 +10,7 @@ import tensorflow as tf
 from keras import Model, saving, losses
 
 # Own modules
-from illia.tf.nn import BayesianModule
+from illia.tf.nn.base import BayesianModule
 
 
 @saving.register_keras_serializable(package="BayesianModule", name="KLDivergenceLoss")

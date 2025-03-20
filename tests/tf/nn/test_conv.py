@@ -7,7 +7,7 @@ import pytest
 
 # own modules
 from illia.tf.nn import Conv2d
-from illia.tf.distributions import Distribution, GaussianDistribution
+from illia.tf.distributions import GaussianDistribution
 
 # parametrized testing functions
 conv_test_keys = [

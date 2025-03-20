@@ -10,11 +10,8 @@ import torch
 import torch.nn.functional as F
 
 # Own modules
-from illia.torch.nn import BayesianModule
-from illia.torch.distributions import (
-    Distribution,
-    GaussianDistribution,
-)
+from illia.torch.nn.base import BayesianModule
+from illia.torch.distributions import GaussianDistribution
 
 
 class Conv2d(BayesianModule):
@@ -45,8 +42,8 @@ class Conv2d(BayesianModule):
         padding: Union[int, tuple[int, int]] = 0,
         dilation: Union[int, tuple[int, int]] = 1,
         groups: int = 1,
-        weights_distribution: Optional[Distribution] = None,
-        bias_distribution: Optional[Distribution] = None,
+        weights_distribution: Optional[GaussianDistribution] = None,
+        bias_distribution: Optional[GaussianDistribution] = None,
     ) -> None:
         """
         Definition of a Bayesian Convolution 2D layer.
@@ -84,7 +81,7 @@ class Conv2d(BayesianModule):
                 kernel_size = (kernel_size, kernel_size)
 
             # Define weights distribution
-            self.weights_distribution: Distribution = GaussianDistribution(
+            self.weights_distribution: GaussianDistribution = GaussianDistribution(
                 (output_channels, input_channels // groups, *kernel_size)
             )
         else:
@@ -93,7 +90,7 @@ class Conv2d(BayesianModule):
         # Set bias distribution
         if bias_distribution is None:
             # Define weights distribution
-            self.bias_distribution: Distribution = GaussianDistribution(
+            self.bias_distribution: GaussianDistribution = GaussianDistribution(
                 (output_channels,)
             )
         else:
