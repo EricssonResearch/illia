@@ -1,6 +1,9 @@
-# own modules
-from illia.tf.distributions.base import Distribution
+"""
+This module defines the imports for illia.tf.distributions.
+"""
+
+# Own modules
 from illia.tf.distributions.gaussian import GaussianDistribution
 
-# define all names to vbe imported
-__all__: list[str] = ["Distribution", "GaussianDistribution"]
+# Define all names to be imported
+__all__: list[str] = ["GaussianDistribution"]

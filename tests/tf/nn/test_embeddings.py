@@ -1,13 +1,13 @@
-# standard libraries
+# Standard libraries
 from typing import Optional, Union
 
 # 3pp
 import tensorflow as tf
 import pytest
 
-# own modules
+# Own modules
 from illia.tf.nn import Embedding
-from illia.tf.distributions import Distribution, GaussianDistribution
+from illia.tf.distributions import GaussianDistribution
 
 embedding_test_keys = [
     "num_embeddings",
@@ -54,7 +54,7 @@ COMBOS_WOMBOS = (
 def test_embedding_init(
     num_embeddings: int,
     embeddings_dim: int,
-    weights_distribution: Optional[Distribution],
+    weights_distribution: Optional[GaussianDistribution],
     padding_idx: Optional[int],
     max_norm: Optional[float],
     norm_type: float,
@@ -89,7 +89,7 @@ def test_embedding_init(
         None.
     """
 
-    # define embedding layer
+    # Define embedding layer
     model: Embedding = Embedding(
         num_embeddings,
         embeddings_dim,
@@ -101,7 +101,7 @@ def test_embedding_init(
         sparse,
     )
 
-    # check parameters length
+    # Check parameters length
     len_parameters: int = len(model.trainable_variables)
     assert (
         len_parameters == 2
@@ -117,7 +117,7 @@ def test_embedding_init(
 def test_embedding_forward(
     num_embeddings: int,
     embeddings_dim: int,
-    weights_distribution: Optional[Distribution],
+    weights_distribution: Optional[GaussianDistribution],
     padding_idx: Optional[int],
     max_norm: Optional[float],
     norm_type: float,
@@ -152,7 +152,7 @@ def test_embedding_forward(
         None.
     """
 
-    # define embedding layer
+    # Define embedding layer
     model: Embedding = Embedding(
         num_embeddings,
         embeddings_dim,
@@ -164,20 +164,20 @@ def test_embedding_forward(
         sparse,
     )
 
-    # get inputs
+    # Get inputs
     inputs = tf.random.stateless_uniform(
         (batch_size,), minval=0, maxval=num_embeddings, dtype=tf.int32, seed=(0, 0)
     )
 
-    # check parameters length
+    # Check parameters length
     outputs: tf.Tensor = model(inputs)
 
-    # check type of outputs
+    # Check type of outputs
     assert isinstance(
         outputs, tf.Tensor
     ), f"Incorrect outputs class, expected {tf.Tensor} and got {type(outputs)}"
 
-    # check shape
+    # Check shape
     assert outputs.shape == (batch_size, embeddings_dim), (
         f"Incorrect outputs shape, expected {(batch_size, embeddings_dim)} and got "
         f"{outputs.shape}"
@@ -193,7 +193,7 @@ def test_embedding_forward(
 def test_embedding_backward(
     num_embeddings: int,
     embeddings_dim: int,
-    weights_distribution: Optional[Distribution],
+    weights_distribution: Optional[GaussianDistribution],
     padding_idx: Optional[int],
     max_norm: Optional[float],
     norm_type: float,
@@ -228,7 +228,7 @@ def test_embedding_backward(
         None.
     """
 
-    # define embedding layer
+    # Define embedding layer
     model: Embedding = Embedding(
         num_embeddings,
         embeddings_dim,
@@ -240,7 +240,7 @@ def test_embedding_backward(
         sparse,
     )
 
-    # get inputs
+    # Get inputs
     inputs = tf.random.stateless_uniform(
         (batch_size,), minval=0, maxval=num_embeddings, dtype=tf.int32, seed=(0, 0)
     )
@@ -269,7 +269,7 @@ def test_embedding_backward(
 def test_embedding_freeze(
     num_embeddings: int,
     embeddings_dim: int,
-    weights_distribution: Optional[Distribution],
+    weights_distribution: Optional[GaussianDistribution],
     padding_idx: Optional[int],
     max_norm: Optional[float],
     norm_type: float,
@@ -304,7 +304,7 @@ def test_embedding_freeze(
         None.
     """
 
-    # define embedding layer
+    # Define embedding layer
     model: Embedding = Embedding(
         num_embeddings,
         embeddings_dim,
@@ -316,36 +316,36 @@ def test_embedding_freeze(
         sparse,
     )
 
-    # get inputs
+    # Get inputs
     inputs = tf.random.stateless_uniform(
         (batch_size,), minval=0, maxval=num_embeddings, dtype=tf.int32, seed=(0, 0)
     )
 
-    # compute outputs
+    # Compute outputs
     outputs_first: tf.Tensor = model(inputs)
     outputs_second: tf.Tensor = model(inputs)
 
-    # check if both outputs are equal
+    # Check if both outputs are equal
     assert outputs_first.numpy() != pytest.approx(
         outputs_second.numpy(), rel=1e-8, nan_ok=False
     ), "Incorrect outputs, different forwards are equal when at the initialization the layer should be unfrozen"
 
-    # freeze layer
+    # Freeze layer
     model.freeze()
 
-    # compute outputs
+    # Compute outputs
     outputs_first = model(inputs)
     outputs_second = model(inputs)
 
-    # check if both outputs are equal
+    # Check if both outputs are equal
     assert outputs_first.numpy() == pytest.approx(
         outputs_second.numpy(), rel=1e-8, nan_ok=False
     ), "Incorrect freezing, when layer is frozen outputs are not the same in different forward passes"
 
-    # unfreeze layer
+    # Unfreeze layer
     model.unfreeze()
 
-    # compute outputs
+    # Compute outputs
     outputs_first = model(inputs)
     outputs_second = model(inputs)
 
@@ -363,7 +363,7 @@ def test_embedding_freeze(
 def test_linear_kl_cost(
     num_embeddings: int,
     embeddings_dim: int,
-    weights_distribution: Optional[Distribution],
+    weights_distribution: Optional[GaussianDistribution],
     padding_idx: Optional[int],
     max_norm: Optional[float],
     norm_type: float,
@@ -397,7 +397,7 @@ def test_linear_kl_cost(
         None.
     """
 
-    # define embedding layer
+    # Define embedding layer
     model: Embedding = Embedding(
         num_embeddings,
         embeddings_dim,
@@ -409,32 +409,32 @@ def test_linear_kl_cost(
         sparse,
     )
 
-    # get inputs
+    # Get inputs
     inputs = tf.random.stateless_uniform(
         (batch_size,), minval=0, maxval=num_embeddings, dtype=tf.int32, seed=(0, 0)
     )
 
     outputs: tuple[tf.Tensor, int] = model.kl_cost()
 
-    # check type of output
+    # Check type of output
     assert isinstance(
         outputs, tuple
     ), f"Incorrect output type, expected {tuple} and got {type(outputs)}"
 
-    # check type of kl cost
+    # Check type of kl cost
     assert isinstance(outputs[0], tf.Tensor), (
         f"Incorrect output type in the first element, expected {tf.Tensor} and "
         f"got {type(outputs[0])}"
     )
 
-    # work around 'tensorflow.python.framework.ops.EagerTensor'
+    # Work around 'tensorflow.python.framework.ops.EagerTensor'
     nparams = outputs[1]
-    assert tf.int32 == nparams.dtype, (
-        f"Incorrect output type in the second element, expected {int} and got "
-        f"{outputs[1].dtype}"
+    assert isinstance(nparams, int), (
+        f"Incorrect output type in the second element, expected {int} and "
+        f"got {type(outputs[0])}"
     )
 
-    # check shape of kl cost
+    # Check shape of kl cost
     assert outputs[0].shape == (), (
         f"Incorrect shape of outputs first element, expected () and got "
         f"{outputs[0].shape}"

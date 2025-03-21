@@ -1,11 +1,11 @@
-# Available backends for illia
 _AVAILABLE_DNN_BACKENDS = ["torch", "tf", "jax"]
 _AVAILABLE_GNN_BACKENDS = ["torch_geometric", "dgl", "spektral"]
 
 
 def show_available_backends():
     """
-    This function prints the available deep neural network (DNN) and graph neural network (GNN) backends.
+    This function prints the available deep neural network (DNN) and
+    graph neural network (GNN) backends.
     """
 
     print("Available backends for DNN: ")

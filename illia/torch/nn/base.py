@@ -1,53 +1,65 @@
-# 3pp
+"""
+This module contains the code for the BayesianModule.
+"""
+
+# Standard libraries
+from abc import ABC
+
+# 3pps
 import torch
 
 
-class BayesianModule(torch.nn.Module):
-    def __init__(self) -> None:
+class BayesianModule(ABC, torch.nn.Module):
+    """
+    This class serves as the base class for Bayesian modules.
+    Any module designed to function as a Bayesian layer should inherit
+    from this class.
+    """
+
+    def __init__(self):
         """
-        This method is the constructor for BayesianModule.
+        Initializes the BayesianModule, setting the frozen state to
+        False.
         """
 
-        # call super class constructor
+        # Call super class constructor
         super().__init__()
 
-        # set state
+        # Set freeze false by default
         self.frozen: bool = False
 
-        # create attribute to know is a bayesian layer
+        # Create attribute to know is a bayesian layer
         self.is_bayesian: bool = True
 
     @torch.jit.export
     def freeze(self) -> None:
         """
-        This method freezes the layer.
-
-        Returns:
-            None.
+        Freezes the current module and all submodules that are instances
+        of BayesianModule. Sets the frozen state to True.
         """
 
+        # Set frozen indicator to true for current layer
         self.frozen = True
 
     @torch.jit.export
     def unfreeze(self) -> None:
         """
-        This method unfreezes the layer.
-
-        Returns:
-            None.
+        Unfreezes the current module and all submodules that are
+        instances of BayesianModule. Sets the frozen state to False.
         """
 
+        # Set frozen indicator to false for current layer
         self.frozen = False
 
     @torch.jit.export
     def kl_cost(self) -> tuple[torch.Tensor, int]:
         """
-        This is a default implementation of the kl_cots function,
-        which computes
+        Abstract method to compute the KL divergence cost.
+        Must be implemented by subclasses.
 
         Returns:
-            tensor with the kl cost.
-            number of parameters of the layer.
+            A tuple containing the KL divergence cost and its
+            associated integer value.
         """
 
         return torch.tensor([0.0]), 0

@@ -1,6 +1,9 @@
-# own modules
-from illia.torch.distributions.base import Distribution
+"""
+This module defines the imports for illia.torch.distributions.
+"""
+
+# Own modules
 from illia.torch.distributions.gaussian import GaussianDistribution
 
-# define all names to vbe imported
-__all__: list[str] = ["Distribution", "GaussianDistribution"]
+# Define all names to be imported
+__all__: list[str] = ["GaussianDistribution"]

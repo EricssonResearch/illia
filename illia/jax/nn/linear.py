@@ -1,0 +1,133 @@
+"""
+This module contains the code for Linear Bayesian layer.
+"""
+
+# Standard libraries
+from typing import Optional
+
+# 3pps
+import jax
+import jax.numpy as jnp
+from jax import lax
+from flax.nnx.nn import dtypes
+from flax.typing import (
+    Dtype,
+    PrecisionLike,
+    DotGeneralT,
+)
+
+# Own modules
+from illia.jax.nn.base import BayesianModule
+from illia.jax.distributions import GaussianDistribution
+
+
+class Linear(BayesianModule):
+    """
+    Bayesian Linear layer with trainable weights and biases,
+    supporting prior and posterior distributions.
+    """
+
+    def __init__(
+        self,
+        input_size: int,
+        output_size: int,
+        weights_distribution: Optional[GaussianDistribution] = None,
+        bias_distribution: Optional[GaussianDistribution] = None,
+        *,
+        use_bias: bool = True,
+        dtype: Optional[Dtype] = None,
+        param_dtype: Dtype = jnp.float32,
+        precision: PrecisionLike = None,
+        dot_general: DotGeneralT = lax.dot_general,
+    ) -> None:
+        """
+        This is the constructor of the Linear class.
+
+        Args:
+            input_size: Size of the input features.
+            output_size: Size of the output features.
+            weights_distribution: Prior distribution of the weights.
+            bias_distribution: Prior distribution of the bias.
+            use_bias: Whether to include a bias term in the layer.
+            dtype: Data type for computations.
+            param_dtype: Data type for parameters.
+            precision: Precision used in dot product operations.
+            dot_general: Function for computing generalized dot
+                products.
+        """
+
+        # Call super class constructor
+        super().__init__()
+
+        # Set attributes
+        self.use_bias = use_bias
+        self.dtype = dtype
+        self.param_dtype = param_dtype
+        self.precision = precision
+        self.dot_general = dot_general
+        self.weights: jax.Array
+        self.bias: jax.Array
+
+        # Set weights prior
+        if weights_distribution is None:
+            self.weights_distribution = GaussianDistribution((input_size, output_size))
+        else:
+            self.weights_distribution = weights_distribution
+
+        # Set bias prior
+        if bias_distribution is None:
+            self.bias_distribution = GaussianDistribution((output_size,))
+        else:
+            self.bias_distribution = self.bias_distribution
+
+    def __call__(self, inputs: jax.Array) -> jax.Array:
+        """
+        This methos is the forward pass of the model.
+
+        Args:
+            inputs: inputs of the model. Dimensions: [*, input size].
+
+        Returns:
+            output tensor. Dimension: [*, output size].
+        """
+
+        # Sample if model not frozen
+        if not self.frozen:
+            self.weights = self.weights_distribution.sample()
+            self.bias = self.bias_distribution.sample()
+
+        # Compute ouputs
+        inputs, _, _ = dtypes.promote_dtype(
+            (inputs, self.weights, self.bias), dtype=self.dtype
+        )
+        outputs = self.dot_general(
+            inputs,
+            self.weights,
+            (((inputs.ndim - 1,), (0,)), ((), ())),
+            precision=self.precision,
+        )
+        if self.bias is not None:
+            outputs += jnp.reshape(self.bias, (1,) * (outputs.ndim - 1) + (-1,))
+
+        return outputs
+
+    def kl_cost(self) -> tuple[jax.Array, int]:
+        """
+        This method computes the kl-divergence cost for the layer.
+
+        Returns:
+            kl cost.
+            number of parameters of the layer.
+        """
+
+        # Compute log probs
+        log_probs: jax.Array = self.weights_distribution.log_prob(
+            self.weights
+        ) + self.bias_distribution.log_prob(self.bias)
+
+        # Compute the number of parameters
+        num_params: int = (
+            self.weights_distribution.num_params + self.bias_distribution.num_params
+        )
+
+        return log_probs, num_params
