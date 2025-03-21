@@ -28,7 +28,7 @@ class KLDivergenceLoss(torch.nn.Module):
             weight: Scaling factor for the KL divergence loss.
         """
 
-        # Call super class constructor
+        # call super class constructor
         super().__init__()
 
         # Set parameters

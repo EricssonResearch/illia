@@ -48,7 +48,7 @@ class Embedding(BayesianModule):
             sparse: Use sparse tensor for weight gradients.
         """
 
-        # Call super class constructor
+        # call super class constructor
         super().__init__()
 
         # Set embeddings atributtes
