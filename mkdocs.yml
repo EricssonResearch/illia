@@ -10,15 +10,15 @@ theme:
   palette:
     - media: "(prefers-color-scheme: light)"
       scheme: default
-      primary: yellow
-      accent: yellow
+      primary: deep purple
+      accent: deep purple
       toggle:
         icon: material/lightbulb-outline
         name: "Switch to dark mode"
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
-      primary: yellow
-      accent: yellow
+      primary: deep purple
+      accent: deep purple
       toggle:
         icon: material/lightbulb
         name: "Switch to light mode"
@@ -41,7 +41,7 @@ theme:
     - navigation.indexes
     - search.suggest
     - toc.follow
-  logo: "assets/images/logo_black.png"
+  logo: "assets/images/logo_white.png"
   favicon: "assets/images/logo_black.png"
 
 use_directory_urls: false
@@ -58,6 +58,12 @@ markdown_extensions:
   - md_in_html
   - abbr
   - pymdownx.snippets
+  - pymdownx.arithmatex:
+      generic: true
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
 
 plugins:
   - search:

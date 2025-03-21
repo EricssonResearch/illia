@@ -115,7 +115,7 @@ class CGConv(MessagePassing):
         out = out + x[1]
         return out
 
-    def message(self, x_i, x_j, edge_attr: OptTensor) -> Tensor:
+    def message(self, x_i: Tensor, x_j: Tensor, edge_attr: OptTensor) -> Tensor:
         """
         Constructs messages to be passed to neighboring nodes.
 

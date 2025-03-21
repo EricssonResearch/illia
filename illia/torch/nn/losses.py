@@ -102,8 +102,8 @@ class ELBOLoss(torch.nn.Module):
         Computes the ELBO loss, averaging over multiple samples.
 
         Args:
-            y_true: True target values.
-            y_pred: Predicted values from the model.
+            outputs: Predicted values from the model.
+            targets: True target values.
             model: PyTorch model containing Bayesian modules.
 
         Returns:

@@ -1,8 +1,10 @@
 # 3pp
 import pytest
+import numpy as np
 import tensorflow as tf
+from keras.src.backend.tensorflow.core import Variable as BackendVariable
 
-# own modules
+# Own modules
 from illia.tf.distributions.gaussian import GaussianDistribution
 
 
@@ -36,7 +38,7 @@ def test_gaussian_init(
         None.
     """
 
-    # define model
+    # Define model
     model: GaussianDistribution = GaussianDistribution(
         shape=shape,
         mu_prior=mu_prior,
@@ -45,34 +47,39 @@ def test_gaussian_init(
         rho_init=rho_init,
     )
 
-    # check mu prior type
+    # Check mu prior type
     assert isinstance(model.mu_prior, tf.Tensor), (
         f"Incorrect type of mu prior, expected {tf.Tensor}, got "
         f"{type(model.mu_prior)}"
     )
 
-    # check std prior type
+    # Check std prior type
     assert isinstance(model.std_prior, tf.Tensor), (
         f"Incorrect type of std prior, expected {tf.Tensor}, got "
         f"{type(model.std_prior)}"
     )
 
-    # check mu type
-    assert isinstance(model.mu, tf.keras.Variable), (
-        f"Incorrect type of mu, expected {tf.keras.Variable}, got " f"{type(model.mu)}"
-    )
+    # Check mu type
+    assert isinstance(
+        model.mu, BackendVariable
+    ), f"Incorrect type of mu, expected {BackendVariable}, got {type(model.mu)}"
 
-    # check rho type
-    assert isinstance(model.rho, tf.keras.Variable), (
-        f"Incorrect type of rho, expected {tf.keras.Variable}, got "
-        f"{type(model.rho)}"
-    )
+    # Check rho type
+    assert isinstance(
+        model.rho, BackendVariable
+    ), f"Incorrect type of rho, expected {BackendVariable}, got {type(model.rho)}"
 
-    # check number of parameters
+    # Check number of parameters
     num_parameters: int = len(model.trainable_variables)
     assert (
         num_parameters == 2
     ), f"Incorrect number of parameters, expected 2, got {num_parameters}"
+
+    # Check the shape of the initialized tensors
+    assert model.mu_prior.shape == (), "Incorrect shape of mu_prior"
+    assert model.std_prior.shape == (), "Incorrect shape of std_prior"
+    assert model.mu.shape == shape, "Incorrect shape of mu"
+    assert model.rho.shape == shape, "Incorrect shape of rho"
 
     return None
 
@@ -99,7 +106,7 @@ def test_gaussian_sample(
         None.
     """
 
-    # define model
+    # Define model
     model: GaussianDistribution = GaussianDistribution(
         shape=shape,
         mu_prior=mu_prior,
@@ -108,30 +115,30 @@ def test_gaussian_sample(
         rho_init=rho_init,
     )
 
-    # execute backward pass
+    # Execute backward pass
     with tf.GradientTape() as tape:
         sample: tf.Tensor = model.sample()
     gradients = tape.gradient(sample, model.trainable_variables)
 
-    # check type of sampled tensor
+    # Check type of sampled tensor
     assert isinstance(sample, tf.Tensor), (
         f"Incorrect type of sample, expected {tf.Tensor}, got " f"{type(sample)}"
     )
 
-    # check shape
+    # Check shape
     assert (
         sample.shape == shape
     ), f"Incorrect shape, expected {shape}, got {sample.shape}"
 
-    # check number of gradients
+    # Check number of gradients
     num_gradients: int = len(gradients)
     assert (
         num_gradients == 2
     ), f"Incorrect number of gradients, expected 2, got {num_gradients}"
 
-    # check gradients shape
+    # Check gradients shape
     for i, gradient in enumerate(gradients):
-        # check shape of gradients
+        # Check shape of gradients
         assert gradient.shape == model.trainable_variables[i].shape, (
             f"Incorrect mu grads shape, expected {shape}, got "
             f"{model.trainable_variables[i].shape}"
@@ -162,7 +169,7 @@ def test_gaussian_log_prob(
         None.
     """
 
-    # define model
+    # Define model
     model: GaussianDistribution = GaussianDistribution(
         shape=shape,
         mu_prior=mu_prior,
@@ -171,34 +178,34 @@ def test_gaussian_log_prob(
         rho_init=rho_init,
     )
 
-    # iter over possible x values
+    # Iter over possible x values
     for x in [None, model.sample()]:
-        # execute forward & backward pass
+        # Execute forward & backward pass
         with tf.GradientTape() as tape:
             log_prob: tf.Tensor = model.log_prob(x)
         gradients = tape.gradient(log_prob, model.trainable_variables)
 
-        # check type of sampled tensor
+        # Check type of sampled tensor
         assert isinstance(log_prob, tf.Tensor), (
             f"Incorrect type of log prob, expected {tf.Tensor}, got "
             f"{type(log_prob)}, when input x is {type(x)}"
         )
 
-        # check shape
+        # Check shape
         assert log_prob.shape == (), (
             f"Incorrect shape of log prob, expected (), got "
             f"{log_prob.shape}, when input x is {type(x)}"
         )
 
-        # check number of gradients
+        # Check number of gradients
         num_gradients: int = len(gradients)
         assert (
             num_gradients == 2
         ), f"Incorrect number of gradients, expected 2, got {num_gradients}"
 
-        # check gradients shape
+        # Check gradients shape
         for i, gradient in enumerate(gradients):
-            # check shape of gradients
+            # Check shape of gradients
             assert gradient.shape == model.trainable_variables[i].shape, (
                 f"Incorrect mu grads shape, expected {shape}, got "
                 f"{model.trainable_variables[i].shape}"

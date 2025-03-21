@@ -1,11 +1,11 @@
-# standard libraries
+# Standard libraries
 from typing import Optional, Union
 
 # 3pp
 import tensorflow as tf
 import pytest
 
-# own modules
+# Own modules
 from illia.tf.nn import Linear
 from illia.tf.distributions import GaussianDistribution
 
@@ -62,12 +62,12 @@ def test_linear_init(
         None.
     """
 
-    # define linear layer
+    # Define linear layer
     model: Linear = Linear(
         input_size, output_size, weights_distribution, bias_distribution
     )
 
-    # check parameters length
+    # Check parameters length
     len_parameters: int = len(model.trainable_variables)
     assert (
         len_parameters == 4
@@ -103,29 +103,29 @@ def test_linear_forward(
         None.
     """
 
-    # define linear layer
+    # Define linear layer
     original_model: Linear = Linear(
         input_size, output_size, weights_distribution, bias_distribution
     )
 
-    # get scripted version
+    # Get scripted version
     model_scripted = tf.function(
         original_model,
     )
-    # get inputs
+    # Get inputs
     inputs = tf.random.uniform((batch_size, input_size))
 
     # iter over models
     for model in (original_model, original_model):  # , model_scripted):
-        # check parameters length
+        # Check parameters length
         outputs: tf.Tensor = model(inputs)
 
-        # check type of outputs
+        # Check type of outputs
         assert isinstance(
             outputs, tf.Tensor
         ), f"Incorrect outputs class, expected {tf.Tensor} and got {type(outputs)}"
 
-        # check outputs shape
+        # Check outputs shape
         assert outputs.shape == (batch_size, output_size), (
             f"Incorrect outputs shape, expected {(batch_size, output_size)} and got "
             f"{outputs.shape}"
@@ -161,17 +161,17 @@ def test_linear_backward(
         None.
     """
 
-    # define linear layer
+    # Define linear layer
     model: Linear = Linear(
         input_size, output_size, weights_distribution, bias_distribution
     )
 
-    # get scripted version
+    # Get scripted version
     model_scripted = tf.function(
         model,
     )
 
-    # get inputs
+    # Get inputs
     inputs = tf.random.uniform((batch_size, input_size))
     inputs = tf.Variable(inputs)
     with tf.GradientTape() as tape:
@@ -220,44 +220,44 @@ def test_linear_freeze(
         None.
     """
 
-    # define linear layer
+    # Define linear layer
     model: Linear = Linear(
         input_size, output_size, weights_distribution, bias_distribution
     )
 
-    # get scripted version
+    # Get scripted version
     model_scripted = tf.function(
         model,
     )
 
-    # get inputs
+    # Get inputs
     inputs = tf.random.uniform((batch_size, input_size))
 
-    # compute outputs
+    # Compute outputs
     outputs_first: tf.Tensor = model(inputs)
     outputs_second: tf.Tensor = model(inputs)
 
-    # check if both outputs are equal
+    # Check if both outputs are equal
     assert outputs_first.numpy() != pytest.approx(
         outputs_second.numpy(), rel=1e-8, nan_ok=False
     ), "Incorrect outputs, different forwards are equal when at the initialization the layer should be unfrozen"
 
-    # freeze layer
+    # Freeze layer
     model.freeze()
 
-    # compute outputs
+    # Compute outputs
     outputs_first = model(inputs)
     outputs_second = model(inputs)
 
-    # check if both outputs are equal
+    # Check if both outputs are equal
     assert outputs_first.numpy() == pytest.approx(
         outputs_second.numpy(), rel=1e-8, nan_ok=False
     ), "Incorrect freezing, when layer is frozen outputs are not the same in different forward passes"
 
-    # unfreeze layer
+    # Unfreeze layer
     model.unfreeze()
 
-    # compute outputs
+    # Compute outputs
     outputs_first = model(inputs)
     outputs_second = model(inputs)
 
@@ -295,38 +295,37 @@ def test_linear_kl_cost(
         None.
     """
 
-    # define linear layer
+    # Define linear layer
     model: Linear = Linear(
         input_size, output_size, weights_distribution, bias_distribution
     )
 
-    # get scripted version
-    # compile_jit = True #TODO
+    # Get scripted version
+    # Compile_jit = True #TODO
     model_scripted = tf.function(model)
 
-    # iter over models
-    # for model in (original_model, original_model): #, model_scripted):
-    # compute outputs
+    # Compute outputs
     outputs: tuple[tf.Tensor, int] = model.kl_cost()
 
-    # check type of output
+    # Check type of output
     assert isinstance(
         outputs, tuple
     ), f"Incorrect output type, expected {tuple} and got {type(outputs)}"
 
-    # check type of kl cost
+    # Check type of kl cost
     assert isinstance(outputs[0], tf.Tensor), (
         f"Incorrect output type in the first element, expected {tf.Tensor} and "
         f"got {type(outputs[0])}"
     )
 
-    # work around 'tensorflow.python.framework.ops.EagerTensor'
+    # Work around 'tensorflow.python.framework.ops.EagerTensor'
     nparams = outputs[1]
-    assert isinstance(
-        nparams, int
-    ), f"Incorrect output type in the second element, expected {int}"
+    assert isinstance(nparams, int), (
+        f"Incorrect output type in the second element, expected {int} and "
+        f"got {type(outputs[0])}"
+    )
 
-    # check shape of kl cost
+    # Check shape of kl cost
     assert outputs[0].shape == (), (
         f"Incorrect shape of outputs first element, expected () and got "
         f"{outputs[0].shape}"

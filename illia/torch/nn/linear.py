@@ -57,37 +57,6 @@ class Linear(BayesianModule):
         self.register_buffer("weights", self.weights_distribution.sample())
         self.register_buffer("bias", self.bias_distribution.sample())
 
-    def forward(self, inputs: torch.Tensor) -> torch.Tensor:
-        """
-        Performs a forward pass through the Bayesian Linear layer.
-
-        If the layer is not frozen, it samples weights and bias from
-        their respective posterior distributions. If the layer is
-        frozen and the weights or bias are not initialized, it samples
-        them from their respective posterior distributions.
-
-        Args:
-            inputs: input tensor. Dimensions: [batch, *].
-
-        Raises:
-            ValueError: Module has been frozen with undefined weights.
-
-        Returns:
-            outputs tensor. Dimensions: [batch, *].
-        """
-
-        # Check if layer is frozen
-        if not self.frozen:
-            self.weights = self.weights_distribution.sample()
-            self.bias = self.bias_distribution.sample()
-        elif self.weights is None or self.bias is None:
-            raise ValueError("Module has been frozen with undefined weights")
-
-        # Run torch forward
-        outputs: torch.Tensor = F.linear(inputs, self.weights, self.bias)
-
-        return outputs
-
     @torch.jit.export
     def freeze(self) -> None:
         """
@@ -101,16 +70,16 @@ class Linear(BayesianModule):
         self.frozen = True
 
         # Sample weights if they are undefined
-        if self.weights is None:
-            self.weights = self.weights_distribution.sample()
+        if self.weights is None:  # type: ignore
+            self.weights = self.weights_distribution.sample()  # pylint: disable=W0201
 
         # Sample bias is they are undefined
-        if self.bias is None:
-            self.bias = self.bias_distribution.sample()
+        if self.bias is None:  # type: ignore
+            self.bias = self.bias_distribution.sample()  # pylint: disable=W0201
 
         # Detach weights and bias
-        self.weights = self.weights.detach()
-        self.bias = self.bias.detach()
+        self.weights = self.weights.detach()  # pylint: disable=W0201
+        self.bias = self.bias.detach()  # pylint: disable=W0201
 
     @torch.jit.export
     def kl_cost(self) -> tuple[torch.Tensor, int]:
@@ -134,3 +103,34 @@ class Linear(BayesianModule):
         )
 
         return log_probs, num_params
+
+    def forward(self, inputs: torch.Tensor) -> torch.Tensor:
+        """
+        Performs a forward pass through the Bayesian Linear layer.
+
+        If the layer is not frozen, it samples weights and bias from
+        their respective posterior distributions. If the layer is
+        frozen and the weights or bias are not initialized, it samples
+        them from their respective posterior distributions.
+
+        Args:
+            inputs: input tensor. Dimensions: [batch, *].
+
+        Raises:
+            ValueError: Module has been frozen with undefined weights.
+
+        Returns:
+            outputs tensor. Dimensions: [batch, *].
+        """
+
+        # Check if layer is frozen
+        if not self.frozen:
+            self.weights = self.weights_distribution.sample()  # pylint: disable=W0201
+            self.bias = self.bias_distribution.sample()  # pylint: disable=W0201
+        elif self.weights is None or self.bias is None:
+            raise ValueError("Module has been frozen with undefined weights")
+
+        # Run torch forward
+        outputs: torch.Tensor = F.linear(inputs, self.weights, self.bias)
+
+        return outputs

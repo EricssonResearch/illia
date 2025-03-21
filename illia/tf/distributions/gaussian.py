@@ -7,6 +7,7 @@ import math
 from typing import Optional
 
 # 3pps
+import keras
 import tensorflow as tf
 
 # Own modules
@@ -44,33 +45,31 @@ class GaussianDistribution(Distribution):
 
         # Set parameters
         self.shape = shape
-        self.mu_init = tf.constant(mu_init)
-        self.rho_init = tf.constant(rho_init)
-        self.mu: tf.Variable = self.add_weight(
-            initializer=tf.random.normal(
-                shape=self.shape, mean=self.mu_init, stddev=0.1
-            ),
-            trainable=True,
-            name="mu",
-        )
-        self.rho: tf.Variable = self.add_weight(
-            initializer=tf.random.normal(
-                shape=self.shape, mean=self.rho_init, stddev=0.1
-            ),
-            trainable=True,
-            name="rho",
-        )
+        self.mu_init = mu_init
+        self.rho_init = rho_init
 
         # Define priors
         self.mu_prior: tf.Tensor = tf.convert_to_tensor(mu_prior, dtype=tf.float32)
         self.std_prior: tf.Tensor = tf.convert_to_tensor(std_prior, dtype=tf.float32)
 
+        # Define trainable parameters
+        self.mu = self.add_weight(
+            shape=self.shape,
+            initializer=keras.initializers.RandomNormal(mean=self.mu_init, stddev=0.1),
+            trainable=True,
+            name=f"{self.name}_mu",
+        )
+
+        self.rho = self.add_weight(
+            shape=self.shape,
+            initializer=keras.initializers.RandomNormal(mean=self.rho_init, stddev=0.1),
+            trainable=True,
+            name=f"{self.name}_rho",
+        )
+
     def sample(self) -> tf.Tensor:
         """
         Samples from the distribution using the current parameters.
-
-        Args:
-            seed: A random seed for generating the sample.
 
         Returns:
             A sampled tensor.
@@ -134,4 +133,4 @@ class GaussianDistribution(Distribution):
             The number of parameters as an integer.
         """
 
-        return tf.reshape(self.mu, [-1]).shape[0]
+        return int(tf.size(self.mu).numpy())

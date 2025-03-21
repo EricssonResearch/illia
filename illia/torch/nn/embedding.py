@@ -74,6 +74,44 @@ class Embedding(BayesianModule):
         # Sample initial weights and register buffers
         self.register_buffer("weights", weights)
 
+    @torch.jit.export
+    def freeze(self) -> None:
+        """
+        This method freezes the layer.
+
+        Returns:
+            None.
+        """
+
+        # Set indicator
+        self.frozen = True
+
+        # Sample weights if they are undefined
+        if self.weights is None:  # type: ignore
+            self.weights = self.weights_distribution.sample()  # pylint: disable=W0201
+
+        # Detach weights
+        self.weights = self.weights.detach()  # pylint: disable=W0201
+
+    @torch.jit.export
+    def kl_cost(self) -> tuple[torch.Tensor, int]:
+        """
+        Computes the Kullback-Leibler (KL) divergence cost for the
+        layer's weights and bias.
+
+        Returns:
+            Tuple containing KL divergence cost and total number of
+            parameters.
+        """
+
+        # Get log posterior and log prior
+        log_probs: torch.Tensor = self.weights_distribution.log_prob(self.weights)
+
+        # Get number of parameters
+        num_params: int = self.weights_distribution.num_params()
+
+        return log_probs, num_params
+
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
         Performs a forward pass through the Bayesian Embedding layer.
@@ -94,7 +132,7 @@ class Embedding(BayesianModule):
 
         # forward depeding of frozen state
         if not self.frozen:
-            self.weights = self.weights_distribution.sample()
+            self.weights = self.weights_distribution.sample()  # pylint: disable=W0201
         elif self.weights is None:
             raise ValueError("Module has been frozen with undefined weights")
 
@@ -104,40 +142,3 @@ class Embedding(BayesianModule):
         )
 
         return outputs
-
-    @torch.jit.export
-    def freeze(self) -> None:
-        """
-        This method freezes the layer.
-
-        Returns:
-            None.
-        """
-
-        # Set indicator
-        self.frozen = True
-
-        # Sample weights if they are undefined
-        if self.weights is None:
-            self.weights = self.weights_distribution.sample()
-
-        # Detach weights
-        self.weights = self.weights.detach()
-
-    def kl_cost(self) -> tuple[torch.Tensor, int]:
-        """
-        Computes the Kullback-Leibler (KL) divergence cost for the
-        layer's weights and bias.
-
-        Returns:
-            Tuple containing KL divergence cost and total number of
-            parameters.
-        """
-
-        # Get log posterior and log prior
-        log_probs: torch.Tensor = self.weights_distribution.log_prob(self.weights)
-
-        # Get number of parameters
-        num_params: int = self.weights_distribution.num_params()
-
-        return log_probs, num_params

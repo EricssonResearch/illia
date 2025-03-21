@@ -106,6 +106,55 @@ class Conv2d(BayesianModule):
 
         return None
 
+    @torch.jit.export
+    def freeze(self) -> None:
+        """
+        This method is to freeze the layer.
+
+        Returns:
+            None.
+        """
+
+        # Set indicator
+        self.frozen = True
+
+        # Sample weights if they are undefined
+        if self.weights is None:  # type: ignore
+            self.weights = self.weights_distribution.sample()  # pylint: disable=W0201
+
+        # Sample bias is they are undefined
+        if self.bias is None:  # type: ignore
+            self.bias = self.bias_distribution.sample()  # pylint: disable=W0201
+
+        # Detach weights and bias
+        self.weights = self.weights.detach()  # pylint: disable=W0201
+        self.bias = self.bias.detach()  # pylint: disable=W0201
+
+        return None
+
+    @torch.jit.export
+    def kl_cost(self) -> tuple[torch.Tensor, int]:
+        """
+        Calculate the Kullback-Leibler (KL) divergence cost for the
+        weights and bias of the layer.
+
+        Returns:
+            KL divergence cost. Dimensions: [].
+            number of parameters.
+        """
+
+        # Compute log probs
+        log_probs: torch.Tensor = self.weights_distribution.log_prob(
+            self.weights
+        ) + self.bias_distribution.log_prob(self.bias)
+
+        # Compute number of parameters
+        num_params: int = (
+            self.weights_distribution.num_params() + self.bias_distribution.num_params()
+        )
+
+        return log_probs, num_params
+
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
         Performs a forward pass through the Bayesian Convolution 2D
@@ -138,52 +187,3 @@ class Conv2d(BayesianModule):
         return F.conv2d(  # pylint: disable=E1102
             inputs, self.weights, self.bias, *self.conv_params  # type: ignore
         )
-
-    @torch.jit.export
-    def freeze(self) -> None:
-        """
-        This method is to freeze the layer.
-
-        Returns:
-            None.
-        """
-
-        # Set indicator
-        self.frozen = True
-
-        # Sample weights if they are undefined
-        if self.weights is None:
-            self.weights = self.weights_distribution.sample()  # pylint: disable=W0201
-
-        # Sample bias is they are undefined
-        if self.bias is None:
-            self.bias = self.bias_distribution.sample()  # pylint: disable=W0201
-
-        # Detach weights and bias
-        self.weights = self.weights.detach()  # pylint: disable=W0201
-        self.bias = self.bias.detach()  # pylint: disable=W0201
-
-        return None
-
-    @torch.jit.export
-    def kl_cost(self) -> tuple[torch.Tensor, int]:
-        """
-        Calculate the Kullback-Leibler (KL) divergence cost for the
-        weights and bias of the layer.
-
-        Returns:
-            KL divergence cost. Dimensions: [].
-            number of parameters.
-        """
-
-        # Compute log probs
-        log_probs: torch.Tensor = self.weights_distribution.log_prob(
-            self.weights
-        ) + self.bias_distribution.log_prob(self.bias)
-
-        # Compute number of parameters
-        num_params: int = (
-            self.weights_distribution.num_params() + self.bias_distribution.num_params()
-        )
-
-        return log_probs, num_params

@@ -23,15 +23,8 @@ from illia.jax.distributions import GaussianDistribution
 
 class Linear(BayesianModule):
     """
-    This class is the Linear bayesian layer.
-
-    Attr:
-        input_size: input size of the Linear Layer.
-        output_size: output size of the Linear layer.
-        weights_posterior:
-
-    Returns:
-        _description_
+    Bayesian Linear layer with trainable weights and biases,
+    supporting prior and posterior distributions.
     """
 
     def __init__(
@@ -47,6 +40,21 @@ class Linear(BayesianModule):
         precision: PrecisionLike = None,
         dot_general: DotGeneralT = lax.dot_general,
     ) -> None:
+        """
+        This is the constructor of the Linear class.
+
+        Args:
+            input_size: Size of the input features.
+            output_size: Size of the output features.
+            weights_distribution: Prior distribution of the weights.
+            bias_distribution: Prior distribution of the bias.
+            use_bias: Whether to include a bias term in the layer.
+            dtype: Data type for computations.
+            param_dtype: Data type for parameters.
+            precision: Precision used in dot product operations.
+            dot_general: Function for computing generalized dot
+                products.
+        """
 
         # Call super class constructor
         super().__init__()

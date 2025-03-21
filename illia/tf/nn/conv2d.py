@@ -81,8 +81,6 @@ class Conv2d(BayesianModule):
         self.stride = stride
         self.groups = groups
         self.data_format = data_format
-        self.w: tf.Variable
-        self.b: tf.Variable
 
         # Set kernel size
         if isinstance(kernel_size, int):
@@ -117,7 +115,7 @@ class Conv2d(BayesianModule):
             ), 'Padding arg must be either "SAME" or "VALID"'
             self.padding = padding.upper()
 
-        # GaussianDistribution initialization
+        # Set weights distribution
         self._weights_distribution_shape = (
             *self.kernel_size,
             input_channels // groups,
@@ -125,7 +123,7 @@ class Conv2d(BayesianModule):
         )
 
         if weights_distribution is None:
-            self.weights_distribution: GaussianDistribution = GaussianDistribution(
+            self.weights_distribution = GaussianDistribution(
                 self._weights_distribution_shape
             )
         else:
@@ -137,11 +135,10 @@ class Conv2d(BayesianModule):
             )
             self.weights_distribution = weights_distribution
 
+        # Set bias distribution
         self._bias_distribution_shape = (output_channels,)
         if bias_distribution is None:
-            self.bias_distribution: GaussianDistribution = GaussianDistribution(
-                self._bias_distribution_shape
-            )
+            self.bias_distribution = GaussianDistribution(self._bias_distribution_shape)
         else:
             assert bias_distribution.sample().shape == self._bias_distribution_shape, (
                 f"Expected shape  {self._bias_distribution_shape}, "
@@ -149,30 +146,20 @@ class Conv2d(BayesianModule):
             )
             self.bias_distribution = bias_distribution
 
-    def build(self, input_shape: tf.TensorShape) -> None:
-        """
-        Builds the conv2d layer.
-
-        Args:
-            input_shape: The shape of the input tensor.
-        """
-
         # Register non-trainable variables
         self.w = self.add_weight(
+            shape=self._weights_distribution_shape,
             initializer=tf.constant_initializer(self.weights_distribution.sample()),
             trainable=False,
             name="weights",
-            shape=self._weights_distribution_shape,
         )
 
         self.b = self.add_weight(
+            shape=self._bias_distribution_shape,
             initializer=tf.constant_initializer(self.bias_distribution.sample()),
             trainable=False,
             name="bias",
-            shape=self._bias_distribution_shape,
         )
-
-        super().build(input_shape)
 
     @staticmethod
     def channels_first_to_last(shape: list):
