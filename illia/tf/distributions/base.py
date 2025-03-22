@@ -8,10 +8,10 @@ from typing import Optional
 
 # 3pps
 import tensorflow as tf
-from keras import Model
+from keras import layers
 
 
-class Distribution(ABC, Model):
+class Distribution(ABC, layers.Layer):
     """
     This class is the base class for distributions.
     """

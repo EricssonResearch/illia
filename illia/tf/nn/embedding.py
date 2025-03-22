@@ -10,12 +10,8 @@ import tensorflow as tf
 from keras import saving
 
 # Own modules
-from illia.tf.nn import BayesianModule
-from illia.tf.distributions import (
-    Distribution,
-    GaussianDistribution,
-)
-
+from illia.tf.nn.base import BayesianModule
+from illia.tf.distributions import GaussianDistribution
 
 @saving.register_keras_serializable(package="BayesianModule", name="Embedding")
 class Embedding(BayesianModule):
@@ -28,7 +24,7 @@ class Embedding(BayesianModule):
         self,
         num_embeddings: int,
         embeddings_dim: int,
-        weights_distribution: Optional[Distribution] = None,
+        weights_distribution: Optional[GaussianDistribution] = None,
         padding_idx: Optional[int] = None,
         max_norm: Optional[float] = None,
         norm_type: float = 2.0,
@@ -42,7 +38,7 @@ class Embedding(BayesianModule):
         Args:
             num_embeddings: Number of unique embeddings.
             embeddings_dim: Dimension of each embedding vector.
-            weights_distribution: Distribution for the weights of the
+            weights_distribution: GaussianDistribution for the weights of the
                 layer.
             padding_idx: Index for padding, which keeps gradient
                 constant.
@@ -65,7 +61,7 @@ class Embedding(BayesianModule):
         self.sparse = sparse
 
         # Set weights distribution
-        self.weights_distribution: Distribution
+        self.weights_distribution: GaussianDistribution
         if weights_distribution is None:
             self.weights_distribution = GaussianDistribution(
                 (num_embeddings, embeddings_dim)
@@ -73,23 +69,15 @@ class Embedding(BayesianModule):
         else:
             self.weights_distribution = weights_distribution
 
-    def build(self, input_shape: tf.TensorShape) -> None:
-        """
-        Builds the Embedding layer.
-
-        Args:
-            input_shape: The shape of the input tensor.
-        """
-
         # Create a variable for weights
-        self.w = self.add_weight(
-            initial_value=tf.constant_initializer(self.weights_distribution.sample()),
+        self.w: tf.Variable = self.add_weight(
+            initializer=tf.constant_initializer(
+                self.weights_distribution.sample().numpy()
+            ),
             trainable=False,
             name="weights",
             shape=(self.num_embeddings, self.embeddings_dim),
         )
-
-        super().build(input_shape)
 
     @tf.function
     def _embedding(
@@ -121,7 +109,7 @@ class Embedding(BayesianModule):
         if sparse is not None:
             embeddings = tf.nn.embedding_lookup(weight, inputs)
         else:
-            embeddings = tf.nn.embedding_lookup_sparse(weight, inputs)
+            embeddings = tf.nn.embedding_lookup_sparse(weight, inputs, sp_weights=None)
 
         if padding_idx is not None:
             padding_mask = tf.not_equal(inputs, padding_idx)
@@ -199,3 +187,23 @@ class Embedding(BayesianModule):
         num_params: int = self.weights_distribution.num_params
 
         return log_probs, num_params
+
+    def call(self, inputs: tf.Tensor) -> tf.Tensor:
+
+        # Forward depeding of frozen state
+        if not self.frozen:
+            self.w.assign(self.weights_distribution.sample())
+        else:
+            raise ValueError("Module has been frozen with undefined weights")
+
+        # Run tensorflow forward
+        outputs: tf.Tensor = self._embedding(
+            inputs,
+            self.w,
+            self.padding_idx,
+            self.max_norm,
+            self.norm_type,
+            self.sparse,
+        )
+
+        return outputs

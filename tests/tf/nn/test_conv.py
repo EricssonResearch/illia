@@ -1,15 +1,27 @@
+<<<<<<< HEAD
 # standard libraries
+=======
+# Standard libraries
+>>>>>>> dev
 from typing import Optional, Union
 
 # 3pp
 import tensorflow as tf
 import pytest
 
+<<<<<<< HEAD
 # own modules
 from illia.tf.nn import Conv2d
 from illia.tf.distributions import Distribution, GaussianDistribution
 
 # parametrized testing functions
+=======
+# Own modules
+from illia.tf.nn import Conv2d
+from illia.tf.distributions import GaussianDistribution
+
+# Parametrized testing functions
+>>>>>>> dev
 conv_test_keys = [
     "input_channels",
     "output_channels",
@@ -120,7 +132,11 @@ def test_conv_init(
         data_format,
     )
 
+<<<<<<< HEAD
     # check parameters length (of distribution)
+=======
+    # Check parameters length (of distribution)
+>>>>>>> dev
     len_parameters: int = len(original_model.trainable_variables)
     assert (
         len_parameters == 4
@@ -167,7 +183,11 @@ def test_conv_freeze(
     output_1 = model(input)
     output_2 = model(input)
 
+<<<<<<< HEAD
     # model_scripted = tf.function(model, jit_compile=True)
+=======
+    # Model_scripted = tf.function(model, jit_compile=True)
+>>>>>>> dev
 
     assert output_2.numpy() != pytest.approx(
         output_1.numpy(), rel=1e-6, nan_ok=False
@@ -179,7 +199,11 @@ def test_conv_freeze(
     output_1 = model(input)
     output_2 = model(input)
 
+<<<<<<< HEAD
     # model_scripted = tf.function(model, jit_compile=True)
+=======
+    # Model_scripted = tf.function(model, jit_compile=True)
+>>>>>>> dev
 
     assert output_2.numpy() == pytest.approx(
         output_1.numpy(), rel=1e-6, nan_ok=False
@@ -268,28 +292,47 @@ def test_conv_kl_loss(
 
     input = tf.random.stateless_uniform(expected_input_shape, seed=(0, 0))
 
+<<<<<<< HEAD
     # compute outputs
     outputs: tuple[tf.Tensor, int] = model.kl_cost()
 
     # check type of output
+=======
+    # Compute outputs
+    outputs: tuple[tf.Tensor, int] = model.kl_cost()
+
+    # Check type of output
+>>>>>>> dev
     assert isinstance(
         outputs, tuple
     ), f"Incorrect output type, expected {tuple} and got {type(outputs)}"
 
+<<<<<<< HEAD
     # check type of kl cost
+=======
+    # Check type of kl cost
+>>>>>>> dev
     assert isinstance(outputs[0], tf.Tensor), (
         f"Incorrect output type in the first element, expected {tf.Tensor} and "
         f"got {type(outputs[0])}"
     )
 
+<<<<<<< HEAD
     # check type of num params
     # work around 'tensorflow.python.framework.ops.EagerTensor'
+=======
+    # Check type of num params
+>>>>>>> dev
     nparams = outputs[1]
     assert isinstance(
         nparams, int
     ), f"Incorrect output type in the second element, expected {int}"
 
+<<<<<<< HEAD
     # check shape of kl cost
+=======
+    # Check shape of kl cost
+>>>>>>> dev
     assert outputs[0].shape == (), (
         f"Incorrect shape of outputs first element, expected () and got "
         f"{outputs[0].shape}"

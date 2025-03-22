@@ -73,7 +73,7 @@ class Embedding(BayesianModule):
                 sparse tensor. Defaults to False.
         """
 
-        # Call super class constructor
+        # call super class constructor
         super().__init__()
 
         # Set embeddings atributtes

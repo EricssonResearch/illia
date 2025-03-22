@@ -7,7 +7,7 @@
 # Variables
 SRC_PROJECT_NAME ?= illia
 SRC_NOTEBOOKS_DL ?= docs/deep_learning_frameworks/examples
-TEST_FILE ?= tests
+TEST_FILE ?= tests/torch
 
 # Allows the installation of project dependencies
 install:

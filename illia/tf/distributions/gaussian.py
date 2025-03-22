@@ -7,10 +7,11 @@ import math
 from typing import Optional
 
 # 3pps
+import keras
 import tensorflow as tf
 
 # Own modules
-from . import Distribution
+from illia.tf.distributions.base import Distribution
 
 
 class GaussianDistribution(Distribution):
@@ -51,43 +52,24 @@ class GaussianDistribution(Distribution):
         self.mu_prior: tf.Tensor = tf.convert_to_tensor(mu_prior, dtype=tf.float32)
         self.std_prior: tf.Tensor = tf.convert_to_tensor(std_prior, dtype=tf.float32)
 
-    def build(self, input_shape: tf.TensorShape) -> None:
-        """
-        Builds the GaussianDistribution layer.
-
-        Args:
-            input_shape: The shape of the input tensor.
-        """
-
-        # Define initial mu and rho
-        self.mu: tf.Variable = tf.Variable(
-            initial_value=tf.random.normal(
-                shape=self.shape, mean=self.mu_init, stddev=0.1
-            ),
+        # Define trainable parameters
+        self.mu = self.add_weight(
+            shape=self.shape,
+            initializer=keras.initializers.RandomNormal(mean=self.mu_init, stddev=0.1),
             trainable=True,
-            name="mu",
-            shape=(),
-            dtype=tf.float32,
+            name=f"{self.name}_mu",
         )
 
-        self.rho: tf.Variable = tf.Variable(
-            initial_value=tf.random.normal(
-                shape=self.shape, mean=self.rho_init, stddev=0.1
-            ),
+        self.rho = self.add_weight(
+            shape=self.shape,
+            initializer=keras.initializers.RandomNormal(mean=self.rho_init, stddev=0.1),
             trainable=True,
-            name="rho",
-            shape=(),
-            dtype=tf.float32,
+            name=f"{self.name}_rho",
         )
-
-        super().build(input_shape)
 
     def sample(self) -> tf.Tensor:
         """
         Samples from the distribution using the current parameters.
-
-        Args:
-            seed: A random seed for generating the sample.
 
         Returns:
             A sampled tensor.
@@ -151,4 +133,4 @@ class GaussianDistribution(Distribution):
             The number of parameters as an integer.
         """
 
-        return tf.reshape(self.mu, [-1]).shape[0]
+        return int(tf.size(self.mu).numpy())

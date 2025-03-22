@@ -7,11 +7,11 @@ from abc import ABC
 
 # 3pps
 import tensorflow as tf
-from keras import Model, saving
+from keras import layers, saving
 
 
 @saving.register_keras_serializable(package="BayesianModule", name="BayesianModule")
-class BayesianModule(ABC, Model):
+class BayesianModule(ABC, layers.Layer):
     """
     This class implements a BayesianModule. This is still an abstract
     class since it does not implement the forward method.

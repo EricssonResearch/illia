@@ -10,7 +10,7 @@ import tensorflow as tf
 from keras import Model, saving, losses
 
 # Own modules
-from illia.tf.nn import BayesianModule
+from illia.tf.nn.base import BayesianModule
 
 
 @saving.register_keras_serializable(package="BayesianModule", name="KLDivergenceLoss")
@@ -120,6 +120,27 @@ class ELBOLoss(Model):
         self.kl_weight = kl_weight
         self.kl_loss = KLDivergenceLoss(weight=kl_weight)
 
+    def get_config(self) -> dict:
+        """
+        Retrieves the configuration of the ELBO loss.
+
+        Returns:
+            Dictionary containing ELBO loss configuration.
+        """
+
+        # Get the base configuration
+        base_config = super().get_config()
+
+        # Add the custom configurations
+        custom_config = {
+            "loss_function": self.loss_function,
+            "num_samples": self.num_samples,
+            "kl_weight": self.kl_weight,
+        }
+
+        # Combine both configurations
+        return {**base_config, **custom_config}
+
     def call(self, y_true: tf.Tensor, y_pred: tf.Tensor, model: Model) -> tf.Tensor:
         """
         Computes the ELBO loss, averaging over multiple samples.
@@ -142,24 +163,3 @@ class ELBOLoss(Model):
         loss_value = tf.divide(loss_value, tf.cast(self.num_samples, tf.float32))
 
         return loss_value
-
-    def get_config(self) -> dict:
-        """
-        Retrieves the configuration of the ELBO loss.
-
-        Returns:
-            Dictionary containing ELBO loss configuration.
-        """
-
-        # Get the base configuration
-        base_config = super().get_config()
-
-        # Add the custom configurations
-        custom_config = {
-            "loss_function": self.loss_function,
-            "num_samples": self.num_samples,
-            "kl_weight": self.kl_weight,
-        }
-
-        # Combine both configurations
-        return {**base_config, **custom_config}
