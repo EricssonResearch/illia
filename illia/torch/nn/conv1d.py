@@ -10,7 +10,7 @@ import torch
 import torch.nn.functional as F
 
 # Own modules
-from illia.torch.nn import BayesianModule
+from illia.torch.nn.base import BayesianModule
 from illia.torch.distributions import (
     Distribution,
     GaussianDistribution,

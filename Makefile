@@ -1,5 +1,5 @@
 # Declare all phony targets
-.PHONY: install lint clean tests wiki-up all
+.PHONY: install clean lint tests doc all
 
 # Default command
 .DEFAULT_GOAL := all
@@ -16,6 +16,13 @@ install:
 	@echo "Installing requirements..."
 	pip install -r requirements.txt
 
+# Allows cache clearing
+clean:
+	@echo "Cleaning cache..."
+	find . -type d -name __pycache__ -exec rm -rf {} +
+	find . -type d -name .pytest_cache -exec rm -rf {} +
+	find . -type d -name nohup.out -exec rm -rf {} +
+
 # Check format, quality and more, of the code
 lint:
 	@echo "Apply code format with Black..."
@@ -29,22 +36,15 @@ lint:
 	@echo "Checking code style and quality with Pylint..."
 	pylint --fail-under=8 $(SRC_PROJECT_NAME)/
 
-# Allows cache clearing
-clean:
-	@echo "Cleaning cache..."
-	find . -type d -name __pycache__ -exec rm -rf {} +
-	find . -type d -name .pytest_cache -exec rm -rf {} +
-	find . -type d -name nohup.out -exec rm -rf {} +
-
-# Allows testing the code
-tests: clean lint
+# Test the code
+tests: clean
 	@echo "Testing code..."
-	pytest -v $(TEST_FILE)
+	pytest $(TEST_FILE)
 
 # Allows run the MkDocs
-wiki-up:
+doc:
 	@echo "Running MkDocs..."
 	mkdocs serve
 
 # Run all tasks in sequence
-all: install tests
+all: install clean lint tests

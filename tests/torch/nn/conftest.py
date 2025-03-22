@@ -10,9 +10,9 @@ import torch
 import pytest
 
 # Own modules
-from illia.torch.nn import Linear, Conv1d, Conv2d, Embedding
+from illia.torch.nn import Linear, Conv1d, Conv2d, Embedding, BayesianModule
 from illia.torch.distributions import Distribution, GaussianDistribution
-from tests.torch.nn.utils import ComposedModel
+from tests.torch.nn.utils import ComposedModel, BayesianComposedModel
 
 
 @pytest.fixture(
@@ -266,7 +266,7 @@ def embedding_fixture(request: pytest.FixtureRequest) -> tuple[Embedding, torch.
 @pytest.fixture(params=[2, 3, 4])
 def composed_fixture(
     request: pytest.FixtureRequest, linear_fixture: tuple[Linear, torch.Tensor]
-) -> tuple[torch.nn.Module, torch.Tensor]:
+) -> tuple[BayesianModule, torch.nn.Module, torch.Tensor]:
     """
     This fixture creates a module with several bayesian Linear modules.
 
@@ -289,5 +289,6 @@ def composed_fixture(
 
     # Define composed model
     composed_model: torch.nn.Module = ComposedModel(model, num_models)
+    bayesian_composed_model: BayesianModule = BayesianComposedModel(model, num_models)
 
-    return composed_model, inputs
+    return bayesian_composed_model, composed_model, inputs

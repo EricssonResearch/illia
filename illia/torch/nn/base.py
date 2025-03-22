@@ -62,4 +62,4 @@ class BayesianModule(ABC, torch.nn.Module):
             associated integer value.
         """
 
-        return torch.tensor([0.0]), 0
+        return torch.tensor(0.0), 0

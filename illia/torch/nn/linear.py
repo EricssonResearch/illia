@@ -10,7 +10,7 @@ import torch
 import torch.nn.functional as F
 
 # Own modules
-from illia.torch.nn import BayesianModule
+from illia.torch.nn.base import BayesianModule
 from illia.torch.distributions import (
     Distribution,
     GaussianDistribution,
@@ -19,8 +19,17 @@ from illia.torch.distributions import (
 
 class Linear(BayesianModule):
     """
-    Represents a Bayesian Linear layer that models uncertainty in its
-    weights and biases using prior and posterior distributions.
+    This class is the bayesian implementation of the torch Linear layer.
+
+    Attributes:
+        weights_distribution: distribution for the weights of the
+            layer. Dimensions: [output size, input size].
+        bias_distribution: distribution of the bias layer. Dimensions:
+            [output size].
+        weights: sampled weights of the layer. They are registered in
+            the buffer. Dimensions: [output size, input size].
+        bias: sampled bias of the layer. They are registered in
+            the buffer. Dimensions: [output size].
     """
 
     def __init__(
@@ -34,11 +43,12 @@ class Linear(BayesianModule):
         This is the constructor of the Linear class.
 
         Args:
-            input_size: Size of each input sample.
-            output_size: Size of each output sample.
+            input_size: Input size of the linear layer.
+            output_size: Output size of the linear layer.
             weights_distribution: Distribution for the weights of the
-                layer.
+                layer. Defaults to None.
             bias_distribution: Distribution for the bias of the layer.
+                Defaults to None.
         """
 
         # Call super-class constructor
@@ -66,14 +76,11 @@ class Linear(BayesianModule):
         self.register_buffer("weights", weights)
         self.register_buffer("bias", bias)
 
+        return None
+
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
-        Performs a forward pass through the Bayesian Linear layer.
-
-        If the layer is not frozen, it samples weights and bias from
-        their respective posterior distributions. If the layer is
-        frozen and the weights or bias are not initialized, it samples
-        them from their respective posterior distributions.
+        This method is the forward pass of the layer.
 
         Args:
             inputs: input tensor. Dimensions: [batch, *].
@@ -87,13 +94,17 @@ class Linear(BayesianModule):
 
         # Check if layer is frozen
         if not self.frozen:
-            self.weights = self.weights_posterior.sample()
-            self.bias = self.bias_posterior.sample()
-        elif self.weights is None or self.bias is None:
-            raise ValueError("Module has been frozen with undefined weights")
+            self.weights = self.weights_distribution.sample()  # pylint: disable=W0201
+            self.bias = self.bias_distribution.sample()  # pylint: disable=W0201
 
-        # Run torch forward
-        outputs: torch.Tensor = F.linear(inputs, self.weights, self.bias)
+        else:
+            if self.weights is None or self.bias is None:
+                raise ValueError("Module has been frozen with undefined weights")
+
+        # compute outputs
+        outputs: torch.Tensor = F.linear(  # pylint: disable=E1102
+            inputs, self.weights, self.bias
+        )
 
         return outputs
 
@@ -111,33 +122,34 @@ class Linear(BayesianModule):
 
         # sample weights if they are undefined
         if self.weights is None:
-            self.weights = self.weights_distribution.sample()
+            self.weights = self.weights_distribution.sample()  # pylint: disable=W0201
 
         # sample bias is they are undefined
         if self.bias is None:
-            self.bias = self.bias_distribution.sample()
+            self.bias = self.bias_distribution.sample()  # pylint: disable=W0201
 
         # detach weights and bias
-        self.weights = self.weights.detach()
-        self.bias = self.bias.detach()
+        self.weights = self.weights.detach()  # pylint: disable=W0201
+        self.bias = self.bias.detach()  # pylint: disable=W0201
+
+        return None
 
     @torch.jit.export
     def kl_cost(self) -> tuple[torch.Tensor, int]:
         """
-        Calculate the Kullback-Leibler (KL) divergence cost for the
-        weights and bias of the layer.
+        This method is to compute the kl cost of the library.
 
         Returns:
-            A tuple containing the KL divergence cost for the weights
-            and bias, and the total number of parameters.
+            Kl cost. Dimensions: [].
+            Number of parameters of the layer.
         """
 
-        # Compute log probs
+        # compute log probs
         log_probs: torch.Tensor = self.weights_distribution.log_prob(
             self.weights
         ) + self.bias_distribution.log_prob(self.bias)
 
-        # Compute the number of parameters
+        # compute the number of parameters
         num_params: int = (
             self.weights_distribution.num_params() + self.bias_distribution.num_params()
         )

@@ -9,7 +9,7 @@ from typing import Literal
 import torch
 
 # Own modules
-from illia.torch.nn import BayesianModule
+from illia.torch.nn.base import BayesianModule
 
 
 class KLDivergenceLoss(torch.nn.Module):
@@ -17,7 +17,9 @@ class KLDivergenceLoss(torch.nn.Module):
     Computes the KL divergence loss for Bayesian modules within a model.
     """
 
-    def __init__(self, reduction: Literal["mean"] = "mean", weight: float = 1.0):
+    def __init__(
+        self, reduction: Literal["mean"] = "mean", weight: float = 1.0
+    ) -> None:
         """
         Initializes the KL Divergence Loss with specified reduction
         method and weight.
