@@ -241,7 +241,6 @@ class Conv2d(BayesianModule):
         return log_posterior, num_params
 
     def get_config(self):
-
         base_config = super().get_config()
 
         config = {

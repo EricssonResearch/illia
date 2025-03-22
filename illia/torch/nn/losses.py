@@ -5,7 +5,7 @@ This module contains the code for the Losses.
 # Standard libraries
 from typing import Literal
 
-# 3pp
+# 3pps
 import torch
 
 # Own modules
@@ -26,6 +26,9 @@ class KLDivergenceLoss(torch.nn.Module):
             reduction: Method to reduce the loss, currently only "mean"
                 is supported.
             weight: Scaling factor for the KL divergence loss.
+
+        Returns:
+            None.
         """
 
         # Call super class constructor
@@ -34,6 +37,8 @@ class KLDivergenceLoss(torch.nn.Module):
         # Set parameters
         self.reduction = reduction
         self.weight = weight
+
+        return None
 
     def forward(self, model: torch.nn.Module) -> torch.Tensor:
         """
@@ -47,16 +52,23 @@ class KLDivergenceLoss(torch.nn.Module):
             KL divergence cost scaled by the specified weight.
         """
 
-        kl_global_cost: torch.Tensor = torch.tensor(
-            0, device=next(model.parameters()).device, dtype=torch.float32
-        )
+        # Get device and dtype
+        parameter: torch.nn.Parameter = next(model.parameters())
+        device: torch.device = parameter.device
+        dtype = parameter.dtype
+
+        # Init kl cost and params
+        kl_global_cost: torch.Tensor = torch.tensor(0, device=device, dtype=dtype)
         num_params_global: int = 0
+
+        # Iter over modules
         for module in model.modules():
-            if module != model and isinstance(module, BayesianModule):
+            if isinstance(module, BayesianModule):
                 kl_cost, num_params = module.kl_cost()
                 kl_global_cost += kl_cost
                 num_params_global += num_params
 
+        # Average by the number of parameters
         kl_global_cost /= num_params
         kl_global_cost *= self.weight
 
@@ -90,10 +102,13 @@ class ELBOLoss(torch.nn.Module):
         # Call super class constructor
         super().__init__()
 
+        # Set attributes
         self.loss_function = loss_function
         self.num_samples = num_samples
         self.kl_weight = kl_weight
         self.kl_loss = KLDivergenceLoss(weight=kl_weight)
+
+        return None
 
     def forward(
         self, outputs: torch.Tensor, targets: torch.Tensor, model: torch.nn.Module
