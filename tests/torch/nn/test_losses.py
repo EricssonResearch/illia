@@ -48,8 +48,6 @@ class TestKLDivergenceLoss:
             loss_value.shape == ()
         ), f"Incorrect shape, got {loss_value.shape} and got ()"
 
-        return None
-
     @pytest.mark.order(2)
     def test_backward_single(self, linear_fixture: tuple[Linear, torch.Tensor]) -> None:
         """
@@ -79,8 +77,6 @@ class TestKLDivergenceLoss:
                 f"Incorrect backward computation, gradient of {name} shouldn't be "
                 f"None"
             )
-
-        return None
 
     @pytest.mark.order(3)
     def test_forward_multiple(
@@ -122,5 +118,3 @@ class TestKLDivergenceLoss:
         assert torch.allclose(
             loss_value, loss_value_bayesian
         ), "Not equal value with BayesianModule and torch.nn.Module."
-
-        return None

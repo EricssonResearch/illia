@@ -38,8 +38,6 @@ class TestEmbedding:
             len_parameters == 2
         ), f"Incorrect parameters length, expected 4 and got {len_parameters}"
 
-        return None
-
     @pytest.mark.order(2)
     def test_forward(self, embedding_fixture: tuple[Embedding, torch.Tensor]) -> None:
         """
@@ -72,8 +70,6 @@ class TestEmbedding:
             f"{(inputs.shape[0], model.weights.shape[1])} and got {outputs.shape}"
         )
 
-        return None
-
     @pytest.mark.order(3)
     def test_backward(self, embedding_fixture: tuple[Embedding, torch.Tensor]) -> None:
         """
@@ -103,8 +99,6 @@ class TestEmbedding:
                 f"Incorrect backward computation, gradient of {name} shouldn't be "
                 f"None"
             )
-
-        return None
 
     @pytest.mark.order(4)
     def test_freeze(self, embedding_fixture: tuple[Embedding, torch.Tensor]) -> None:
@@ -161,8 +155,6 @@ class TestEmbedding:
             "different forward passes"
         )
 
-        return None
-
     @pytest.mark.order(5)
     def test_kl_cost(self, embedding_fixture: tuple[Embedding, torch.Tensor]) -> None:
         """
@@ -205,8 +197,6 @@ class TestEmbedding:
             f"Incorrect shape of outputs first element, expected () and got "
             f"{outputs[0].shape}"
         )
-
-        return None
 
     @pytest.mark.order(6)
     def test_jit(self, embedding_fixture: tuple[Embedding, torch.Tensor]) -> None:
@@ -264,5 +254,3 @@ class TestEmbedding:
 
         # Compute kl cost
         kl_cost, num_params = model_scripted.kl_cost()
-
-        return None

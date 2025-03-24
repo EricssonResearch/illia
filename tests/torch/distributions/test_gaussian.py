@@ -86,8 +86,6 @@ class TestGaussianDistribution:
             num_parameters == 2
         ), f"Incorrect number of parameters, expected 2, got {num_parameters}"
 
-        return None
-
     @pytest.mark.order(2)
     def test_sample(
         self,
@@ -163,8 +161,6 @@ class TestGaussianDistribution:
             f"Incorrect rho grads shape, expected {shape}, got "
             f"{distribution.rho.grad.shape}"
         )
-
-        return None
 
     @pytest.mark.order(3)
     def test_log_prob(
@@ -246,8 +242,6 @@ class TestGaussianDistribution:
                 f"{distribution.rho.grad.shape}, when input x is {type(x)}"
             )
 
-        return None
-
     @pytest.mark.order(4)
     def test_num_params(
         self,
@@ -293,8 +287,6 @@ class TestGaussianDistribution:
             f"Incorrect number of parameters, expected {num_params_correct} and got "
             f"{num_params}"
         )
-
-        return None
 
     @pytest.mark.order(5)
     def test_change_device(
@@ -343,8 +335,6 @@ class TestGaussianDistribution:
 
         # Check device of sample
         assert sample.device == device, "Incorrect outputs device when device changed"
-
-        return None
 
     @pytest.mark.order(6)
     def test_jit(
@@ -395,5 +385,3 @@ class TestGaussianDistribution:
         assert isinstance(
             num_params, int
         ), f"Incorrect type, expected {int} and got {type(num_params)}"
-
-        return None

@@ -32,8 +32,6 @@ class ComposedModel(torch.nn.Module):
         # Set up models
         self.models = torch.nn.Sequential(*[model for _ in range(num_models)])
 
-        return None
-
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
         This method is the forward pass of the model.
@@ -73,8 +71,6 @@ class BayesianComposedModel(BayesianModule):
 
         # Set up models
         self.models = torch.nn.Sequential(*[model for _ in range(num_models)])
-
-        return None
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """

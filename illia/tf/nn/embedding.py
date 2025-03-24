@@ -162,7 +162,7 @@ class Embedding(BayesianModule):
             desired = tf.clip_by_value(norms, clip_value_min=0, clip_value_max=max_norm)
             scale = desired / (tf.maximum(norms, 1e-7))
             embeddings = embeddings * scale
-        
+
         return embeddings
 
     def freeze(self) -> None:
