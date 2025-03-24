@@ -7,7 +7,7 @@
 # Variables
 SRC_PROJECT_NAME ?= illia
 SRC_NOTEBOOKS_DL ?= docs/deep_learning_frameworks/examples
-TEST_FILE ?= tests/torch tests/tf/distributions
+TEST_FILE ?= tests/torch tests/tf
 
 # Allows the installation of project dependencies
 install: requirements.txt

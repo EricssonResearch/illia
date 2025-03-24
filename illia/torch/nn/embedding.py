@@ -11,10 +11,7 @@ import torch.nn.functional as F
 
 # Own modules
 from illia.torch.nn.base import BayesianModule
-from illia.torch.distributions import (
-    Distribution,
-    GaussianDistribution,
-)
+from illia.torch.distributions import GaussianDistribution
 
 
 class Embedding(BayesianModule):
@@ -49,7 +46,7 @@ class Embedding(BayesianModule):
         norm_type: float = 2.0,
         scale_grad_by_freq: bool = False,
         sparse: bool = False,
-        weights_distribution: Optional[Distribution] = None,
+        weights_distribution: Optional[GaussianDistribution] = None,
     ) -> None:
         """
         This method is the constructor of the embedding class.
@@ -86,7 +83,7 @@ class Embedding(BayesianModule):
         )
 
         # set weights distribution
-        self.weights_distribution: Distribution
+        self.weights_distribution: GaussianDistribution
         if weights_distribution is None:
             self.weights_distribution = GaussianDistribution(
                 (num_embeddings, embeddings_dim)

@@ -7,7 +7,8 @@ import torch
 import pytest
 
 # Own modules
-from illia.torch.nn import KLDivergenceLoss, Linear, BayesianModule
+from illia.torch.nn.base import BayesianModule
+from illia.torch.nn import KLDivergenceLoss, Linear
 
 
 class TestKLDivergenceLoss:

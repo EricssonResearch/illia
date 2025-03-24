@@ -48,30 +48,26 @@ class Linear(BayesianModule):
 
         # Set weights distribution
         if weights_distribution is None:
-            self.weights_distribution: GaussianDistribution = GaussianDistribution(
-                (input_size, output_size)
-            )
+            self.weights_distribution = GaussianDistribution((output_size, input_size))
         else:
             self.weights_distribution = weights_distribution
 
         # Set bias distribution
         if bias_distribution is None:
-            self.bias_distribution: GaussianDistribution = GaussianDistribution(
-                (output_size,)
-            )
+            self.bias_distribution = GaussianDistribution((output_size,))
         else:
             self.bias_distribution = bias_distribution
 
         # Register non-trainable variables
-        self.w: tf.Variable = self.add_weight(
+        self.w = self.add_weight(
             name="weights",
             initializer=tf.constant_initializer(
                 self.weights_distribution.sample().numpy()
             ),
-            shape=(self.input_size, self.output_size),
+            shape=(self.output_size, self.input_size),
             trainable=False,
         )
-        self.b: tf.Variable = self.add_weight(
+        self.b = self.add_weight(
             name="bias",
             initializer=tf.constant_initializer(
                 self.bias_distribution.sample().numpy()
@@ -79,6 +75,17 @@ class Linear(BayesianModule):
             shape=(self.output_size,),
             trainable=False,
         )
+        
+    def build(self, input_shape: tf.TensorShape) -> None:
+        """
+        Builds the Linear layer.
+
+        Args:
+            input_shape: Input shape of the layer.
+        """
+
+        # Call super-class build method
+        super().build(input_shape)
 
     def get_config(self) -> dict:
         """
@@ -102,7 +109,22 @@ class Linear(BayesianModule):
         # Combine both configurations
         return {**base_config, **custom_config}
 
-    @tf.function
+    def freeze(self) -> None:
+        """
+        This method is to freeze the layer.
+        """
+
+        # Set indicator
+        self.frozen = True
+
+        # Sample weights if they are undefined
+        if self.w is None:
+            self.w = self.weights_distribution.sample()  # pylint: disable=W0201
+
+        # Sample bias is they are undefined
+        if self.b is None:
+            self.b = self.bias_distribution.sample()  # pylint: disable=W0201
+
     def kl_cost(self) -> tuple[tf.Tensor, int]:
         """
         Computes the Kullback-Leibler (KL) divergence cost for the
@@ -113,10 +135,12 @@ class Linear(BayesianModule):
             parameters.
         """
 
+        # Compute log probs
         log_probs: tf.Tensor = self.weights_distribution.log_prob(
             self.w
         ) + self.bias_distribution.log_prob(self.b)
 
+        # Compute the number of parameters
         num_params: int = (
             self.weights_distribution.num_params + self.bias_distribution.num_params
         )
@@ -143,13 +167,12 @@ class Linear(BayesianModule):
 
         # Check if layer is frozen
         if not self.frozen:
-            self.w.assign(self.weights_distribution.sample())
-            self.b.assign(self.bias_distribution.sample())
+            self.w = self.weights_distribution.sample()
+            self.b = self.bias_distribution.sample()
         elif self.w is None or self.b is None:
             raise ValueError("Module has been frozen with undefined weights")
 
         # Compute outputs
-        lin_output = tf.linalg.matmul(inputs, self.w)
-        outputs: tf.Tensor = tf.nn.bias_add(lin_output, self.b)
+        outputs: tf.Tensor = tf.nn.bias_add(tf.linalg.matmul(inputs, self.w, transpose_b=True), self.b)
 
         return outputs

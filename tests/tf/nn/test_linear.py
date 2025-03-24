@@ -1,122 +1,54 @@
-# Standard libraries
-from typing import Optional, Union
+"""
+This module contains the code to test the bayesian Linear layer.
+"""
 
-# 3pp
+# 3pps
 import tensorflow as tf
 import pytest
 
-# Own modules
+# own modules
 from illia.tf.nn import Linear
-from illia.tf.distributions import GaussianDistribution
 
 
-linear_test_keys = [
-    "input_size",
-    "output_size",
-    "weights_distribution",
-    "bias_distribution",
-    "batch_size",
-]
-combos_ids = ["normal_default", "normal_distr"]
-COMBOS_WOMBOS = (
-    {
-        "input_size": 30,
-        "output_size": 20,
-        "weights_distribution": None,
-        "bias_distribution": None,
-        "batch_size": 1,
-    },
-    {
-        "input_size": 30,
-        "output_size": 20,
-        "weights_distribution": GaussianDistribution((30, 20)),
-        "bias_distribution": GaussianDistribution((20,)),
-        "batch_size": 1,
-    },
-)
-
-
-@pytest.mark.order(1)
-@pytest.mark.parametrize(
-    linear_test_keys, [tuple(d.values()) for d in COMBOS_WOMBOS], ids=combos_ids
-)
-def test_linear_init(
-    input_size: int,
-    output_size: int,
-    weights_distribution: Optional[GaussianDistribution],
-    bias_distribution: Optional[GaussianDistribution],
-    batch_size: Optional[int],
-) -> None:
+class TestLinear:
     """
-    This function is the test for the Linear constructor.
-
-    Args:
-        input_size: input size of the linear layer.
-        output_size: output size of the linear layer.
-        weights_distribution: distribution for the weights of the
-            layer. Defaults to None.
-        bias_distribution: distribution for the bias of the layer.
-            Defaults to None.
-
-    Returns:
-        None.
+    This class tests the Linear bayesian layer.
     """
 
-    # Define linear layer
-    model: Linear = Linear(
-        input_size, output_size, weights_distribution, bias_distribution
-    )
+    @pytest.mark.order(1)
+    def test_init(self, linear_fixture: tuple[Linear, tf.Tensor]) -> None:
+        """
+        This method is the test for the Linear constructor.
 
-    # Check parameters length
-    len_parameters: int = len(model.trainable_variables)
-    assert (
-        len_parameters == 4
-    ), f"Incorrect parameters length, expected 4 and got {len_parameters}"
+        Args:
+            linear_fixture: tuple of instance of Linear and inputs to
+                use.
+        """
 
-    return None
+        model: Linear
+        model, _ = linear_fixture
 
+        # Check parameters length
+        len_parameters: int = len(model.trainable_variables)
+        assert (
+            len_parameters == 4
+        ), f"Incorrect parameters length, expected 4 and got {len_parameters}"
 
-@pytest.mark.order(2)
-@pytest.mark.parametrize(
-    linear_test_keys, [tuple(d.values()) for d in COMBOS_WOMBOS], ids=combos_ids
-)
-def test_linear_forward(
-    input_size: int,
-    output_size: int,
-    weights_distribution: Optional[GaussianDistribution],
-    bias_distribution: Optional[GaussianDistribution],
-    batch_size: int,
-) -> None:
-    """
-    This function is the test for the Linear forward pass.
+    @pytest.mark.order(2)
+    def test_forward(self, linear_fixture: tuple[Linear, tf.Tensor]) -> None:
+        """
+        This method is the test for the Linear forward pass.
 
-    Args:
-        input_size: input size of the linear layer.
-        output_size: output size of the linear layer.
-        weights_distribution: distribution for the weights of the
-            layer. Defaults to None.
-        bias_distribution: distribution for the bias of the layer.
-            Defaults to None.
-        batch_size: batch size to use in the tests.
+        Args:
+            linear_fixture: tuple of instance of Linear and inputs to
+                use.
+        """
 
-    Returns:
-        None.
-    """
+        # Get model and inputs
+        model: Linear
+        inputs: tf.Tensor
+        model, inputs = linear_fixture
 
-    # Define linear layer
-    original_model: Linear = Linear(
-        input_size, output_size, weights_distribution, bias_distribution
-    )
-
-    # Get scripted version
-    model_scripted = tf.function(
-        original_model,
-    )
-    # Get inputs
-    inputs = tf.random.uniform((batch_size, input_size))
-
-    # iter over models
-    for model in (original_model, original_model):  # , model_scripted):
         # Check parameters length
         outputs: tf.Tensor = model(inputs)
 
@@ -126,209 +58,134 @@ def test_linear_forward(
         ), f"Incorrect outputs class, expected {tf.Tensor} and got {type(outputs)}"
 
         # Check outputs shape
-        assert outputs.shape == (batch_size, output_size), (
-            f"Incorrect outputs shape, expected {(batch_size, output_size)} and got "
-            f"{outputs.shape}"
+        assert outputs.shape == (inputs.shape[0], outputs.shape[-1]), (
+            f"Incorrect outputs shape, expected "
+            f"{(inputs.shape[0], outputs.shape[-1])} and got {outputs.shape}"
         )
 
-    return None
+    @pytest.mark.order(3)
+    def test_backward(self, linear_fixture: tuple[Linear, tf.Tensor]) -> None:
+        """
+        This method is the test for the Linear backward pass.
 
+        Args:
+            linear_fixture: tuple of instance of Linear and inputs to
+                use.
+        """
 
-@pytest.mark.order(3)
-@pytest.mark.parametrize(
-    linear_test_keys, [tuple(d.values()) for d in COMBOS_WOMBOS], ids=combos_ids
-)
-def test_linear_backward(
-    input_size: int,
-    output_size: int,
-    weights_distribution: Optional[GaussianDistribution],
-    bias_distribution: Optional[GaussianDistribution],
-    batch_size: int,
-) -> None:
-    """
-    This function is the test for the Linear backward pass.
+        # Get model and inputs
+        model: Linear
+        inputs: tf.Tensor
+        model, inputs = linear_fixture
 
-    Args:
-        input_size: input size of the linear layer.
-        output_size: output size of the linear layer.
-        weights_distribution: distribution for the weights of the
-            layer. Defaults to None.
-        bias_distribution: distribution for the bias of the layer.
-            Defaults to None.
-        batch_size: batch size to use in the tests.
+        # Check parameters length
+        with tf.GradientTape() as tape:
+            outputs: tf.Tensor = model(inputs)
+        gradients = tape.gradient(outputs, model.trainable_variables)
 
-    Returns:
-        None.
-    """
+        # Check type of outputs
+        for i, gradient in enumerate(gradients):
+            # Check if parameter is none
+            assert gradient is not None, (
+                f"Incorrect backward computation, gradient of {model.trainable_variables[i]} shouldn't be "
+                f"None"
+            )
 
-    # Define linear layer
-    model: Linear = Linear(
-        input_size, output_size, weights_distribution, bias_distribution
-    )
+    @pytest.mark.order(4)
+    def test_freeze(self, linear_fixture: tuple[Linear, tf.Tensor]) -> None:
+        """
+        This method is the test for the freeze and unfreeze layers from
+        Linear layer.
 
-    # Get scripted version
-    model_scripted = tf.function(
-        model,
-    )
+        Args:
+            linear_fixture: tuple of instance of Linear and inputs to
+                use.
 
-    # Get inputs
-    inputs = tf.random.uniform((batch_size, input_size))
-    inputs = tf.Variable(inputs)
-    with tf.GradientTape() as tape:
-        tape.watch(model.trainable_variables)
-        outputs = model(inputs)
-        loss, nparams = model.kl_cost()
+        Returns:
+            None.
+        """
 
-    # Compute the gradients
-    grads = tape.gradient(loss, model.trainable_variables)
+        # Get model and inputs
+        model: Linear
+        inputs: tf.Tensor
+        model, inputs = linear_fixture
 
-    # Check gradients
-    for name, grad in zip([v.name for v in model.trainable_variables], grads):
-        assert (
-            grad is not None
-        ), f"Incorrect backward computation, gradient of {name} shouldn't be None"
-        print(f"Gradient for {name}: {grad}")
+        # Compute outputs
+        outputs_first: tf.Tensor = model(inputs)
+        outputs_second: tf.Tensor = model(inputs)
 
-    return None
+        # Check if both outputs are equal
+        assert not tf.experimental.numpy.allclose(
+            outputs_first, outputs_second, 1e-8
+        ), (
+            "Incorrect outputs, different forwards are equal when at the "
+            "initialization the layer should be unfrozen"
+        )
 
+        # Freeze layer
+        model.freeze()
 
-@pytest.mark.order(4)
-@pytest.mark.parametrize(
-    linear_test_keys, [tuple(d.values()) for d in COMBOS_WOMBOS], ids=combos_ids
-)
-def test_linear_freeze(
-    input_size: int,
-    output_size: int,
-    weights_distribution: Optional[GaussianDistribution],
-    bias_distribution: Optional[GaussianDistribution],
-    batch_size: int,
-) -> None:
-    """
-    This function is the test for the freeze and unfreeze layers from
-    Linear layer.
+        # Compute outputs
+        outputs_first = model(inputs)
+        outputs_second = model(inputs)
 
-    Args:
-        input_size: input size of the linear layer.
-        output_size: output size of the linear layer.
-        weights_distribution: distribution for the weights of the
-            layer. Defaults to None.
-        bias_distribution: distribution for the bias of the layer.
-            Defaults to None.
-        batch_size: batch size to use in the tests.
+        # Check if both outputs are equal
+        assert tf.experimental.numpy.allclose(outputs_first, outputs_second, 1e-8), (
+            "Incorrect freezing, when layer is frozen outputs are not the same in "
+            "different forward passes"
+        )
 
-    Returns:
-        None.
-    """
+        # Unfreeze layer
+        model.unfreeze()
 
-    # Define linear layer
-    model: Linear = Linear(
-        input_size, output_size, weights_distribution, bias_distribution
-    )
+        # Compute outputs
+        outputs_first = model(inputs)
+        outputs_second = model(inputs)
 
-    # Get scripted version
-    model_scripted = tf.function(
-        model,
-    )
+        # Check if both outputs are equal
+        assert not tf.experimental.numpy.allclose(
+            outputs_first, outputs_second, 1e-8
+        ), (
+            "Incorrect unfreezing, when layer is unfrozen outputs are the same in "
+            "different forward passes"
+        )
 
-    # Get inputs
-    inputs = tf.random.uniform((batch_size, input_size))
+    @pytest.mark.order(5)
+    def test_kl_cost(self, linear_fixture: tuple[Linear, tf.Tensor]) -> None:
+        """
+        This method is the test for the kl_cost method of Linear layer.
 
-    # Compute outputs
-    outputs_first: tf.Tensor = model(inputs)
-    outputs_second: tf.Tensor = model(inputs)
+        Args:
+            linear_fixture: tuple of instance of Linear and inputs to
+                use.
+        """
 
-    # Check if both outputs are equal
-    assert outputs_first.numpy() != pytest.approx(
-        outputs_second.numpy(), rel=1e-8, nan_ok=False
-    ), "Incorrect outputs, different forwards are equal when at the initialization the layer should be unfrozen"
+        # Get model and inputs
+        model: Linear
+        model, _ = linear_fixture
 
-    # Freeze layer
-    model.freeze()
+        # Compute outputs
+        outputs: tuple[tf.Tensor, int] = model.kl_cost()
 
-    # Compute outputs
-    outputs_first = model(inputs)
-    outputs_second = model(inputs)
+        # Check type of output
+        assert isinstance(
+            outputs, tuple
+        ), f"Incorrect output type, expected {tuple} and got {type(outputs)}"
 
-    # Check if both outputs are equal
-    assert outputs_first.numpy() == pytest.approx(
-        outputs_second.numpy(), rel=1e-8, nan_ok=False
-    ), "Incorrect freezing, when layer is frozen outputs are not the same in different forward passes"
+        # Check type of kl cost
+        assert isinstance(outputs[0], tf.Tensor), (
+            f"Incorrect output type in the first element, expected {tf.Tensor} and "
+            f"got {type(outputs[0])}"
+        )
 
-    # Unfreeze layer
-    model.unfreeze()
+        # Check type of num params
+        assert isinstance(outputs[1], int), (
+            f"Incorrect output type in the second element, expected {int} and got "
+            f"{type(outputs[1])}"
+        )
 
-    # Compute outputs
-    outputs_first = model(inputs)
-    outputs_second = model(inputs)
-
-    assert outputs_first.numpy() != pytest.approx(
-        outputs_second.numpy(), rel=1e-8, nan_ok=False
-    ), "Incorrect unfreezing, when layer is unfrozen outputs are the same in different forward passes"
-
-    return None
-
-
-@pytest.mark.order(5)
-@pytest.mark.parametrize(
-    linear_test_keys, [tuple(d.values()) for d in COMBOS_WOMBOS], ids=combos_ids
-)
-def test_linear_kl_cost(
-    input_size: int,
-    output_size: int,
-    weights_distribution: Optional[GaussianDistribution],
-    bias_distribution: Optional[GaussianDistribution],
-    batch_size: int,
-) -> None:
-    """
-    This function is the test for the kl_cost method of Linear layer.
-
-    Args:
-        input_size: input size of the linear layer.
-        output_size: output size of the linear layer.
-        weights_distribution: distribution for the weights of the
-            layer. Defaults to None.
-        bias_distribution: distribution for the bias of the layer.
-            Defaults to None.
-        batch_size: batch size to use in the tests.
-
-    Returns:
-        None.
-    """
-
-    # Define linear layer
-    model: Linear = Linear(
-        input_size, output_size, weights_distribution, bias_distribution
-    )
-
-    # Get scripted version
-    # Compile_jit = True #TODO
-    model_scripted = tf.function(model)
-
-    # Compute outputs
-    outputs: tuple[tf.Tensor, int] = model.kl_cost()
-
-    # Check type of output
-    assert isinstance(
-        outputs, tuple
-    ), f"Incorrect output type, expected {tuple} and got {type(outputs)}"
-
-    # Check type of kl cost
-    assert isinstance(outputs[0], tf.Tensor), (
-        f"Incorrect output type in the first element, expected {tf.Tensor} and "
-        f"got {type(outputs[0])}"
-    )
-
-    # Work around 'tensorflow.python.framework.ops.EagerTensor'
-    nparams = outputs[1]
-    assert isinstance(nparams, int), (
-        f"Incorrect output type in the second element, expected {int} and "
-        f"got {type(outputs[0])}"
-    )
-
-    # Check shape of kl cost
-    assert outputs[0].shape == (), (
-        f"Incorrect shape of outputs first element, expected () and got "
-        f"{outputs[0].shape}"
-    )
-
-    return None
+        # Check shape of kl cost
+        assert outputs[0].shape == (), (
+            f"Incorrect shape of outputs first element, expected () and got "
+            f"{outputs[0].shape}"
+        )

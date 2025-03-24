@@ -24,9 +24,6 @@ class TestLinear:
         Args:
             linear_fixture: tuple of instance of Linear and inputs to
                 use.
-
-        Returns:
-            None.
         """
 
         model: Linear
@@ -48,9 +45,6 @@ class TestLinear:
         Args:
             linear_fixture: tuple of instance of Linear and inputs to
                 use.
-
-        Returns:
-            None.
         """
 
         # Get model and inputs
@@ -82,9 +76,6 @@ class TestLinear:
         Args:
             linear_fixture: tuple of instance of Linear and inputs to
                 use.
-
-        Returns:
-            None.
         """
 
         # Get model and inputs
@@ -104,8 +95,6 @@ class TestLinear:
                 f"None"
             )
 
-        return None
-
     @pytest.mark.order(4)
     def test_freeze(self, linear_fixture: tuple[Linear, torch.Tensor]) -> None:
         """
@@ -115,9 +104,6 @@ class TestLinear:
         Args:
             linear_fixture: tuple of instance of Linear and inputs to
                 use.
-
-        Returns:
-            None.
         """
 
         # Get model and inputs
@@ -171,9 +157,6 @@ class TestLinear:
         Args:
             linear_fixture: tuple of instance of Linear and inputs to
                 use.
-
-        Returns:
-            None.
         """
 
         # Get model and inputs

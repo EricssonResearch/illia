@@ -11,7 +11,7 @@ env:
   # Folder where the project code is located
   SRC_PROJECT_FOLDER: "illia"
   # Folder where test files are located
-  SRC_PROJECT_TESTS: "tests/torch:tests/tf/distributions"
+  SRC_PROJECT_TESTS: "tests/torch:tests/tf"
   # Python version to use
   SRC_PYTHON_VERSION: "3.11"
 
