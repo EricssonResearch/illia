@@ -75,7 +75,7 @@ class Linear(BayesianModule):
             shape=(self.output_size,),
             trainable=False,
         )
-        
+
     def build(self, input_shape: tf.TensorShape) -> None:
         """
         Builds the Linear layer.
@@ -173,6 +173,8 @@ class Linear(BayesianModule):
             raise ValueError("Module has been frozen with undefined weights")
 
         # Compute outputs
-        outputs: tf.Tensor = tf.nn.bias_add(tf.linalg.matmul(inputs, self.w, transpose_b=True), self.b)
+        outputs: tf.Tensor = tf.nn.bias_add(
+            tf.linalg.matmul(inputs, self.w, transpose_b=True), self.b
+        )
 
         return outputs

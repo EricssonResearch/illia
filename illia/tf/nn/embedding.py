@@ -25,28 +25,33 @@ class Embedding(BayesianModule):
         self,
         num_embeddings: int,
         embeddings_dim: int,
-        weights_distribution: Optional[GaussianDistribution] = None,
         padding_idx: Optional[int] = None,
         max_norm: Optional[float] = None,
         norm_type: float = 2.0,
         scale_grad_by_freq: bool = False,
         sparse: bool = False,
+        weights_distribution: Optional[GaussianDistribution] = None,
     ) -> None:
         """
-        Initializes a Bayesian Embedding layer with specified dimensions
-        and distributions.
+        This method is the constructor of the embedding class.
 
         Args:
-            num_embeddings: Number of unique embeddings.
-            embeddings_dim: Dimension of each embedding vector.
-            weights_distribution: GaussianDistribution for the weights of the
-                layer.
-            padding_idx: Index for padding, which keeps gradient
-                constant.
-            max_norm: Maximum norm for embedding vectors.
-            norm_type: Norm type for max_norm computation.
-            scale_grad_by_freq: Scale gradients by word frequency.
-            sparse: Use sparse tensor for weight gradients.
+            num_embeddings: size of the dictionary of embeddings.
+            embeddings_dim: the size of each embedding vector.
+            weights_distribution: distribution for the weights of the
+                layer. Defaults to None.
+            padding_idx: If specified, the entries at padding_idx do
+                not contribute to the gradient. Defaults to None.
+            max_norm: If given, each embedding vector with norm larger
+                than max_norm is renormalized to have norm max_norm.
+                Defaults to None.
+            norm_type: The p of the p-norm to compute for the max_norm
+                option. Defaults to 2.0.
+            scale_grad_by_freq: If given, this will scale gradients by
+                the inverse of frequency of the words in the
+                mini-batch. Defaults to False.
+            sparse: If True, gradient w.r.t. weight matrix will be a
+                sparse tensor. Defaults to False.
         """
 
         # Call super class constructor
