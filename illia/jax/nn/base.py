@@ -33,8 +33,6 @@ class BayesianModule(nnx.Module):
         # Create attribute to know is a bayesian layer
         self.is_bayesian: bool = True
 
-        return None
-
     def freeze(self) -> None:
         """
         Freezes the current layer and all submodules that are instances
@@ -44,8 +42,6 @@ class BayesianModule(nnx.Module):
         # Set frozen indicator to true for current layer
         self.frozen = True
 
-        return None
-
     def unfreeze(self) -> None:
         """
         Unfreezes the current layer and all submodules that are
@@ -54,8 +50,6 @@ class BayesianModule(nnx.Module):
 
         # Set frozen indicator to false for current layer
         self.frozen = False
-
-        return None
 
     @abstractmethod
     def kl_cost(self) -> tuple[jax.Array, int]:

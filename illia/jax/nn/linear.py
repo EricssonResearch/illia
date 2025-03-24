@@ -76,8 +76,6 @@ class Linear(BayesianModule):
             else:
                 self.bias_distribution = self.bias_distribution
 
-        return None
-
     def __call__(self, inputs: jax.Array) -> jax.Array:
         """
         This methos is the forward pass of the model.

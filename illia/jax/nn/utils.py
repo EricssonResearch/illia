@@ -19,8 +19,6 @@ def freeze(model: nnx.Module) -> None:
         if hasattr(module, "is_bayesian"):
             module.freeze()  # type: ignore
 
-    return None
-
 
 def unfreeze(model: nnx.Module) -> None:
     """
@@ -34,5 +32,3 @@ def unfreeze(model: nnx.Module) -> None:
     for _, module in model.iter_modules():
         if hasattr(module, "is_bayesian"):
             module.unfreeze()  # type: ignore
-
-    return None

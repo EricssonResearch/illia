@@ -1,4 +1,6 @@
-::: illia.torch.nn.conv
+::: illia.torch.nn.conv1d
+
+::: illia.torch.nn.conv2d
 
 ::: illia.torch.nn.embedding
 

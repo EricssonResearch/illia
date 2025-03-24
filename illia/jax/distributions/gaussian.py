@@ -58,8 +58,6 @@ class GaussianDistribution(Distribution):
             mu_init + rho_init * jax.random.normal(rngs.params(), shape)
         )
 
-        return None
-
     def sample(self, rngs: Rngs = nnx.Rngs(0)) -> jax.Array:
         """
         Samples from the distribution using the current parameters.

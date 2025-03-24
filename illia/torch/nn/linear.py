@@ -75,8 +75,6 @@ class Linear(BayesianModule):
         self.register_buffer("weights", weights)
         self.register_buffer("bias", bias)
 
-        return None
-
     @torch.jit.export
     def freeze(self) -> None:
         """
@@ -100,8 +98,6 @@ class Linear(BayesianModule):
         # Detach weights and bias
         self.weights = self.weights.detach()  # pylint: disable=W0201
         self.bias = self.bias.detach()  # pylint: disable=W0201
-
-        return None
 
     @torch.jit.export
     def kl_cost(self) -> tuple[torch.Tensor, int]:

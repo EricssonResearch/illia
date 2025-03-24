@@ -40,8 +40,6 @@ class KLDivergenceLoss(torch.nn.Module):
         self.reduction = reduction
         self.weight = weight
 
-        return None
-
     def forward(self, model: torch.nn.Module) -> torch.Tensor:
         """
         Computes the KL divergence loss across all Bayesian modules in
@@ -108,8 +106,6 @@ class ELBOLoss(torch.nn.Module):
         self.num_samples = num_samples
         self.kl_weight = kl_weight
         self.kl_loss = KLDivergenceLoss(weight=kl_weight)
-
-        return None
 
     def forward(
         self, outputs: torch.Tensor, targets: torch.Tensor, model: torch.nn.Module
