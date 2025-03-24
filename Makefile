@@ -7,7 +7,7 @@
 # Variables
 SRC_PROJECT_NAME ?= illia
 SRC_NOTEBOOKS_DL ?= docs/deep_learning_frameworks/examples
-TEST_FILE ?= tests/torch
+TEST_FILE ?= tests/torch tests/tf/distributions
 
 # Allows the installation of project dependencies
 install:
@@ -32,7 +32,7 @@ lint:
 	@echo "Checking code complexity with complexipy..."
 	complexipy -d low $(SRC_PROJECT_NAME)/
 	@echo "Checking code annotations with Mypy..."
-	mypy $(SRC_PROJECT_NAME)/ $(TEST_FILE)/
+	mypy $(SRC_PROJECT_NAME)/ $(TEST_FILE)
 	@echo "Checking code style and quality with Pylint..."
 	pylint --fail-under=8 $(SRC_PROJECT_NAME)/
 

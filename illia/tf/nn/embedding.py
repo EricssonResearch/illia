@@ -13,6 +13,7 @@ from keras import saving
 from illia.tf.nn.base import BayesianModule
 from illia.tf.distributions import GaussianDistribution
 
+
 @saving.register_keras_serializable(package="BayesianModule", name="Embedding")
 class Embedding(BayesianModule):
     """

@@ -9,11 +9,15 @@ from typing import Optional
 # 3pps
 import keras
 import tensorflow as tf
+from keras import saving
 
 # Own modules
 from illia.tf.distributions.base import Distribution
 
 
+@saving.register_keras_serializable(
+    package="GaussianDistribution", name="GaussianDistribution"
+)
 class GaussianDistribution(Distribution):
     """
     This is the class to implement a learnable gausssian distribution.
@@ -28,16 +32,18 @@ class GaussianDistribution(Distribution):
         rho_init: float = -7.0,
     ) -> None:
         """
-        Initializes the GaussianDistribution with given priors and
-        initial parameters.
+        This class is the constructor for GaussianDistribution.
 
         Args:
-            shape: The shape of the parameters.
-            mu_prior: The mean prior value.
-            std_prior: The standard deviation prior value.
-            mu_init: The initial mean value.
-            rho_init: The initial rho value, which affects the initial
-                standard deviation.
+            shape: shape of the distribution.
+            mu_prior: mu for the prior distribution.
+            std_prior: std for the prior distribution.
+            mu_init: init value for mu. This tensor will be initialized
+                with a normal distribution with std 0.1 and the mean is
+                the parameter specified here.
+            rho_init: init value for rho. This tensor will be
+                initialized with a normal distribution with std 0.1 and
+                the mean is the parameter specified here.
         """
 
         # Call super-class constructor
@@ -48,9 +54,12 @@ class GaussianDistribution(Distribution):
         self.mu_init = mu_init
         self.rho_init = rho_init
 
-        # Define priors
-        self.mu_prior: tf.Tensor = tf.convert_to_tensor(mu_prior, dtype=tf.float32)
-        self.std_prior: tf.Tensor = tf.convert_to_tensor(std_prior, dtype=tf.float32)
+        # Define non-trainable priors variables
+        self.mu_prior = tf.Variable(initial_value=[mu_prior], trainable=False)
+        self.std_prior = tf.Variable(
+            initial_value=[std_prior],
+            trainable=False,
+        )
 
         # Define trainable parameters
         self.mu = self.add_weight(
@@ -59,13 +68,27 @@ class GaussianDistribution(Distribution):
             trainable=True,
             name=f"{self.name}_mu",
         )
-
         self.rho = self.add_weight(
             shape=self.shape,
             initializer=keras.initializers.RandomNormal(mean=self.rho_init, stddev=0.1),
             trainable=True,
             name=f"{self.name}_rho",
         )
+
+    def get_config(self):
+
+        base_config = super().get_config()
+
+        config = {
+            "shape": self.shape,
+            "mu_prior": self.mu_prior,
+            "std_prior": self.std_prior,
+            "mu_init": self.mu_init,
+            "rho_init": self.rho_init,
+        }
+
+        # Combine both configurations
+        return {**base_config, **config}
 
     def sample(self) -> tf.Tensor:
         """
@@ -79,7 +102,7 @@ class GaussianDistribution(Distribution):
         eps: tf.Tensor = tf.random.normal(shape=self.rho.shape)
         sigma: tf.Tensor = tf.math.log1p(tf.math.exp(self.rho))
 
-        return self.mu + tf.multiply(sigma, eps)
+        return self.mu + sigma * eps
 
     def log_prob(self, x: Optional[tf.Tensor] = None) -> tf.Tensor:
         """
@@ -133,4 +156,4 @@ class GaussianDistribution(Distribution):
             The number of parameters as an integer.
         """
 
-        return int(tf.size(self.mu).numpy())
+        return int(tf.reshape(self.mu, [-1]).shape[0])

@@ -265,15 +265,9 @@ class Conv2d(BayesianModule):
         """
 
         if not self.frozen:
-<<<<<<< HEAD
-            self.kernels.assign(self.weights_distribution.sample())
-            self.bias.assign(self.bias_distribution.sample())
-        elif self.kernels is None or self.bias is None:
-=======
             self.w.assign(self.weights_distribution.sample())
             self.b.assign(self.bias_distribution.sample())
         elif self.w is None or self.b is None:
->>>>>>> dev
             raise ValueError("Module has been frozen with undefined weights")
 
         return self.__conv__(inputs)
