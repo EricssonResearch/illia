@@ -46,8 +46,6 @@ class Linear(BayesianModule):
             weights_distribution: Prior distribution of the weights.
             bias_distribution: Prior distribution of the bias.
             use_bias: Whether to include a bias term in the layer.
-            dtype: Data type for computations.
-            param_dtype: Data type for parameters.
             precision: Precision used in dot product operations.
             dot_general: Function for computing generalized dot
                 products.

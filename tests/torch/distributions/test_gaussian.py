@@ -42,9 +42,6 @@ class TestGaussianDistribution:
             rho_init: init value for rho. This tensor will be initialized
                 with a normal distribution with std 0.1 and the mean is
                 the parameter specified here.
-
-        Returns:
-            None.
         """
 
         # Define distribution
@@ -108,9 +105,6 @@ class TestGaussianDistribution:
             rho_init: init value for rho. This tensor will be initialized
                 with a normal distribution with std 0.1 and the mean is
                 the parameter specified here.
-
-        Returns:
-            None.
         """
 
         # Define distribution
@@ -184,9 +178,6 @@ class TestGaussianDistribution:
             rho_init: init value for rho. This tensor will be initialized
                 with a normal distribution with std 0.1 and the mean is
                 the parameter specified here.
-
-        Returns:
-            None.
         """
 
         # Define distribution
@@ -264,9 +255,6 @@ class TestGaussianDistribution:
             rho_init: init value for rho. This tensor will be initialized
                 with a normal distribution with std 0.1 and the mean is
                 the parameter specified here.
-
-        Returns:
-            None.
         """
 
         # Define distribution
@@ -310,9 +298,6 @@ class TestGaussianDistribution:
             rho_init: init value for rho. This tensor will be initialized
                 with a normal distribution with std 0.1 and the mean is
                 the parameter specified here.
-
-        Returns:
-            None.
         """
 
         # Define two devices
@@ -358,9 +343,6 @@ class TestGaussianDistribution:
             rho_init: init value for rho. This tensor will be initialized
                 with a normal distribution with std 0.1 and the mean is
                 the parameter specified here.
-
-        Returns:
-            None.
         """
 
         # Define distribution and script

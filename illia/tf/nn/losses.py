@@ -7,14 +7,14 @@ from typing import Literal
 
 # 3pps
 import tensorflow as tf
-from keras import Model, saving, losses
+from keras import Model, layers, saving, losses
 
 # Own modules
 from illia.tf.nn.base import BayesianModule
 
 
 @saving.register_keras_serializable(package="BayesianModule", name="KLDivergenceLoss")
-class KLDivergenceLoss(Model):
+class KLDivergenceLoss(layers.Layer):
     """
     Computes the KL divergence loss for Bayesian modules within a model.
     """
@@ -33,7 +33,7 @@ class KLDivergenceLoss(Model):
         # Call super class constructor
         super().__init__()
 
-        # Set atributtes
+        # Set parameters
         self.reduction = reduction
         self.weight = weight
 
@@ -69,8 +69,8 @@ class KLDivergenceLoss(Model):
             KL divergence cost scaled by the specified weight.
         """
 
-        kl_global_cost = tf.constant(0.0, dtype=tf.float32)
-        num_params_global = 0
+        kl_global_cost: tf.Tensor = tf.constant(0.0, dtype=tf.float32)
+        num_params_global: int = 0
 
         # Iterate through the model's layers
         for layer in model.layers:
@@ -87,8 +87,8 @@ class KLDivergenceLoss(Model):
         return kl_global_cost
 
 
-@saving.register_keras_serializable(package="illia_tf", name="ELBOLoss")
-class ELBOLoss(Model):
+@saving.register_keras_serializable(package="BayesianModule", name="ELBOLoss")
+class ELBOLoss(layers.Layer):
     """
     Computes the Evidence Lower Bound (ELBO) loss, combining a
     likelihood loss and KL divergence.
@@ -154,7 +154,7 @@ class ELBOLoss(Model):
             Average ELBO loss across samples.
         """
 
-        loss_value = tf.constant(0.0, dtype=tf.float32)
+        loss_value: tf.Tensor = tf.constant(0.0, dtype=tf.float32)
 
         for _ in range(self.num_samples):
             current_loss = self.loss_function(y_true, y_pred) + self.kl_loss(model)

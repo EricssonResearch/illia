@@ -24,9 +24,6 @@ class TestConv2d:
         Args:
             conv2d_fixture: tuple of instance of Conv2d and inputs to
                 use.
-
-        Returns:
-            None.
         """
 
         model: Conv2d
@@ -46,9 +43,6 @@ class TestConv2d:
         Args:
             conv2d_fixture: tuple of instance of Conv2d and inputs to
                 use.
-
-        Returns:
-            None.
         """
 
         # Get model and inputs
@@ -78,9 +72,6 @@ class TestConv2d:
         Args:
             conv2d_fixture: tuple of instance of Conv2d and inputs to
                 use.
-
-        Returns:
-            None.
         """
 
         # Get model and inputs
@@ -109,9 +100,6 @@ class TestConv2d:
         Args:
             conv2d_fixture: tuple of instance of Conv2d and inputs to
                 use.
-
-        Returns:
-            None.
         """
 
         # Get model and inputs
@@ -163,9 +151,6 @@ class TestConv2d:
         Args:
             conv2d_fixture: tuple of instance of Conv2d and inputs to
                 use.
-
-        Returns:
-            None.
         """
 
         # Get model and inputs
@@ -206,9 +191,6 @@ class TestConv2d:
         Args:
             conv2d_fixture: tuple of instance of Conv2d and inputs to
                 use.
-
-        Returns:
-            None.
         """
 
         # Get model and inputs

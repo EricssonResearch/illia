@@ -24,9 +24,6 @@ class TestKLDivergenceLoss:
         Args:
             linear_fixture: tuple of instance of Linear and inputs to
                 use.
-
-        Returns:
-            None.
         """
 
         # Get model and inputs
@@ -56,9 +53,6 @@ class TestKLDivergenceLoss:
         Args:
             linear_fixture: tuple of instance of Linear and inputs to
                 use.
-
-        Returns:
-            None.
         """
 
         # Get model and inputs
@@ -88,9 +82,6 @@ class TestKLDivergenceLoss:
         Args:
             linear_fixture: tuple of instance of Composed model and
                 inputs to use.
-
-        Returns:
-            None.
         """
 
         # Get model and inputs

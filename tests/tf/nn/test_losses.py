@@ -1,0 +1,78 @@
+"""
+This module contains the code to test losses.
+"""
+
+# 3pps
+import keras
+import tensorflow as tf
+import pytest
+
+# Own modules
+from illia.tf.nn.base import BayesianModule
+from illia.tf.nn import KLDivergenceLoss, Linear
+
+
+class TestKLDivergenceLoss:
+    """
+    This class implements the tests for KLDivergenceLoss.
+    """
+
+    @pytest.mark.order(1)
+    def test_forward_single(self, linear_fixture: tuple[Linear, tf.Tensor]) -> None:
+        """
+        This method is the test for the forward pass.
+
+        Args:
+            linear_fixture: tuple of instance of Linear and inputs to
+                use.
+        """
+
+        # Get model and inputs
+        linear_layer: Linear
+        linear_layer, _ = linear_fixture
+        model = keras.Sequential([linear_layer])
+
+        # Define loss and compute value
+        loss: keras.layers.Layer = KLDivergenceLoss()
+        loss_value: tf.Tensor = loss(model=model)
+
+        # Check type
+        assert isinstance(loss_value, tf.Tensor), (
+            f"Incorrect type of loss value, expected {tf.Tensor} and got "
+            f"{type(loss_value)}"
+        )
+
+        # Check shape
+        assert (
+            loss_value.shape == ()
+        ), f"Incorrect shape, got {loss_value.shape} and got ()"
+
+    @pytest.mark.order(2)
+    def test_backward_single(self, linear_fixture: tuple[Linear, tf.Tensor]) -> None:
+        """
+        This method is the test for the backward pass.
+
+        Args:
+            linear_fixture: tuple of instance of Linear and inputs to
+                use.
+        """
+
+        # Get model and inputs
+        linear_layer: Linear
+        linear_layer, _ = linear_fixture
+        model = keras.Sequential([linear_layer])
+
+        # Define loss and compute value
+        loss: keras.layers.Layer = KLDivergenceLoss()
+
+        with tf.GradientTape() as tape:
+            loss_value: tf.Tensor = loss(model=model)
+        gradients = tape.gradient(loss_value, model.trainable_variables)
+
+        # Check type of outputs
+        for i, gradient in enumerate(gradients):
+            # Check if parameter is none
+            assert gradient is not None, (
+                f"Incorrect backward computation, gradient of {model.trainable_variables[i]} shouldn't be "
+                f"None"
+            )

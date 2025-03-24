@@ -100,9 +100,6 @@ class TestLinear:
         Args:
             linear_fixture: tuple of instance of Linear and inputs to
                 use.
-
-        Returns:
-            None.
         """
 
         # Get model and inputs

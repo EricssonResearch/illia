@@ -6,6 +6,7 @@ This module defines fixtures for illia.torch.nn.
 from typing import Optional, Union
 
 # 3pps
+import keras
 import tensorflow as tf
 import pytest
 
