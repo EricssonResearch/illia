@@ -1,4 +1,4 @@
-# [Illia Dependencies]
+# Illia Dependencies
 torch==2.4.0
 tensorflow==2.19.0
 flax==0.10.1
@@ -7,7 +7,7 @@ optax==0.2.3
 orbax==0.1.9
 torch-geometric==2.6.1
 
-# [Lint and Test]
+# Lint and Test
 black==25.1.0
 black[jupyter]
 complexipy==1.2.0
@@ -20,7 +20,7 @@ pytest==8.3.5
 pytest-order==1.3.0
 types-requests==2.32.0.20240712
 
-# [Documentation]
+# Documentation
 mkdocs==1.6.1
 mkdocstrings[python]==0.29.0
 mkdocs-material==9.6.9

@@ -61,6 +61,8 @@ class GaussianDistribution(Distribution):
             torch.randn(shape).normal_(rho_init, 0.1)
         )
 
+        return None
+
     # Overriding method
     @torch.jit.export
     def sample(self) -> torch.Tensor:

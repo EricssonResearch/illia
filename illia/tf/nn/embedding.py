@@ -13,6 +13,7 @@ from keras import saving
 from illia.tf.nn.base import BayesianModule
 from illia.tf.distributions import GaussianDistribution
 
+
 @saving.register_keras_serializable(package="BayesianModule", name="Embedding")
 class Embedding(BayesianModule):
     """
@@ -189,7 +190,6 @@ class Embedding(BayesianModule):
         return log_probs, num_params
 
     def call(self, inputs: tf.Tensor) -> tf.Tensor:
-
         # Forward depeding of frozen state
         if not self.frozen:
             self.w.assign(self.weights_distribution.sample())

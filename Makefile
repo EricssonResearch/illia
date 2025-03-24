@@ -10,7 +10,7 @@ SRC_NOTEBOOKS_DL ?= docs/deep_learning_frameworks/examples
 TEST_FILE ?= tests/torch
 
 # Allows the installation of project dependencies
-install:
+install: requirements.txt
 	@echo "Upgrading pip..."
 	pip install --upgrade pip
 	@echo "Installing requirements..."
@@ -47,4 +47,4 @@ doc:
 	mkdocs serve
 
 # Run all tasks in sequence
-all: install clean lint tests
+all: install lint tests

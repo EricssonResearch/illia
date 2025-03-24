@@ -9,6 +9,7 @@ from typing import Optional
 import jax
 import jax.numpy as jnp
 from flax import nnx
+from flax.nnx.rnglib import Rngs
 
 # Own modules
 from illia.jax.distributions.base import Distribution
@@ -26,6 +27,7 @@ class GaussianDistribution(Distribution):
         std_prior: float = 0.1,
         mu_init: float = 0.0,
         rho_init: float = -7.0,
+        rngs: Rngs = nnx.Rngs(0),
     ) -> None:
         """
         Initializes the GaussianDistribution with given priors and
@@ -38,6 +40,7 @@ class GaussianDistribution(Distribution):
             mu_init: The initial mean value.
             rho_init: The initial rho value, which affects the initial
                 standard deviation.
+            rngs: Nnx rng container. Defaults to nnx.Rngs(0).
         """
 
         # Call super-class constructor
@@ -47,29 +50,29 @@ class GaussianDistribution(Distribution):
         self.mu_prior = mu_prior
         self.std_prior = std_prior
 
-        # Get key
-        key = jax.random.key(0)
-
         # Define initial mu and rho
-        self.mu = nnx.Param(mu_init + rho_init * jax.random.normal(key, shape))
-        self.rho = nnx.Param(mu_init + rho_init * jax.random.normal(key, shape))
+        self.mu = nnx.Param(
+            mu_init + rho_init * jax.random.normal(rngs.params(), shape)
+        )
+        self.rho = nnx.Param(
+            mu_init + rho_init * jax.random.normal(rngs.params(), shape)
+        )
 
-    def sample(self, seed: int = 0) -> jax.Array:
+        return None
+
+    def sample(self, rngs: Rngs = nnx.Rngs(0)) -> jax.Array:
         """
         Samples from the distribution using the current parameters.
 
         Args:
-            seed: A random seed for generating the sample.
+            rngs: Nnx rng container. Defaults to nnx.Rngs(0).
 
         Returns:
             A sampled JAX array.
         """
 
-        # Get key
-        key = jax.random.key(seed)
-
         # Compute epsilon and sigma
-        eps: jax.Array = jax.random.normal(key, self.rho.shape)
+        eps: jax.Array = jax.random.normal(rngs.params(), self.rho.shape)
         sigma: jax.Array = jnp.log1p(jnp.exp(self.rho))  # type: ignore
 
         return self.mu + sigma * eps

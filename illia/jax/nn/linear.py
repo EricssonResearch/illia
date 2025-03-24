@@ -3,7 +3,7 @@ This module contains the code for Linear Bayesian layer.
 """
 
 # Standard libraries
-from typing import Optional
+from typing import Optional, Any
 
 # 3pps
 import jax
@@ -11,7 +11,6 @@ import jax.numpy as jnp
 from jax import lax
 from flax.nnx.nn import dtypes
 from flax.typing import (
-    Dtype,
     PrecisionLike,
     DotGeneralT,
 )
@@ -35,8 +34,6 @@ class Linear(BayesianModule):
         bias_distribution: Optional[GaussianDistribution] = None,
         *,
         use_bias: bool = True,
-        dtype: Optional[Dtype] = None,
-        param_dtype: Dtype = jnp.float32,
         precision: PrecisionLike = None,
         dot_general: DotGeneralT = lax.dot_general,
     ) -> None:
@@ -60,13 +57,11 @@ class Linear(BayesianModule):
         super().__init__()
 
         # Set attributes
-        self.use_bias = use_bias
-        self.dtype = dtype
-        self.param_dtype = param_dtype
-        self.precision = precision
-        self.dot_general = dot_general
-        self.weights: jax.Array
-        self.bias: jax.Array
+        self.backend_params: dict[str, Any] = {
+            "use_bias": True,
+            "precision": precision,
+            "dot_general": dot_general,
+        }
 
         # Set weights prior
         if weights_distribution is None:
@@ -75,10 +70,13 @@ class Linear(BayesianModule):
             self.weights_distribution = weights_distribution
 
         # Set bias prior
-        if bias_distribution is None:
-            self.bias_distribution = GaussianDistribution((output_size,))
-        else:
-            self.bias_distribution = self.bias_distribution
+        if self.backend_params["use_bias"]:
+            if bias_distribution is None:
+                self.bias_distribution = GaussianDistribution((output_size,))
+            else:
+                self.bias_distribution = self.bias_distribution
+
+        return None
 
     def __call__(self, inputs: jax.Array) -> jax.Array:
         """
@@ -93,8 +91,12 @@ class Linear(BayesianModule):
 
         # Sample if model not frozen
         if not self.frozen:
+            # Sample weights
             self.weights = self.weights_distribution.sample()
-            self.bias = self.bias_distribution.sample()
+
+            # Sample bias
+            if self.backend_params["use_bias"]:
+                self.bias = self.bias_distribution.sample()
 
         # Compute ouputs
         inputs, _, _ = dtypes.promote_dtype(
@@ -106,7 +108,7 @@ class Linear(BayesianModule):
             (((inputs.ndim - 1,), (0,)), ((), ())),
             precision=self.precision,
         )
-        if self.bias is not None:
+        if self.backend_params["use_bias"]:
             outputs += jnp.reshape(self.bias, (1,) * (outputs.ndim - 1) + (-1,))
 
         return outputs

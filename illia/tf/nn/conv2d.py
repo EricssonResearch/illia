@@ -217,7 +217,6 @@ class Conv2d(BayesianModule):
 
     @tf.function
     def kl_cost(self) -> tuple[tf.Tensor, int]:
-
         log_probs: tf.Tensor = self.weights_distribution.log_prob(
             self.w
         ) + self.bias_distribution.log_prob(self.b)
@@ -229,7 +228,6 @@ class Conv2d(BayesianModule):
         return log_probs, num_params
 
     def get_config(self):
-
         base_config = super().get_config()
 
         config = {
@@ -265,15 +263,9 @@ class Conv2d(BayesianModule):
         """
 
         if not self.frozen:
-<<<<<<< HEAD
-            self.kernels.assign(self.weights_distribution.sample())
-            self.bias.assign(self.bias_distribution.sample())
-        elif self.kernels is None or self.bias is None:
-=======
             self.w.assign(self.weights_distribution.sample())
             self.b.assign(self.bias_distribution.sample())
         elif self.w is None or self.b is None:
->>>>>>> dev
             raise ValueError("Module has been frozen with undefined weights")
 
         return self.__conv__(inputs)

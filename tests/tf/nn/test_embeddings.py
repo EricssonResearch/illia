@@ -1,23 +1,13 @@
-<<<<<<< HEAD
-# standard libraries
-=======
 # Standard libraries
->>>>>>> dev
 from typing import Optional, Union
 
 # 3pp
 import tensorflow as tf
 import pytest
 
-<<<<<<< HEAD
-# own modules
-from illia.tf.nn import Embedding
-from illia.tf.distributions import Distribution, GaussianDistribution
-=======
 # Own modules
 from illia.tf.nn import Embedding
 from illia.tf.distributions import GaussianDistribution
->>>>>>> dev
 
 embedding_test_keys = [
     "num_embeddings",
@@ -64,11 +54,7 @@ COMBOS_WOMBOS = (
 def test_embedding_init(
     num_embeddings: int,
     embeddings_dim: int,
-<<<<<<< HEAD
-    weights_distribution: Optional[Distribution],
-=======
     weights_distribution: Optional[GaussianDistribution],
->>>>>>> dev
     padding_idx: Optional[int],
     max_norm: Optional[float],
     norm_type: float,
@@ -103,11 +89,7 @@ def test_embedding_init(
         None.
     """
 
-<<<<<<< HEAD
-    # define embedding layer
-=======
     # Define embedding layer
->>>>>>> dev
     model: Embedding = Embedding(
         num_embeddings,
         embeddings_dim,
@@ -119,11 +101,7 @@ def test_embedding_init(
         sparse,
     )
 
-<<<<<<< HEAD
-    # check parameters length
-=======
     # Check parameters length
->>>>>>> dev
     len_parameters: int = len(model.trainable_variables)
     assert (
         len_parameters == 2
@@ -139,11 +117,7 @@ def test_embedding_init(
 def test_embedding_forward(
     num_embeddings: int,
     embeddings_dim: int,
-<<<<<<< HEAD
-    weights_distribution: Optional[Distribution],
-=======
     weights_distribution: Optional[GaussianDistribution],
->>>>>>> dev
     padding_idx: Optional[int],
     max_norm: Optional[float],
     norm_type: float,
@@ -178,11 +152,7 @@ def test_embedding_forward(
         None.
     """
 
-<<<<<<< HEAD
-    # define embedding layer
-=======
     # Define embedding layer
->>>>>>> dev
     model: Embedding = Embedding(
         num_embeddings,
         embeddings_dim,
@@ -194,35 +164,20 @@ def test_embedding_forward(
         sparse,
     )
 
-<<<<<<< HEAD
-    # get inputs
-=======
     # Get inputs
->>>>>>> dev
     inputs = tf.random.stateless_uniform(
         (batch_size,), minval=0, maxval=num_embeddings, dtype=tf.int32, seed=(0, 0)
     )
 
-<<<<<<< HEAD
-    # check parameters length
-    outputs: tf.Tensor = model(inputs)
-
-    # check type of outputs
-=======
     # Check parameters length
     outputs: tf.Tensor = model(inputs)
 
     # Check type of outputs
->>>>>>> dev
     assert isinstance(
         outputs, tf.Tensor
     ), f"Incorrect outputs class, expected {tf.Tensor} and got {type(outputs)}"
 
-<<<<<<< HEAD
-    # check shape
-=======
     # Check shape
->>>>>>> dev
     assert outputs.shape == (batch_size, embeddings_dim), (
         f"Incorrect outputs shape, expected {(batch_size, embeddings_dim)} and got "
         f"{outputs.shape}"
@@ -238,11 +193,7 @@ def test_embedding_forward(
 def test_embedding_backward(
     num_embeddings: int,
     embeddings_dim: int,
-<<<<<<< HEAD
-    weights_distribution: Optional[Distribution],
-=======
     weights_distribution: Optional[GaussianDistribution],
->>>>>>> dev
     padding_idx: Optional[int],
     max_norm: Optional[float],
     norm_type: float,
@@ -277,11 +228,7 @@ def test_embedding_backward(
         None.
     """
 
-<<<<<<< HEAD
-    # define embedding layer
-=======
     # Define embedding layer
->>>>>>> dev
     model: Embedding = Embedding(
         num_embeddings,
         embeddings_dim,
@@ -293,11 +240,7 @@ def test_embedding_backward(
         sparse,
     )
 
-<<<<<<< HEAD
-    # get inputs
-=======
     # Get inputs
->>>>>>> dev
     inputs = tf.random.stateless_uniform(
         (batch_size,), minval=0, maxval=num_embeddings, dtype=tf.int32, seed=(0, 0)
     )
@@ -326,11 +269,7 @@ def test_embedding_backward(
 def test_embedding_freeze(
     num_embeddings: int,
     embeddings_dim: int,
-<<<<<<< HEAD
-    weights_distribution: Optional[Distribution],
-=======
     weights_distribution: Optional[GaussianDistribution],
->>>>>>> dev
     padding_idx: Optional[int],
     max_norm: Optional[float],
     norm_type: float,
@@ -365,11 +304,7 @@ def test_embedding_freeze(
         None.
     """
 
-<<<<<<< HEAD
-    # define embedding layer
-=======
     # Define embedding layer
->>>>>>> dev
     model: Embedding = Embedding(
         num_embeddings,
         embeddings_dim,
@@ -381,42 +316,20 @@ def test_embedding_freeze(
         sparse,
     )
 
-<<<<<<< HEAD
-    # get inputs
-=======
     # Get inputs
->>>>>>> dev
     inputs = tf.random.stateless_uniform(
         (batch_size,), minval=0, maxval=num_embeddings, dtype=tf.int32, seed=(0, 0)
     )
 
-<<<<<<< HEAD
-    # compute outputs
-    outputs_first: tf.Tensor = model(inputs)
-    outputs_second: tf.Tensor = model(inputs)
-
-    # check if both outputs are equal
-=======
     # Compute outputs
     outputs_first: tf.Tensor = model(inputs)
     outputs_second: tf.Tensor = model(inputs)
 
     # Check if both outputs are equal
->>>>>>> dev
     assert outputs_first.numpy() != pytest.approx(
         outputs_second.numpy(), rel=1e-8, nan_ok=False
     ), "Incorrect outputs, different forwards are equal when at the initialization the layer should be unfrozen"
 
-<<<<<<< HEAD
-    # freeze layer
-    model.freeze()
-
-    # compute outputs
-    outputs_first = model(inputs)
-    outputs_second = model(inputs)
-
-    # check if both outputs are equal
-=======
     # Freeze layer
     model.freeze()
 
@@ -425,22 +338,14 @@ def test_embedding_freeze(
     outputs_second = model(inputs)
 
     # Check if both outputs are equal
->>>>>>> dev
     assert outputs_first.numpy() == pytest.approx(
         outputs_second.numpy(), rel=1e-8, nan_ok=False
     ), "Incorrect freezing, when layer is frozen outputs are not the same in different forward passes"
 
-<<<<<<< HEAD
-    # unfreeze layer
-    model.unfreeze()
-
-    # compute outputs
-=======
     # Unfreeze layer
     model.unfreeze()
 
     # Compute outputs
->>>>>>> dev
     outputs_first = model(inputs)
     outputs_second = model(inputs)
 
@@ -458,11 +363,7 @@ def test_embedding_freeze(
 def test_linear_kl_cost(
     num_embeddings: int,
     embeddings_dim: int,
-<<<<<<< HEAD
-    weights_distribution: Optional[Distribution],
-=======
     weights_distribution: Optional[GaussianDistribution],
->>>>>>> dev
     padding_idx: Optional[int],
     max_norm: Optional[float],
     norm_type: float,
@@ -496,11 +397,7 @@ def test_linear_kl_cost(
         None.
     """
 
-<<<<<<< HEAD
-    # define embedding layer
-=======
     # Define embedding layer
->>>>>>> dev
     model: Embedding = Embedding(
         num_embeddings,
         embeddings_dim,
@@ -512,45 +409,24 @@ def test_linear_kl_cost(
         sparse,
     )
 
-<<<<<<< HEAD
-    # get inputs
-=======
     # Get inputs
->>>>>>> dev
     inputs = tf.random.stateless_uniform(
         (batch_size,), minval=0, maxval=num_embeddings, dtype=tf.int32, seed=(0, 0)
     )
 
     outputs: tuple[tf.Tensor, int] = model.kl_cost()
 
-<<<<<<< HEAD
-    # check type of output
-=======
     # Check type of output
->>>>>>> dev
     assert isinstance(
         outputs, tuple
     ), f"Incorrect output type, expected {tuple} and got {type(outputs)}"
 
-<<<<<<< HEAD
-    # check type of kl cost
-=======
     # Check type of kl cost
->>>>>>> dev
     assert isinstance(outputs[0], tf.Tensor), (
         f"Incorrect output type in the first element, expected {tf.Tensor} and "
         f"got {type(outputs[0])}"
     )
 
-<<<<<<< HEAD
-    # work around 'tensorflow.python.framework.ops.EagerTensor'
-    nparams = outputs[1]
-    assert isinstance(
-        nparams, int
-    ), f"Incorrect output type in the second element, expected {int}"
-
-    # check shape of kl cost
-=======
     # Work around 'tensorflow.python.framework.ops.EagerTensor'
     nparams = outputs[1]
     assert isinstance(nparams, int), (
@@ -559,7 +435,6 @@ def test_linear_kl_cost(
     )
 
     # Check shape of kl cost
->>>>>>> dev
     assert outputs[0].shape == (), (
         f"Incorrect shape of outputs first element, expected () and got "
         f"{outputs[0].shape}"
