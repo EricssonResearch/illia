@@ -1,5 +1,5 @@
 """
-This module contains the code for the bayesian Conv2d.
+This module contains the code for the bayesian Conv1d.
 """
 
 # Standard libraries
@@ -14,19 +14,19 @@ from illia.tf.nn.base import BayesianModule
 from illia.tf.distributions import GaussianDistribution
 
 
-@saving.register_keras_serializable(package="BayesianModule", name="Conv2d")
-class Conv2d(BayesianModule):
+@saving.register_keras_serializable(package="BayesianModule", name="Conv1d")
+class Conv1d(BayesianModule):
     """
-    This class is the bayesian implementation of the Conv2d class.
+    This class is the bayesian implementation of the Conv1d class.
     """
 
     def __init__(
         self,
         input_channels: int,
         output_channels: int,
-        kernel_size: Union[int, list[int]],
+        kernel_size: int,
         stride: Union[int, list[int]] = 1,
-        padding: Union[str, list[int]] = "VALID",
+        padding: str = "VALID",
         dilation: Union[int, list[int]] = 1,
         groups: int = 1,
         weights_distribution: Optional[GaussianDistribution] = None,
@@ -36,6 +36,9 @@ class Conv2d(BayesianModule):
         Definition of a Bayesian Convolution 2D layer.
 
         Args:
+            input_channels: Number of channels in the input image.
+            output_channels: Number of channels produced by the
+                convolution.
             kernel_size: Size of the convolving kernel.
             stride: Stride of the convolution. Deafults to 1.
             padding: Padding added to all four sides of the input.
@@ -45,6 +48,9 @@ class Conv2d(BayesianModule):
                 to output channels. Defaults to 1.
             weights_distribution: The distribution for the weights.
             bias_distribution: The distribution for the bias.
+
+        Returns:
+            None.
         """
 
         # Call super class constructor
@@ -59,9 +65,7 @@ class Conv2d(BayesianModule):
         self.dilation = dilation
         self.groups = groups
 
-        # Check if kernel_size is a list and unpack it if necessary
-        kernel_shape = kernel_size if isinstance(kernel_size, list) else [kernel_size]
-        shape = (output_channels, *kernel_shape, input_channels // groups)
+        shape = (output_channels, kernel_size, input_channels // groups)
 
         # Set weights distribution
         if weights_distribution is None:
@@ -131,16 +135,16 @@ class Conv2d(BayesianModule):
         # Combine both configurations
         return {**base_config, **custom_config}
 
-    def _conv2d(
+    def _conv1d(
         self,
         inputs: tf.Tensor,
         weight: tf.Tensor,
         stride: Union[int, list[int]],
-        padding: Union[str, list[int]],
+        padding: str,
         dilation: Union[int, list[int]],
     ) -> tf.Tensor:
         """
-        Applies a 2D convolution operation to the input tensor.
+        Applies a 1D convolution operation to the input tensor.
 
         Args:
             inputs: The input tensor of shape
@@ -155,10 +159,10 @@ class Conv2d(BayesianModule):
             [batch_size, height, width, output_channels].
         """
 
-        output: tf.Tensor = tf.nn.conv2d(
+        output: tf.Tensor = tf.nn.conv1d(
             input=inputs,
             filters=weight,
-            strides=stride,
+            stride=stride,
             padding=padding,
             dilations=dilation,
         )
@@ -205,7 +209,7 @@ class Conv2d(BayesianModule):
 
     def call(self, inputs: tf.Tensor) -> tf.Tensor:
         """
-        Performs a forward pass through the Bayesian Convolution 2D
+        Performs a forward pass through the Bayesian Convolution 1D
         layer. If the layer is not frozen, it samples weights and bias
         from their respective distributions. If the layer is frozen
         and the weights or bias are not initialized, it also performs
@@ -228,7 +232,7 @@ class Conv2d(BayesianModule):
             raise ValueError("Module has been frozen with undefined weights")
 
         # Compute outputs
-        outputs: tf.Tensor = self._conv2d(
+        outputs: tf.Tensor = self._conv1d(
             inputs=inputs,
             weight=self.w,
             stride=self.stride,

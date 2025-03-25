@@ -12,7 +12,7 @@ import pytest
 
 # Own modules
 from illia.tf.nn.base import BayesianModule
-from illia.tf.nn import Linear, Embedding
+from illia.tf.nn import Linear, Embedding, Conv2d, Conv1d
 from illia.tf.distributions.base import Distribution
 from illia.tf.distributions import GaussianDistribution
 
@@ -114,5 +114,154 @@ def embedding_fixture(request: pytest.FixtureRequest) -> tuple[Embedding, tf.Ten
     inputs: tf.Tensor = tf.random.uniform(
         shape=(batch_size,), minval=0, maxval=num_embeddings, dtype=tf.int32
     )
+
+    return model, inputs
+
+
+@pytest.fixture(
+    params=[
+        (
+            32,
+            3,
+            9,
+            3,
+            1,
+            [[0, 0], [0, 0],[0, 0], [0, 0]],
+            1,
+            1,
+            GaussianDistribution((9, 3, 3, 3)),
+            GaussianDistribution((9,)),
+            32,
+            32,
+        ),
+        (64, 6, 6, (4, 4), (2, 1), [[0, 0], [3, 3],[1, 1], [0, 0]], (2, 1), 2, None, None, 64, 64),
+    ]
+)
+def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2d, tf.Tensor]:
+    """
+    This function is the fixture for bayesian Conv2d layer.
+
+    Args:
+        request: Pytest fixture request.
+
+    Returns:
+        Conv2d instance.
+        Inputs compatible with Conv2d instance.
+    """
+
+    # Get parameters
+    batch_size: int
+    input_channels: int
+    output_channels: int
+    kernel_size: Union[int, list[int]]
+    stride: Union[int, list[int]]
+    padding: Union[str, list[int]]
+    dilation: Union[int, list[int]] = 1
+    groups: int = 1
+    weights_distribution: Optional[GaussianDistribution]
+    bias_distribution: Optional[GaussianDistribution]
+    height: int
+    width: int
+    (
+        batch_size,
+        input_channels,
+        output_channels,
+        kernel_size,
+        stride,
+        padding,
+        dilation,
+        groups,
+        weights_distribution,
+        bias_distribution,
+        height,
+        width,
+    ) = request.param
+
+    # Define model and inputs
+    model: Conv2d = Conv2d(
+        input_channels,
+        output_channels,
+        kernel_size,
+        stride,
+        padding,
+        dilation,
+        groups,
+        weights_distribution,
+        bias_distribution,
+    )
+    inputs: tf.Tensor = tf.random.uniform((batch_size, input_channels, height, width))
+
+    return model, inputs
+
+
+@pytest.fixture(
+    params=[
+        (
+            32,
+            3,
+            9,
+            3,
+            1,
+            "VALID",
+            1,
+            1,
+            GaussianDistribution((9, 3, 3)),
+            GaussianDistribution((9,)),
+            32,
+        ),
+        (64, 6, 6, 4, 2, "SAME", 2, 2, None, None, 16),
+    ]
+)
+def conv1d_fixture(request: pytest.FixtureRequest) -> tuple[Conv1d, tf.Tensor]:
+    """
+    This function is the fixture for bayesian Conv1d layer.
+
+    Args:
+        request: Pytest fixture request.
+
+    Returns:
+        Conv1d instance.
+        Inputs compatible with Conv1d instance.
+    """
+
+    # Get parameters
+    batch_size: int
+    input_channels: int
+    output_channels: int
+    kernel_size: Union[int, list[int]]
+    stride: Union[int, list[int]]
+    padding: Union[str, list[int]]
+    dilation: Union[int, list[int]]
+    groups: int
+    weights_distribution: Optional[GaussianDistribution]
+    bias_distribution: Optional[GaussianDistribution]
+    embedding_dim: int
+    (
+        batch_size,
+        input_channels,
+        output_channels,
+        kernel_size,
+        stride,
+        padding,
+        dilation,
+        groups,
+        weights_distribution,
+        bias_distribution,
+        embedding_dim,
+    ) = request.param
+
+    # Define model and inputs
+    model: Conv1d = Conv1d(
+        input_channels,
+        output_channels,
+        kernel_size,
+        stride,
+        padding,
+        dilation,
+        groups,
+        weights_distribution,
+        bias_distribution,
+    )
+    inputs: tf.Tensor = tf.random.uniform((batch_size, input_channels, embedding_dim))
 
     return model, inputs

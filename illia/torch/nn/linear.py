@@ -17,16 +17,6 @@ from illia.torch.distributions import GaussianDistribution
 class Linear(BayesianModule):
     """
     This class is the bayesian implementation of the torch Linear layer.
-
-    Attributes:
-        weights_distribution: distribution for the weights of the
-            layer. Dimensions: [output size, input size].
-        bias_distribution: distribution of the bias layer. Dimensions:
-            [output size].
-        weights: sampled weights of the layer. They are registered in
-            the buffer. Dimensions: [output size, input size].
-        bias: sampled bias of the layer. They are registered in
-            the buffer. Dimensions: [output size].
     """
 
     def __init__(
@@ -79,9 +69,6 @@ class Linear(BayesianModule):
     def freeze(self) -> None:
         """
         This method is to freeze the layer.
-
-        Returns:
-            None.
         """
 
         # Set indicator

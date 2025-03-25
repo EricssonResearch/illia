@@ -17,23 +17,6 @@ from illia.torch.distributions import GaussianDistribution
 class Conv1d(BayesianModule):
     """
     This class is the bayesian implementation of the Conv1d class.
-
-    Attributes:
-        weights_distribution: distribution for the weights of the
-            layer. Dimensions: [output channels,
-            input channels // groups, kernel size, kernel size].
-        bias_distribution: distribution of the bias layer. Dimensions:
-            [output channels].
-        weights: sampled weights of the layer. They are registered in
-            the buffer. Dimensions: [output channels,
-            input channels // groups, kernel size, kernel size].
-        bias: sampled bias of the layer. They are registered in
-            the buffer. Dimensions: [output channels].
-        input_channels: Number of channels in the input image.
-        output_channels: Number of channels produced by the
-            convolution.
-        conv_params: Tuple with the following parameters: stride,
-                padding, dilation and groups.
     """
 
     def __init__(
@@ -64,9 +47,6 @@ class Conv1d(BayesianModule):
                 to output channels. Defaults to 1.
             weights_distribution: The distribution for the weights.
             bias_distribution: The distribution for the bias.
-
-        Returns:
-            None.
         """
 
         # Call super class constructor
@@ -105,9 +85,6 @@ class Conv1d(BayesianModule):
     def freeze(self) -> None:
         """
         This method is to freeze the layer.
-
-        Returns:
-            None.
         """
 
         # Set indicator

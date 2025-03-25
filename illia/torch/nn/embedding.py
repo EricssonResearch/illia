@@ -17,24 +17,6 @@ from illia.torch.distributions import GaussianDistribution
 class Embedding(BayesianModule):
     """
     This class is the bayesian implementation of the Embedding class.
-
-    Attr:
-        weights_distribution: distribution for the weights of the
-            layer. Dimensions: [number of embeddings, embedding dim].
-        weights: sampled weights of the layer. They are registered in
-            the buffer. Dimensions: [number of embeddings,
-            embedding dim].
-        padding_idx: If specified, the entries at padding_idx do
-            not contribute to the gradient.
-        max_norm: If given, each embedding vector with norm larger
-            than max_norm is renormalized to have norm max_norm.
-        norm_type: The p of the p-norm to compute for the max_norm
-            option.
-        scale_grad_by_freq: If given, this will scale gradients by
-            the inverse of frequency of the words in the
-            mini-batch.
-        sparse: If True, gradient w.r.t. weight matrix will be a
-            sparse tensor.
     """
 
     def __init__(
@@ -99,9 +81,6 @@ class Embedding(BayesianModule):
     def freeze(self) -> None:
         """
         This method freezes the layer.
-
-        Returns:
-            None.
         """
 
         # set indicator
