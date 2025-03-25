@@ -126,7 +126,7 @@ def embedding_fixture(request: pytest.FixtureRequest) -> tuple[Embedding, tf.Ten
             9,
             3,
             1,
-            [[0, 0], [0, 0],[0, 0], [0, 0]],
+            [[0, 0], [0, 0], [0, 0], [0, 0]],
             1,
             1,
             GaussianDistribution((9, 3, 3, 3)),
@@ -134,7 +134,20 @@ def embedding_fixture(request: pytest.FixtureRequest) -> tuple[Embedding, tf.Ten
             32,
             32,
         ),
-        (64, 6, 6, (4, 4), (2, 1), [[0, 0], [3, 3],[1, 1], [0, 0]], (2, 1), 2, None, None, 64, 64),
+        (
+            64,
+            6,
+            6,
+            (4, 4),
+            (2, 1),
+            [[0, 0], [3, 3], [1, 1], [0, 0]],
+            (2, 1),
+            2,
+            None,
+            None,
+            64,
+            64,
+        ),
     ]
 )
 def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2d, tf.Tensor]:
@@ -228,9 +241,9 @@ def conv1d_fixture(request: pytest.FixtureRequest) -> tuple[Conv1d, tf.Tensor]:
     batch_size: int
     input_channels: int
     output_channels: int
-    kernel_size: Union[int, list[int]]
+    kernel_size: int
     stride: Union[int, list[int]]
-    padding: Union[str, list[int]]
+    padding: str
     dilation: Union[int, list[int]]
     groups: int
     weights_distribution: Optional[GaussianDistribution]

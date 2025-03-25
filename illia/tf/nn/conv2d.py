@@ -49,7 +49,7 @@ class Conv2d(BayesianModule):
 
         # Call super class constructor
         super().__init__()
-        
+
         # Set attributes
         self.input_channels = input_channels
         self.output_channels = output_channels
@@ -237,6 +237,6 @@ class Conv2d(BayesianModule):
         )
 
         # Add bias
-        #outputs = tf.nn.bias_add(outputs, self.b)
+        # outputs = tf.nn.bias_add(outputs, self.b)
 
         return outputs
