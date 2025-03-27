@@ -61,7 +61,7 @@ class Conv2d(BayesianModule):
 
         # Check if kernel_size is a list and unpack it if necessary
         kernel_shape = kernel_size if isinstance(kernel_size, list) else [kernel_size]
-        shape = (output_channels, *kernel_shape, input_channels // groups)
+        shape = (input_channels // groups, *kernel_shape, output_channels)
 
         # Set weights distribution
         if weights_distribution is None:
@@ -237,6 +237,6 @@ class Conv2d(BayesianModule):
         )
 
         # Add bias
-        # outputs = tf.nn.bias_add(outputs, self.b)
+        outputs = tf.nn.bias_add(outputs, self.b)
 
         return outputs

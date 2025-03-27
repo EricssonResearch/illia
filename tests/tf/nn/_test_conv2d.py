@@ -59,9 +59,9 @@ class TestConv2d:
         ), f"Incorrect outputs class, expected {tf.Tensor} and got {type(outputs)}"
 
         # Check outputs shape
-        assert outputs.shape[:2] == (inputs.shape[0], model.w.shape[0]), (
+        assert (outputs.shape[0], outputs.shape[-1]) == (inputs.shape[0], model.w.shape[-1]), (
             f"Incorrect outputs shape, expected "
-            f"{(inputs.shape[0], model.w.shape[0])} and got {outputs.shape}"
+            f"{(inputs.shape[0], model.w.shape[-1])} and got {(outputs.shape[0], outputs.shape[-1])}"
         )
 
     @pytest.mark.order(3)
@@ -88,8 +88,8 @@ class TestConv2d:
         for i, gradient in enumerate(gradients):
             # Check if parameter is none
             assert gradient is not None, (
-                f"Incorrect backward computation, gradient of {model.trainable_variables[i]} shouldn't be "
-                f"None"
+                "Incorrect backward computation, gradient of "
+                f"{model.trainable_variables[i]} shouldn't be None"
             )
 
     @pytest.mark.order(4)

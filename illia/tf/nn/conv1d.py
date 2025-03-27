@@ -48,9 +48,6 @@ class Conv1d(BayesianModule):
                 to output channels. Defaults to 1.
             weights_distribution: The distribution for the weights.
             bias_distribution: The distribution for the bias.
-
-        Returns:
-            None.
         """
 
         # Call super class constructor
@@ -65,11 +62,11 @@ class Conv1d(BayesianModule):
         self.dilation = dilation
         self.groups = groups
 
-        shape = (output_channels, kernel_size, input_channels // groups)
-
         # Set weights distribution
         if weights_distribution is None:
-            self.weights_distribution = GaussianDistribution(shape=shape)
+            self.weights_distribution = GaussianDistribution(
+                (input_channels // groups, kernel_size, output_channels)
+            )
         else:
             self.weights_distribution = weights_distribution
 
@@ -85,7 +82,7 @@ class Conv1d(BayesianModule):
             initializer=tf.constant_initializer(
                 self.weights_distribution.sample().numpy()
             ),
-            shape=shape,
+            shape=(input_channels // groups, kernel_size, output_channels),
             trainable=False,
         )
         self.b = self.add_weight(
@@ -241,6 +238,6 @@ class Conv1d(BayesianModule):
         )
 
         # Add bias
-        # outputs = tf.nn.bias_add(outputs, self.b)
+        outputs = tf.nn.bias_add(outputs, self.b)
 
         return outputs

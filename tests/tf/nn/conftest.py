@@ -126,10 +126,10 @@ def embedding_fixture(request: pytest.FixtureRequest) -> tuple[Embedding, tf.Ten
             9,
             3,
             1,
-            [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "VALID",
             1,
             1,
-            GaussianDistribution((9, 3, 3, 3)),
+            GaussianDistribution((3, 3, 3, 9)),
             GaussianDistribution((9,)),
             32,
             32,
@@ -138,10 +138,10 @@ def embedding_fixture(request: pytest.FixtureRequest) -> tuple[Embedding, tf.Ten
             64,
             6,
             6,
-            (4, 4),
-            (2, 1),
-            [[0, 0], [3, 3], [1, 1], [0, 0]],
-            (2, 1),
+            [4, 4],
+            [2, 1],
+            "SAME",
+            [2, 1],
             2,
             None,
             None,
@@ -202,7 +202,7 @@ def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2d, tf.Tensor]:
         weights_distribution,
         bias_distribution,
     )
-    inputs: tf.Tensor = tf.random.uniform((batch_size, input_channels, height, width))
+    inputs: tf.Tensor = tf.random.uniform((batch_size, height, width, input_channels))
 
     return model, inputs
 
@@ -218,11 +218,11 @@ def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2d, tf.Tensor]:
             "VALID",
             1,
             1,
-            GaussianDistribution((9, 3, 3)),
+            GaussianDistribution((3, 3, 9)),
             GaussianDistribution((9,)),
             32,
         ),
-        (64, 6, 6, 4, 2, "SAME", 2, 2, None, None, 16),
+        (64, 6, 6, 3, 2, "SAME", 2, 2, None, None, 16),
     ]
 )
 def conv1d_fixture(request: pytest.FixtureRequest) -> tuple[Conv1d, tf.Tensor]:
@@ -275,6 +275,6 @@ def conv1d_fixture(request: pytest.FixtureRequest) -> tuple[Conv1d, tf.Tensor]:
         weights_distribution,
         bias_distribution,
     )
-    inputs: tf.Tensor = tf.random.uniform((batch_size, input_channels, embedding_dim))
+    inputs: tf.Tensor = tf.random.uniform((batch_size, embedding_dim, input_channels))
 
     return model, inputs
