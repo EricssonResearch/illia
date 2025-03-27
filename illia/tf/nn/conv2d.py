@@ -60,7 +60,7 @@ class Conv2d(BayesianModule):
         self.groups = groups
 
         # Check if kernel_size is a list and unpack it if necessary
-        kernel_shape = kernel_size if isinstance(kernel_size, list) else [kernel_size]
+        kernel_shape = kernel_size if isinstance(kernel_size, list) else [kernel_size, kernel_size]
         shape = (input_channels // groups, *kernel_shape, output_channels)
 
         # Set weights distribution

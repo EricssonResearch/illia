@@ -138,7 +138,7 @@ def embedding_fixture(request: pytest.FixtureRequest) -> tuple[Embedding, tf.Ten
             64,
             6,
             6,
-            [4, 4],
+            [3, 3],
             [2, 1],
             "SAME",
             [2, 1],
