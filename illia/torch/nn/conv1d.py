@@ -11,32 +11,12 @@ import torch.nn.functional as F
 
 # Own modules
 from illia.torch.nn.base import BayesianModule
-from illia.torch.distributions import (
-    Distribution,
-    GaussianDistribution,
-)
+from illia.torch.distributions import GaussianDistribution
 
 
 class Conv1d(BayesianModule):
     """
     This class is the bayesian implementation of the Conv1d class.
-
-    Attributes:
-        weights_distribution: distribution for the weights of the
-            layer. Dimensions: [output channels,
-            input channels // groups, kernel size, kernel size].
-        bias_distribution: distribution of the bias layer. Dimensions:
-            [output channels].
-        weights: sampled weights of the layer. They are registered in
-            the buffer. Dimensions: [output channels,
-            input channels // groups, kernel size, kernel size].
-        bias: sampled bias of the layer. They are registered in
-            the buffer. Dimensions: [output channels].
-        input_channels: Number of channels in the input image.
-        output_channels: Number of channels produced by the
-            convolution.
-        conv_params: Tuple with the following parameters: stride,
-                padding, dilation and groups.
     """
 
     def __init__(
@@ -48,8 +28,8 @@ class Conv1d(BayesianModule):
         padding: int = 0,
         dilation: int = 1,
         groups: int = 1,
-        weights_distribution: Optional[Distribution] = None,
-        bias_distribution: Optional[Distribution] = None,
+        weights_distribution: Optional[GaussianDistribution] = None,
+        bias_distribution: Optional[GaussianDistribution] = None,
     ) -> None:
         """
         Definition of a Bayesian Convolution 2D layer.
@@ -67,9 +47,6 @@ class Conv1d(BayesianModule):
                 to output channels. Defaults to 1.
             weights_distribution: The distribution for the weights.
             bias_distribution: The distribution for the bias.
-
-        Returns:
-            None.
         """
 
         # Call super class constructor
@@ -81,7 +58,7 @@ class Conv1d(BayesianModule):
         # Set weights distribution
         if weights_distribution is None:
             # Define weights distribution
-            self.weights_distribution: Distribution = GaussianDistribution(
+            self.weights_distribution: GaussianDistribution = GaussianDistribution(
                 (output_channels, input_channels // groups, kernel_size)
             )
         else:
@@ -90,7 +67,7 @@ class Conv1d(BayesianModule):
         # Set bias distribution
         if bias_distribution is None:
             # Define weights distribution
-            self.bias_distribution: Distribution = GaussianDistribution(
+            self.bias_distribution: GaussianDistribution = GaussianDistribution(
                 (output_channels,)
             )
         else:
@@ -104,66 +81,26 @@ class Conv1d(BayesianModule):
         self.register_buffer("weights", weights)
         self.register_buffer("bias", bias)
 
-        return None
-
-    def forward(self, inputs: torch.Tensor) -> torch.Tensor:
-        """
-        Performs a forward pass through the Bayesian Convolution 2D
-        layer. If the layer is not frozen, it samples weights and bias
-        from their respective distributions. If the layer is frozen
-        and the weights or bias are not initialized, it also performs
-        sampling.
-
-        Args:
-            inputs: Input tensor to the layer. Dimensions: [batch,
-                input channels, input width, input height].
-
-        Returns:
-            Output tensor after passing through the layer. Dimensions:
-                [batch, output channels, output width, output height].
-        """
-
-        # Forward depending of frozen state
-        if not self.frozen:
-            self.weights = self.weights_distribution.sample()  # pylint: disable=W0201
-            self.bias = self.bias_distribution.sample()  # pylint: disable=W0201
-        else:
-            if self.weights is None or self.bias is None:
-                self.weights = (  # pylint: disable=W0201
-                    self.weights_distribution.sample()
-                )
-                self.bias = self.bias_distribution.sample()  # pylint: disable=W0201
-
-        # Execute torch forward
-        return F.conv1d(  # pylint: disable=E1102
-            inputs, self.weights, self.bias, *self.conv_params  # type: ignore
-        )
-
     @torch.jit.export
     def freeze(self) -> None:
         """
         This method is to freeze the layer.
-
-        Returns:
-            None.
         """
 
         # Set indicator
         self.frozen = True
 
         # Sample weights if they are undefined
-        if self.weights is None:
+        if self.weights is None:  # type: ignore
             self.weights = self.weights_distribution.sample()  # pylint: disable=W0201
 
         # Sample bias is they are undefined
-        if self.bias is None:
+        if self.bias is None:  # type: ignore
             self.bias = self.bias_distribution.sample()  # pylint: disable=W0201
 
         # Detach weights and bias
         self.weights = self.weights.detach()  # pylint: disable=W0201
         self.bias = self.bias.detach()  # pylint: disable=W0201
-
-        return None
 
     @torch.jit.export
     def kl_cost(self) -> tuple[torch.Tensor, int]:
@@ -187,3 +124,32 @@ class Conv1d(BayesianModule):
         )
 
         return log_probs, num_params
+
+    def forward(self, inputs: torch.Tensor) -> torch.Tensor:
+        """
+        Performs a forward pass through the Bayesian Convolution 2D
+        layer. If the layer is not frozen, it samples weights and bias
+        from their respective distributions. If the layer is frozen
+        and the weights or bias are not initialized, it also performs
+        sampling.
+
+        Args:
+            inputs: Input tensor to the layer. Dimensions: [batch,
+                input channels, input width, input height].
+
+        Returns:
+            Output tensor after passing through the layer. Dimensions:
+                [batch, output channels, output width, output height].
+        """
+
+        # Forward depending of frozen state
+        if not self.frozen:
+            self.weights = self.weights_distribution.sample()  # pylint: disable=W0201
+            self.bias = self.bias_distribution.sample()  # pylint: disable=W0201
+        elif self.weights is None or self.bias is None:
+            raise ValueError("Module has been frozen with undefined weights")
+
+        # Execute torch forward
+        return F.conv1d(  # pylint: disable=E1102
+            inputs, self.weights, self.bias, *self.conv_params  # type: ignore
+        )

@@ -25,28 +25,32 @@ class Embedding(BayesianModule):
         self,
         num_embeddings: int,
         embeddings_dim: int,
-        weights_distribution: Optional[GaussianDistribution] = None,
         padding_idx: Optional[int] = None,
         max_norm: Optional[float] = None,
         norm_type: float = 2.0,
         scale_grad_by_freq: bool = False,
         sparse: bool = False,
+        weights_distribution: Optional[GaussianDistribution] = None,
     ) -> None:
         """
-        Initializes a Bayesian Embedding layer with specified dimensions
-        and distributions.
+        This method is the constructor of the embedding class.
 
         Args:
-            num_embeddings: Number of unique embeddings.
-            embeddings_dim: Dimension of each embedding vector.
-            weights_distribution: GaussianDistribution for the weights of the
+            num_embeddings: size of the dictionary of embeddings.
+            embeddings_dim: the size of each embedding vector.
+            padding_idx: If specified, the entries at padding_idx do
+                not contribute to the gradient.
+            max_norm: If given, each embedding vector with norm larger
+                than max_norm is renormalized to have norm max_norm.
+            norm_type: The p of the p-norm to compute for the max_norm
+                option.
+            scale_grad_by_freq: If given, this will scale gradients by
+                the inverse of frequency of the words in the
+                mini-batch.
+            sparse: If True, gradient w.r.t. weight matrix will be a
+                sparse tensor.
+            weights_distribution: distribution for the weights of the
                 layer.
-            padding_idx: Index for padding, which keeps gradient
-                constant.
-            max_norm: Maximum norm for embedding vectors.
-            norm_type: Norm type for max_norm computation.
-            scale_grad_by_freq: Scale gradients by word frequency.
-            sparse: Use sparse tensor for weight gradients.
         """
 
         # Call super class constructor
@@ -62,7 +66,6 @@ class Embedding(BayesianModule):
         self.sparse = sparse
 
         # Set weights distribution
-        self.weights_distribution: GaussianDistribution
         if weights_distribution is None:
             self.weights_distribution = GaussianDistribution(
                 (num_embeddings, embeddings_dim)
@@ -71,16 +74,52 @@ class Embedding(BayesianModule):
             self.weights_distribution = weights_distribution
 
         # Create a variable for weights
-        self.w: tf.Variable = self.add_weight(
+        self.w = self.add_weight(
+            name="weights",
             initializer=tf.constant_initializer(
                 self.weights_distribution.sample().numpy()
             ),
-            trainable=False,
-            name="weights",
             shape=(self.num_embeddings, self.embeddings_dim),
+            trainable=False,
         )
 
-    @tf.function
+    def build(self, input_shape: tf.TensorShape) -> None:
+        """
+        Builds the Embedding layer.
+
+        Args:
+            input_shape: Input shape of the layer.
+        """
+
+        # Call super-class build method
+        super().build(input_shape)
+
+    def get_config(self) -> dict:
+        """
+        Retrieves the configuration of the Embedding layer.
+
+        Returns:
+            Dictionary containing layer configuration.
+        """
+
+        # Get the base configuration
+        base_config = super().get_config()
+
+        # Add the custom configurations
+        config = {
+            "num_embeddings": self.num_embeddings,
+            "embeddings_dim": self.embeddings_dim,
+            "padding_idx": self.padding_idx,
+            "max_norm": self.max_norm,
+            "norm_type": self.norm_type,
+            "scale_grad_by_freq": self.scale_grad_by_freq,
+            "sparse": self.sparse,
+            "weights_distribution": self.weights_distribution,
+        }
+
+        # Combine both configurations
+        return {**base_config, **config}
+
     def _embedding(
         self,
         inputs: tf.Tensor,
@@ -126,32 +165,6 @@ class Embedding(BayesianModule):
 
         return embeddings
 
-    def get_config(self) -> dict:
-        """
-        Retrieves the configuration of the Embedding layer.
-
-        Returns:
-            Dictionary containing layer configuration.
-        """
-
-        # Get the base configuration
-        base_config = super().get_config()
-
-        # Add the custom configurations
-        config = {
-            "num_embeddings": self.num_embeddings,
-            "embeddings_dim": self.embeddings_dim,
-            "weights_distribution": self.weights_distribution,
-            "padding_idx": self.padding_idx,
-            "max_norm": self.max_norm,
-            "norm_type": self.norm_type,
-            "scale_grad_by_freq": self.scale_grad_by_freq,
-            "sparse": self.sparse,
-        }
-
-        # Combine both configurations
-        return {**base_config, **config}
-
     def freeze(self) -> None:
         """
         This method freezes the layer.
@@ -165,16 +178,12 @@ class Embedding(BayesianModule):
 
         # Sample weights if they are undefined
         if self.w is None:
-            self.w.assign(self.weights_distribution.sample())  # type: ignore
+            self.w = self.weights_distribution.sample()  # type: ignore
 
-        # Detach weights stopping training updates
-        self.w.assign(tf.stop_gradient(self.w))
-
-    @tf.function
     def kl_cost(self) -> tuple[tf.Tensor, int]:
         """
-        Computes the KL divergence cost for the layer's weights and
-        bias.
+        Computes the Kullback-Leibler (KL) divergence cost for the
+        layer's weights and bias.
 
         Returns:
             Tuple containing KL divergence cost and total number of
@@ -190,13 +199,30 @@ class Embedding(BayesianModule):
         return log_probs, num_params
 
     def call(self, inputs: tf.Tensor) -> tf.Tensor:
-        # Forward depeding of frozen state
+        """
+        Performs a forward pass through the Bayesian Embedding layer.
+
+        Samples weights from their posterior distributions if
+        the layer is not frozen. If frozen and not initialized, samples
+        them once.
+
+        Args:
+            inputs: input tensor. Dimensions: [batch, *].
+
+        Raises:
+            ValueError: Module has been frozen with undefined weights.
+
+        Returns:
+            Output tensor after linear transformation.
+        """
+
+        # Check if layer is frozen
         if not self.frozen:
-            self.w.assign(self.weights_distribution.sample())
-        else:
+            self.w = self.weights_distribution.sample()
+        elif self.w is None:
             raise ValueError("Module has been frozen with undefined weights")
 
-        # Run tensorflow forward
+        # Compute outputs
         outputs: tf.Tensor = self._embedding(
             inputs,
             self.w,

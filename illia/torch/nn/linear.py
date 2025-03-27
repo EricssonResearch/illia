@@ -11,33 +11,20 @@ import torch.nn.functional as F
 
 # Own modules
 from illia.torch.nn.base import BayesianModule
-from illia.torch.distributions import (
-    Distribution,
-    GaussianDistribution,
-)
+from illia.torch.distributions import GaussianDistribution
 
 
 class Linear(BayesianModule):
     """
     This class is the bayesian implementation of the torch Linear layer.
-
-    Attributes:
-        weights_distribution: distribution for the weights of the
-            layer. Dimensions: [output size, input size].
-        bias_distribution: distribution of the bias layer. Dimensions:
-            [output size].
-        weights: sampled weights of the layer. They are registered in
-            the buffer. Dimensions: [output size, input size].
-        bias: sampled bias of the layer. They are registered in
-            the buffer. Dimensions: [output size].
     """
 
     def __init__(
         self,
         input_size: int,
         output_size: int,
-        weights_distribution: Optional[Distribution] = None,
-        bias_distribution: Optional[Distribution] = None,
+        weights_distribution: Optional[GaussianDistribution] = None,
+        bias_distribution: Optional[GaussianDistribution] = None,
     ) -> None:
         """
         This is the constructor of the Linear class.
@@ -45,9 +32,9 @@ class Linear(BayesianModule):
         Args:
             input_size: Input size of the linear layer.
             output_size: Output size of the linear layer.
-            weights_distribution: Distribution for the weights of the
+            weights_distribution: GaussianDistribution for the weights of the
                 layer. Defaults to None.
-            bias_distribution: Distribution for the bias of the layer.
+            bias_distribution: GaussianDistribution for the bias of the layer.
                 Defaults to None.
         """
 
@@ -56,7 +43,7 @@ class Linear(BayesianModule):
 
         # Set weights distribution
         if weights_distribution is None:
-            self.weights_distribution: Distribution = GaussianDistribution(
+            self.weights_distribution: GaussianDistribution = GaussianDistribution(
                 (output_size, input_size)
             )
         else:
@@ -64,7 +51,9 @@ class Linear(BayesianModule):
 
         # Set bias distribution
         if bias_distribution is None:
-            self.bias_distribution: Distribution = GaussianDistribution((output_size,))
+            self.bias_distribution: GaussianDistribution = GaussianDistribution(
+                (output_size,)
+            )
         else:
             self.bias_distribution = bias_distribution
 
@@ -76,7 +65,49 @@ class Linear(BayesianModule):
         self.register_buffer("weights", weights)
         self.register_buffer("bias", bias)
 
-        return None
+    @torch.jit.export
+    def freeze(self) -> None:
+        """
+        This method is to freeze the layer.
+        """
+
+        # Set indicator
+        self.frozen = True
+
+        # Sample weights if they are undefined
+        if self.weights is None:  # type: ignore
+            self.weights = self.weights_distribution.sample()  # pylint: disable=W0201
+
+        # Sample bias is they are undefined
+        if self.bias is None:  # type: ignore
+            self.bias = self.bias_distribution.sample()  # pylint: disable=W0201
+
+        # Detach weights and bias
+        self.weights = self.weights.detach()  # pylint: disable=W0201
+        self.bias = self.bias.detach()  # pylint: disable=W0201
+
+    @torch.jit.export
+    def kl_cost(self) -> tuple[torch.Tensor, int]:
+        """
+        Computes the Kullback-Leibler (KL) divergence cost for the
+        layer's weights and bias.
+
+        Returns:
+            Tuple containing KL divergence cost and total number of
+            parameters.
+        """
+
+        # Compute log probs
+        log_probs: torch.Tensor = self.weights_distribution.log_prob(
+            self.weights
+        ) + self.bias_distribution.log_prob(self.bias)
+
+        # Compute the number of parameters
+        num_params: int = (
+            self.weights_distribution.num_params() + self.bias_distribution.num_params()
+        )
+
+        return log_probs, num_params
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
@@ -96,10 +127,8 @@ class Linear(BayesianModule):
         if not self.frozen:
             self.weights = self.weights_distribution.sample()  # pylint: disable=W0201
             self.bias = self.bias_distribution.sample()  # pylint: disable=W0201
-
-        else:
-            if self.weights is None or self.bias is None:
-                raise ValueError("Module has been frozen with undefined weights")
+        elif self.weights is None or self.bias is None:
+            raise ValueError("Module has been frozen with undefined weights")
 
         # compute outputs
         outputs: torch.Tensor = F.linear(  # pylint: disable=E1102
@@ -107,51 +136,3 @@ class Linear(BayesianModule):
         )
 
         return outputs
-
-    @torch.jit.export
-    def freeze(self) -> None:
-        """
-        This method is to freeze the layer.
-
-        Returns:
-            None.
-        """
-
-        # set indicator
-        self.frozen = True
-
-        # sample weights if they are undefined
-        if self.weights is None:
-            self.weights = self.weights_distribution.sample()  # pylint: disable=W0201
-
-        # sample bias is they are undefined
-        if self.bias is None:
-            self.bias = self.bias_distribution.sample()  # pylint: disable=W0201
-
-        # detach weights and bias
-        self.weights = self.weights.detach()  # pylint: disable=W0201
-        self.bias = self.bias.detach()  # pylint: disable=W0201
-
-        return None
-
-    @torch.jit.export
-    def kl_cost(self) -> tuple[torch.Tensor, int]:
-        """
-        This method is to compute the kl cost of the library.
-
-        Returns:
-            Kl cost. Dimensions: [].
-            Number of parameters of the layer.
-        """
-
-        # compute log probs
-        log_probs: torch.Tensor = self.weights_distribution.log_prob(
-            self.weights
-        ) + self.bias_distribution.log_prob(self.bias)
-
-        # compute the number of parameters
-        num_params: int = (
-            self.weights_distribution.num_params() + self.bias_distribution.num_params()
-        )
-
-        return log_probs, num_params

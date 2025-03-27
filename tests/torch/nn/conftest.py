@@ -10,8 +10,9 @@ import torch
 import pytest
 
 # Own modules
-from illia.torch.nn import Linear, Conv1d, Conv2d, Embedding, BayesianModule
-from illia.torch.distributions import Distribution, GaussianDistribution
+from illia.torch.nn.base import BayesianModule
+from illia.torch.nn import Linear, Conv1d, Conv2d, Embedding
+from illia.torch.distributions import GaussianDistribution
 from tests.torch.nn.utils import ComposedModel, BayesianComposedModel
 
 
@@ -39,8 +40,8 @@ def linear_fixture(request: pytest.FixtureRequest) -> tuple[Linear, torch.Tensor
     batch_size: int
     input_size: int
     output_size: int
-    weights_distribution: Optional[Distribution]
-    bias_distribution: Optional[Distribution]
+    weights_distribution: Optional[GaussianDistribution]
+    bias_distribution: Optional[GaussianDistribution]
     (
         batch_size,
         input_size,
@@ -98,8 +99,8 @@ def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2d, torch.Tensor
     padding: Union[int, tuple[int, int]]
     dilation: Union[int, tuple[int, int]] = 1
     groups: int = 1
-    weights_distribution: Optional[Distribution]
-    bias_distribution: Optional[Distribution]
+    weights_distribution: Optional[GaussianDistribution]
+    bias_distribution: Optional[GaussianDistribution]
     height: int
     width: int
     (
@@ -173,8 +174,8 @@ def conv1d_fixture(request: pytest.FixtureRequest) -> tuple[Conv1d, torch.Tensor
     padding: int
     dilation: int
     groups: int
-    weights_distribution: Optional[Distribution]
-    bias_distribution: Optional[Distribution]
+    weights_distribution: Optional[GaussianDistribution]
+    bias_distribution: Optional[GaussianDistribution]
     embedding_dim: int
     (
         batch_size,
@@ -234,7 +235,7 @@ def embedding_fixture(request: pytest.FixtureRequest) -> tuple[Embedding, torch.
     norm_type: float
     scale_grad_by_freq: bool
     sparse: bool
-    weights_distribution: Optional[Distribution]
+    weights_distribution: Optional[GaussianDistribution]
     (
         batch_size,
         num_embeddings,

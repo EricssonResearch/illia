@@ -28,9 +28,6 @@ class KLDivergenceLoss(torch.nn.Module):
             reduction: Method to reduce the loss, currently only "mean"
                 is supported.
             weight: Scaling factor for the KL divergence loss.
-
-        Returns:
-            None.
         """
 
         # call super class constructor
@@ -39,8 +36,6 @@ class KLDivergenceLoss(torch.nn.Module):
         # Set parameters
         self.reduction = reduction
         self.weight = weight
-
-        return None
 
     def forward(self, model: torch.nn.Module) -> torch.Tensor:
         """
@@ -109,8 +104,6 @@ class ELBOLoss(torch.nn.Module):
         self.kl_weight = kl_weight
         self.kl_loss = KLDivergenceLoss(weight=kl_weight)
 
-        return None
-
     def forward(
         self, outputs: torch.Tensor, targets: torch.Tensor, model: torch.nn.Module
     ) -> torch.Tensor:
@@ -118,8 +111,8 @@ class ELBOLoss(torch.nn.Module):
         Computes the ELBO loss, averaging over multiple samples.
 
         Args:
-            y_true: True target values.
-            y_pred: Predicted values from the model.
+            outputs: Predicted values from the model.
+            targets: True target values.
             model: PyTorch model containing Bayesian modules.
 
         Returns:

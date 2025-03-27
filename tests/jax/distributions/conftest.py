@@ -1,6 +1,4 @@
-"""
-
-"""
+""" """
 
 # 3pps
 import pytest

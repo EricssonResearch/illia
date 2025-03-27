@@ -31,8 +31,6 @@ class BayesianModule(ABC, torch.nn.Module):
         # Create attribute to know is a bayesian layer
         self.is_bayesian: bool = True
 
-        return None
-
     @torch.jit.export
     def freeze(self) -> None:
         """
@@ -43,8 +41,6 @@ class BayesianModule(ABC, torch.nn.Module):
         # Set frozen indicator to true for current layer
         self.frozen = True
 
-        return None
-
     @torch.jit.export
     def unfreeze(self) -> None:
         """
@@ -54,8 +50,6 @@ class BayesianModule(ABC, torch.nn.Module):
 
         # Set frozen indicator to false for current layer
         self.frozen = False
-
-        return None
 
     @torch.jit.export
     def kl_cost(self) -> tuple[torch.Tensor, int]:

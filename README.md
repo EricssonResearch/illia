@@ -1,4 +1,4 @@
-**Warning:**  
+**Warning:**
 
 Illia is currently undergoing active development to achieve stability across all
 frameworks and backends. The library is subject to ongoing changes.

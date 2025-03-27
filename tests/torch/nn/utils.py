@@ -6,7 +6,7 @@ This module contains auxiliary code for tests.torch.nn.
 import torch
 
 # Own modules
-from illia.torch.nn import BayesianModule
+from illia.torch.nn.base import BayesianModule
 
 
 class ComposedModel(torch.nn.Module):
@@ -31,8 +31,6 @@ class ComposedModel(torch.nn.Module):
 
         # Set up models
         self.models = torch.nn.Sequential(*[model for _ in range(num_models)])
-
-        return None
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
@@ -73,8 +71,6 @@ class BayesianComposedModel(BayesianModule):
 
         # Set up models
         self.models = torch.nn.Sequential(*[model for _ in range(num_models)])
-
-        return None
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """

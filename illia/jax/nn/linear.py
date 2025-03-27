@@ -46,8 +46,6 @@ class Linear(BayesianModule):
             weights_distribution: Prior distribution of the weights.
             bias_distribution: Prior distribution of the bias.
             use_bias: Whether to include a bias term in the layer.
-            dtype: Data type for computations.
-            param_dtype: Data type for parameters.
             precision: Precision used in dot product operations.
             dot_general: Function for computing generalized dot
                 products.
@@ -76,8 +74,6 @@ class Linear(BayesianModule):
             else:
                 self.bias_distribution = self.bias_distribution
 
-        return None
-
     def __call__(self, inputs: jax.Array) -> jax.Array:
         """
         This methos is the forward pass of the model.
@@ -100,13 +96,13 @@ class Linear(BayesianModule):
 
         # Compute ouputs
         inputs, _, _ = dtypes.promote_dtype(
-            (inputs, self.weights, self.bias), dtype=self.dtype
+            (inputs, self.weights, self.bias), dtype=self.dtype  # type: ignore
         )
-        outputs = self.dot_general(
+        outputs = self.dot_general(  # type: ignore
             inputs,
             self.weights,
             (((inputs.ndim - 1,), (0,)), ((), ())),
-            precision=self.precision,
+            precision=self.precision,  # type: ignore
         )
         if self.backend_params["use_bias"]:
             outputs += jnp.reshape(self.bias, (1,) * (outputs.ndim - 1) + (-1,))

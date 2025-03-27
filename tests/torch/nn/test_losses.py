@@ -7,7 +7,8 @@ import torch
 import pytest
 
 # Own modules
-from illia.torch.nn import KLDivergenceLoss, Linear, BayesianModule
+from illia.torch.nn.base import BayesianModule
+from illia.torch.nn import KLDivergenceLoss, Linear
 
 
 class TestKLDivergenceLoss:
@@ -23,9 +24,6 @@ class TestKLDivergenceLoss:
         Args:
             linear_fixture: tuple of instance of Linear and inputs to
                 use.
-
-        Returns:
-            None.
         """
 
         # Get model and inputs
@@ -47,8 +45,6 @@ class TestKLDivergenceLoss:
             loss_value.shape == ()
         ), f"Incorrect shape, got {loss_value.shape} and got ()"
 
-        return None
-
     @pytest.mark.order(2)
     def test_backward_single(self, linear_fixture: tuple[Linear, torch.Tensor]) -> None:
         """
@@ -57,9 +53,6 @@ class TestKLDivergenceLoss:
         Args:
             linear_fixture: tuple of instance of Linear and inputs to
                 use.
-
-        Returns:
-            None.
         """
 
         # Get model and inputs
@@ -79,8 +72,6 @@ class TestKLDivergenceLoss:
                 f"None"
             )
 
-        return None
-
     @pytest.mark.order(3)
     def test_forward_multiple(
         self, composed_fixture: tuple[BayesianModule, torch.nn.Module, torch.Tensor]
@@ -91,9 +82,6 @@ class TestKLDivergenceLoss:
         Args:
             linear_fixture: tuple of instance of Composed model and
                 inputs to use.
-
-        Returns:
-            None.
         """
 
         # Get model and inputs
@@ -121,5 +109,3 @@ class TestKLDivergenceLoss:
         assert torch.allclose(
             loss_value, loss_value_bayesian
         ), "Not equal value with BayesianModule and torch.nn.Module."
-
-        return None

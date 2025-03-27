@@ -24,9 +24,6 @@ class TestConv2d:
         Args:
             conv2d_fixture: tuple of instance of Conv2d and inputs to
                 use.
-
-        Returns:
-            None.
         """
 
         model: Conv2d
@@ -38,8 +35,6 @@ class TestConv2d:
             len_parameters == 4
         ), f"Incorrect parameters length, expected 4 and got {len_parameters}"
 
-        return None
-
     @pytest.mark.order(2)
     def test_forward(self, conv2d_fixture: tuple[Conv2d, torch.Tensor]) -> None:
         """
@@ -48,9 +43,6 @@ class TestConv2d:
         Args:
             conv2d_fixture: tuple of instance of Conv2d and inputs to
                 use.
-
-        Returns:
-            None.
         """
 
         # Get model and inputs
@@ -72,8 +64,6 @@ class TestConv2d:
             f"{(inputs.shape[0], model.weights.shape[0])} and got {outputs.shape}"
         )
 
-        return None
-
     @pytest.mark.order(3)
     def test_backward(self, conv2d_fixture: tuple[Conv2d, torch.Tensor]) -> None:
         """
@@ -82,9 +72,6 @@ class TestConv2d:
         Args:
             conv2d_fixture: tuple of instance of Conv2d and inputs to
                 use.
-
-        Returns:
-            None.
         """
 
         # Get model and inputs
@@ -104,8 +91,6 @@ class TestConv2d:
                 f"None"
             )
 
-        return None
-
     @pytest.mark.order(4)
     def test_freeze(self, conv2d_fixture: tuple[Conv2d, torch.Tensor]) -> None:
         """
@@ -115,9 +100,6 @@ class TestConv2d:
         Args:
             conv2d_fixture: tuple of instance of Conv2d and inputs to
                 use.
-
-        Returns:
-            None.
         """
 
         # Get model and inputs
@@ -161,8 +143,6 @@ class TestConv2d:
             "different forward passes"
         )
 
-        return None
-
     @pytest.mark.order(5)
     def test_kl_cost(self, conv2d_fixture: tuple[Conv2d, torch.Tensor]) -> None:
         """
@@ -171,9 +151,6 @@ class TestConv2d:
         Args:
             conv2d_fixture: tuple of instance of Conv2d and inputs to
                 use.
-
-        Returns:
-            None.
         """
 
         # Get model and inputs
@@ -206,8 +183,6 @@ class TestConv2d:
             f"{outputs[0].shape}"
         )
 
-        return None
-
     @pytest.mark.order(6)
     def test_jit(self, conv2d_fixture: tuple[Conv2d, torch.Tensor]) -> None:
         """
@@ -216,9 +191,6 @@ class TestConv2d:
         Args:
             conv2d_fixture: tuple of instance of Conv2d and inputs to
                 use.
-
-        Returns:
-            None.
         """
 
         # Get model and inputs
@@ -264,5 +236,3 @@ class TestConv2d:
 
         # Compute kl cost
         kl_cost, num_params = model_scripted.kl_cost()
-
-        return None

@@ -1,32 +1,33 @@
 """
-This module contains the code to test the bayesian Linear layer.
+This module contains the tests for the bayesian Conv2d.
 """
 
 # 3pps
+import keras
 import tensorflow as tf
 import pytest
 
-# own modules
-from illia.tf.nn import Linear
+# Own modules
+from illia.tf.nn import Conv2d
 
 
-class TestLinear:
+class TestConv2d:
     """
-    This class tests the Linear bayesian layer.
+    This class tests the bayesian Conv2d.
     """
 
     @pytest.mark.order(1)
-    def test_init(self, linear_fixture: tuple[Linear, tf.Tensor]) -> None:
+    def test_init(self, conv2d_fixture: tuple[Conv2d, tf.Tensor]) -> None:
         """
-        This method is the test for the Linear constructor.
+        This method is the test for the Conv2d constructor.
 
         Args:
-            linear_fixture: tuple of instance of Linear and inputs to
+            conv2d_fixture: tuple of instance of Conv2d and inputs to
                 use.
         """
 
-        model: Linear
-        model, _ = linear_fixture
+        model: Conv2d
+        model, _ = conv2d_fixture
 
         # Check parameters length
         len_parameters: int = len(model.trainable_variables)
@@ -35,19 +36,19 @@ class TestLinear:
         ), f"Incorrect parameters length, expected 4 and got {len_parameters}"
 
     @pytest.mark.order(2)
-    def test_forward(self, linear_fixture: tuple[Linear, tf.Tensor]) -> None:
+    def test_forward(self, conv2d_fixture: tuple[Conv2d, tf.Tensor]) -> None:
         """
-        This method is the test for the Linear forward pass.
+        This method is the test for the Conv2d forward pass.
 
         Args:
-            linear_fixture: tuple of instance of Linear and inputs to
+            conv2d_fixture: tuple of instance of Conv2d and inputs to
                 use.
         """
 
         # Get model and inputs
-        model: Linear
+        model: Conv2d
         inputs: tf.Tensor
-        model, inputs = linear_fixture
+        model, inputs = conv2d_fixture
 
         # Check parameters length
         outputs: tf.Tensor = model(inputs)
@@ -58,25 +59,35 @@ class TestLinear:
         ), f"Incorrect outputs class, expected {tf.Tensor} and got {type(outputs)}"
 
         # Check outputs shape
-        assert outputs.shape == (inputs.shape[0], outputs.shape[-1]), (
+        assert (outputs.shape[0], outputs.shape[-1]) == (
+            inputs.shape[0],
+            model.w.shape[-1],
+        ), (
             f"Incorrect outputs shape, expected "
-            f"{(inputs.shape[0], outputs.shape[-1])} and got {outputs.shape}"
+            f"{(inputs.shape[0], model.w.shape[-1])} and got {(outputs.shape[0], outputs.shape[-1])}"
         )
 
     @pytest.mark.order(3)
-    def test_backward(self, linear_fixture: tuple[Linear, tf.Tensor]) -> None:
+    def test_backward(self, conv2d_fixture: tuple[Conv2d, tf.Tensor]) -> None:
         """
-        This method is the test for the Linear backward pass.
+        This method is the test for the Conv2d backward pass.
 
         Args:
-            linear_fixture: tuple of instance of Linear and inputs to
+            conv2d_fixture: tuple of instance of Conv2d and inputs to
                 use.
         """
 
         # Get model and inputs
-        model: Linear
+        model: Conv2d
         inputs: tf.Tensor
-        model, inputs = linear_fixture
+        model, inputs = conv2d_fixture
+
+        # Skip gradient test if running on CPU
+        if len(tf.config.list_physical_devices("GPU")) == 0:
+            pytest.skip(
+                "Skipping backward test because grouped convolution "
+                "gradients are not supported on CPU."
+            )
 
         # Check parameters length
         with tf.GradientTape() as tape:
@@ -87,25 +98,25 @@ class TestLinear:
         for i, gradient in enumerate(gradients):
             # Check if parameter is none
             assert gradient is not None, (
-                f"Incorrect backward computation, gradient of {model.trainable_variables[i]} shouldn't be "
-                f"None"
+                "Incorrect backward computation, gradient of "
+                f"{model.trainable_variables[i]} shouldn't be None"
             )
 
     @pytest.mark.order(4)
-    def test_freeze(self, linear_fixture: tuple[Linear, tf.Tensor]) -> None:
+    def test_freeze(self, conv2d_fixture: tuple[Conv2d, tf.Tensor]) -> None:
         """
         This method is the test for the freeze and unfreeze layers from
-        Linear layer.
+        Conv2d layer.
 
         Args:
-            linear_fixture: tuple of instance of Linear and inputs to
+            conv2d_fixture: tuple of instance of Conv2d and inputs to
                 use.
         """
 
         # Get model and inputs
-        model: Linear
+        model: Conv2d
         inputs: tf.Tensor
-        model, inputs = linear_fixture
+        model, inputs = conv2d_fixture
 
         # Compute outputs
         outputs_first: tf.Tensor = model(inputs)
@@ -148,18 +159,18 @@ class TestLinear:
         )
 
     @pytest.mark.order(5)
-    def test_kl_cost(self, linear_fixture: tuple[Linear, tf.Tensor]) -> None:
+    def test_kl_cost(self, conv2d_fixture: tuple[Conv2d, tf.Tensor]) -> None:
         """
-        This method is the test for the kl_cost method of Linear layer.
+        This method is the test for the kl_cost method of Conv2d layer.
 
         Args:
-            linear_fixture: tuple of instance of Linear and inputs to
+            conv2d_fixture: tuple of instance of Conv2d and inputs to
                 use.
         """
 
         # Get model and inputs
-        model: Linear
-        model, _ = linear_fixture
+        model: Conv2d
+        model, _ = conv2d_fixture
 
         # Compute outputs
         outputs: tuple[tf.Tensor, int] = model.kl_cost()
