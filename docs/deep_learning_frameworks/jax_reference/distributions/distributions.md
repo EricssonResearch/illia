@@ -1,1 +1,0 @@
-::: illia.jax.distributions.gaussian

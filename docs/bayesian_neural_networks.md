@@ -22,8 +22,7 @@ where:
 - $P(\theta | D)$ is the posterior distribution of the parameters given the data.
 - $P(D | \theta)$ is the likelihood of the data given the parameters.
 - $P(\theta)$ is the prior distribution of the parameters.
-- $P(D)$ is the marginal likelihood (evidence), which acts as a normalization
-  factor.
+- $P(D)$ is the marginal likelihood (evidence), which acts as a normalization factor.
 
 ## Bayesian Neural Networks
 

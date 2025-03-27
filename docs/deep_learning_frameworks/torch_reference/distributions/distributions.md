@@ -1,1 +1,0 @@
-::: illia.torch.distributions.gaussian
