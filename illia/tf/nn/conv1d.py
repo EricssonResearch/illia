@@ -161,7 +161,7 @@ class Conv1d(BayesianModule):
             filters=weight,
             stride=stride,
             padding=padding,
-            dilations=dilation,
+            # dilations=dilation,
         )
 
         return output
