@@ -148,7 +148,7 @@ class Conv1d(BayesianModule):
             self.bias = self.bias_distribution.sample()  # pylint: disable=W0201
         elif self.weights is None or self.bias is None:
             raise ValueError("Module has been frozen with undefined weights")
-        
+
         # Execute torch forward
         return F.conv1d(  # pylint: disable=E1102
             inputs, self.weights, self.bias, *self.conv_params  # type: ignore

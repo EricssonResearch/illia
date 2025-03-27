@@ -59,7 +59,10 @@ class TestConv2d:
         ), f"Incorrect outputs class, expected {tf.Tensor} and got {type(outputs)}"
 
         # Check outputs shape
-        assert (outputs.shape[0], outputs.shape[-1]) == (inputs.shape[0], model.w.shape[-1]), (
+        assert (outputs.shape[0], outputs.shape[-1]) == (
+            inputs.shape[0],
+            model.w.shape[-1],
+        ), (
             f"Incorrect outputs shape, expected "
             f"{(inputs.shape[0], model.w.shape[-1])} and got {(outputs.shape[0], outputs.shape[-1])}"
         )
