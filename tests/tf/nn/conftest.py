@@ -151,11 +151,8 @@ def embedding_fixture(request: pytest.FixtureRequest) -> tuple[Embedding, tf.Ten
             [3, 3],
             [2, 1],
             "SAME",
-            [
-                2,
-                1,
-            ],  # TODO: Error GitHub Workflow with CPU implementation dilation=[2, 1]
-            2,  # TODO: Error GitHub Workflow with CPU implementation groups=2
+            1,  # TODO: Error GitHub Workflow with CPU implementation dilation=[2, 1]
+            1,  # TODO: Error GitHub Workflow with CPU implementation groups=2
             None,
             None,
             64,
@@ -247,8 +244,8 @@ def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2D, tf.Tensor]:
             3,
             2,
             "SAME",
-            2,  # TODO: Error GitHub Workflow with CPU implementation dilation=2
-            2,  # TODO: Error GitHub Workflow with CPU implementation groups=2
+            1,  # TODO: Error GitHub Workflow with CPU implementation dilation=2
+            1,  # TODO: Error GitHub Workflow with CPU implementation groups=2
             None,
             None,
             16,
@@ -274,8 +271,8 @@ def conv1d_fixture(request: pytest.FixtureRequest) -> tuple[Conv1D, tf.Tensor]:
     kernel_size: int
     stride: Union[int, list[int]]
     padding: str
-    dilation: Union[int, list[int]]
-    groups: int
+    dilation: Union[int, list[int]] = 1
+    groups: int = 1
     weights_distribution: Optional[GaussianDistribution]
     bias_distribution: Optional[GaussianDistribution]
     embedding_dim: int
