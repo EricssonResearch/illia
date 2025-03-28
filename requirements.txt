@@ -1,6 +1,7 @@
 # Illia Dependencies
 torch==2.4.0
 tensorflow==2.19.0
+keras==3.9.0
 flax==0.10.1
 jax==0.4.31
 optax==0.2.3

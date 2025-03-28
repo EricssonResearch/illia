@@ -151,7 +151,7 @@ def embedding_fixture(request: pytest.FixtureRequest) -> tuple[Embedding, tf.Ten
             [3, 3],
             [2, 1],
             "SAME",
-            1,  # TODO: Error GitHub Workflow with CPU implementation dilation=[2, 1]
+            None,  # TODO: Error GitHub Workflow with CPU implementation dilation=[2, 1]
             1,  # TODO: Error GitHub Workflow with CPU implementation groups=2
             None,
             None,
@@ -244,7 +244,7 @@ def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2D, tf.Tensor]:
             3,
             2,
             "SAME",
-            1,  # TODO: Error GitHub Workflow with CPU implementation dilation=2
+            None,  # TODO: Error GitHub Workflow with CPU implementation dilation=2
             1,  # TODO: Error GitHub Workflow with CPU implementation groups=2
             None,
             None,
