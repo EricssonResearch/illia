@@ -1,5 +1,5 @@
 """
-This module contains the tests for the bayesian Conv2d.
+This module contains the tests for the bayesian Conv2D.
 """
 
 # 3pps
@@ -8,25 +8,25 @@ from torch.jit import RecursiveScriptModule
 import pytest
 
 # Own modules
-from illia.torch.nn import Conv2d
+from illia.torch.nn import Conv2D
 
 
 class TestConv2d:
     """
-    This class tests the bayesian Conv2d.
+    This class tests the bayesian Conv2D.
     """
 
     @pytest.mark.order(1)
-    def test_init(self, conv2d_fixture: tuple[Conv2d, torch.Tensor]) -> None:
+    def test_init(self, conv2d_fixture: tuple[Conv2D, torch.Tensor]) -> None:
         """
-        This method is the test for the Conv2d constructor.
+        This method is the test for the Conv2D constructor.
 
         Args:
-            conv2d_fixture: tuple of instance of Conv2d and inputs to
+            conv2d_fixture: tuple of instance of Conv2D and inputs to
                 use.
         """
 
-        model: Conv2d
+        model: Conv2D
         model, _ = conv2d_fixture
 
         # Check parameters length
@@ -36,17 +36,17 @@ class TestConv2d:
         ), f"Incorrect parameters length, expected 4 and got {len_parameters}"
 
     @pytest.mark.order(2)
-    def test_forward(self, conv2d_fixture: tuple[Conv2d, torch.Tensor]) -> None:
+    def test_forward(self, conv2d_fixture: tuple[Conv2D, torch.Tensor]) -> None:
         """
-        This method is the test for the Conv2d forward pass.
+        This method is the test for the Conv2D forward pass.
 
         Args:
-            conv2d_fixture: tuple of instance of Conv2d and inputs to
+            conv2d_fixture: tuple of instance of Conv2D and inputs to
                 use.
         """
 
         # Get model and inputs
-        model: Conv2d
+        model: Conv2D
         inputs: torch.Tensor
         model, inputs = conv2d_fixture
 
@@ -65,17 +65,17 @@ class TestConv2d:
         )
 
     @pytest.mark.order(3)
-    def test_backward(self, conv2d_fixture: tuple[Conv2d, torch.Tensor]) -> None:
+    def test_backward(self, conv2d_fixture: tuple[Conv2D, torch.Tensor]) -> None:
         """
-        This method is the test for the Conv2d backward pass.
+        This method is the test for the Conv2D backward pass.
 
         Args:
-            conv2d_fixture: tuple of instance of Conv2d and inputs to
+            conv2d_fixture: tuple of instance of Conv2D and inputs to
                 use.
         """
 
         # Get model and inputs
-        model: Conv2d
+        model: Conv2D
         inputs: torch.Tensor
         model, inputs = conv2d_fixture
 
@@ -92,18 +92,18 @@ class TestConv2d:
             )
 
     @pytest.mark.order(4)
-    def test_freeze(self, conv2d_fixture: tuple[Conv2d, torch.Tensor]) -> None:
+    def test_freeze(self, conv2d_fixture: tuple[Conv2D, torch.Tensor]) -> None:
         """
         This method is the test for the freeze and unfreeze layers from
-        Conv2d layer.
+        Conv2D layer.
 
         Args:
-            conv2d_fixture: tuple of instance of Conv2d and inputs to
+            conv2d_fixture: tuple of instance of Conv2D and inputs to
                 use.
         """
 
         # Get model and inputs
-        model: Conv2d
+        model: Conv2D
         inputs: torch.Tensor
         model, inputs = conv2d_fixture
 
@@ -144,17 +144,17 @@ class TestConv2d:
         )
 
     @pytest.mark.order(5)
-    def test_kl_cost(self, conv2d_fixture: tuple[Conv2d, torch.Tensor]) -> None:
+    def test_kl_cost(self, conv2d_fixture: tuple[Conv2D, torch.Tensor]) -> None:
         """
-        This method is the test for the kl_cost method of Conv2d layer.
+        This method is the test for the kl_cost method of Conv2D layer.
 
         Args:
-            conv2d_fixture: tuple of instance of Conv2d and inputs to
+            conv2d_fixture: tuple of instance of Conv2D and inputs to
                 use.
         """
 
         # Get model and inputs
-        model: Conv2d
+        model: Conv2D
         model, _ = conv2d_fixture
 
         # Compute outputs
@@ -184,17 +184,17 @@ class TestConv2d:
         )
 
     @pytest.mark.order(6)
-    def test_jit(self, conv2d_fixture: tuple[Conv2d, torch.Tensor]) -> None:
+    def test_jit(self, conv2d_fixture: tuple[Conv2D, torch.Tensor]) -> None:
         """
         This method tests the scripting of the layer.
 
         Args:
-            conv2d_fixture: tuple of instance of Conv2d and inputs to
+            conv2d_fixture: tuple of instance of Conv2D and inputs to
                 use.
         """
 
         # Get model and inputs
-        model: Conv2d
+        model: Conv2D
         inputs: torch.Tensor
         model, inputs = conv2d_fixture
 

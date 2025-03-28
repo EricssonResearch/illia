@@ -1,5 +1,5 @@
 """
-This module contains the code for the bayesian Conv1d.
+This module contains the code for the bayesian Conv1D.
 """
 
 # Standard libraries
@@ -14,10 +14,10 @@ from illia.tf.nn.base import BayesianModule
 from illia.tf.distributions import GaussianDistribution
 
 
-@saving.register_keras_serializable(package="BayesianModule", name="Conv1d")
-class Conv1d(BayesianModule):
+@saving.register_keras_serializable(package="BayesianModule", name="Conv1D")
+class Conv1D(BayesianModule):
     """
-    This class is the bayesian implementation of the Conv1d class.
+    This class is the bayesian implementation of the Conv1D class.
     """
 
     def __init__(
@@ -76,24 +76,6 @@ class Conv1d(BayesianModule):
         else:
             self.bias_distribution = bias_distribution
 
-        # Register non-trainable variables
-        self.w = self.add_weight(
-            name="weights",
-            initializer=tf.constant_initializer(
-                self.weights_distribution.sample().numpy()
-            ),
-            shape=(input_channels // groups, kernel_size, output_channels),
-            trainable=False,
-        )
-        self.b = self.add_weight(
-            name="bias",
-            initializer=tf.constant_initializer(
-                self.bias_distribution.sample().numpy()
-            ),
-            shape=(output_channels,),
-            trainable=False,
-        )
-
     def build(self, input_shape: tf.TensorShape) -> None:
         """
         Builds the Conv2D layer.
@@ -101,6 +83,28 @@ class Conv1d(BayesianModule):
         Args:
             input_shape: Input shape of the layer.
         """
+
+        # Register non-trainable variables
+        self.w = self.add_weight(
+            name="weights",
+            initializer=tf.constant_initializer(
+                self.weights_distribution.sample().numpy()
+            ),
+            shape=(
+                self.input_channels // self.groups,
+                self.kernel_size,
+                self.output_channels,
+            ),
+            trainable=False,
+        )
+        self.b = self.add_weight(
+            name="bias",
+            initializer=tf.constant_initializer(
+                self.bias_distribution.sample().numpy()
+            ),
+            shape=(self.output_channels,),
+            trainable=False,
+        )
 
         # Call super-class build method
         super().build(input_shape)
@@ -161,7 +165,7 @@ class Conv1d(BayesianModule):
             filters=weight,
             stride=stride,
             padding=padding,
-            # dilations=dilation,
+            dilations=dilation,
         )
 
         return output

@@ -58,6 +58,14 @@ class Linear(BayesianModule):
         else:
             self.bias_distribution = bias_distribution
 
+    def build(self, input_shape: tf.TensorShape) -> None:
+        """
+        Builds the Linear layer.
+
+        Args:
+            input_shape: Input shape of the layer.
+        """
+
         # Register non-trainable variables
         self.w = self.add_weight(
             name="weights",
@@ -75,14 +83,6 @@ class Linear(BayesianModule):
             shape=(self.output_size,),
             trainable=False,
         )
-
-    def build(self, input_shape: tf.TensorShape) -> None:
-        """
-        Builds the Linear layer.
-
-        Args:
-            input_shape: Input shape of the layer.
-        """
 
         # Call super-class build method
         super().build(input_shape)

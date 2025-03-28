@@ -12,7 +12,7 @@ import pytest
 
 # Own modules
 from illia.tf.nn.base import BayesianModule
-from illia.tf.nn import Linear, Embedding, Conv2d, Conv1d
+from illia.tf.nn import Linear, Embedding, Conv2D, Conv1D
 from illia.tf.distributions.base import Distribution
 from illia.tf.distributions import GaussianDistribution
 
@@ -51,11 +51,16 @@ def linear_fixture(request: pytest.FixtureRequest) -> tuple[Linear, tf.Tensor]:
         bias_distribution,
     ) = request.param
 
-    # Define model and inputs
+    # Define model
     model: Linear = Linear(
         input_size, output_size, weights_distribution, bias_distribution
     )
+
+    # Define inputs
     inputs: tf.Tensor = tf.random.uniform((batch_size, input_size))
+
+    # Build the model
+    model.build(inputs.shape)
 
     return model, inputs
 
@@ -100,7 +105,7 @@ def embedding_fixture(request: pytest.FixtureRequest) -> tuple[Embedding, tf.Ten
         weights_distribution,
     ) = request.param
 
-    # Define model and inputs
+    # Define model
     model: Embedding = Embedding(
         num_embeddings,
         embeddings_dim,
@@ -111,9 +116,14 @@ def embedding_fixture(request: pytest.FixtureRequest) -> tuple[Embedding, tf.Ten
         sparse,
         weights_distribution,
     )
+
+    # Define inputs
     inputs: tf.Tensor = tf.random.uniform(
         shape=(batch_size,), minval=0, maxval=num_embeddings, dtype=tf.int32
     )
+
+    # Build model
+    model.build(inputs.shape)
 
     return model, inputs
 
@@ -153,16 +163,16 @@ def embedding_fixture(request: pytest.FixtureRequest) -> tuple[Embedding, tf.Ten
         ),
     ]
 )
-def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2d, tf.Tensor]:
+def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2D, tf.Tensor]:
     """
-    This function is the fixture for bayesian Conv2d layer.
+    This function is the fixture for bayesian Conv2D layer.
 
     Args:
         request: Pytest fixture request.
 
     Returns:
-        Conv2d instance.
-        Inputs compatible with Conv2d instance.
+        Conv2D instance.
+        Inputs compatible with Conv2D instance.
     """
 
     # Get parameters
@@ -193,8 +203,8 @@ def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2d, tf.Tensor]:
         width,
     ) = request.param
 
-    # Define model and inputs
-    model: Conv2d = Conv2d(
+    # Define model
+    model: Conv2D = Conv2D(
         input_channels,
         output_channels,
         kernel_size,
@@ -205,7 +215,12 @@ def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2d, tf.Tensor]:
         weights_distribution,
         bias_distribution,
     )
+
+    # Define inputs
     inputs: tf.Tensor = tf.random.uniform((batch_size, height, width, input_channels))
+
+    # Build model
+    model.build(inputs.shape)
 
     return model, inputs
 
@@ -240,16 +255,16 @@ def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2d, tf.Tensor]:
         ),
     ]
 )
-def conv1d_fixture(request: pytest.FixtureRequest) -> tuple[Conv1d, tf.Tensor]:
+def conv1d_fixture(request: pytest.FixtureRequest) -> tuple[Conv1D, tf.Tensor]:
     """
-    This function is the fixture for bayesian Conv1d layer.
+    This function is the fixture for bayesian Conv1D layer.
 
     Args:
         request: Pytest fixture request.
 
     Returns:
-        Conv1d instance.
-        Inputs compatible with Conv1d instance.
+        Conv1D instance.
+        Inputs compatible with Conv1D instance.
     """
 
     # Get parameters
@@ -278,8 +293,8 @@ def conv1d_fixture(request: pytest.FixtureRequest) -> tuple[Conv1d, tf.Tensor]:
         embedding_dim,
     ) = request.param
 
-    # Define model and inputs
-    model: Conv1d = Conv1d(
+    # Define model
+    model: Conv1D = Conv1D(
         input_channels,
         output_channels,
         kernel_size,
@@ -290,6 +305,11 @@ def conv1d_fixture(request: pytest.FixtureRequest) -> tuple[Conv1d, tf.Tensor]:
         weights_distribution,
         bias_distribution,
     )
+
+    # Define inputs
     inputs: tf.Tensor = tf.random.uniform((batch_size, embedding_dim, input_channels))
+
+    # Build model
+    model.build(inputs.shape)
 
     return model, inputs

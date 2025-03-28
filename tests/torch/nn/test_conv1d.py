@@ -1,5 +1,5 @@
 """
-This module contains the tests for the bayesian Conv1d.
+This module contains the tests for the bayesian Conv1D.
 """
 
 # 3pps
@@ -8,25 +8,25 @@ from torch.jit import RecursiveScriptModule
 import pytest
 
 # Own modules
-from illia.torch.nn import Conv1d
+from illia.torch.nn import Conv1D
 
 
 class TestConv1d:
     """
-    This class tests the bayesian Conv1d.
+    This class tests the bayesian Conv1D.
     """
 
     @pytest.mark.order(1)
-    def test_init(self, conv1d_fixture: tuple[Conv1d, torch.Tensor]) -> None:
+    def test_init(self, conv1d_fixture: tuple[Conv1D, torch.Tensor]) -> None:
         """
-        This method is the test for the Conv1d constructor.
+        This method is the test for the Conv1D constructor.
 
         Args:
-            conv1d_fixture: tuple of instance of Conv1d and inputs to
+            conv1d_fixture: tuple of instance of Conv1D and inputs to
                 use.
         """
 
-        model: Conv1d
+        model: Conv1D
         model, _ = conv1d_fixture
 
         # Check parameters length
@@ -36,12 +36,12 @@ class TestConv1d:
         ), f"Incorrect parameters length, expected 4 and got {len_parameters}"
 
     @pytest.mark.order(2)
-    def test_forward(self, conv1d_fixture: tuple[Conv1d, torch.Tensor]) -> None:
+    def test_forward(self, conv1d_fixture: tuple[Conv1D, torch.Tensor]) -> None:
         """
-        This method is the test for the Conv1d forward pass.
+        This method is the test for the Conv1D forward pass.
 
         Args:
-            conv1d_fixture: tuple of instance of Conv1d and inputs to
+            conv1d_fixture: tuple of instance of Conv1D and inputs to
                 use.
 
         Returns:
@@ -49,7 +49,7 @@ class TestConv1d:
         """
 
         # Get model and inputs
-        model: Conv1d
+        model: Conv1D
         inputs: torch.Tensor
         model, inputs = conv1d_fixture
 
@@ -68,17 +68,17 @@ class TestConv1d:
         )
 
     @pytest.mark.order(3)
-    def test_backward(self, conv1d_fixture: tuple[Conv1d, torch.Tensor]) -> None:
+    def test_backward(self, conv1d_fixture: tuple[Conv1D, torch.Tensor]) -> None:
         """
-        This method is the test for the Conv1d backward pass.
+        This method is the test for the Conv1D backward pass.
 
         Args:
-            conv1d_fixture: tuple of instance of Conv1d and inputs to
+            conv1d_fixture: tuple of instance of Conv1D and inputs to
                 use.
         """
 
         # Get model and inputs
-        model: Conv1d
+        model: Conv1D
         inputs: torch.Tensor
         model, inputs = conv1d_fixture
 
@@ -95,13 +95,13 @@ class TestConv1d:
             )
 
     @pytest.mark.order(4)
-    def test_freeze(self, conv1d_fixture: tuple[Conv1d, torch.Tensor]) -> None:
+    def test_freeze(self, conv1d_fixture: tuple[Conv1D, torch.Tensor]) -> None:
         """
         This method is the test for the freeze and unfreeze layers from
-        Conv1d layer.
+        Conv1D layer.
 
         Args:
-            conv1d_fixture: tuple of instance of Conv1d and inputs to
+            conv1d_fixture: tuple of instance of Conv1D and inputs to
                 use.
 
         Returns:
@@ -109,7 +109,7 @@ class TestConv1d:
         """
 
         # Get model and inputs
-        model: Conv1d
+        model: Conv1D
         inputs: torch.Tensor
         model, inputs = conv1d_fixture
 
@@ -150,17 +150,17 @@ class TestConv1d:
         )
 
     @pytest.mark.order(5)
-    def test_kl_cost(self, conv1d_fixture: tuple[Conv1d, torch.Tensor]) -> None:
+    def test_kl_cost(self, conv1d_fixture: tuple[Conv1D, torch.Tensor]) -> None:
         """
-        This method is the test for the kl_cost method of Conv1d layer.
+        This method is the test for the kl_cost method of Conv1D layer.
 
         Args:
-            conv1d_fixture: tuple of instance of Conv1d and inputs to
+            conv1d_fixture: tuple of instance of Conv1D and inputs to
                 use.
         """
 
         # Get model and inputs
-        model: Conv1d
+        model: Conv1D
         model, _ = conv1d_fixture
 
         # Compute outputs
@@ -190,17 +190,17 @@ class TestConv1d:
         )
 
     @pytest.mark.order(6)
-    def test_jit(self, conv1d_fixture: tuple[Conv1d, torch.Tensor]) -> None:
+    def test_jit(self, conv1d_fixture: tuple[Conv1D, torch.Tensor]) -> None:
         """
         This method tests the scripting of the layer.
 
         Args:
-            conv1d_fixture: tuple of instance of Conv1d and inputs to
+            conv1d_fixture: tuple of instance of Conv1D and inputs to
                 use.
         """
 
         # Get model and inputs
-        model: Conv1d
+        model: Conv1D
         inputs: torch.Tensor
         model, inputs = conv1d_fixture
 

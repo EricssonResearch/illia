@@ -11,7 +11,7 @@ import pytest
 
 # Own modules
 from illia.torch.nn.base import BayesianModule
-from illia.torch.nn import Linear, Conv1d, Conv2d, Embedding
+from illia.torch.nn import Linear, Conv1D, Conv2D, Embedding
 from illia.torch.distributions import GaussianDistribution
 from tests.torch.nn.utils import ComposedModel, BayesianComposedModel
 
@@ -78,16 +78,16 @@ def linear_fixture(request: pytest.FixtureRequest) -> tuple[Linear, torch.Tensor
         (64, 6, 6, (4, 4), (2, 1), (3, 1), (2, 1), 2, None, None, 64, 64),
     ]
 )
-def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2d, torch.Tensor]:
+def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2D, torch.Tensor]:
     """
-    This function is the fixture for bayesian Conv2d layer.
+    This function is the fixture for bayesian Conv2D layer.
 
     Args:
         request: Pytest fixture request.
 
     Returns:
-        Conv2d instance.
-        Inputs compatible with Conv2d instance.
+        Conv2D instance.
+        Inputs compatible with Conv2D instance.
     """
 
     # Get parameters
@@ -119,7 +119,7 @@ def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2d, torch.Tensor
     ) = request.param
 
     # Define model and inputs
-    model: Conv2d = Conv2d(
+    model: Conv2D = Conv2D(
         input_channels,
         output_channels,
         kernel_size,
@@ -153,16 +153,16 @@ def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2d, torch.Tensor
         (64, 6, 6, 4, 2, 3, 2, 2, None, None, 16),
     ]
 )
-def conv1d_fixture(request: pytest.FixtureRequest) -> tuple[Conv1d, torch.Tensor]:
+def conv1d_fixture(request: pytest.FixtureRequest) -> tuple[Conv1D, torch.Tensor]:
     """
-    This function is the fixture for bayesian Conv1d layer.
+    This function is the fixture for bayesian Conv1D layer.
 
     Args:
         request: Pytest fixture request.
 
     Returns:
-        Conv1d instance.
-        Inputs compatible with Conv1d instance.
+        Conv1D instance.
+        Inputs compatible with Conv1D instance.
     """
 
     # Get parameters
@@ -192,7 +192,7 @@ def conv1d_fixture(request: pytest.FixtureRequest) -> tuple[Conv1d, torch.Tensor
     ) = request.param
 
     # Define model and inputs
-    model: Conv1d = Conv1d(
+    model: Conv1D = Conv1D(
         input_channels,
         output_channels,
         kernel_size,

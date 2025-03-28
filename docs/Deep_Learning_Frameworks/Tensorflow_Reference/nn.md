@@ -1,5 +1,7 @@
 # Neural Network
 
+::: illia.tf.nn.conv1d
+
 ::: illia.tf.nn.conv2d
 
 ::: illia.tf.nn.embedding

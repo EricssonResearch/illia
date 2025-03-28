@@ -8,9 +8,10 @@ from typing import Optional
 
 # 3pps
 import tensorflow as tf
-from keras import layers
+from keras import layers, saving
 
 
+@saving.register_keras_serializable(package="BayesianModule", name="Distribution")
 class Distribution(ABC, layers.Layer):
     """
     This class is the base class for distributions.

@@ -1,5 +1,5 @@
 """
-This module contains the tests for the bayesian Conv2d.
+This module contains the tests for the bayesian Conv2D.
 """
 
 # 3pps
@@ -8,25 +8,25 @@ import tensorflow as tf
 import pytest
 
 # Own modules
-from illia.tf.nn import Conv2d
+from illia.tf.nn import Conv2D
 
 
 class TestConv2d:
     """
-    This class tests the bayesian Conv2d.
+    This class tests the bayesian Conv2D.
     """
 
     @pytest.mark.order(1)
-    def test_init(self, conv2d_fixture: tuple[Conv2d, tf.Tensor]) -> None:
+    def test_init(self, conv2d_fixture: tuple[Conv2D, tf.Tensor]) -> None:
         """
-        This method is the test for the Conv2d constructor.
+        This method is the test for the Conv2D constructor.
 
         Args:
-            conv2d_fixture: tuple of instance of Conv2d and inputs to
+            conv2d_fixture: tuple of instance of Conv2D and inputs to
                 use.
         """
 
-        model: Conv2d
+        model: Conv2D
         model, _ = conv2d_fixture
 
         # Check parameters length
@@ -36,17 +36,17 @@ class TestConv2d:
         ), f"Incorrect parameters length, expected 4 and got {len_parameters}"
 
     @pytest.mark.order(2)
-    def test_forward(self, conv2d_fixture: tuple[Conv2d, tf.Tensor]) -> None:
+    def test_forward(self, conv2d_fixture: tuple[Conv2D, tf.Tensor]) -> None:
         """
-        This method is the test for the Conv2d forward pass.
+        This method is the test for the Conv2D forward pass.
 
         Args:
-            conv2d_fixture: tuple of instance of Conv2d and inputs to
+            conv2d_fixture: tuple of instance of Conv2D and inputs to
                 use.
         """
 
         # Get model and inputs
-        model: Conv2d
+        model: Conv2D
         inputs: tf.Tensor
         model, inputs = conv2d_fixture
 
@@ -64,33 +64,35 @@ class TestConv2d:
             model.w.shape[-1],
         ), (
             f"Incorrect outputs shape, expected "
-            f"{(inputs.shape[0], model.w.shape[-1])} and got {(outputs.shape[0], outputs.shape[-1])}"
+            f"{(inputs.shape[0], model.w.shape[-1])} and got "
+            f"{(outputs.shape[0], outputs.shape[-1])}"
         )
 
     @pytest.mark.order(3)
-    def test_backward(self, conv2d_fixture: tuple[Conv2d, tf.Tensor]) -> None:
+    def test_backward(self, conv2d_fixture: tuple[Conv2D, tf.Tensor]) -> None:
         """
-        This method is the test for the Conv2d backward pass.
+        This method is the test for the Conv2D backward pass.
 
         Args:
-            conv2d_fixture: tuple of instance of Conv2d and inputs to
+            conv2d_fixture: tuple of instance of Conv2D and inputs to
                 use.
         """
 
         # Get model and inputs
-        model: Conv2d
+        model: Conv2D
         inputs: tf.Tensor
         model, inputs = conv2d_fixture
 
-        # Skip gradient test if running on CPU
-        if len(tf.config.list_physical_devices("GPU")) == 0:
-            pytest.skip(
-                "Skipping backward test because grouped convolution "
-                "gradients are not supported on CPU."
-            )
+        # # Skip gradient test if running on CPU
+        # if len(tf.config.list_physical_devices("GPU")) == 0:
+        #     pytest.skip(
+        #         "Skipping backward test because grouped convolution "
+        #         "gradients are not supported on CPU."
+        #     )
 
         # Check parameters length
         with tf.GradientTape() as tape:
+            tape.watch(inputs)
             outputs: tf.Tensor = model(inputs)
         gradients = tape.gradient(outputs, model.trainable_variables)
 
@@ -103,18 +105,18 @@ class TestConv2d:
             )
 
     @pytest.mark.order(4)
-    def test_freeze(self, conv2d_fixture: tuple[Conv2d, tf.Tensor]) -> None:
+    def test_freeze(self, conv2d_fixture: tuple[Conv2D, tf.Tensor]) -> None:
         """
         This method is the test for the freeze and unfreeze layers from
-        Conv2d layer.
+        Conv2D layer.
 
         Args:
-            conv2d_fixture: tuple of instance of Conv2d and inputs to
+            conv2d_fixture: tuple of instance of Conv2D and inputs to
                 use.
         """
 
         # Get model and inputs
-        model: Conv2d
+        model: Conv2D
         inputs: tf.Tensor
         model, inputs = conv2d_fixture
 
@@ -159,17 +161,17 @@ class TestConv2d:
         )
 
     @pytest.mark.order(5)
-    def test_kl_cost(self, conv2d_fixture: tuple[Conv2d, tf.Tensor]) -> None:
+    def test_kl_cost(self, conv2d_fixture: tuple[Conv2D, tf.Tensor]) -> None:
         """
-        This method is the test for the kl_cost method of Conv2d layer.
+        This method is the test for the kl_cost method of Conv2D layer.
 
         Args:
-            conv2d_fixture: tuple of instance of Conv2d and inputs to
+            conv2d_fixture: tuple of instance of Conv2D and inputs to
                 use.
         """
 
         # Get model and inputs
-        model: Conv2d
+        model: Conv2D
         model, _ = conv2d_fixture
 
         # Compute outputs

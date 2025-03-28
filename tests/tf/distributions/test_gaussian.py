@@ -55,14 +55,14 @@ class TestGaussianDistribution:
         )
 
         # Check mu prior type
-        assert isinstance(distribution.mu_prior, tf.Variable), (
-            f"Incorrect type of mu prior, expected {tf.Variable}, got "
+        assert isinstance(distribution.mu_prior, BackendVariable), (
+            f"Incorrect type of mu prior, expected {BackendVariable}, got "
             f"{type(distribution.mu_prior)}"
         )
 
         # Check std prior type
-        assert isinstance(distribution.std_prior, tf.Variable), (
-            f"Incorrect type of std prior, expected {tf.Variable}, got "
+        assert isinstance(distribution.std_prior, BackendVariable), (
+            f"Incorrect type of std prior, expected {BackendVariable}, got "
             f"{type(distribution.std_prior)}"
         )
 
@@ -85,11 +85,11 @@ class TestGaussianDistribution:
         ), f"Incorrect number of parameters, expected 2, got {num_parameters}"
 
         # Check the shape of the initialized tensors
-        assert distribution.mu_prior.shape == (
-            1,
+        assert (
+            distribution.mu_prior.shape == ()
         ), f"Incorrect shape of mu_prior got {distribution.mu_prior.shape}"
-        assert distribution.std_prior.shape == (
-            1,
+        assert (
+            distribution.std_prior.shape == ()
         ), f"Incorrect shape of std_prior got {distribution.mu_prior.shape}"
         assert (
             distribution.mu.shape == shape
@@ -120,9 +120,6 @@ class TestGaussianDistribution:
             rho_init: init value for rho. This tensor will be initialized
                 with a normal distribution with std 0.1 and the mean is
                 the parameter specified here.
-
-        Returns:
-            None.
         """
 
         # Define distribution
@@ -178,9 +175,6 @@ class TestGaussianDistribution:
             rho_init: init value for rho. This tensor will be initialized
                 with a normal distribution with std 0.1 and the mean is
                 the parameter specified here.
-
-        Returns:
-            None.
         """
 
         # Define distribution
@@ -240,9 +234,6 @@ class TestGaussianDistribution:
             rho_init: init value for rho. This tensor will be initialized
                 with a normal distribution with std 0.1 and the mean is
                 the parameter specified here.
-
-        Returns:
-            None.
         """
 
         # Define distribution

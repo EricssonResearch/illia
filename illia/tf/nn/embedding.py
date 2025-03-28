@@ -73,6 +73,14 @@ class Embedding(BayesianModule):
         else:
             self.weights_distribution = weights_distribution
 
+    def build(self, input_shape: tf.TensorShape) -> None:
+        """
+        Builds the Embedding layer.
+
+        Args:
+            input_shape: Input shape of the layer.
+        """
+
         # Create a variable for weights
         self.w = self.add_weight(
             name="weights",
@@ -82,14 +90,6 @@ class Embedding(BayesianModule):
             shape=(self.num_embeddings, self.embeddings_dim),
             trainable=False,
         )
-
-    def build(self, input_shape: tf.TensorShape) -> None:
-        """
-        Builds the Embedding layer.
-
-        Args:
-            input_shape: Input shape of the layer.
-        """
 
         # Call super-class build method
         super().build(input_shape)
