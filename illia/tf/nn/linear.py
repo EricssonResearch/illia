@@ -119,11 +119,11 @@ class Linear(BayesianModule):
 
         # Sample weights if they are undefined
         if self.w is None:
-            self.w = self.weights_distribution.sample()  # pylint: disable=W0201
+            self.w = self.weights_distribution.sample()
 
         # Sample bias is they are undefined
         if self.b is None:
-            self.b = self.bias_distribution.sample()  # pylint: disable=W0201
+            self.b = self.bias_distribution.sample()
 
     def kl_cost(self) -> tuple[tf.Tensor, int]:
         """

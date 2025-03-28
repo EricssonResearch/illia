@@ -52,7 +52,7 @@ class GaussianDistribution(Distribution):
         self.mu_prior_value = mu_prior
         self.std_prior_value = std_prior
 
-        # Define non-trainable priors variables correctamente
+        # Define non-trainable priors variables
         self.mu_prior = self.add_weight(
             name="mu_prior",
             shape=(),

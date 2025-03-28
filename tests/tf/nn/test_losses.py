@@ -33,7 +33,7 @@ class TestKLDivergenceLoss:
         model = keras.Sequential([linear_layer])
 
         # Define loss and compute value
-        loss: keras.layers.Layer = KLDivergenceLoss()
+        loss: keras.losses.Loss = KLDivergenceLoss()
         loss_value: tf.Tensor = loss(model=model)
 
         # Check type
@@ -63,7 +63,7 @@ class TestKLDivergenceLoss:
         model = keras.Sequential([linear_layer])
 
         # Define loss and compute value
-        loss: keras.layers.Layer = KLDivergenceLoss()
+        loss: keras.losses.Loss = KLDivergenceLoss()
 
         with tf.GradientTape() as tape:
             loss_value: tf.Tensor = loss(model=model)

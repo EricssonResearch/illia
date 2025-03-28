@@ -3,18 +3,18 @@ This module contains the code for the Losses.
 """
 
 # Standard libraries
-from typing import Literal
+from typing import Literal, Callable
 
-# 3pps
+# 3rd party libraries
 import tensorflow as tf
-from keras import Model, layers, saving, losses
+from keras import Model, losses, saving
 
 # Own modules
 from illia.tf.nn.base import BayesianModule
 
 
 @saving.register_keras_serializable(package="BayesianModule", name="KLDivergenceLoss")
-class KLDivergenceLoss(layers.Layer):
+class KLDivergenceLoss(losses.Loss):
     """
     Computes the KL divergence loss for Bayesian modules within a model.
     """
@@ -48,7 +48,7 @@ class KLDivergenceLoss(layers.Layer):
         # Get the base configuration
         base_config = super().get_config()
 
-        # Add the custom configurations
+        # Add custom configurations
         custom_config = {
             "reduction": self.reduction,
             "weight": self.weight,
@@ -57,7 +57,7 @@ class KLDivergenceLoss(layers.Layer):
         # Combine both configurations
         return {**base_config, **custom_config}
 
-    def call(self, model: Model) -> tf.Tensor:
+    def __call__(self, model: Model) -> tf.Tensor:
         """
         Computes the KL divergence loss across all Bayesian layers in
         the model.
@@ -79,6 +79,7 @@ class KLDivergenceLoss(layers.Layer):
                 kl_global_cost += kl_cost
                 num_params_global += num_params
 
+        # Compute mean KL cost and scale by weight
         kl_global_cost = tf.divide(
             kl_global_cost, tf.cast(num_params_global, tf.float32)
         )
@@ -88,7 +89,7 @@ class KLDivergenceLoss(layers.Layer):
 
 
 @saving.register_keras_serializable(package="BayesianModule", name="ELBOLoss")
-class ELBOLoss(layers.Layer):
+class ELBOLoss(losses.Loss):
     """
     Computes the Evidence Lower Bound (ELBO) loss, combining a
     likelihood loss and KL divergence.
@@ -96,7 +97,7 @@ class ELBOLoss(layers.Layer):
 
     def __init__(
         self,
-        loss_function: losses.Loss,
+        loss_function: Callable[[tf.Tensor, tf.Tensor], tf.Tensor],
         num_samples: int = 1,
         kl_weight: float = 1e-3,
     ):
@@ -106,15 +107,14 @@ class ELBOLoss(layers.Layer):
 
         Args:
             loss_function: Loss function for computing likelihood loss.
-            num_samples: Number of samples for Monte Carlo
-                approximation.
+            num_samples: Number of samples for Monte Carlo approximation.
             kl_weight: Scaling factor for the KL divergence component.
         """
 
         # Call super class constructor
         super().__init__()
 
-        # Set atributtes
+        # Set attributes
         self.loss_function = loss_function
         self.num_samples = num_samples
         self.kl_weight = kl_weight
@@ -131,7 +131,7 @@ class ELBOLoss(layers.Layer):
         # Get the base configuration
         base_config = super().get_config()
 
-        # Add the custom configurations
+        # Add custom configurations
         custom_config = {
             "loss_function": self.loss_function,
             "num_samples": self.num_samples,
@@ -141,7 +141,7 @@ class ELBOLoss(layers.Layer):
         # Combine both configurations
         return {**base_config, **custom_config}
 
-    def call(self, y_true: tf.Tensor, y_pred: tf.Tensor, model: Model) -> tf.Tensor:
+    def __call__(self, y_true: tf.Tensor, y_pred: tf.Tensor, model: Model) -> tf.Tensor:
         """
         Computes the ELBO loss, averaging over multiple samples.
 
@@ -160,6 +160,7 @@ class ELBOLoss(layers.Layer):
             current_loss = self.loss_function(y_true, y_pred) + self.kl_loss(model)
             loss_value += current_loss
 
+        # Average the loss across samples
         loss_value = tf.divide(loss_value, tf.cast(self.num_samples, tf.float32))
 
         return loss_value
