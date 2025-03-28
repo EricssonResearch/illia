@@ -28,7 +28,7 @@ class Conv2D(BayesianModule):
         stride: Union[int, list[int]] = 1,
         padding: Union[str, list[int]] = "VALID",
         dilation: Union[int, list[int]] = 1,
-        num_groups: int = 1,
+        groups: int = 1,
         weights_distribution: Optional[GaussianDistribution] = None,
         bias_distribution: Optional[GaussianDistribution] = None,
     ) -> None:
@@ -41,7 +41,7 @@ class Conv2D(BayesianModule):
             padding: Padding added to all four sides of the input.
                 Defaults to 0.
             dilation: Spacing between kernel elements.
-            num_groups: Number of blocked connections from input channels
+            groups: Number of blocked connections from input channels
                 to output channels. Defaults to 1.
             weights_distribution: The distribution for the weights.
             bias_distribution: The distribution for the bias.
@@ -57,13 +57,13 @@ class Conv2D(BayesianModule):
         self.stride = stride
         self.padding = padding
         self.dilation = dilation
-        self.num_groups = num_groups
+        self.groups = groups
 
         # Check if kernel_size is a list and unpack it if necessary
         kernel_shape = (
             kernel_size if isinstance(kernel_size, list) else [kernel_size, kernel_size]
         )
-        self.shape = (input_channels // num_groups, *kernel_shape, output_channels)
+        self.shape = (input_channels // groups, *kernel_shape, output_channels)
 
         # Set weights distribution
         if weights_distribution is None:
@@ -125,7 +125,7 @@ class Conv2D(BayesianModule):
             "stride": self.stride,
             "padding": self.padding,
             "dilation": self.dilation,
-            "num_groups": self.num_groups,
+            "groups": self.groups,
             "weights_distribution": self.weights_distribution,
             "bias_distribution": self.bias_distribution,
         }
