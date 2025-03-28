@@ -28,7 +28,7 @@ class Conv1D(BayesianModule):
         stride: Union[int, list[int]] = 1,
         padding: str = "VALID",
         dilation: Union[int, list[int]] = 1,
-        groups: int = 1,
+        num_groups: int = 1,
         weights_distribution: Optional[GaussianDistribution] = None,
         bias_distribution: Optional[GaussianDistribution] = None,
     ) -> None:
@@ -44,7 +44,7 @@ class Conv1D(BayesianModule):
             padding: Padding added to all four sides of the input.
                 Defaults to 0.
             dilation: Spacing between kernel elements.
-            groups: Number of blocked connections from input channels
+            num_groups: Number of blocked connections from input channels
                 to output channels. Defaults to 1.
             weights_distribution: The distribution for the weights.
             bias_distribution: The distribution for the bias.
@@ -60,12 +60,12 @@ class Conv1D(BayesianModule):
         self.stride = stride
         self.padding = padding
         self.dilation = dilation
-        self.groups = groups
+        self.num_groups = num_groups
 
         # Set weights distribution
         if weights_distribution is None:
             self.weights_distribution = GaussianDistribution(
-                (input_channels // groups, kernel_size, output_channels)
+                (input_channels // num_groups, kernel_size, output_channels)
             )
         else:
             self.weights_distribution = weights_distribution
@@ -91,7 +91,7 @@ class Conv1D(BayesianModule):
                 self.weights_distribution.sample().numpy()
             ),
             shape=(
-                self.input_channels // self.groups,
+                self.input_channels // self.num_groups,
                 self.kernel_size,
                 self.output_channels,
             ),
@@ -128,7 +128,7 @@ class Conv1D(BayesianModule):
             "stride": self.stride,
             "padding": self.padding,
             "dilation": self.dilation,
-            "groups": self.groups,
+            "num_groups": self.num_groups,
             "weights_distribution": self.weights_distribution,
             "bias_distribution": self.bias_distribution,
         }

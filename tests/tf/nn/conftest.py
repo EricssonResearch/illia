@@ -180,7 +180,7 @@ def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2D, tf.Tensor]:
     stride: Union[int, list[int]]
     padding: Union[str, list[int]]
     dilation: Union[int, list[int]] = 1
-    groups: int = 1
+    num_groups: int = 1
     weights_distribution: Optional[GaussianDistribution]
     bias_distribution: Optional[GaussianDistribution]
     height: int
@@ -193,7 +193,7 @@ def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2D, tf.Tensor]:
         stride,
         padding,
         dilation,
-        groups,
+        num_groups,
         weights_distribution,
         bias_distribution,
         height,
@@ -208,7 +208,7 @@ def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2D, tf.Tensor]:
         stride,
         padding,
         dilation,
-        groups,
+        num_groups,
         weights_distribution,
         bias_distribution,
     )
@@ -272,7 +272,7 @@ def conv1d_fixture(request: pytest.FixtureRequest) -> tuple[Conv1D, tf.Tensor]:
     stride: Union[int, list[int]]
     padding: str
     dilation: Union[int, list[int]] = 1
-    groups: int = 1
+    num_groups: int = 1
     weights_distribution: Optional[GaussianDistribution]
     bias_distribution: Optional[GaussianDistribution]
     embedding_dim: int
@@ -284,7 +284,7 @@ def conv1d_fixture(request: pytest.FixtureRequest) -> tuple[Conv1D, tf.Tensor]:
         stride,
         padding,
         dilation,
-        groups,
+        num_groups,
         weights_distribution,
         bias_distribution,
         embedding_dim,
@@ -298,7 +298,7 @@ def conv1d_fixture(request: pytest.FixtureRequest) -> tuple[Conv1D, tf.Tensor]:
         stride,
         padding,
         dilation,
-        groups,
+        num_groups,
         weights_distribution,
         bias_distribution,
     )
