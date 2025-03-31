@@ -244,15 +244,23 @@ def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2D, tf.Tensor, s
         bias_distribution=bias_distribution,
     )
 
-    # Define inputs
-    if data_format == "NHWC":
-        inputs: tf.Tensor = tf.random.uniform(
-            (batch_size, height, width, input_channels)
-        )
-    elif data_format == "NCHW":
-        inputs = tf.random.uniform((batch_size, input_channels, height, width))
-    else:
+    # Validate and adjust data format if needed
+    if data_format not in {"NHWC", "NCHW"}:
         raise ValueError(f"Invalid data format: {data_format}")
+
+    # If NCHW is requested but CUDA is unavailable, fall back to NHWC
+    if data_format == "NCHW" and not tf.test.is_built_with_cuda():
+        data_format = "NHWC"
+
+    # Define input tensor shape based on data format
+    input_shape = (
+        (batch_size, height, width, input_channels)  # NHWC
+        if data_format == "NHWC"
+        else (batch_size, input_channels, height, width)  # NCHW
+    )
+
+    # Create the random input tensor
+    inputs: tf.Tensor = tf.random.uniform(input_shape)
 
     # Build model
     model.build(inputs.shape)
@@ -374,15 +382,19 @@ def conv1d_fixture(request: pytest.FixtureRequest) -> tuple[Conv1D, tf.Tensor, s
         bias_distribution=bias_distribution,
     )
 
-    # Define inputs
-    if data_format == "NWC":
-        inputs: tf.Tensor = tf.random.uniform(
-            (batch_size, embedding_dim, input_channels)
-        )
-    elif data_format == "NCW":
-        inputs = tf.random.uniform((batch_size, input_channels, embedding_dim))
-    else:
+    # Validate data format
+    if data_format not in {"NWC", "NCW"}:
         raise ValueError(f"Invalid data format: {data_format}")
+
+    # Define input tensor shape based on data format
+    input_shape = (
+        (batch_size, embedding_dim, input_channels)  # NWC
+        if data_format == "NWC"
+        else (batch_size, input_channels, embedding_dim)  # NCW
+    )
+
+    # Create the random input tensor
+    inputs: tf.Tensor = tf.random.uniform(input_shape)
 
     # Build model
     model.build(inputs.shape)
