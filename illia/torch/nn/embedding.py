@@ -80,7 +80,8 @@ class Embedding(BayesianModule):
     @torch.jit.export
     def freeze(self) -> None:
         """
-        This method freezes the layer.
+        Freezes the current module and all submodules that are instances
+        of BayesianModule. Sets the frozen state to True.
         """
 
         # set indicator
@@ -88,20 +89,20 @@ class Embedding(BayesianModule):
 
         # sample weights if they are undefined
         if self.weights is None:  # type: ignore
-            self.weights = self.weights_distribution.sample()  # pylint: disable=W0201
+            self.weights = self.weights_distribution.sample()
 
         # detach weights
-        self.weights = self.weights.detach()  # pylint: disable=W0201
+        self.weights = self.weights.detach()
 
     @torch.jit.export
     def kl_cost(self) -> tuple[torch.Tensor, int]:
         """
-        This method calculates the kl cost of the layer.
+        Computes the Kullback-Leibler (KL) divergence cost for the
+        layer's weights and bias.
 
         Returns:
-            kl cost. Dimensions: [].
-            number of parameters of the layer. It can be used to
-                average the kl cost.
+            Tuple containing KL divergence cost and total number of
+            parameters.
         """
 
         # get log posterior and log prior
@@ -128,12 +129,12 @@ class Embedding(BayesianModule):
 
         # Forward depeding of frozen state
         if not self.frozen:
-            self.weights = self.weights_distribution.sample()  # pylint: disable=W0201
+            self.weights = self.weights_distribution.sample()
         elif self.weights is None:
             raise ValueError("Module has been frozen with undefined weights")
 
         # Run torch forward
-        outputs: torch.Tensor = F.embedding(  # pylint: disable=E1102
+        outputs: torch.Tensor = F.embedding(
             inputs, self.weights, *self.embedding_params  # type: ignore
         )
 

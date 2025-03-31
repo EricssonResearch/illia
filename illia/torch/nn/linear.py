@@ -68,7 +68,8 @@ class Linear(BayesianModule):
     @torch.jit.export
     def freeze(self) -> None:
         """
-        This method is to freeze the layer.
+        Freezes the current module and all submodules that are instances
+        of BayesianModule. Sets the frozen state to True.
         """
 
         # Set indicator
@@ -76,15 +77,15 @@ class Linear(BayesianModule):
 
         # Sample weights if they are undefined
         if self.weights is None:  # type: ignore
-            self.weights = self.weights_distribution.sample()  # pylint: disable=W0201
+            self.weights = self.weights_distribution.sample()
 
         # Sample bias is they are undefined
         if self.bias is None:  # type: ignore
-            self.bias = self.bias_distribution.sample()  # pylint: disable=W0201
+            self.bias = self.bias_distribution.sample()
 
         # Detach weights and bias
-        self.weights = self.weights.detach()  # pylint: disable=W0201
-        self.bias = self.bias.detach()  # pylint: disable=W0201
+        self.weights = self.weights.detach()
+        self.bias = self.bias.detach()
 
     @torch.jit.export
     def kl_cost(self) -> tuple[torch.Tensor, int]:
@@ -125,14 +126,12 @@ class Linear(BayesianModule):
 
         # Check if layer is frozen
         if not self.frozen:
-            self.weights = self.weights_distribution.sample()  # pylint: disable=W0201
-            self.bias = self.bias_distribution.sample()  # pylint: disable=W0201
+            self.weights = self.weights_distribution.sample()
+            self.bias = self.bias_distribution.sample()
         elif self.weights is None or self.bias is None:
             raise ValueError("Module has been frozen with undefined weights")
 
         # compute outputs
-        outputs: torch.Tensor = F.linear(  # pylint: disable=E1102
-            inputs, self.weights, self.bias
-        )
+        outputs: torch.Tensor = F.linear(inputs, self.weights, self.bias)
 
         return outputs

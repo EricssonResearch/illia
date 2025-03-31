@@ -49,10 +49,7 @@ class KLDivergenceLoss(losses.Loss):
         base_config = super().get_config()
 
         # Add custom configurations
-        custom_config = {
-            "reduction": self.reduction,
-            "weight": self.weight,
-        }
+        custom_config = {"reduction": self.reduction, "weight": self.weight}
 
         # Combine both configurations
         return {**base_config, **custom_config}

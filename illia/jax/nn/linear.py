@@ -22,8 +22,7 @@ from illia.jax.distributions import GaussianDistribution
 
 class Linear(BayesianModule):
     """
-    Bayesian Linear layer with trainable weights and biases,
-    supporting prior and posterior distributions.
+    This class is the bayesian implementation of the Linear class.
     """
 
     def __init__(
@@ -111,11 +110,12 @@ class Linear(BayesianModule):
 
     def kl_cost(self) -> tuple[jax.Array, int]:
         """
-        This method computes the kl-divergence cost for the layer.
+        Computes the Kullback-Leibler (KL) divergence cost for the
+        layer's weights and bias.
 
         Returns:
-            kl cost.
-            number of parameters of the layer.
+            Tuple containing KL divergence cost and total number of
+            parameters.
         """
 
         # Compute log probs

@@ -1,5 +1,5 @@
 """
-This module contains the code for the gaussian distribution.
+This module contains the code for the Gaussian distribution.
 """
 
 # Standard libraries
@@ -17,7 +17,7 @@ from illia.jax.distributions.base import Distribution
 
 class GaussianDistribution(Distribution):
     """
-    This is the class to implement a learnable gausssian distribution.
+    This is the class to implement a learnable Gaussian distribution.
     """
 
     def __init__(
@@ -30,8 +30,7 @@ class GaussianDistribution(Distribution):
         rngs: Rngs = nnx.Rngs(0),
     ) -> None:
         """
-        Initializes the GaussianDistribution with given priors and
-        initial parameters.
+        Constructor for GaussianDistribution.
 
         Args:
             shape: The shape of the parameters.

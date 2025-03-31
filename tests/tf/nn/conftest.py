@@ -43,13 +43,9 @@ def linear_fixture(request: pytest.FixtureRequest) -> tuple[Linear, tf.Tensor]:
     output_size: int
     weights_distribution: Optional[Distribution]
     bias_distribution: Optional[Distribution]
-    (
-        batch_size,
-        input_size,
-        output_size,
-        weights_distribution,
-        bias_distribution,
-    ) = request.param
+    (batch_size, input_size, output_size, weights_distribution, bias_distribution) = (
+        request.param
+    )
 
     # Define model
     model: Linear = Linear(
@@ -139,8 +135,9 @@ def embedding_fixture(request: pytest.FixtureRequest) -> tuple[Embedding, tf.Ten
             "VALID",
             1,
             1,
-            GaussianDistribution((3, 3, 3, 9)),
-            GaussianDistribution((9,)),
+            "NHWC",
+            GaussianDistribution(shape=(3, 3, 3, 9)),
+            GaussianDistribution(shape=(9,)),
             32,
             32,
         ),
@@ -153,6 +150,37 @@ def embedding_fixture(request: pytest.FixtureRequest) -> tuple[Embedding, tf.Ten
             "SAME",
             None,  # TODO: Error GitHub Workflow with CPU implementation dilation=[2, 1]
             1,  # TODO: Error GitHub Workflow with CPU implementation groups=2
+            "NHWC",
+            None,
+            None,
+            64,
+            64,
+        ),
+        (
+            32,
+            3,
+            9,
+            3,
+            1,
+            "VALID",
+            1,
+            1,
+            "NCHW",
+            GaussianDistribution(shape=(3, 3, 3, 9)),
+            GaussianDistribution(shape=(9,)),
+            32,
+            32,
+        ),
+        (
+            64,
+            6,
+            6,
+            [3, 3],
+            [2, 1],
+            "SAME",
+            None,
+            1,
+            "NCHW",
             None,
             None,
             64,
@@ -160,7 +188,7 @@ def embedding_fixture(request: pytest.FixtureRequest) -> tuple[Embedding, tf.Ten
         ),
     ]
 )
-def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2D, tf.Tensor]:
+def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2D, tf.Tensor, str]:
     """
     This function is the fixture for bayesian Conv2D layer.
 
@@ -181,6 +209,7 @@ def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2D, tf.Tensor]:
     padding: Union[str, list[int]]
     dilation: Union[int, list[int]] = 1
     groups: int = 1
+    data_format: Optional[str] = "NHWC"
     weights_distribution: Optional[GaussianDistribution]
     bias_distribution: Optional[GaussianDistribution]
     height: int
@@ -194,6 +223,7 @@ def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2D, tf.Tensor]:
         padding,
         dilation,
         groups,
+        data_format,
         weights_distribution,
         bias_distribution,
         height,
@@ -202,24 +232,32 @@ def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2D, tf.Tensor]:
 
     # Define model
     model: Conv2D = Conv2D(
-        input_channels,
-        output_channels,
-        kernel_size,
-        stride,
-        padding,
-        dilation,
-        groups,
-        weights_distribution,
-        bias_distribution,
+        input_channels=input_channels,
+        output_channels=output_channels,
+        kernel_size=kernel_size,
+        stride=stride,
+        padding=padding,
+        dilation=dilation,
+        groups=groups,
+        data_format=data_format,
+        weights_distribution=weights_distribution,
+        bias_distribution=bias_distribution,
     )
 
     # Define inputs
-    inputs: tf.Tensor = tf.random.uniform((batch_size, height, width, input_channels))
+    if data_format == "NHWC":
+        inputs: tf.Tensor = tf.random.uniform(
+            (batch_size, height, width, input_channels)
+        )
+    elif data_format == "NCHW":
+        inputs = tf.random.uniform((batch_size, input_channels, height, width))
+    else:
+        raise ValueError(f"Invalid data format: {data_format}")
 
     # Build model
     model.build(inputs.shape)
 
-    return model, inputs
+    return model, inputs, data_format
 
 
 @pytest.fixture(
@@ -233,8 +271,9 @@ def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2D, tf.Tensor]:
             "VALID",
             1,
             1,
-            GaussianDistribution((3, 3, 9)),
-            GaussianDistribution((9,)),
+            "NWC",
+            GaussianDistribution(shape=(3, 3, 9)),
+            GaussianDistribution(shape=(9,)),
             32,
         ),
         (
@@ -246,13 +285,42 @@ def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2D, tf.Tensor]:
             "SAME",
             None,  # TODO: Error GitHub Workflow with CPU implementation dilation=2
             1,  # TODO: Error GitHub Workflow with CPU implementation groups=2
+            "NWC",
+            None,
+            None,
+            16,
+        ),
+        (
+            32,
+            3,
+            9,
+            3,
+            1,
+            "VALID",
+            1,
+            1,
+            "NCW",
+            GaussianDistribution(shape=(3, 3, 9)),
+            GaussianDistribution(shape=(9,)),
+            32,
+        ),
+        (
+            64,
+            6,
+            6,
+            3,
+            2,
+            "SAME",
+            None,
+            1,
+            "NCW",
             None,
             None,
             16,
         ),
     ]
 )
-def conv1d_fixture(request: pytest.FixtureRequest) -> tuple[Conv1D, tf.Tensor]:
+def conv1d_fixture(request: pytest.FixtureRequest) -> tuple[Conv1D, tf.Tensor, str]:
     """
     This function is the fixture for bayesian Conv1D layer.
 
@@ -273,6 +341,7 @@ def conv1d_fixture(request: pytest.FixtureRequest) -> tuple[Conv1D, tf.Tensor]:
     padding: str
     dilation: Union[int, list[int]] = 1
     groups: int = 1
+    data_format: Optional[str] = "NWC"
     weights_distribution: Optional[GaussianDistribution]
     bias_distribution: Optional[GaussianDistribution]
     embedding_dim: int
@@ -285,6 +354,7 @@ def conv1d_fixture(request: pytest.FixtureRequest) -> tuple[Conv1D, tf.Tensor]:
         padding,
         dilation,
         groups,
+        data_format,
         weights_distribution,
         bias_distribution,
         embedding_dim,
@@ -292,21 +362,29 @@ def conv1d_fixture(request: pytest.FixtureRequest) -> tuple[Conv1D, tf.Tensor]:
 
     # Define model
     model: Conv1D = Conv1D(
-        input_channels,
-        output_channels,
-        kernel_size,
-        stride,
-        padding,
-        dilation,
-        groups,
-        weights_distribution,
-        bias_distribution,
+        input_channels=input_channels,
+        output_channels=output_channels,
+        kernel_size=kernel_size,
+        stride=stride,
+        padding=padding,
+        dilation=dilation,
+        groups=groups,
+        data_format=data_format,
+        weights_distribution=weights_distribution,
+        bias_distribution=bias_distribution,
     )
 
     # Define inputs
-    inputs: tf.Tensor = tf.random.uniform((batch_size, embedding_dim, input_channels))
+    if data_format == "NWC":
+        inputs: tf.Tensor = tf.random.uniform(
+            (batch_size, embedding_dim, input_channels)
+        )
+    elif data_format == "NCW":
+        inputs = tf.random.uniform((batch_size, input_channels, embedding_dim))
+    else:
+        raise ValueError(f"Invalid data format: {data_format}")
 
     # Build model
     model.build(inputs.shape)
 
-    return model, inputs
+    return model, inputs, data_format

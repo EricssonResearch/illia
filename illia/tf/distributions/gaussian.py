@@ -7,7 +7,6 @@ import math
 from typing import Optional
 
 # 3pps
-import keras
 import tensorflow as tf
 from keras import saving
 
@@ -69,13 +68,13 @@ class GaussianDistribution(Distribution):
         # Define trainable parameters
         self.mu = self.add_weight(
             shape=self.shape,
-            initializer=keras.initializers.RandomNormal(mean=self.mu_init, stddev=0.1),
+            initializer=tf.random_normal_initializer(mean=self.mu_init, stddev=0.1),
             trainable=True,
             name=f"{self.name}_mu",
         )
         self.rho = self.add_weight(
             shape=self.shape,
-            initializer=keras.initializers.RandomNormal(mean=self.rho_init, stddev=0.1),
+            initializer=tf.random_normal_initializer(mean=self.rho_init, stddev=0.1),
             trainable=True,
             name=f"{self.name}_rho",
         )
@@ -102,12 +101,14 @@ class GaussianDistribution(Distribution):
 
     def sample(self) -> tf.Tensor:
         """
-        Samples from the distribution using the current parameters.
+        This method samples a tensor from the distribution.
 
         Returns:
-            A sampled tensor.
+            Sampled tensor. Dimensions: [*] (same ones as the mu and
+                std parameters).
         """
 
+        # Sampling with reparametrization trick
         eps: tf.Tensor = tf.random.normal(shape=self.rho.shape)
         sigma: tf.Tensor = tf.math.log1p(tf.math.exp(self.rho))
 
@@ -115,20 +116,25 @@ class GaussianDistribution(Distribution):
 
     def log_prob(self, x: Optional[tf.Tensor] = None) -> tf.Tensor:
         """
-        Computes the log probability of a given sample.
+        This method computes the log prob of the distribution.
 
         Args:
-            x: An optional sampled array. If None, a sample is generated.
+            x: Output already sampled. If no output is introduced,
+                first we will sample a tensor from the current
+                distribution.
 
         Returns:
-            The log probability of the sample as a tensor.
+            Log prob calculated as a tensor. Dimensions: [].
         """
 
+        # Sample if x is None
         if x is None:
             x = self.sample()
 
+        # Define pi variable
         pi: tf.Tensor = tf.convert_to_tensor(math.pi)
 
+        # Compute log priors
         log_prior = (
             -tf.math.log(tf.math.sqrt(2 * pi))
             - tf.math.log(self.std_prior)
@@ -136,8 +142,10 @@ class GaussianDistribution(Distribution):
             - 0.5
         )
 
+        # Compute sigma
         sigma: tf.Tensor = tf.math.log1p(tf.math.exp(self.rho))
 
+        # Compute log posteriors
         log_posteriors: tf.Tensor = (
             -tf.math.log(tf.math.sqrt(2 * pi))
             - tf.math.log(sigma)
@@ -145,6 +153,7 @@ class GaussianDistribution(Distribution):
             - 0.5
         )
 
+        # Compute final log probs
         log_probs = tf.math.reduce_sum(log_posteriors) - tf.math.reduce_sum(log_prior)
 
         return log_probs
@@ -152,10 +161,11 @@ class GaussianDistribution(Distribution):
     @property
     def num_params(self) -> int:
         """
-        Returns the number of parameters in the module.
+        This method computes the number of parameters of the
+        distribution.
 
         Returns:
-            The number of parameters as an integer.
+            Number of parameters.
         """
 
         return int(tf.size(self.mu))

@@ -17,8 +17,7 @@ from illia.tf.distributions import GaussianDistribution
 @saving.register_keras_serializable(package="BayesianModule", name="Linear")
 class Linear(BayesianModule):
     """
-    Bayesian Linear layer with trainable weights and biases,
-    supporting prior and posterior distributions.
+    This class is the bayesian implementation of the Linear class.
     """
 
     def __init__(
@@ -34,9 +33,10 @@ class Linear(BayesianModule):
         Args:
             input_size: Input size of the linear layer.
             output_size: Output size of the linear layer.
-            weights_distribution: GaussianDistribution for the weights of the
-                layer.
-            bias_distribution: GaussianDistribution for the bias of the layer.
+            weights_distribution: The Gaussian distribution for the
+                weights, if applicable.
+            bias_distribution: The Gaussian distribution for the bias,
+                if applicable.
         """
 
         # Call super-class constructor
@@ -111,7 +111,8 @@ class Linear(BayesianModule):
 
     def freeze(self) -> None:
         """
-        This method is to freeze the layer.
+        Freezes the current module and all submodules that are instances
+        of BayesianModule. Sets the frozen state to True.
         """
 
         # Set indicator
@@ -170,7 +171,9 @@ class Linear(BayesianModule):
             self.w = self.weights_distribution.sample()
             self.b = self.bias_distribution.sample()
         elif self.w is None or self.b is None:
-            raise ValueError("Module has been frozen with undefined weights")
+            raise ValueError(
+                "Module has been frozen with undefined weights and/or bias."
+            )
 
         # Compute outputs
         outputs: tf.Tensor = tf.nn.bias_add(

@@ -14,7 +14,9 @@ from keras import layers, saving
 @saving.register_keras_serializable(package="BayesianModule", name="Distribution")
 class Distribution(ABC, layers.Layer):
     """
-    This class is the base class for distributions.
+    This class serves as the base class for Distributions modules.
+    Any module designed to function as a distribution layer should inherit
+    from this class.
     """
 
     @abstractmethod
@@ -35,7 +37,7 @@ class Distribution(ABC, layers.Layer):
         Args:
             x: Output already sampled. If no output is introduced,
                 first we will sample a tensor from the current
-                distribution. Defaults to None.
+                distribution.
 
         Returns:
             Log prob calculated as a tensor. Dimensions: [].

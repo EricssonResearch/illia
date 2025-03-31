@@ -17,7 +17,7 @@ class TestConv1d:
     """
 
     @pytest.mark.order(1)
-    def test_init(self, conv1d_fixture: tuple[Conv1D, tf.Tensor]) -> None:
+    def test_init(self, conv1d_fixture: tuple[Conv1D, tf.Tensor, str]) -> None:
         """
         This method is the test for the Conv1D constructor.
 
@@ -27,7 +27,7 @@ class TestConv1d:
         """
 
         model: Conv1D
-        model, _ = conv1d_fixture
+        model, _, _ = conv1d_fixture
 
         # Check parameters length
         len_parameters: int = len(model.trainable_variables)
@@ -36,7 +36,7 @@ class TestConv1d:
         ), f"Incorrect parameters length, expected 4 and got {len_parameters}"
 
     @pytest.mark.order(2)
-    def test_forward(self, conv1d_fixture: tuple[Conv1D, tf.Tensor]) -> None:
+    def test_forward(self, conv1d_fixture: tuple[Conv1D, tf.Tensor, str]) -> None:
         """
         This method is the test for the Conv1D forward pass.
 
@@ -48,7 +48,7 @@ class TestConv1d:
         # Get model and inputs
         model: Conv1D
         inputs: tf.Tensor
-        model, inputs = conv1d_fixture
+        model, inputs, data_format = conv1d_fixture
 
         # Check parameters length
         outputs: tf.Tensor = model(inputs)
@@ -59,13 +59,21 @@ class TestConv1d:
         ), f"Incorrect outputs class, expected {tf.Tensor} and got {type(outputs)}"
 
         # Check outputs shape
-        assert outputs.shape[::2] == (inputs.shape[0], model.w.shape[-1]), (
-            f"Incorrect outputs shape, expected "
-            f"{(inputs.shape[0], model.w.shape[-1])} and got {outputs.shape[::2]}"
-        )
+        if data_format == "NWC":
+            assert outputs.shape[::2] == (inputs.shape[0], model.w.shape[-1]), (
+                f"Incorrect outputs shape, expected "
+                f"{(inputs.shape[0], model.w.shape[-1])} and got {outputs.shape[::2]}"
+            )
+        elif data_format == "NCW":
+            assert outputs.shape[:2] == (inputs.shape[0], model.w.shape[-1]), (
+                f"Incorrect outputs shape, expected "
+                f"{(inputs.shape[0], model.w.shape[-1])} and got {outputs.shape[:2]}"
+            )
+        else:
+            raise ValueError(f"Invalid data format: {data_format}")
 
     @pytest.mark.order(3)
-    def test_backward(self, conv1d_fixture: tuple[Conv1D, tf.Tensor]) -> None:
+    def test_backward(self, conv1d_fixture: tuple[Conv1D, tf.Tensor, str]) -> None:
         """
         This method is the test for the Conv1D backward pass.
 
@@ -77,7 +85,7 @@ class TestConv1d:
         # Get model and inputs
         model: Conv1D
         inputs: tf.Tensor
-        model, inputs = conv1d_fixture
+        model, inputs, _ = conv1d_fixture
 
         # Skip gradient test if running on CPU
         if len(tf.config.list_physical_devices("GPU")) == 0:
@@ -101,7 +109,7 @@ class TestConv1d:
             )
 
     @pytest.mark.order(4)
-    def test_freeze(self, conv1d_fixture: tuple[Conv1D, tf.Tensor]) -> None:
+    def test_freeze(self, conv1d_fixture: tuple[Conv1D, tf.Tensor, str]) -> None:
         """
         This method is the test for the freeze and unfreeze layers from
         Conv1D layer.
@@ -109,15 +117,12 @@ class TestConv1d:
         Args:
             conv1d_fixture: tuple of instance of Conv1D and inputs to
                 use.
-
-        Returns:
-            None.
         """
 
         # Get model and inputs
         model: Conv1D
         inputs: tf.Tensor
-        model, inputs = conv1d_fixture
+        model, inputs, _ = conv1d_fixture
 
         # Compute outputs
         outputs_first: tf.Tensor = model(inputs)
@@ -160,7 +165,7 @@ class TestConv1d:
         )
 
     @pytest.mark.order(5)
-    def test_kl_cost(self, conv1d_fixture: tuple[Conv1D, tf.Tensor]) -> None:
+    def test_kl_cost(self, conv1d_fixture: tuple[Conv1D, tf.Tensor, str]) -> None:
         """
         This method is the test for the kl_cost method of Conv1D layer.
 
@@ -171,7 +176,7 @@ class TestConv1d:
 
         # Get model and inputs
         model: Conv1D
-        model, _ = conv1d_fixture
+        model, _, _ = conv1d_fixture
 
         # Compute outputs
         outputs: tuple[tf.Tensor, int] = model.kl_cost()

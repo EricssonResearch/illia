@@ -17,7 +17,7 @@ class TestConv2d:
     """
 
     @pytest.mark.order(1)
-    def test_init(self, conv2d_fixture: tuple[Conv2D, tf.Tensor]) -> None:
+    def test_init(self, conv2d_fixture: tuple[Conv2D, tf.Tensor, str]) -> None:
         """
         This method is the test for the Conv2D constructor.
 
@@ -27,7 +27,7 @@ class TestConv2d:
         """
 
         model: Conv2D
-        model, _ = conv2d_fixture
+        model, _, _ = conv2d_fixture
 
         # Check parameters length
         len_parameters: int = len(model.trainable_variables)
@@ -36,7 +36,7 @@ class TestConv2d:
         ), f"Incorrect parameters length, expected 4 and got {len_parameters}"
 
     @pytest.mark.order(2)
-    def test_forward(self, conv2d_fixture: tuple[Conv2D, tf.Tensor]) -> None:
+    def test_forward(self, conv2d_fixture: tuple[Conv2D, tf.Tensor, str]) -> None:
         """
         This method is the test for the Conv2D forward pass.
 
@@ -48,7 +48,7 @@ class TestConv2d:
         # Get model and inputs
         model: Conv2D
         inputs: tf.Tensor
-        model, inputs = conv2d_fixture
+        model, inputs, data_format = conv2d_fixture
 
         # Check parameters length
         outputs: tf.Tensor = model(inputs)
@@ -59,17 +59,29 @@ class TestConv2d:
         ), f"Incorrect outputs class, expected {tf.Tensor} and got {type(outputs)}"
 
         # Check outputs shape
-        assert (outputs.shape[0], outputs.shape[-1]) == (
-            inputs.shape[0],
-            model.w.shape[-1],
-        ), (
-            f"Incorrect outputs shape, expected "
-            f"{(inputs.shape[0], model.w.shape[-1])} and got "
-            f"{(outputs.shape[0], outputs.shape[-1])}"
-        )
+        if data_format == "NHWC":
+            assert (outputs.shape[0], outputs.shape[-1]) == (
+                inputs.shape[0],
+                model.w.shape[-1],
+            ), (
+                f"Incorrect outputs shape, expected "
+                f"{(inputs.shape[0], model.w.shape[-1])} and got "
+                f"{(outputs.shape[0], outputs.shape[-1])}"
+            )
+        elif data_format == "NCHW":
+            assert (outputs.shape[0], outputs.shape[1]) == (
+                inputs.shape[0],
+                model.w.shape[-1],
+            ), (
+                f"Incorrect outputs shape, expected "
+                f"{(inputs.shape[0], model.w.shape[-1])} and got "
+                f"{(outputs.shape[0], outputs.shape[1])}"
+            )
+        else:
+            raise ValueError(f"Invalid data format: {data_format}")
 
     @pytest.mark.order(3)
-    def test_backward(self, conv2d_fixture: tuple[Conv2D, tf.Tensor]) -> None:
+    def test_backward(self, conv2d_fixture: tuple[Conv2D, tf.Tensor, str]) -> None:
         """
         This method is the test for the Conv2D backward pass.
 
@@ -81,7 +93,7 @@ class TestConv2d:
         # Get model and inputs
         model: Conv2D
         inputs: tf.Tensor
-        model, inputs = conv2d_fixture
+        model, inputs, _ = conv2d_fixture
 
         # Skip gradient test if running on CPU
         if len(tf.config.list_physical_devices("GPU")) == 0:
@@ -105,7 +117,7 @@ class TestConv2d:
             )
 
     @pytest.mark.order(4)
-    def test_freeze(self, conv2d_fixture: tuple[Conv2D, tf.Tensor]) -> None:
+    def test_freeze(self, conv2d_fixture: tuple[Conv2D, tf.Tensor, str]) -> None:
         """
         This method is the test for the freeze and unfreeze layers from
         Conv2D layer.
@@ -118,7 +130,7 @@ class TestConv2d:
         # Get model and inputs
         model: Conv2D
         inputs: tf.Tensor
-        model, inputs = conv2d_fixture
+        model, inputs, _ = conv2d_fixture
 
         # Compute outputs
         outputs_first: tf.Tensor = model(inputs)
@@ -161,7 +173,7 @@ class TestConv2d:
         )
 
     @pytest.mark.order(5)
-    def test_kl_cost(self, conv2d_fixture: tuple[Conv2D, tf.Tensor]) -> None:
+    def test_kl_cost(self, conv2d_fixture: tuple[Conv2D, tf.Tensor, str]) -> None:
         """
         This method is the test for the kl_cost method of Conv2D layer.
 
@@ -172,7 +184,7 @@ class TestConv2d:
 
         # Get model and inputs
         model: Conv2D
-        model, _ = conv2d_fixture
+        model, _, _ = conv2d_fixture
 
         # Compute outputs
         outputs: tuple[tf.Tensor, int] = model.kl_cost()

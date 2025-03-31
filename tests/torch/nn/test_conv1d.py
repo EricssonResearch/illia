@@ -43,9 +43,6 @@ class TestConv1d:
         Args:
             conv1d_fixture: tuple of instance of Conv1D and inputs to
                 use.
-
-        Returns:
-            None.
         """
 
         # Get model and inputs
@@ -103,9 +100,6 @@ class TestConv1d:
         Args:
             conv1d_fixture: tuple of instance of Conv1D and inputs to
                 use.
-
-        Returns:
-            None.
         """
 
         # Get model and inputs

@@ -17,8 +17,7 @@ from illia.tf.distributions import GaussianDistribution
 @saving.register_keras_serializable(package="BayesianModule", name="Embedding")
 class Embedding(BayesianModule):
     """
-    Bayesian Embedding layer with trainable weights and biases,
-    supporting prior and posterior distributions.
+    This class is the bayesian implementation of the Embedding class.
     """
 
     def __init__(
@@ -36,8 +35,8 @@ class Embedding(BayesianModule):
         This method is the constructor of the embedding class.
 
         Args:
-            num_embeddings: size of the dictionary of embeddings.
-            embeddings_dim: the size of each embedding vector.
+            num_embeddings: Size of the dictionary of embeddings.
+            embeddings_dim: The size of each embedding vector.
             padding_idx: If specified, the entries at padding_idx do
                 not contribute to the gradient.
             max_norm: If given, each embedding vector with norm larger
@@ -49,8 +48,8 @@ class Embedding(BayesianModule):
                 mini-batch.
             sparse: If True, gradient w.r.t. weight matrix will be a
                 sparse tensor.
-            weights_distribution: distribution for the weights of the
-                layer.
+            weights_distribution: The Gaussian distribution for the
+                weights, if applicable.
         """
 
         # Call super class constructor
@@ -167,10 +166,8 @@ class Embedding(BayesianModule):
 
     def freeze(self) -> None:
         """
-        This method freezes the layer.
-
-        Returns:
-            None.
+        Freezes the current module and all submodules that are instances
+        of BayesianModule. Sets the frozen state to True.
         """
 
         # Set indicator
@@ -183,7 +180,7 @@ class Embedding(BayesianModule):
     def kl_cost(self) -> tuple[tf.Tensor, int]:
         """
         Computes the Kullback-Leibler (KL) divergence cost for the
-        layer's weights and bias.
+        layer's weights.
 
         Returns:
             Tuple containing KL divergence cost and total number of
@@ -220,7 +217,7 @@ class Embedding(BayesianModule):
         if not self.frozen:
             self.w = self.weights_distribution.sample()
         elif self.w is None:
-            raise ValueError("Module has been frozen with undefined weights")
+            raise ValueError("Module has been frozen with undefined weights.")
 
         # Compute outputs
         outputs: tf.Tensor = self._embedding(

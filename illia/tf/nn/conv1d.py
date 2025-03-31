@@ -29,29 +29,37 @@ class Conv1D(BayesianModule):
         padding: str = "VALID",
         dilation: Union[int, list[int]] = 1,
         groups: int = 1,
+        data_format: Optional[str] = "NWC",
         weights_distribution: Optional[GaussianDistribution] = None,
         bias_distribution: Optional[GaussianDistribution] = None,
     ) -> None:
         """
-        Definition of a Bayesian Convolution 2D layer.
+        Initializes a Bayesian Conv1D layer.
 
         Args:
-            input_channels: Number of channels in the input image.
-            output_channels: Number of channels produced by the
+            input_channels: The number of channels in the input image.
+            output_channels: The number of channels produced by the
                 convolution.
-            kernel_size: Size of the convolving kernel.
-            stride: Stride of the convolution. Deafults to 1.
-            padding: Padding added to all four sides of the input.
-                Defaults to 0.
-            dilation: Spacing between kernel elements.
-            groups: Number of blocked connections from input channels
-                to output channels. Defaults to 1.
-            weights_distribution: The distribution for the weights.
-            bias_distribution: The distribution for the bias.
+            kernel_size: The size of the convolving kernel.
+            stride: The stride of the convolution.
+            padding: The padding added to all four sides of the input.
+                Can be 'VALID' or 'SAME'.
+            dilation: The spacing between kernel elements.
+            groups: The number of blocked connections from input channels
+                to output channels.
+            data_format: The data format for the convolution, either
+                'NWC' or 'NCW'.
+            weights_distribution: The Gaussian distribution for the
+                weights, if applicable.
+            bias_distribution: The Gaussian distribution for the bias,
+                if applicable.
         """
 
         # Call super class constructor
         super().__init__()
+
+        # Check data format
+        self._check_params(kernel_size, groups, stride, dilation, data_format)
 
         # Set attributes
         self.input_channels = input_channels
@@ -62,10 +70,22 @@ class Conv1D(BayesianModule):
         self.dilation = dilation
         self.groups = groups
 
+        # Adjust the weights distribution based on the channel format
+        self.data_format = (
+            "NWC" if data_format is None or data_format == "NWC" else "NCW"
+        )
+
+        # Get the weights distribution shape, needs to be channel last
+        self._weights_distribution_shape = (
+            input_channels // groups,
+            kernel_size,
+            output_channels,
+        )
+
         # Set weights distribution
         if weights_distribution is None:
             self.weights_distribution = GaussianDistribution(
-                (input_channels // groups, kernel_size, output_channels)
+                self._weights_distribution_shape
             )
         else:
             self.weights_distribution = weights_distribution
@@ -76,9 +96,48 @@ class Conv1D(BayesianModule):
         else:
             self.bias_distribution = bias_distribution
 
+    def _check_params(self, kernel_size, groups, stride, dilation, data_format) -> None:
+        """
+        Checks the validity of the parameters for the convolution
+        operation.
+
+        Args:
+            kernel_size: The size of the convolving kernel.
+            groups: The number of blocked connections from input
+                channels to output channels.
+            stride: The stride of the convolution.
+            dilation: The spacing between kernel elements.
+            data_format: The data format for the convolution, either
+                "NHWC" or "NCHW".
+
+        Raises:
+            ValueError: If the kernel size is invalid, the groups is
+                invalid, the stride is invalid, the dilation is
+                invalid, or the data format is invalid.
+        """
+
+        if kernel_size is not None and (kernel_size <= 0 or kernel_size % groups != 0):
+            raise ValueError(
+                f"Invalid `kernel_size`: {kernel_size}. Must be > 0 "
+                f"and divisible by `groups` {groups}."
+            )
+        if groups <= 0:
+            raise ValueError(f"Invalid `groups`: {groups}. Must be > 0.")
+        if isinstance(stride, list):
+            if any(s == 0 for s in stride):
+                raise ValueError(f"`stride` {stride} cannot contain 0.")
+            if max(stride) > 1 and isinstance(dilation, list) and max(dilation) > 1:
+                raise ValueError(
+                    f"`stride` {stride} > 1 not allowed with `dilation` {dilation} > 1."
+                )
+        if data_format not in {"NWC", "NCW"}:
+            raise ValueError(
+                f"Invalid `data_format`: {data_format}. Must be 'NWC' or 'NCW'."
+            )
+
     def build(self, input_shape: tf.TensorShape) -> None:
         """
-        Builds the Conv2D layer.
+        Builds the Conv1D layer.
 
         Args:
             input_shape: Input shape of the layer.
@@ -90,11 +149,7 @@ class Conv1D(BayesianModule):
             initializer=tf.constant_initializer(
                 self.weights_distribution.sample().numpy()
             ),
-            shape=(
-                self.input_channels // self.groups,
-                self.kernel_size,
-                self.output_channels,
-            ),
+            shape=self._weights_distribution_shape,
             trainable=False,
         )
         self.b = self.add_weight(
@@ -111,7 +166,7 @@ class Conv1D(BayesianModule):
 
     def get_config(self) -> dict:
         """
-        Retrieves the configuration of the Linear layer.
+        Retrieves the configuration of the Conv1D layer.
 
         Returns:
             Dictionary containing layer configuration.
@@ -129,6 +184,7 @@ class Conv1D(BayesianModule):
             "padding": self.padding,
             "dilation": self.dilation,
             "groups": self.groups,
+            "data_format": self.data_format,
             "weights_distribution": self.weights_distribution,
             "bias_distribution": self.bias_distribution,
         }
@@ -142,22 +198,25 @@ class Conv1D(BayesianModule):
         weight: tf.Tensor,
         stride: Union[int, list[int]],
         padding: str,
-        dilation: Union[int, list[int]],
+        data_format: Optional[str] = "NWC",
+        dilation: Optional[Union[int, list[int]]] = None,
     ) -> tf.Tensor:
         """
         Applies a 1D convolution operation to the input tensor.
 
         Args:
-            inputs: The input tensor of shape
-                [batch_size, height, width, channels].
+            inputs: The input tensor.
             weight: The convolutional kernel weights.
             stride: The stride of the convolution.
-            padding: The padding to be applied to the input tensor.
-            dilation: The dilation rate of the convolution.
+            padding: The padding strategy to be applied, either
+                'VALID' or 'SAME'.
+            data_format: The data format for the input tensor, either
+                'NWC' or 'NCW'.
+            dilation: The dilation rate for spacing between kernel
+                elements.
 
         Returns:
-            The output tensor of shape
-            [batch_size, height, width, output_channels].
+            The output tensor after applying the 1D convolution.
         """
 
         output: tf.Tensor = tf.nn.conv1d(
@@ -165,6 +224,7 @@ class Conv1D(BayesianModule):
             filters=weight,
             stride=stride,
             padding=padding,
+            data_format=data_format,
             dilations=dilation,
         )
 
@@ -172,7 +232,8 @@ class Conv1D(BayesianModule):
 
     def freeze(self) -> None:
         """
-        This method is to freeze the layer.
+        Freezes the current module and all submodules that are instances
+        of BayesianModule. Sets the frozen state to True.
         """
 
         # Set indicator
@@ -180,11 +241,11 @@ class Conv1D(BayesianModule):
 
         # Sample weights if they are undefined
         if self.w is None:
-            self.w = self.weights_distribution.sample()  # pylint: disable=W0201
+            self.w = self.weights_distribution.sample()
 
         # Sample bias is they are undefined
         if self.b is None:
-            self.b = self.bias_distribution.sample()  # pylint: disable=W0201
+            self.b = self.bias_distribution.sample()
 
     def kl_cost(self) -> tuple[tf.Tensor, int]:
         """
@@ -217,12 +278,10 @@ class Conv1D(BayesianModule):
         sampling.
 
         Args:
-            inputs: Input tensor to the layer. Dimensions: [batch,
-                input channels, input width, input height].
+            inputs: Input tensor to the layer.
 
         Returns:
-            Output tensor after passing through the layer. Dimensions:
-                [batch, output channels, output width, output height].
+            Output tensor after passing through the layer.
         """
 
         # Check if layer is frozen
@@ -230,7 +289,9 @@ class Conv1D(BayesianModule):
             self.w = self.weights_distribution.sample()
             self.b = self.bias_distribution.sample()
         elif self.w is None or self.b is None:
-            raise ValueError("Module has been frozen with undefined weights")
+            raise ValueError(
+                "Module has been frozen with undefined weights and/or bias."
+            )
 
         # Compute outputs
         outputs: tf.Tensor = self._conv1d(
@@ -238,10 +299,15 @@ class Conv1D(BayesianModule):
             weight=self.w,
             stride=self.stride,
             padding=self.padding,
+            data_format=self.data_format,
             dilation=self.dilation,
         )
 
         # Add bias
-        outputs = tf.nn.bias_add(outputs, self.b)
+        outputs = tf.nn.bias_add(
+            value=outputs,
+            bias=self.b,
+            data_format="N..C" if self.data_format == "NWC" else "NC..",
+        )
 
         return outputs
