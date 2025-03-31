@@ -230,6 +230,14 @@ def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2D, tf.Tensor, s
         width,
     ) = request.param
 
+    # Validate and adjust data format if needed
+    if data_format not in {"NHWC", "NCHW"}:
+        raise ValueError(f"Invalid data format: {data_format}")
+
+    # If NCHW is requested but CUDA is unavailable, fall back to NHWC
+    if data_format == "NCHW" and not tf.test.is_built_with_cuda():
+        data_format = "NHWC"
+
     # Define model
     model: Conv2D = Conv2D(
         input_channels=input_channels,
@@ -243,14 +251,6 @@ def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2D, tf.Tensor, s
         weights_distribution=weights_distribution,
         bias_distribution=bias_distribution,
     )
-
-    # Validate and adjust data format if needed
-    if data_format not in {"NHWC", "NCHW"}:
-        raise ValueError(f"Invalid data format: {data_format}")
-
-    # If NCHW is requested but CUDA is unavailable, fall back to NHWC
-    if data_format == "NCHW" and not tf.test.is_built_with_cuda():
-        data_format = "NHWC"
 
     # Define input tensor shape based on data format
     input_shape = (
@@ -368,6 +368,14 @@ def conv1d_fixture(request: pytest.FixtureRequest) -> tuple[Conv1D, tf.Tensor, s
         embedding_dim,
     ) = request.param
 
+    # Validate data format
+    if data_format not in {"NWC", "NCW"}:
+        raise ValueError(f"Invalid data format: {data_format}")
+
+    # If NCHW is requested but CUDA is unavailable, fall back to NWC
+    if data_format == "NCW" and not tf.test.is_built_with_cuda():
+        data_format = "NWC"
+
     # Define model
     model: Conv1D = Conv1D(
         input_channels=input_channels,
@@ -381,10 +389,6 @@ def conv1d_fixture(request: pytest.FixtureRequest) -> tuple[Conv1D, tf.Tensor, s
         weights_distribution=weights_distribution,
         bias_distribution=bias_distribution,
     )
-
-    # Validate data format
-    if data_format not in {"NWC", "NCW"}:
-        raise ValueError(f"Invalid data format: {data_format}")
 
     # Define input tensor shape based on data format
     input_shape = (
