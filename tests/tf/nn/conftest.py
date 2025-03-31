@@ -235,7 +235,7 @@ def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2D, tf.Tensor, s
         raise ValueError(f"Invalid data format: {data_format}")
 
     # If NCHW is requested but CUDA is unavailable, fall back to NHWC
-    if data_format == "NCHW" and not tf.test.is_built_with_cuda():
+    if data_format == "NCHW" and len(tf.config.list_physical_devices("GPU")) == 0:
         data_format = "NHWC"
 
     # Define model
@@ -373,7 +373,7 @@ def conv1d_fixture(request: pytest.FixtureRequest) -> tuple[Conv1D, tf.Tensor, s
         raise ValueError(f"Invalid data format: {data_format}")
 
     # If NCHW is requested but CUDA is unavailable, fall back to NWC
-    if data_format == "NCW" and not tf.test.is_built_with_cuda():
+    if data_format == "NCW" and len(tf.config.list_physical_devices("GPU")) == 0:
         data_format = "NWC"
 
     # Define model
