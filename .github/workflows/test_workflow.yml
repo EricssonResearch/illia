@@ -29,7 +29,7 @@ jobs:
     # Name of the job
     name: Setup, Lint and Test Illia Code
     # Operating system to be used in the job
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     # Sequence of steps to be used in the job
     steps:
