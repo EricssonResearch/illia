@@ -2,8 +2,12 @@
 This module contains the code to test the bayesian Linear layer.
 """
 
+# Standard libraries
+import tempfile
+
 # 3pps
 import pytest
+import keras
 import tensorflow as tf
 
 # own modules
@@ -187,3 +191,57 @@ class TestLinear:
             f"Incorrect shape of outputs first element, expected () and got "
             f"{outputs[0].shape}"
         )
+
+    @pytest.mark.filterwarnings("ignore::DeprecationWarning")
+    @pytest.mark.order(6)
+    def test_saving_load_model(self, linear_fixture: tuple[Linear, tf.Tensor]) -> None:
+        """
+        This method is the test for the test_saving_load_model of Linear layer.
+
+        Args:
+            linear_fixture: tuple of instance of Linear and inputs to use.
+        """
+
+        # Get model and inputs
+        layer: Linear
+        inputs: tf.Tensor
+        layer, inputs = linear_fixture
+
+        # Create a model
+        input_model = keras.Input(shape=inputs.shape[1:])
+        output_model = layer(input_model)
+        model = keras.Model(input_model, output_model)
+
+        # Create a temporary directory
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # Define the path for saving the model
+            model_path = f"{temp_dir}/linear_test.keras"
+
+            # Save the model
+            model.save(model_path)
+
+            # Load the model without compiling it
+            loaded_model = keras.models.load_model(model_path, compile=False)
+
+            # Verify the loaded model is the same as the original model
+            # by checking the architecture and weights.
+            original_weights = model.get_weights()
+            loaded_weights = loaded_model.get_weights()
+
+            # Check if all weights are equal
+            for o_w, l_w in zip(original_weights, loaded_weights):
+                assert tf.reduce_all(
+                    tf.equal(o_w, l_w)
+                ), "Weights of the loaded model do not match the original model."
+
+            # Optionally, verify the loaded model with a forward pass
+            original_output = model(inputs)
+            loaded_output = loaded_model(inputs)
+
+            # Check if the shapes and dtypes of the outputs are the same
+            assert (
+                original_output.shape == loaded_output.shape
+            ), "Incorrect shape of the loaded model outputs."
+            assert (
+                original_output.dtype == loaded_output.dtype
+            ), "Incorrect dtype of the loaded model outputs."

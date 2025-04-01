@@ -51,6 +51,7 @@ class Embedding(BayesianModule):
                 sparse tensor.
             weights_distribution: The Gaussian distribution for the
                 weights, if applicable.
+            **kwargs: Additional keyword arguments.
         """
 
         # Call super class constructor
@@ -114,7 +115,6 @@ class Embedding(BayesianModule):
             "norm_type": self.norm_type,
             "scale_grad_by_freq": self.scale_grad_by_freq,
             "sparse": self.sparse,
-            "weights_distribution": self.weights_distribution,
         }
 
         # Combine both configurations
@@ -176,7 +176,7 @@ class Embedding(BayesianModule):
 
         # Sample weights if they are undefined
         if self.w is None:
-            self.w = self.weights_distribution.sample()  # type: ignore
+            self.w = self.weights_distribution.sample()
 
     def kl_cost(self) -> tuple[tf.Tensor, int]:
         """

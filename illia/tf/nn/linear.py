@@ -38,6 +38,7 @@ class Linear(BayesianModule):
                 weights, if applicable.
             bias_distribution: The Gaussian distribution for the bias,
                 if applicable.
+            **kwargs: Additional keyword arguments.
         """
 
         # Call super-class constructor
@@ -103,8 +104,6 @@ class Linear(BayesianModule):
         custom_config = {
             "input_size": self.input_size,
             "output_size": self.output_size,
-            "weights_distribution": self.weights_distribution,
-            "bias_distribution": self.bias_distribution,
         }
 
         # Combine both configurations

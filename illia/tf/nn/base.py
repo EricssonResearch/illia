@@ -21,6 +21,9 @@ class BayesianModule(ABC, layers.Layer):
     def __init__(self, **kwargs) -> None:
         """
         This method is the constructor for BayesianModule.
+
+        Args:
+            **kwargs: Additional keyword arguments.
         """
 
         # Call super class constructor

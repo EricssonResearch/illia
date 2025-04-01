@@ -54,6 +54,7 @@ class Conv1D(BayesianModule):
                 weights, if applicable.
             bias_distribution: The Gaussian distribution for the bias,
                 if applicable.
+            **kwargs: Additional keyword arguments.
         """
 
         # Call super class constructor
@@ -186,8 +187,6 @@ class Conv1D(BayesianModule):
             "dilation": self.dilation,
             "groups": self.groups,
             "data_format": self.data_format,
-            "weights_distribution": self.weights_distribution,
-            "bias_distribution": self.bias_distribution,
         }
 
         # Combine both configurations

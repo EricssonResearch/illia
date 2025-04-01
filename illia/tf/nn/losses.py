@@ -30,6 +30,7 @@ class KLDivergenceLoss(losses.Loss):
             reduction: Method to reduce the loss, currently only "mean"
                 is supported.
             weight: Scaling factor for the KL divergence loss.
+            **kwargs: Additional keyword arguments.
         """
 
         # Call super class constructor
@@ -109,6 +110,7 @@ class ELBOLoss(losses.Loss):
             loss_function: Loss function for computing likelihood loss.
             num_samples: Number of samples for Monte Carlo approximation.
             kl_weight: Scaling factor for the KL divergence component.
+            **kwargs: Additional keyword arguments.
         """
 
         # Call super class constructor
