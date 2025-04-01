@@ -32,6 +32,7 @@ class Conv2D(BayesianModule):
         data_format: Optional[str] = "NHWC",
         weights_distribution: Optional[GaussianDistribution] = None,
         bias_distribution: Optional[GaussianDistribution] = None,
+        **kwargs,
     ) -> None:
         """
         Initializes a Bayesian Conv2D layer.
@@ -56,7 +57,7 @@ class Conv2D(BayesianModule):
         """
 
         # Call super class constructor
-        super().__init__()
+        super().__init__(**kwargs)
 
         # Check data format
         self._check_params(kernel_size, groups, stride, dilation, data_format)

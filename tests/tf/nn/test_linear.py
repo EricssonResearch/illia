@@ -3,8 +3,8 @@ This module contains the code to test the bayesian Linear layer.
 """
 
 # 3pps
-import tensorflow as tf
 import pytest
+import tensorflow as tf
 
 # own modules
 from illia.tf.nn import Linear
@@ -25,6 +25,7 @@ class TestLinear:
                 use.
         """
 
+        # Get model and inputs
         model: Linear
         model, _ = linear_fixture
 
@@ -87,8 +88,8 @@ class TestLinear:
         for i, gradient in enumerate(gradients):
             # Check if parameter is none
             assert gradient is not None, (
-                f"Incorrect backward computation, gradient of {model.trainable_variables[i]} shouldn't be "
-                f"None"
+                f"Incorrect backward computation, gradient of "
+                f"{model.trainable_variables[i]} shouldn't be None"
             )
 
     @pytest.mark.order(4)

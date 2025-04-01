@@ -3,9 +3,9 @@ This module contains the tests for the bayesian Conv1D.
 """
 
 # 3pps
+import pytest
 import torch
 from torch.jit import RecursiveScriptModule
-import pytest
 
 # Own modules
 from illia.torch.nn import Conv1D

@@ -29,6 +29,7 @@ class GaussianDistribution(Distribution):
         std_prior: float = 0.1,
         mu_init: float = 0.0,
         rho_init: float = -7.0,
+        **kwargs,
     ) -> None:
         """
         Constructor for GaussianDistribution.
@@ -42,27 +43,25 @@ class GaussianDistribution(Distribution):
         """
 
         # Call super class constructor
-        super().__init__()
+        super().__init__(**kwargs)
 
         # Set parameters
         self.shape = shape
         self.mu_init = mu_init
         self.rho_init = rho_init
-        self.mu_prior_value = mu_prior
-        self.std_prior_value = std_prior
 
         # Define non-trainable priors variables
         self.mu_prior = self.add_weight(
-            name="mu_prior",
             shape=(),
-            initializer=tf.constant_initializer(self.mu_prior_value),
+            initializer=tf.constant_initializer(mu_prior),
             trainable=False,
+            name="mu_prior",
         )
         self.std_prior = self.add_weight(
-            name="std_prior",
             shape=(),
-            initializer=tf.constant_initializer(self.std_prior_value),
+            initializer=tf.constant_initializer(std_prior),
             trainable=False,
+            name="std_prior",
         )
 
         # Define trainable parameters
@@ -70,13 +69,13 @@ class GaussianDistribution(Distribution):
             shape=self.shape,
             initializer=tf.random_normal_initializer(mean=self.mu_init, stddev=0.1),
             trainable=True,
-            name=f"{self.name}_mu",
+            name="mu",
         )
         self.rho = self.add_weight(
             shape=self.shape,
             initializer=tf.random_normal_initializer(mean=self.rho_init, stddev=0.1),
             trainable=True,
-            name=f"{self.name}_rho",
+            name="rho",
         )
 
     def get_config(self):
@@ -91,8 +90,8 @@ class GaussianDistribution(Distribution):
 
         config = {
             "shape": self.shape,
-            "mu_prior": float(self.mu_prior.numpy()),
-            "std_prior": float(self.std_prior.numpy()),
+            "mu_prior": self.mu_prior,
+            "std_prior": self.std_prior,
             "mu_init": self.mu_init,
             "rho_init": self.rho_init,
         }

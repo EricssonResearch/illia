@@ -26,6 +26,7 @@ class Linear(BayesianModule):
         output_size: int,
         weights_distribution: Optional[GaussianDistribution] = None,
         bias_distribution: Optional[GaussianDistribution] = None,
+        **kwargs
     ) -> None:
         """
         This is the constructor of the Linear class.
@@ -40,7 +41,7 @@ class Linear(BayesianModule):
         """
 
         # Call super-class constructor
-        super().__init__()
+        super().__init__(**kwargs)
 
         # Set parameters
         self.input_size = input_size

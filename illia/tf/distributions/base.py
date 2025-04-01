@@ -15,8 +15,8 @@ from keras import layers, saving
 class Distribution(ABC, layers.Layer):
     """
     This class serves as the base class for Distributions modules.
-    Any module designed to function as a distribution layer should inherit
-    from this class.
+    Any module designed to function as a distribution layer should
+    inherit from this class.
     """
 
     @abstractmethod

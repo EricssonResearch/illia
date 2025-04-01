@@ -32,6 +32,7 @@ class Conv1D(BayesianModule):
         data_format: Optional[str] = "NWC",
         weights_distribution: Optional[GaussianDistribution] = None,
         bias_distribution: Optional[GaussianDistribution] = None,
+        **kwargs,
     ) -> None:
         """
         Initializes a Bayesian Conv1D layer.
@@ -45,8 +46,8 @@ class Conv1D(BayesianModule):
             padding: The padding added to all four sides of the input.
                 Can be 'VALID' or 'SAME'.
             dilation: The spacing between kernel elements.
-            groups: The number of blocked connections from input channels
-                to output channels.
+            groups: The number of blocked connections from input
+                channels to output channels.
             data_format: The data format for the convolution, either
                 'NWC' or 'NCW'.
             weights_distribution: The Gaussian distribution for the
@@ -56,7 +57,7 @@ class Conv1D(BayesianModule):
         """
 
         # Call super class constructor
-        super().__init__()
+        super().__init__(**kwargs)
 
         # Check data format
         self._check_params(kernel_size, groups, stride, dilation, data_format)

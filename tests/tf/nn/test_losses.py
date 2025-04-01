@@ -3,9 +3,9 @@ This module contains the code to test losses.
 """
 
 # 3pps
+import pytest
 import keras
 import tensorflow as tf
-import pytest
 
 # Own modules
 from illia.tf.nn.base import BayesianModule
@@ -73,6 +73,6 @@ class TestKLDivergenceLoss:
         for i, gradient in enumerate(gradients):
             # Check if parameter is none
             assert gradient is not None, (
-                f"Incorrect backward computation, gradient of {model.trainable_variables[i]} shouldn't be "
-                f"None"
+                f"Incorrect backward computation, gradient of "
+                f"{model.trainable_variables[i]} shouldn't be None"
             )

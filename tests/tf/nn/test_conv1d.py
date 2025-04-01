@@ -2,10 +2,13 @@
 This module contains the tests for the bayesian Conv1D.
 """
 
+# Standard libraries
+import tempfile
+
 # 3pps
+import pytest
 import keras
 import tensorflow as tf
-import pytest
 
 # Own modules
 from illia.tf.nn import Conv1D
@@ -104,8 +107,8 @@ class TestConv1d:
         for i, gradient in enumerate(gradients):
             # Check if parameter is none
             assert gradient is not None, (
-                f"Incorrect backward computation, gradient of {model.trainable_variables[i]} shouldn't be "
-                f"None"
+                f"Incorrect backward computation, gradient of "
+                f"{model.trainable_variables[i]} shouldn't be None"
             )
 
     @pytest.mark.order(4)
@@ -203,3 +206,55 @@ class TestConv1d:
             f"Incorrect shape of outputs first element, expected () and got "
             f"{outputs[0].shape}"
         )
+
+    @pytest.mark.order(6)
+    def _test_saving_load_model(
+        self, conv1d_fixture: tuple[Conv1D, tf.Tensor, str]
+    ) -> None:
+        """
+        This method is the test for the test_saving_load_model of Conv1D layer.
+
+        Args:
+            conv1d_fixture: tuple of instance of Conv1D and inputs to use.
+        """
+
+        # Get model and inputs
+        layer: Conv1D
+        inputs: tf.Tensor
+        layer, inputs, _ = conv1d_fixture
+
+        # Create a model
+        inputs = keras.Input(shape=inputs.shape[1:])
+        outputs = layer(inputs)
+        model = keras.Model(inputs, outputs)
+
+        # Create a temporary directory
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # Define the path for saving the model
+            model_path = f"{temp_dir}/conv1d_test.keras"
+
+            # Save the model
+            model.save(model_path)
+
+            # Load the model
+            loaded_model = keras.models.load_model(model_path)
+
+            # Verify the loaded model is the same as the original model
+            # by checking the architecture and weights.
+            original_weights = model.get_weights()
+            loaded_weights = loaded_model.get_weights()
+
+            # Check if all weights are equal
+            for o_w, l_w in zip(original_weights, loaded_weights):
+                assert tf.reduce_all(
+                    tf.equal(o_w, l_w)
+                ), "Weights of the loaded model do not match the original model."
+
+            # Optionally, verify the loaded model with a forward pass
+            original_output = model(inputs)
+            loaded_output = loaded_model(inputs)
+
+            # Check if both outputs are equal
+            assert tf.experimental.numpy.allclose(
+                original_output, loaded_output, 1e-8
+            ), "Incorrect outputs, when model is saved and loaded."

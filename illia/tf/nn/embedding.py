@@ -30,6 +30,7 @@ class Embedding(BayesianModule):
         scale_grad_by_freq: bool = False,
         sparse: bool = False,
         weights_distribution: Optional[GaussianDistribution] = None,
+        **kwargs
     ) -> None:
         """
         This method is the constructor of the embedding class.
@@ -53,7 +54,7 @@ class Embedding(BayesianModule):
         """
 
         # Call super class constructor
-        super().__init__()
+        super().__init__(**kwargs)
 
         # Set atributtes
         self.num_embeddings = num_embeddings

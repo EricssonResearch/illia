@@ -3,8 +3,8 @@ This module contains the tests for the Embedding layer.
 """
 
 # 3pps
-import tensorflow as tf
 import pytest
+import tensorflow as tf
 
 # own modules
 from illia.tf.nn import Embedding
@@ -23,9 +23,6 @@ class TestEmbedding:
         Args:
             embedding_fixture: tuple of instance of Embedding and inputs to
                 use.
-
-        Returns:
-            None.
         """
 
         model: Embedding
@@ -45,9 +42,6 @@ class TestEmbedding:
         Args:
             embedding_fixture: tuple of instance of Embedding and inputs to
                 use.
-
-        Returns:
-            None.
         """
 
         # Get model and inputs
@@ -77,9 +71,6 @@ class TestEmbedding:
         Args:
             embedding_fixture: tuple of instance of Embedding and inputs to
                 use.
-
-        Returns:
-            None.
         """
 
         # Get model and inputs
@@ -96,8 +87,8 @@ class TestEmbedding:
         for i, gradient in enumerate(gradients):
             # Check if parameter is none
             assert gradient is not None, (
-                f"Incorrect backward computation, gradient of {model.trainable_variables[i]} shouldn't be "
-                f"None"
+                f"Incorrect backward computation, gradient of "
+                f"{model.trainable_variables[i]} shouldn't be None"
             )
 
     @pytest.mark.order(4)
@@ -109,9 +100,6 @@ class TestEmbedding:
         Args:
             embedding_fixture: tuple of instance of Embedding and inputs to
                 use.
-
-        Returns:
-            None.
         """
 
         # Get model and inputs
@@ -167,9 +155,6 @@ class TestEmbedding:
         Args:
             embedding_fixture: tuple of instance of Embedding and inputs to
                 use.
-
-        Returns:
-            None.
         """
 
         # Get model and inputs

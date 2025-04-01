@@ -18,13 +18,13 @@ class BayesianModule(ABC, layers.Layer):
     from this class.
     """
 
-    def __init__(self):
+    def __init__(self, **kwargs) -> None:
         """
         This method is the constructor for BayesianModule.
         """
 
         # Call super class constructor
-        super().__init__()
+        super().__init__(**kwargs)
 
         # Set freeze false by default
         self.frozen: bool = False

@@ -19,7 +19,9 @@ class KLDivergenceLoss(losses.Loss):
     Computes the KL divergence loss for Bayesian modules within a model.
     """
 
-    def __init__(self, reduction: Literal["mean"] = "mean", weight: float = 1.0):
+    def __init__(
+        self, reduction: Literal["mean"] = "mean", weight: float = 1.0, **kwargs
+    ) -> None:
         """
         Initializes the KL divergence loss with specified reduction
         method and weight.
@@ -31,7 +33,7 @@ class KLDivergenceLoss(losses.Loss):
         """
 
         # Call super class constructor
-        super().__init__()
+        super().__init__(**kwargs)
 
         # Set parameters
         self.reduction = reduction
@@ -97,7 +99,8 @@ class ELBOLoss(losses.Loss):
         loss_function: Callable[[tf.Tensor, tf.Tensor], tf.Tensor],
         num_samples: int = 1,
         kl_weight: float = 1e-3,
-    ):
+        **kwargs
+    ) -> None:
         """
         Initializes the ELBO loss with specified likelihood loss
         function, sample count, and KL weight.
@@ -109,7 +112,7 @@ class ELBOLoss(losses.Loss):
         """
 
         # Call super class constructor
-        super().__init__()
+        super().__init__(**kwargs)
 
         # Set attributes
         self.loss_function = loss_function

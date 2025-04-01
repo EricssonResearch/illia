@@ -3,9 +3,9 @@ This module contains the tests for the bayesian Conv2D.
 """
 
 # 3pps
+import pytest
 import keras
 import tensorflow as tf
-import pytest
 
 # Own modules
 from illia.tf.nn import Conv2D

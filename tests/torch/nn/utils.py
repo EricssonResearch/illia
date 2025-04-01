@@ -46,6 +46,7 @@ class ComposedModel(torch.nn.Module):
         outputs: torch.Tensor = torch.sum(
             torch.stack([model(inputs) for _, model in enumerate(self.models)]), dim=1
         )
+
         return outputs
 
 
@@ -86,4 +87,5 @@ class BayesianComposedModel(BayesianModule):
         outputs: torch.Tensor = torch.sum(
             torch.stack([model(inputs) for _, model in enumerate(self.models)]), dim=1
         )
+
         return outputs

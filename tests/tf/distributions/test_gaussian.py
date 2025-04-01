@@ -3,8 +3,8 @@ This module contains the code to test the GaussianDistribution.
 """
 
 # 3pps
-import tensorflow as tf
 import pytest
+import tensorflow as tf
 from keras.src.backend.tensorflow.core import Variable as BackendVariable
 
 # Own modules

@@ -6,9 +6,9 @@ This module defines fixtures for illia.torch.nn.
 from typing import Optional, Union
 
 # 3pps
+import pytest
 import keras
 import tensorflow as tf
-import pytest
 
 # Own modules
 from illia.tf.nn.base import BayesianModule
@@ -148,8 +148,8 @@ def embedding_fixture(request: pytest.FixtureRequest) -> tuple[Embedding, tf.Ten
             [3, 3],
             [2, 1],
             "SAME",
-            None,  # TODO: Error GitHub Workflow with CPU implementation dilation=[2, 1]
-            1,  # TODO: Error GitHub Workflow with CPU implementation groups=2
+            None,
+            1,
             "NHWC",
             None,
             None,
@@ -291,8 +291,8 @@ def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2D, tf.Tensor, s
             3,
             2,
             "SAME",
-            None,  # TODO: Error GitHub Workflow with CPU implementation dilation=2
-            1,  # TODO: Error GitHub Workflow with CPU implementation groups=2
+            None,
+            1,
             "NWC",
             None,
             None,
