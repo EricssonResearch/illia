@@ -26,7 +26,7 @@ class Linear(BayesianModule):
         output_size: int,
         weights_distribution: Optional[GaussianDistribution] = None,
         bias_distribution: Optional[GaussianDistribution] = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         """
         This is the constructor of the Linear class.

@@ -29,7 +29,7 @@ class GaussianDistribution(Distribution):
         std_prior: float = 0.1,
         mu_init: float = 0.0,
         rho_init: float = -7.0,
-        **kwargs
+        **kwargs,
     ) -> None:
         """
         Constructor for GaussianDistribution.

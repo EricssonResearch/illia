@@ -14,5 +14,5 @@ runs:
     - name: Pytest
       run: |
         echo "Running tests with Pytest..."
-        pytest ${{ inputs.src-tests-folder }}/
+        uv run pytest ${{ inputs.src-tests-folder }}/
       shell: bash

@@ -30,7 +30,7 @@ class Embedding(BayesianModule):
         scale_grad_by_freq: bool = False,
         sparse: bool = False,
         weights_distribution: Optional[GaussianDistribution] = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         """
         This method is the constructor of the embedding class.

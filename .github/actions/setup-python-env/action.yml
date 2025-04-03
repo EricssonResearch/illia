@@ -1,24 +1,44 @@
-name: Setup Python Environment
-description: Sets up Python and dependencies
+name: Setup Python Environment and uv
+description: Setup Python, uv, and dependencies for the project
 
-# Define inputs for the action, such as the Python version and the dependencies
-# to install
 inputs:
   src-python-version:
     description: "Python version to set up for the project"
+    required: true
+  dependencies:
+    description: "Dependencies to install (comma-separated list)"
     required: true
 
 runs:
   using: composite
   steps:
-    - name: Install Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ inputs.src-python-version }}
-        # Caching pip dependencies
-        cache: "pip"
+    # Step 1: Install uv, a fast Python package and project manager
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
 
+    # Step 2: Install the specified version of Python using uv
+    - name: Install Python
+      shell: bash
+      run: |
+        uv python install ${{ inputs.src-python-version }}
+
+    # Step 3: Create a virtual environment using uv
+    - name: Create virtual environment
+      shell: bash
+      run: |
+        uv venv .venv --python ${{ inputs.src-python-version }}
+
+    # Step 4: Install dependencies using uv within the virtual environment
     - name: Install dependencies
       shell: bash
       run: |
-        pip install -r requirements.txt
+        source .venv/bin/activate
+        uv pip install -r pyproject.toml --group ${{ inputs.dependencies }}
+
+    # Step 5: Verify the installation of uv and display environment info
+    - name: Verify uv installation
+      shell: bash
+      run: |
+        source .venv/bin/activate
+        uv --version
+        uv venv list

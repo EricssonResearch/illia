@@ -23,5 +23,5 @@ runs:
 
     # Step 3: Generate the GitHub Pages artifacts (the MkDocs site) and deploy it to the gh-deploy branch
     - name: Create artifacts to gh-deploy branch
-      run: mkdocs gh-deploy --config-file ./mkdocs.yml --force
+      run: uv run mkdocs gh-deploy --config-file ./mkdocs.yml --force
       shell: bash
