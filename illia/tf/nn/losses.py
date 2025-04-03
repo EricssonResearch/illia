@@ -100,7 +100,7 @@ class ELBOLoss(losses.Loss):
         loss_function: Callable[[tf.Tensor, tf.Tensor], tf.Tensor],
         num_samples: int = 1,
         kl_weight: float = 1e-3,
-        **kwargs
+        **kwargs,
     ) -> None:
         """
         Initializes the ELBO loss with specified likelihood loss

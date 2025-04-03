@@ -43,6 +43,7 @@ jobs:
         uses: ./.github/actions/setup-python-env
         with:
           src-python-version: ${{ env.SRC_PYTHON_VERSION }}
+          dependencies: "pipeline"
 
       # Step 3: Run code linting to check code style, syntax, and quality
       # using Black, MyPy and Flake8
@@ -76,7 +77,8 @@ jobs:
         uses: ./.github/actions/setup-python-env
         with:
           src-python-version: ${{ env.SRC_PYTHON_VERSION }}
-
+          dependencies: "documentation"
+          
       # Step 3: Build the MkDocs site
       - name: Build MkDocs
         uses: ./.github/actions/build-mkdocs
