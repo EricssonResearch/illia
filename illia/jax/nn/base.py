@@ -20,8 +20,7 @@ class BayesianModule(nnx.Module):
 
     def __init__(self) -> None:
         """
-        Initializes the BayesianModule, setting the frozen state to
-        False.
+        This method is the constructor for BayesianModule.
         """
 
         # Call super class constructor
@@ -54,12 +53,12 @@ class BayesianModule(nnx.Module):
     @abstractmethod
     def kl_cost(self) -> tuple[jax.Array, int]:
         """
-        Abstract method to compute the KL divergence cost.
-        Must be implemented by subclasses.
+        Computes the Kullback-Leibler (KL) divergence cost for the
+        layer's weights and bias.
 
         Returns:
-            A tuple containing the KL divergence cost and its
-            associated integer value.
+            Tuple containing KL divergence cost and total number of
+            parameters.
         """
 
         return jnp.array(0), 0

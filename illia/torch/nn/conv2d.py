@@ -90,7 +90,8 @@ class Conv2D(BayesianModule):
     @torch.jit.export
     def freeze(self) -> None:
         """
-        This method is to freeze the layer.
+        Freezes the current module and all submodules that are instances
+        of BayesianModule. Sets the frozen state to True.
         """
 
         # Set indicator
@@ -98,25 +99,25 @@ class Conv2D(BayesianModule):
 
         # Sample weights if they are undefined
         if self.weights is None:  # type: ignore
-            self.weights = self.weights_distribution.sample()  # pylint: disable=W0201
+            self.weights = self.weights_distribution.sample()
 
         # Sample bias is they are undefined
         if self.bias is None:  # type: ignore
-            self.bias = self.bias_distribution.sample()  # pylint: disable=W0201
+            self.bias = self.bias_distribution.sample()
 
         # Detach weights and bias
-        self.weights = self.weights.detach()  # pylint: disable=W0201
-        self.bias = self.bias.detach()  # pylint: disable=W0201
+        self.weights = self.weights.detach()
+        self.bias = self.bias.detach()
 
     @torch.jit.export
     def kl_cost(self) -> tuple[torch.Tensor, int]:
         """
-        Calculate the Kullback-Leibler (KL) divergence cost for the
-        weights and bias of the layer.
+        Computes the Kullback-Leibler (KL) divergence cost for the
+        layer's weights and bias.
 
         Returns:
-            KL divergence cost. Dimensions: [].
-            number of parameters.
+            Tuple containing KL divergence cost and total number of
+            parameters.
         """
 
         # Compute log probs
@@ -150,14 +151,12 @@ class Conv2D(BayesianModule):
 
         # Forward depending of frozen state
         if not self.frozen:
-            self.weights = self.weights_distribution.sample()  # pylint: disable=W0201
-            self.bias = self.bias_distribution.sample()  # pylint: disable=W0201
+            self.weights = self.weights_distribution.sample()
+            self.bias = self.bias_distribution.sample()
         else:
             if self.weights is None or self.bias is None:
-                self.weights = (  # pylint: disable=W0201
-                    self.weights_distribution.sample()
-                )
-                self.bias = self.bias_distribution.sample()  # pylint: disable=W0201
+                self.weights = self.weights_distribution.sample()
+                self.bias = self.bias_distribution.sample()
 
         # Execute torch forward
         return F.conv2d(  # pylint: disable=E1102

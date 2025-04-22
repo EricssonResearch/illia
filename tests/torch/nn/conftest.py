@@ -6,8 +6,8 @@ This module defines fixtures for illia.torch.nn.
 from typing import Optional, Union
 
 # 3pps
-import torch
 import pytest
+import torch
 
 # Own modules
 from illia.torch.nn.base import BayesianModule
@@ -50,10 +50,12 @@ def linear_fixture(request: pytest.FixtureRequest) -> tuple[Linear, torch.Tensor
         bias_distribution,
     ) = request.param
 
-    # Define model and inputs
+    # Define model
     model: Linear = Linear(
         input_size, output_size, weights_distribution, bias_distribution
     )
+
+    # Define inputs
     inputs: torch.Tensor = torch.rand((batch_size, input_size))
 
     return model, inputs
@@ -118,7 +120,7 @@ def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2D, torch.Tensor
         width,
     ) = request.param
 
-    # Define model and inputs
+    # Define model
     model: Conv2D = Conv2D(
         input_channels,
         output_channels,
@@ -130,6 +132,8 @@ def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2D, torch.Tensor
         weights_distribution,
         bias_distribution,
     )
+
+    # Define inputs
     inputs: torch.Tensor = torch.rand((batch_size, input_channels, height, width))
 
     return model, inputs
@@ -191,7 +195,7 @@ def conv1d_fixture(request: pytest.FixtureRequest) -> tuple[Conv1D, torch.Tensor
         embedding_dim,
     ) = request.param
 
-    # Define model and inputs
+    # Define model
     model: Conv1D = Conv1D(
         input_channels,
         output_channels,
@@ -203,6 +207,8 @@ def conv1d_fixture(request: pytest.FixtureRequest) -> tuple[Conv1D, torch.Tensor
         weights_distribution,
         bias_distribution,
     )
+
+    # Define inputs
     inputs: torch.Tensor = torch.rand((batch_size, input_channels, embedding_dim))
 
     return model, inputs
@@ -248,7 +254,7 @@ def embedding_fixture(request: pytest.FixtureRequest) -> tuple[Embedding, torch.
         weights_distribution,
     ) = request.param
 
-    # Define model and inputs
+    # Define model
     model: Embedding = Embedding(
         num_embeddings,
         embeddings_dim,
@@ -259,6 +265,8 @@ def embedding_fixture(request: pytest.FixtureRequest) -> tuple[Embedding, torch.
         sparse,
         weights_distribution,
     )
+
+    # Define inputs
     inputs: torch.Tensor = torch.randint(0, num_embeddings, (batch_size,))
 
     return model, inputs

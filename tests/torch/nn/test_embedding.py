@@ -3,11 +3,11 @@ This module contains the tests for the Embedding layer.
 """
 
 # 3pps
+import pytest
 import torch
 from torch.jit import RecursiveScriptModule
-import pytest
 
-# own modules
+# Own modules
 from illia.torch.nn import Embedding
 
 

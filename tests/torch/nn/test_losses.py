@@ -3,8 +3,8 @@ This module contains the code to test losses.
 """
 
 # 3pps
-import torch
 import pytest
+import torch
 
 # Own modules
 from illia.torch.nn.base import BayesianModule

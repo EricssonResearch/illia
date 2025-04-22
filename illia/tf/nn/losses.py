@@ -19,7 +19,9 @@ class KLDivergenceLoss(losses.Loss):
     Computes the KL divergence loss for Bayesian modules within a model.
     """
 
-    def __init__(self, reduction: Literal["mean"] = "mean", weight: float = 1.0):
+    def __init__(
+        self, reduction: Literal["mean"] = "mean", weight: float = 1.0, **kwargs
+    ) -> None:
         """
         Initializes the KL divergence loss with specified reduction
         method and weight.
@@ -28,10 +30,11 @@ class KLDivergenceLoss(losses.Loss):
             reduction: Method to reduce the loss, currently only "mean"
                 is supported.
             weight: Scaling factor for the KL divergence loss.
+            **kwargs: Additional keyword arguments.
         """
 
         # Call super class constructor
-        super().__init__()
+        super().__init__(**kwargs)
 
         # Set parameters
         self.reduction = reduction
@@ -49,10 +52,7 @@ class KLDivergenceLoss(losses.Loss):
         base_config = super().get_config()
 
         # Add custom configurations
-        custom_config = {
-            "reduction": self.reduction,
-            "weight": self.weight,
-        }
+        custom_config = {"reduction": self.reduction, "weight": self.weight}
 
         # Combine both configurations
         return {**base_config, **custom_config}
@@ -100,7 +100,8 @@ class ELBOLoss(losses.Loss):
         loss_function: Callable[[tf.Tensor, tf.Tensor], tf.Tensor],
         num_samples: int = 1,
         kl_weight: float = 1e-3,
-    ):
+        **kwargs,
+    ) -> None:
         """
         Initializes the ELBO loss with specified likelihood loss
         function, sample count, and KL weight.
@@ -109,10 +110,11 @@ class ELBOLoss(losses.Loss):
             loss_function: Loss function for computing likelihood loss.
             num_samples: Number of samples for Monte Carlo approximation.
             kl_weight: Scaling factor for the KL divergence component.
+            **kwargs: Additional keyword arguments.
         """
 
         # Call super class constructor
-        super().__init__()
+        super().__init__(**kwargs)
 
         # Set attributes
         self.loss_function = loss_function

@@ -3,9 +3,9 @@ This module contains the code to test the GaussianDistribution.
 """
 
 # 3pps
+import pytest
 import torch
 from torch.jit import RecursiveScriptModule
-import pytest
 
 # Own modules
 from illia.torch.distributions import GaussianDistribution
@@ -146,8 +146,8 @@ class TestGaussianDistribution:
 
         # Check rho gradients
         assert distribution.rho.grad is not None, (
-            "Incorrect backward, rho gradients still None after executing the backward "
-            "pass"
+            "Incorrect backward, rho gradients still None after executing the "
+            "backward pass"
         )
 
         # Check shape of rho gradients
@@ -252,9 +252,9 @@ class TestGaussianDistribution:
             mu_init: init value for mu. This tensor will be initialized
                 with a normal distribution with std 0.1 and the mean is
                 the parameter specified here.
-            rho_init: init value for rho. This tensor will be initialized
-                with a normal distribution with std 0.1 and the mean is
-                the parameter specified here.
+            rho_init: init value for rho. This tensor will be
+                initialized with a normal distribution with std 0.1
+                and the mean is the parameter specified here.
         """
 
         # Define distribution
@@ -286,7 +286,8 @@ class TestGaussianDistribution:
         rho_init: float,
     ) -> None:
         """
-        This test checks the change of device of the GaussianDistribution
+        This test checks the change of device of the
+        GaussianDistribution
 
         Args:
             shape: shape of the distribution.
@@ -295,9 +296,9 @@ class TestGaussianDistribution:
             mu_init: init value for mu. This tensor will be initialized
                 with a normal distribution with std 0.1 and the mean is
                 the parameter specified here.
-            rho_init: init value for rho. This tensor will be initialized
-                with a normal distribution with std 0.1 and the mean is
-                the parameter specified here.
+            rho_init: init value for rho. This tensor will be
+                initialized with a normal distribution with std 0.1
+                and the mean is the parameter specified here.
         """
 
         # Define two devices
@@ -340,9 +341,9 @@ class TestGaussianDistribution:
             mu_init: init value for mu. This tensor will be initialized
                 with a normal distribution with std 0.1 and the mean is
                 the parameter specified here.
-            rho_init: init value for rho. This tensor will be initialized
-                with a normal distribution with std 0.1 and the mean is
-                the parameter specified here.
+            rho_init: init value for rho. This tensor will be
+                initialized with a normal distribution with std 0.1
+                and the mean is the parameter specified here.
         """
 
         # Define distribution and script

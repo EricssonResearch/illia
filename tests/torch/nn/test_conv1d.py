@@ -3,9 +3,9 @@ This module contains the tests for the bayesian Conv1D.
 """
 
 # 3pps
+import pytest
 import torch
 from torch.jit import RecursiveScriptModule
-import pytest
 
 # Own modules
 from illia.torch.nn import Conv1D
@@ -43,9 +43,6 @@ class TestConv1d:
         Args:
             conv1d_fixture: tuple of instance of Conv1D and inputs to
                 use.
-
-        Returns:
-            None.
         """
 
         # Get model and inputs
@@ -103,9 +100,6 @@ class TestConv1d:
         Args:
             conv1d_fixture: tuple of instance of Conv1D and inputs to
                 use.
-
-        Returns:
-            None.
         """
 
         # Get model and inputs

@@ -13,17 +13,21 @@ from keras import layers, saving
 @saving.register_keras_serializable(package="BayesianModule", name="BayesianModule")
 class BayesianModule(ABC, layers.Layer):
     """
-    This class implements a BayesianModule. This is still an abstract
-    class since it does not implement the forward method.
+    This class serves as the base class for Bayesian modules.
+    Any module designed to function as a Bayesian layer should inherit
+    from this class.
     """
 
-    def __init__(self):
+    def __init__(self, **kwargs) -> None:
         """
         This method is the constructor for BayesianModule.
+
+        Args:
+            **kwargs: Additional keyword arguments.
         """
 
         # Call super class constructor
-        super().__init__()
+        super().__init__(**kwargs)
 
         # Set freeze false by default
         self.frozen: bool = False
@@ -33,7 +37,8 @@ class BayesianModule(ABC, layers.Layer):
 
     def freeze(self) -> None:
         """
-        This method freezes the layer.
+        Freezes the current module and all submodules that are instances
+        of BayesianModule. Sets the frozen state to True.
         """
 
         # Set frozen indicator to true for current layer
@@ -41,7 +46,8 @@ class BayesianModule(ABC, layers.Layer):
 
     def unfreeze(self) -> None:
         """
-        This method unfreezes the layer.
+        Unfreezes the current module and all submodules that are
+        instances of BayesianModule. Sets the frozen state to False.
         """
 
         # Set frozen indicator to false for current layer
@@ -49,12 +55,12 @@ class BayesianModule(ABC, layers.Layer):
 
     def kl_cost(self) -> tuple[tf.Tensor, int]:
         """
-        Abstract method to compute the KL divergence cost.
-        Must be implemented by subclasses.
+        Computes the Kullback-Leibler (KL) divergence cost for the
+        layer's weights and bias.
 
         Returns:
-            A tuple containing the KL divergence cost and its
-            associated integer value.
+            Tuple containing KL divergence cost and total number of
+            parameters.
         """
 
         return tf.Tensor([0.0]), 0

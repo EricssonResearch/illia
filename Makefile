@@ -13,8 +13,10 @@ TEST_FILE ?= tests/torch tests/tf
 install:
 	@echo "Upgrading pip..."
 	pip install --upgrade pip
-	@echo "Installing requirements..."
-	pip install -r requirements.txt
+	@echo "Installing uv..."
+	pip install uv
+	@echo "Installing dependecies with uv..."
+	uv pip install -r pyproject.toml
 	@echo ""
 
 # Allows cache clearing

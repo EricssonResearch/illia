@@ -17,8 +17,7 @@ from illia.tf.distributions import GaussianDistribution
 @saving.register_keras_serializable(package="BayesianModule", name="Embedding")
 class Embedding(BayesianModule):
     """
-    Bayesian Embedding layer with trainable weights and biases,
-    supporting prior and posterior distributions.
+    This class is the bayesian implementation of the Embedding class.
     """
 
     def __init__(
@@ -31,13 +30,14 @@ class Embedding(BayesianModule):
         scale_grad_by_freq: bool = False,
         sparse: bool = False,
         weights_distribution: Optional[GaussianDistribution] = None,
+        **kwargs,
     ) -> None:
         """
         This method is the constructor of the embedding class.
 
         Args:
-            num_embeddings: size of the dictionary of embeddings.
-            embeddings_dim: the size of each embedding vector.
+            num_embeddings: Size of the dictionary of embeddings.
+            embeddings_dim: The size of each embedding vector.
             padding_idx: If specified, the entries at padding_idx do
                 not contribute to the gradient.
             max_norm: If given, each embedding vector with norm larger
@@ -49,12 +49,13 @@ class Embedding(BayesianModule):
                 mini-batch.
             sparse: If True, gradient w.r.t. weight matrix will be a
                 sparse tensor.
-            weights_distribution: distribution for the weights of the
-                layer.
+            weights_distribution: The Gaussian distribution for the
+                weights, if applicable.
+            **kwargs: Additional keyword arguments.
         """
 
         # Call super class constructor
-        super().__init__()
+        super().__init__(**kwargs)
 
         # Set atributtes
         self.num_embeddings = num_embeddings
@@ -114,7 +115,6 @@ class Embedding(BayesianModule):
             "norm_type": self.norm_type,
             "scale_grad_by_freq": self.scale_grad_by_freq,
             "sparse": self.sparse,
-            "weights_distribution": self.weights_distribution,
         }
 
         # Combine both configurations
@@ -167,10 +167,8 @@ class Embedding(BayesianModule):
 
     def freeze(self) -> None:
         """
-        This method freezes the layer.
-
-        Returns:
-            None.
+        Freezes the current module and all submodules that are instances
+        of BayesianModule. Sets the frozen state to True.
         """
 
         # Set indicator
@@ -178,12 +176,12 @@ class Embedding(BayesianModule):
 
         # Sample weights if they are undefined
         if self.w is None:
-            self.w = self.weights_distribution.sample()  # type: ignore
+            self.w = self.weights_distribution.sample()
 
     def kl_cost(self) -> tuple[tf.Tensor, int]:
         """
         Computes the Kullback-Leibler (KL) divergence cost for the
-        layer's weights and bias.
+        layer's weights.
 
         Returns:
             Tuple containing KL divergence cost and total number of
@@ -220,7 +218,7 @@ class Embedding(BayesianModule):
         if not self.frozen:
             self.w = self.weights_distribution.sample()
         elif self.w is None:
-            raise ValueError("Module has been frozen with undefined weights")
+            raise ValueError("Module has been frozen with undefined weights.")
 
         # Compute outputs
         outputs: tf.Tensor = self._embedding(
