@@ -49,7 +49,7 @@ class Conv2D(BayesianModule):
             groups: The number of blocked connections from input channels
                 to output channels.
             data_format: The data format for the convolution, either
-                'NWC' or 'NCW'.
+                'NHWC' or 'NCHW'.
             weights_distribution: The Gaussian distribution for the
                 weights, if applicable.
             bias_distribution: The Gaussian distribution for the bias,

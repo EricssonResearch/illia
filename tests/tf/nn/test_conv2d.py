@@ -249,7 +249,7 @@ class TestConv2d:
             loaded_model = keras.models.load_model(model_path, compile=False)
 
             # Verify the loaded model is the same as the original model
-            # by checking the architecture and weights.
+            # by checking the architecture and weights
             original_weights = model.get_weights()
             loaded_weights = loaded_model.get_weights()
 
