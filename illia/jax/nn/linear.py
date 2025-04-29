@@ -73,15 +73,17 @@ class Linear(BayesianModule):
             else:
                 self.bias_distribution = self.bias_distribution
 
+        return None
+
     def __call__(self, inputs: jax.Array) -> jax.Array:
         """
-        This methos is the forward pass of the model.
+        This method is the forward pass of the model.
 
         Args:
-            inputs: inputs of the model. Dimensions: [*, input size].
+            inputs: Inputs of the model. Dimensions: [*, input size].
 
         Returns:
-            output tensor. Dimension: [*, output size].
+            Output tensor. Dimension: [*, output size].
         """
 
         # Sample if model not frozen
@@ -114,8 +116,8 @@ class Linear(BayesianModule):
         layer's weights and bias.
 
         Returns:
-            Tuple containing KL divergence cost and total number of
-            parameters.
+            KL divergence cost.
+            Total number of parameters.
         """
 
         # Compute log probs

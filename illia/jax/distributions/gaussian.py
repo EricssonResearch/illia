@@ -136,4 +136,4 @@ class GaussianDistribution(Distribution):
             The number of parameters as an integer.
         """
 
-        return len(self.mu.view(-1))
+        return len(self.mu.reshape(-1))

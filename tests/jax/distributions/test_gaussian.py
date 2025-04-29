@@ -2,6 +2,9 @@
 This module contains the tests for GaussianDistribution.
 """
 
+# Standard libraries
+import copy
+
 # 3pps
 import jax
 import jax.numpy as jnp
@@ -31,6 +34,20 @@ class TestGaussianDistribution:
         rho_init: float,
         rngs: Rngs,
     ) -> None:
+        """
+        This method tests the init method.
+
+        Args:
+            shape: Shape of the weights.
+            mu_prior: Mu value prior.
+            std_prior: Std value prior.
+            mu_init: Mu init prior.
+            rho_init: Rho init prior.
+            rngs: _description_
+
+        Returns:
+            None.
+        """
 
         # Define distribution
         distribution: GaussianDistribution = GaussianDistribution(
@@ -58,6 +75,20 @@ class TestGaussianDistribution:
         rho_init: float,
         rngs: Rngs,
     ) -> None:
+        """
+        This method tests the sample method.
+
+        Args:
+            shape: Shape of the weights.
+            mu_prior: Mu prior value.
+            std_prior: Std prior value.
+            mu_init: Mu init value.
+            rho_init: Rho init value.
+            rngs: Random key.
+
+        Returns:
+            None.
+        """
 
         # Define distribution
         distribution: GaussianDistribution = GaussianDistribution(
@@ -78,10 +109,142 @@ class TestGaussianDistribution:
         ), f"Incorrect shape of sampled array, expected {shape} and got {sample.shape}"
 
         # Sample again
-        sample_equal: jax.Array = distribution.sample(rngs)
-        sample_nequal: jax.Array = distribution.sample(rngs)
+        sample_equal: jax.Array = distribution.sample(copy.deepcopy(rngs))
+        sample_nequal: jax.Array = distribution.sample(copy.deepcopy(rngs))
 
         # Check equal samples
-        assert jnp.allclose(sample, sample_equal), "Unequal samples with same seed"
+        assert jnp.allclose(
+            sample_equal, sample_nequal
+        ), "Unequal samples with same seed"
+
+        return None
+
+    @pytest.mark.order(3)
+    def test_call(
+        self,
+        shape: tuple[int, ...],
+        mu_prior: float,
+        std_prior: float,
+        mu_init: float,
+        rho_init: float,
+        rngs: Rngs,
+    ) -> None:
+        """
+        This method tests the sample method.
+
+        Args:
+            shape: Shape of the weights.
+            mu_prior: Mu prior value.
+            std_prior: Std prior value.
+            mu_init: Mu init value.
+            rho_init: Rho init value.
+            rngs: Random key.
+
+        Returns:
+            None.
+        """
+
+        # Define distribution
+        distribution: GaussianDistribution = GaussianDistribution(
+            shape, mu_prior, std_prior, mu_init, rho_init, rngs
+        )
+
+        # Compute outputs
+        outputs: jax.Array = distribution()
+
+        # Check type of output
+        assert isinstance(
+            outputs, jax.Array
+        ), f"Incorrect type, expected {jax.Array} and got {type(outputs)}"
+
+        # Check outputs shape
+        assert (
+            outputs.shape == shape
+        ), f"Incorrect shape, expected {shape} and got {outputs.shape}"
+
+        return None
+
+    @pytest.mark.order(4)
+    def test_log_prob(
+        self,
+        shape: tuple[int, ...],
+        mu_prior: float,
+        std_prior: float,
+        mu_init: float,
+        rho_init: float,
+        rngs: Rngs,
+    ) -> None:
+        """
+        This method tests the log_prob method.
+
+        Args:
+            shape: Shape of the weights.
+            mu_prior: Mu prior value.
+            std_prior: Std prior value.
+            mu_init: Mu init value.
+            rho_init: Rho init value.
+            rngs: Random key.
+
+        Returns:
+            None.
+        """
+
+        # Define distribution
+        distribution: GaussianDistribution = GaussianDistribution(
+            shape, mu_prior, std_prior, mu_init, rho_init, rngs
+        )
+
+        # Compute log probs
+        log_prob: jax.Array = distribution.log_prob()
+
+        # Check type of output
+        assert isinstance(
+            log_prob, jax.Array
+        ), f"Incorrect type, expected {jax.Array} and got {type(log_prob)}"
+
+        # Check shape
+        assert (
+            log_prob.shape == ()
+        ), f"Incorrect shape of log probs, expected {()} and got {log_prob.shape}"
+
+        return None
+
+    @pytest.mark.order(5)
+    def test_num_params(
+        self,
+        shape: tuple[int, ...],
+        mu_prior: float,
+        std_prior: float,
+        mu_init: float,
+        rho_init: float,
+        rngs: Rngs,
+    ) -> None:
+        """
+        This method tests the sample method.
+
+        Args:
+            shape: Shape of the weights.
+            mu_prior: Mu prior value.
+            std_prior: Std prior value.
+            mu_init: Mu init value.
+            rho_init: Rho init value.
+            rngs: Random key.
+
+        Returns:
+            None.
+        """
+
+        # Define distribution
+        distribution: GaussianDistribution = GaussianDistribution(
+            shape, mu_prior, std_prior, mu_init, rho_init, rngs
+        )
+
+        # Compute number of parameters
+        num_params: int = distribution.num_params
+
+        # Check type
+        assert isinstance(
+            num_params, int
+        ), f"Incorrect type, expected {int} and got {type(num_params)}"
 
         return None
