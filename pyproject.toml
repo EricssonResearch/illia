@@ -46,7 +46,8 @@ documentation = [
     "mkdocs-git-revision-date-localized-plugin>=1.4.5",
     "mkdocs-git-authors-plugin>=0.9.4",
     "mkdocs-enumerate-headings-plugin>=0.6.2",
-    "mkdocs-jupyter>=0.25.1"
+    "mkdocs-jupyter>=0.25.1",
+    "mkdocs-awesome-nav",
 ]
 
 [tool.uv.sources]

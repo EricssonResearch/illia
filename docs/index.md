@@ -7,19 +7,10 @@
 
 ## Introduction
 
-Illia is an innovative library designed for Bayesian Neural Networks, offering support
-for multiple backends. Our goal is to integrate seamlessly with popular deep learning
-platforms:
-
-- [PyTorch](https://pytorch.org/)
-- [TensorFlow](https://www.tensorflow.org/)
-- [Jax](https://jax.readthedocs.io/en/latest/index.html)
-
-For graph neural networks, Illia aims to support:
-
-- [PyTorch Geometric](https://pytorch-geometric.readthedocs.io/en/latest/#)
-- [Deep Graph Library](https://www.dgl.ai/)
-- [Spektral](https://graphneural.network/)
+**Illia** is an innovative library for **Bayesian Neural Networks**, designed to support
+multiple backends and integrate seamlessly with popular deep learning ecosystems such as
+**PyTorch**, **TensorFlow**, and **JAX**, as well as graph neural network libraries
+including **PyTorch Geometric**, **Deep Graph Library (DGL)**, and **Spektral**.
 
 ## Quick start example
 
@@ -45,35 +36,29 @@ Explore further usage examples in the backend-specific documentation.
 
 ## Contributing
 
-We welcome contributions! To streamline the setup process, follow these steps using our
-convenient Makefile:
+We welcome contributions from the community! To get started quickly, follow these steps
+using our streamlined `Makefile`:
 
-1. **Clone the repository:**  
-   Update your system and install `make` (commands may vary based on your OS or
-   distribution). For Linux:
+1. **Clone the repository** Ensure your system is updated and `make` is installed. On
+   most Linux systems:
 
-   ```bash
-   sudo apt-get update
-   sudo apt-get install build-essential
-   ```
+    ```bash
+    sudo apt-get update
+    sudo apt-get install build-essential
+    ```
 
-2. **Set up your environment:**  
-   Navigate to the cloned repository, create a Python environment, activate it, and
-   install dependencies:
+2. **Set up your environment** Navigate to the cloned directory, create a Python
+   environment, activate it, and run:
 
-   ```bash
-   make install-all
-   ```
+    ```bash
+    make
+    ```
 
-3. **Build a Python wheel:**  
-   To package the repository, execute:
-
-   ```bash
-   python setup.py bdist_wheel
-   ```
+   This command updates `pip`, installs `uv`, and sets up all project dependencies
+   automatically.
 
 ## License
 
-This project is distributed under the
-[MIT License](https://github.com/EricssonResearch/illia/blob/main/LICENSE). Enjoy
-exploring and using Illia!
+Illia is released under the
+[MIT License](https://github.com/EricssonResearch/illia/blob/main/LICENSE). We hope you
+find it useful and inspiring.

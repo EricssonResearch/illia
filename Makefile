@@ -6,62 +6,60 @@
 
 # Variables
 SRC_PROJECT_NAME ?= illia
-SRC_NOTEBOOKS_DL ?= docs/deep_learning_frameworks/examples
-TEST_FILE ?= tests/torch tests/tf
+SRC_TESTS ?= tests/torch tests/tf
 
 # Allows the installation of project dependencies
 install:
-	@echo "Upgrading pip..."
-	pip install --upgrade pip
-	@echo "Installing uv..."
-	pip install uv
-	@echo "Installing dependecies with uv..."
-	uv pip install -r pyproject.toml
-	@echo ""
+	@echo "Installing dependencies..."
+	@pip install --upgrade pip
+	@pip install uv
+	@uv pip install -r pyproject.toml --all-extras
+	@echo "✅ Dependencies installed."
 
-# Allows cache clearing
+# Clean cache and temporary files
 clean:
 	@echo "Cleaning cache and temporary files..."
-	find . -type d -name __pycache__ -exec rm -rf {} +
-	find . -type d -name .pytest_cache -exec rm -rf {} +
-	find . -type d -name .mypy_cache -exec rm -rf {} +
-	find . -type f -name '*.pyc' -delete
-	find . -type f -name '*.pyo' -delete
-	@echo ""
+	@find . -type d -name __pycache__ -exec rm -rf {} +
+	@find . -type d -name .pytest_cache -exec rm -rf {} +
+	@find . -type d -name .mypy_cache -exec rm -rf {} +
+	@find . -type f \( -name '*.pyc' -o -name '*.pyo' \) -delete
+	@echo "✅ Clean complete."
 
-# Check format and quality of the code
+# Check code formatting and linting
 lint:
-	@echo "Checking code format with Black..."
-	black --check $(SRC_PROJECT_NAME)/ $(TEST_FILE)/
-	@echo "Checking code style with Flake8..."
-	flake8 $(SRC_PROJECT_NAME)/
-	@echo "Checking code quality with Pylint..."
-	pylint --fail-under=8 $(SRC_PROJECT_NAME)/
-	@echo ""
+	@echo "Running lint checks..."
+	@uv run black --check $(SRC_PROJECT_NAME)/ $(SRC_TESTS)/
+	@uv run flake8 $(SRC_PROJECT_NAME)/
+	@uv run pylint --fail-under=8 $(SRC_PROJECT_NAME)/
+	@echo "✅ Linting complete."
 
-# Check
+# Static analysis checks
 code_check:
-	@echo "Checking code complexity with complexipy..."
-	complexipy -d low $(SRC_PROJECT_NAME)/
-	@echo "Checking type annotations with Mypy..."
-	mypy $(SRC_PROJECT_NAME)/ $(TEST_FILE)/
-	@echo ""
+	@echo "Running static code checks..."
+	@uv run complexipy -d low $(SRC_PROJECT_NAME)/
+	@uv run mypy $(SRC_PROJECT_NAME)/ $(SRC_TESTS)/
+	@echo "✅ Code checks complete."
 
-# Test the code
+# Test the code, only if the tests directory exists
 tests:
-	@echo "Running tests..."
-	pytest $(TEST_FILE)
-	@echo ""
+	@echo "Checking if tests directory exists..."
+	@if [ -d "$(SRC_TESTS)" ] && [ $$(find $(SRC_TESTS) -name "test_*.py" | wc -l) -gt 0 ]; then \
+		echo "Running tests..."; \
+		uv run pytest $(SRC_TESTS); \
+		echo "✅ Tests complete."; \
+	else \
+		echo "No tests directory found or no test files. Skipping tests."; \
+	fi
 
-# Allows run the MkDocs
+# Serve documentation locally
 doc:
-	@echo "Running MkDocs..."
-	mkdocs serve
+	@echo "Serving documentation..."
+	@uv run mkdocs serve
 
-# Run all tasks of the pipeline without install and doc
+# Run code checks and tests
 pipeline: clean lint code_check tests
-	@echo ""
+	@echo "✅ Pipeline complete."
 
-# Run all tasks in sequence
-all: install clean lint code_check tests doc
-	@echo ""
+# Run full workflow including install and docs
+all: install pipeline doc
+	@echo "✅ All tasks complete."

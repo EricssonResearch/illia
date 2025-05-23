@@ -4,7 +4,9 @@ name: Illia Workflow
 # it is called from another workflow
 on:
   push:
-    branches: ["main"]
+    branches: [main]
+  pull_request:
+    branches: [main, dev]
 
 # Set up environment variables
 env:
@@ -87,6 +89,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-mkdocs
 
+    if:
+      github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref ==
+      'refs/heads/dev')
+      
     permissions:
       pages: write
       id-token: write

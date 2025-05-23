@@ -1,19 +1,18 @@
 name: Build MkDocs Artifacts
 
-# This action runs as a composite, which allows you to define a series of steps
-# that will be executed in sequence
 runs:
-  # Defines the type of the action as a composite action (multiple steps)
   using: composite
 
   steps:
-    # Step 1: Set a cache ID based on the current UTC week number
-    - name: Set cache ID
-      run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
+    - name: Set cache ID based on UTC week number
+      id: set-cache-id
+      run: |
+        echo "Calculating cache ID from UTC week number..."
+        echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
       shell: bash
 
-    # Step 2: Cache MkDocs dependencies and generated files to speed up future runs
-    - name: Cache
+    - name: Cache MkDocs dependencies and .cache folder
+      id: mkdocs-cache
       uses: actions/cache@v4
       with:
         key: mkdocs-material-${{ env.cache_id }}
@@ -21,7 +20,9 @@ runs:
         restore-keys: |
           mkdocs-material-
 
-    # Step 3: Generate the GitHub Pages artifacts (the MkDocs site) and deploy it to the gh-deploy branch
-    - name: Create artifacts to gh-deploy branch
-      run: uv run mkdocs gh-deploy --config-file ./mkdocs.yml --force
+    - name: Build and deploy MkDocs site to gh-deploy branch
+      id: deploy-mkdocs
+      run: |
+        echo "Building and deploying MkDocs site..."
+        uv run mkdocs gh-deploy --config-file ./mkdocs.yml --force
       shell: bash
