@@ -8,6 +8,8 @@ distributions. This conceptual shift allows capturing the inherent uncertainty i
 the model's parameters and its predictions, offering a more comprehensive understanding
 of the model's limitations and reliability.
 
+![image](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fjonascleveland.com%2Fwp-content%2Fuploads%2F2023%2F07%2FBayesian-Network-vs-Neural-Network.png&f=1&nofb=1&ipt=79ec39d4258da81fe61c9d9395d92f984259b951150c23451b0892cd578e92e4)
+
 ## Theoretical Foundations of Bayesian Inference
 
 Bayesian inference is based on **Bayes' Theorem**, which provides a mathematical
@@ -19,7 +21,7 @@ update that knowledge to gain a more accurate understanding.
 Bayes' Theorem is mathematically expressed as:
 
 $$
-P(\theta | D) = \frac{P(D | \theta) P(\theta)}{P(D)}
+P(\theta | D) = \frac{P(D | \theta) P(\theta)}{P(D)}.
 $$
 
 This equation can be interpreted as a rule for updating knowledge, where each component
@@ -79,21 +81,46 @@ most practical cases, approximate inference techniques are employed:
 
 ### ELBO Loss Function
 
-Optimization in BNNs is based on maximizing the Evidence Lower Bound (ELBO):
+Optimization in Bayesian Neural Networks is fundamentally based on maximizing the
+Evidence Lower Bound (ELBO):
 
 $$
-\mathcal{L} = \mathbb{E}_{q(\theta)}[\log P(D | \theta)] - KL(q(\theta) || P(\theta))
+\mathcal{L} = \mathbb{E}_{q(\theta)}[\log P(D | \theta)] - KL(q(\theta) || P(\theta)).
 $$
 
-This function balances two fundamental objectives:
+This objective function balances two critical components that are essential for Bayesian
+learning. The first component, known as the likelihood term
+$\mathbb{E}_{q(\theta)}[\log P(D | \theta)]$, maximizes the probability of the observed
+data under the approximate distribution $q(\theta)$. This component ensures that the
+model maintains a good fit to the training data by encouraging the approximate posterior
+to assign high probability to parameter values that explain the observed data well.
 
-1. **Likelihood Term**: Maximizes the probability of the data under the approximate
-   distribution $q(\theta)$.
-2. **Regularization Term**: Minimizes the KL divergence between the approximate and the
-   prior distribution, preventing overfitting.
+The second component, referred to as the regularization term
+$KL(q(\theta) || P(\theta))$, minimizes the Kullback-Leibler divergence between the
+approximate posterior distribution $q(\theta)$ and the prior distribution $P(\theta)$.
+This component acts as a regularizing force that prevents overfitting by maintaining the
+posterior distribution close to the prior when data is insufficient or ambiguous.
 
-The KL divergence acts as a regularizing force that keeps the posterior distribution
-close to the prior when data is insufficient or ambiguous.
+The KL divergence is formulated differently depending on the type of distribution. For
+discrete distributions, the divergence is calculated as:
+
+$$
+KL(P || Q) = \sum_{x} P(x) \log \frac{P(x)}{Q(x)}.
+$$
+
+For continuous distributions, the divergence is expressed as an integral over the
+parameter space:
+
+$$
+KL(P || Q) = \int_{-\infty}^{\infty} p(x) \log \frac{p(x)}{q(x)} dx.
+$$
+
+This duality in formulation allows the Bayesian framework to be applied in both discrete
+and continuous spaces, providing flexibility in modeling different types of parametric
+uncertainty. The continuous formulation is particularly relevant for BNNs, where the
+parameters typically follow continuous distributions such as Gaussians, enabling the
+framework to capture smooth variations in parameter uncertainty across the continuous
+parameter space.
 
 ## Inference and Uncertainty Quantification
 
