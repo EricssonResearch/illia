@@ -30,4 +30,4 @@ __pycache__/
 *.txt
 
 # Exceptions
-!/configs/*
+!/illia/config/*

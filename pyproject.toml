@@ -1,18 +1,9 @@
 [project]
 name = "illia"
 version = "0.1.0"
-description = "illia, your Bayesian NN library of choice"
+description = "Framework agnostic Bayesian Neural Network library"
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = [
-    "tensorflow>=2.19.0",
-]
-# dependencies = [
-#     "matplotlib>=3.10.1",
-#     "optax==0.2.3",
-#     "orbax==0.1.9",
-    # "tensorflow==2.19.0",
-# ]
 
 [tool.uv]
 default-groups = "all"
@@ -20,6 +11,9 @@ default-groups = "all"
 [project.optional-dependencies]
 torch = [
     "torch",
+]
+tensorflow = [
+    "tensorflow>=2.19.0",
 ]
 jax = [
     "flax>=0.8.4",

@@ -3,7 +3,7 @@ This module contains the code for the Losses.
 """
 
 # Standard libraries
-from typing import Literal, Callable
+from typing import Callable
 
 # 3rd party libraries
 import tensorflow as tf
@@ -68,7 +68,7 @@ class ELBOLoss(losses.Loss):
         # Combine both configurations
         return {**base_config, **custom_config}
 
-    def __call__(self, y_true: tf.Tensor, y_pred: tf.Tensor, model: Model) -> tf.Tensor:
+    def call(self, y_true: tf.Tensor, y_pred: tf.Tensor, model: Model) -> tf.Tensor:
         """
         Computes the ELBO loss, averaging over multiple samples.
 

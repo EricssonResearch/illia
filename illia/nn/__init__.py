@@ -53,5 +53,6 @@ def _load_layer(layer_name: str, *args: Any, **kwargs: Any) -> Any:
             layer_name, "nn"
         )
         raise ValueError(
-            f"{e}. This layer is available in the following backends: {available_backends}"
+            f"{e}. "
+            f"This layer is available in the following backends: {available_backends}"
         ) from e

@@ -1,3 +1,3 @@
 # Distributions
 
-::: illia.tf.distributions.gaussian
+::: illia.distributions.tf.gaussian

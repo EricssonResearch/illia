@@ -1,5 +1,11 @@
 # Standard libraries
 import os
+import importlib
+import warnings
+from typing import Any, Optional, Union
+
+# Own modules
+from illia.support import BACKEND_MODULES, BACKEND_CAPABILITIES
 
 # Globals
 ENV_OS_NAME = "ILLIA_BACKEND"
@@ -7,53 +13,12 @@ DEFAULT_BACKEND = "torch"
 AVAILABLES_DNN_BACKENDS = ["jax", "tf", "torch"]
 AVAILABLES_GNN_BACKENDS = ["pyg"]
 
-# Standard libraries
-import importlib
-import warnings
-from typing import Any, Optional, Union
-
 
 class BackendManager:
     """Backend manager that dynamically loads modules."""
 
-    _backend_modules: dict[str, list[str]] = {
-        "torch": ["illia.nn.torch", "illia.distributions.torch", "illia.losses.torch"],
-        "tf": ["illia.nn.tf", "illia.distributions.tf", "illia.losses.tf"],
-        "jax": ["illia.nn.jax", "illia.distributions.jax"],
-        "pyg": ["illia.nn.pyg"],
-    }
-
-    _backend_capabilities: dict[str, dict[str, set[str]]] = {
-        "torch": {
-            "nn": {
-                "Conv1D",
-                "Conv2D",
-                "Embedding",
-                "Linear",
-            },
-            "distributions": {"GaussianDistribution"},
-            "losses": {
-                "KLDivergenceLoss",
-                "ELBOLoss",
-            },
-        },
-        "tf": {
-            "nn": {
-                "Conv1D",
-                "Conv2D",
-                "Embedding",
-                "Linear",
-            },
-            "distributions": {"GaussianDistribution"},
-            "losses": {
-                "KLDivergenceLoss",
-                "ELBOLoss",
-            },
-        },
-        "jax": {"nn": {"Linear"}, "distributions": {"GaussianDistribution"}},
-        "pyg": {"nn": {"CGConv"}},
-    }
-
+    _backend_modules: dict[str, list[str]] = BACKEND_MODULES
+    _backend_capabilities: dict[str, dict[str, set[str]]] = BACKEND_CAPABILITIES
     _loaded_backends: dict[str, dict[str, Any]] = {}
 
     @classmethod
@@ -266,7 +231,7 @@ class BackendManager:
 
         if network_type.lower() == "dnn":
             return AVAILABLES_DNN_BACKENDS
-        elif network_type.lower() == "gnn":
+        if network_type.lower() == "gnn":
             return AVAILABLES_GNN_BACKENDS
         else:
             return AVAILABLES_DNN_BACKENDS + AVAILABLES_GNN_BACKENDS

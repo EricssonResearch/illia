@@ -1,12 +1,10 @@
 @font-face {
   font-family: "ericsson hilda";
-  src: url("../fonts/ericsson-hilda-regular.eot?#iefix")
-      format("embedded-opentype"),
+  src: url("../fonts/ericsson-hilda-regular.eot?#iefix") format("embedded-opentype"),
     url("../fonts/ericsson-hilda-regular.woff") format("woff"),
     url("../fonts/ericsson-hilda-regular.woff2") format("woff2"),
     url("../fonts/ericsson-hilda-regular.ttf.ttf") format("truetype"),
-    url("../fonts/ericsson-hilda-regular.svg#EricssonHilda-Regular")
-      format("svg");
+    url("../fonts/ericsson-hilda-regular.svg#EricssonHilda-Regular") format("svg");
 }
 
 body {

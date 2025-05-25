@@ -1,5 +1,5 @@
 site_name: illia
-site_description: "illia, your Bayesian NN library of choice"
+site_description: Framework agnostic Bayesian Neural Network library
 repo_name: EricssonResearch/illia
 repo_url: https://github.com/EricssonResearch/illia
 copyright: © Telefonaktiebolaget LM Ericsson 1994-2025
@@ -13,14 +13,14 @@ theme:
       primary: deep purple
       accent: deep purple
       toggle:
-        icon: material/lightbulb-outline
+        icon: material/weather-sunny
         name: "Switch to dark mode"
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
       primary: deep purple
       accent: deep purple
       toggle:
-        icon: material/lightbulb
+        icon: material/weather-night
         name: "Switch to light mode"
   features:
     - content.tabs.link
@@ -34,15 +34,17 @@ theme:
     - navigation.instant.prefetch
     - navigation.instant.preview
     - navigation.instant.progress
-    - navigation.path
     - navigation.sections
     - navigation.top
     - navigation.tracking
     - navigation.indexes
     - search.suggest
     - toc.follow
-  logo: "assets/images/logo_white.png"
-  favicon: "assets/images/logo_black.png"
+    - header.autohide
+  logo: assets/images/white_logo_illia.png
+  favicon: assets/images/white_logo_illia.png
+  icon:
+    repo: fontawesome/brands/github
 
 use_directory_urls: false
 

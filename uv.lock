@@ -818,9 +818,6 @@ wheels = [
 name = "illia"
 version = "0.1.0"
 source = { virtual = "." }
-dependencies = [
-    { name = "tensorflow" },
-]
 
 [package.optional-dependencies]
 jax = [
@@ -829,6 +826,9 @@ jax = [
 ]
 pyg = [
     { name = "torch-geometric" },
+]
+tensorflow = [
+    { name = "tensorflow" },
 ]
 torch = [
     { name = "torch" },
@@ -860,11 +860,11 @@ pipeline = [
 requires-dist = [
     { name = "flax", marker = "extra == 'jax'", specifier = ">=0.8.4" },
     { name = "jax", marker = "extra == 'jax'" },
-    { name = "tensorflow", specifier = ">=2.19.0" },
+    { name = "tensorflow", marker = "extra == 'tensorflow'", specifier = ">=2.19.0" },
     { name = "torch", marker = "extra == 'torch'", index = "https://download.pytorch.org/whl/cu121" },
     { name = "torch-geometric", marker = "extra == 'pyg'", specifier = ">=2.5.1" },
 ]
-provides-extras = ["torch", "jax", "pyg"]
+provides-extras = ["torch", "tensorflow", "jax", "pyg"]
 
 [package.metadata.requires-dev]
 documentation = [

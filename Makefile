@@ -61,5 +61,5 @@ pipeline: clean lint code_check tests
 	@echo "✅ Pipeline complete."
 
 # Run full workflow including install and docs
-all: install pipeline doc
+all: pipeline doc
 	@echo "✅ All tasks complete."

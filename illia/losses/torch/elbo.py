@@ -2,9 +2,6 @@
 This module contains the code for the Losses.
 """
 
-# Standard libraries
-from typing import Literal
-
 # 3pps
 import torch
 

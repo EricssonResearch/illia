@@ -1,11 +1,9 @@
 # Neural Network
 
-::: illia.tf.nn.conv1d
+::: illia.nn.tf.conv1d
 
-::: illia.tf.nn.conv2d
+::: illia.nn.tf.conv2d
 
-::: illia.tf.nn.embedding
+::: illia.nn.tf.embedding
 
-::: illia.tf.nn.linear
-
-::: illia.tf.nn.losses
+::: illia.nn.tf.linear

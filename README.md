@@ -2,6 +2,11 @@
   <a href="https://github.com/EricssonResearch/illia/actions/workflows/workflow.yml"><img src="https://github.com/EricssonResearch/illia/actions/workflows/workflow.yml/badge.svg"></a>
 </p>
 
+<p align="center">
+  <img src="./docs/assets/images/black_logo_illia.png" height="250"/>
+  <br />
+</p>
+
 ### ⚠️ **Warning**
 
 **Illia is under active development.** The library is evolving rapidly to ensure stable
