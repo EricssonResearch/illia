@@ -5,7 +5,7 @@ import warnings
 from typing import Any, Optional, Union
 
 # Own modules
-from illia.support import BACKEND_MODULES, BACKEND_CAPABILITIES
+from illia.support import BACKEND_MODULES, BACKEND_CAPABILITIES, VERSION
 
 # Globals
 ENV_OS_NAME = "ILLIA_BACKEND"
@@ -221,7 +221,7 @@ class BackendManager:
         os.environ[ENV_OS_NAME] = backend
 
     @classmethod
-    def get_available_backends(cls, network_type: str = "all") -> str:
+    def get_available_backends(cls, network_type: str = "all") -> list[str]:
         """
         Get available backends for specific network type.
 
@@ -233,14 +233,29 @@ class BackendManager:
             return AVAILABLES_DNN_BACKENDS
         if network_type.lower() == "gnn":
             return AVAILABLES_GNN_BACKENDS
-        else:
-            return AVAILABLES_DNN_BACKENDS + AVAILABLES_GNN_BACKENDS
+        return AVAILABLES_DNN_BACKENDS + AVAILABLES_GNN_BACKENDS
 
     @classmethod
-    def is_backend_available(cls, backend: str, network_type: str = "all") -> str:
+    def is_backend_available(cls, backend: str, network_type: str = "all") -> bool:
         """
         Check if a backend is available for the specified network type.
         """
 
         available = cls.get_available_backends(network_type)
         return backend.lower() in [b.lower() for b in available]
+
+    @classmethod
+    def version(cls) -> str:
+        """
+        Check Illia version.
+        """
+
+        return VERSION
+
+
+# Export methods
+version = BackendManager.version
+get_backend = BackendManager.get_backend
+set_backend = BackendManager.set_backend
+get_available_backends = BackendManager.get_available_backends
+is_backend_available = BackendManager.is_backend_available

@@ -1,5 +1,5 @@
 """
-This module defines the imports for illia.torch.distributions.
+This module defines the imports for distribution functions in PyTorch.
 """
 
 # Own modules

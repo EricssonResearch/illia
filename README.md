@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <img src="./docs/assets/images/black_logo_illia.png" height="250"/>
+  <img src="./docs/assets/images/white_logo_illia.png" height="250"/>
   <br />
 </p>
 

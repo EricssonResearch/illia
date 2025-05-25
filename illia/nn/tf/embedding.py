@@ -3,7 +3,7 @@ This module contains the code for Embedding Bayesian layer.
 """
 
 # Standard libraries
-from typing import Optional
+from typing import Optional, Any
 
 # 3pps
 import tensorflow as tf
@@ -30,7 +30,7 @@ class Embedding(BayesianModule):
         scale_grad_by_freq: bool = False,
         sparse: bool = False,
         weights_distribution: Optional[GaussianDistribution] = None,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         """
         This method is the constructor of the embedding class.

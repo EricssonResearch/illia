@@ -3,7 +3,7 @@ This module contains the code for Linear Bayesian layer.
 """
 
 # Standard libraries
-from typing import Optional
+from typing import Optional, Any
 
 # 3pps
 import tensorflow as tf
@@ -26,7 +26,7 @@ class Linear(BayesianModule):
         output_size: int,
         weights_distribution: Optional[GaussianDistribution] = None,
         bias_distribution: Optional[GaussianDistribution] = None,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         """
         This is the constructor of the Linear class.

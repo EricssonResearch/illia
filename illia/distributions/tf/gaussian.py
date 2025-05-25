@@ -4,7 +4,7 @@ This module contains the code for the Gaussian distribution.
 
 # Standard libraries
 import math
-from typing import Optional
+from typing import Optional, Any
 
 # 3pps
 import tensorflow as tf
@@ -29,7 +29,7 @@ class GaussianDistribution(Distribution):
         std_prior: float = 0.1,
         mu_init: float = 0.0,
         rho_init: float = -7.0,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         """
         Constructor for GaussianDistribution.

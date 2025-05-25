@@ -11,8 +11,6 @@ SRC_TESTS ?= tests/torch tests/tf
 # Allows the installation of project dependencies
 install:
 	@echo "Installing dependencies..."
-	@pip install --upgrade pip
-	@pip install uv
 	@uv pip install -r pyproject.toml --all-extras
 	@echo "✅ Dependencies installed."
 
@@ -61,5 +59,5 @@ pipeline: clean lint code_check tests
 	@echo "✅ Pipeline complete."
 
 # Run full workflow including install and docs
-all: pipeline doc
+all: install pipeline doc
 	@echo "✅ All tasks complete."

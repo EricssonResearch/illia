@@ -1,5 +1,5 @@
 """
-This module defines the imports for illia.nn.tf.
+This module contains the import statements for NN layers used with Tensorflow.
 """
 
 # Own modules

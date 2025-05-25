@@ -3,7 +3,7 @@ This module contains the code for the bayesian Conv2D.
 """
 
 # Standard libraries
-from typing import Optional, Union
+from typing import Optional, Union, Any
 
 # 3pps
 import tensorflow as tf
@@ -32,7 +32,7 @@ class Conv2D(BayesianModule):
         data_format: Optional[str] = "NHWC",
         weights_distribution: Optional[GaussianDistribution] = None,
         bias_distribution: Optional[GaussianDistribution] = None,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         """
         Initializes a Bayesian Conv2D layer.

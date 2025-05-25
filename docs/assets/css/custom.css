@@ -16,3 +16,19 @@ body {
   display: flex;
   justify-content: center;
 }
+
+/* Logo for light mode (hide white logo) */
+[data-md-color-scheme="default"] .logo-black {
+  display: inline-block;
+}
+[data-md-color-scheme="default"] .logo-white {
+  display: none;
+}
+
+/* Logo for black mode (hide black logo) */
+[data-md-color-scheme="slate"] .logo-black {
+  display: none;
+}
+[data-md-color-scheme="slate"] .logo-white {
+  display: inline-block;
+}

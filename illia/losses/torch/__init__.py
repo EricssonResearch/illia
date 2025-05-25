@@ -1,10 +1,9 @@
 """
-This module defines the imports for illia.losses.torch.
+This module specifies the loss function imports used in PyTorch.
 """
 
 # Own modules
-from illia.losses.torch.elbo import ELBOLoss
-from illia.losses.torch.kl import KLDivergenceLoss
+from illia.losses.torch.elbo import ELBOLoss, KLDivergenceLoss
 
 # Define all names to be imported
 __all__: list[str] = [

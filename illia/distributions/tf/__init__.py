@@ -1,5 +1,5 @@
 """
-This module defines the imports for illia.tf.distributions.
+This module defines the imports for distribution functions in Tensorflow.
 """
 
 # Own modules

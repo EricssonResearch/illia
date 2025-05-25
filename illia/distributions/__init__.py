@@ -1,48 +1,24 @@
 """
-Main module that exposes backend-agnostic distribution layers.
+Backend-agnostic interface for probability distributions.
 """
-
-# Standard libraries
-from typing import Any
 
 # Own modules
 from illia import BackendManager
+from illia.support import BACKEND_CAPABILITIES
 
+_backend = BackendManager.get_backend()
+_dist_module = BackendManager.get_backend_module(_backend, "distributions")
 
-def GaussianDistribution(*args: Any, **kwargs: Any) -> Any:
-    """Backend-agnostic GaussianDistribution."""
+__all__ = sorted(
+    {
+        class_name
+        for backend_caps in BACKEND_CAPABILITIES.values()
+        for class_name in backend_caps.get("distributions", set())
+    }
+)
 
-    return _load_distribution("GaussianDistribution", *args, **kwargs)
-
-
-def _load_distribution(distribution_name: str, *args: Any, **kwargs: Any) -> Any:
-    """
-    Helper function to load a backend-agnostic distribution.
-
-    Args:
-        distribution_name: Name of the distribution class to retrieve.
-        *args: Positional arguments passed to the distribution.
-        **kwargs: Keyword arguments passed to the distribution.
-
-    Returns:
-        Instantiated backend-specific distribution class.
-
-    Raises:
-        ValueError: If the distribution is not available in the selected backend.
-    """
-
-    backend_name = BackendManager.get_backend()
-
-    try:
-        distribution_class = BackendManager.get_distribution_class(
-            backend_name, distribution_name
-        )
-        return distribution_class(*args, **kwargs)
-    except ValueError as e:
-        available_backends = BackendManager.get_all_available_backends_for_class(
-            distribution_name, "distributions"
-        )
-        raise ValueError(
-            f"{e}. "
-            f"Distribution available in the following backends: {available_backends}"
-        ) from e
+for class_name in __all__:
+    # Check if the current backend implements a class with that name
+    if hasattr(_dist_module, class_name):
+        # Dynamically add that class to the current global namespace
+        globals()[class_name] = getattr(_dist_module, class_name)

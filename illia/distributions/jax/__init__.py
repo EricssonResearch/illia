@@ -1,5 +1,5 @@
 """
-This module defines the imports for illia.jax.distributions.
+This module defines the imports for distribution functions in JAX.
 """
 
 # Own modules

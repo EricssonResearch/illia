@@ -17,6 +17,7 @@ BACKEND_MODULES: dict[str, list[str]] = {
 BACKEND_CAPABILITIES: dict[str, dict[str, set[str]]] = {
     "torch": {
         "nn": {
+            "BayesianModule",
             "Conv1D",
             "Conv2D",
             "Embedding",
