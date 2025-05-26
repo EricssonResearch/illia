@@ -43,6 +43,9 @@ BACKEND_CAPABILITIES: dict[str, dict[str, set[str]]] = {
             "ELBOLoss",
         },
     },
-    "jax": {"nn": {"Linear"}, "distributions": {"DistributionModule", "GaussianDistribution"}},
+    "jax": {
+        "nn": {"Linear"},
+        "distributions": {"DistributionModule", "GaussianDistribution"},
+    },
     "pyg": {"nn": {"CGConv"}},
 }
