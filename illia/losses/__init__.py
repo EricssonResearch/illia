@@ -6,9 +6,9 @@ Backend-agnostic interface for loss functions.
 from illia import BackendManager
 from illia.support import BACKEND_CAPABILITIES
 
+# Obtain parameters for losses
 _backend = BackendManager.get_backend()
 _loss_module = BackendManager.get_backend_module(_backend, "losses")
-
 
 # Generate dynamically __all__ with all 'losses' available in any backend
 __all__ = sorted(
@@ -19,8 +19,8 @@ __all__ = sorted(
     }
 )
 
+# Check if the current backend implements a class with that name
+# and dynamically add that class to the current global namespace
 for class_name in __all__:
-    # Check if the current backend implements a class with that name
     if hasattr(_loss_module, class_name):
-        # Dynamically add that class to the current global namespace
         globals()[class_name] = getattr(_loss_module, class_name)

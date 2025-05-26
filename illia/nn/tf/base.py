@@ -11,7 +11,7 @@ from keras import layers, saving
 
 
 @saving.register_keras_serializable(package="BayesianModule", name="BayesianModule")
-class BayesianModule(ABC, layers.Layer):
+class BayesianModule(layers.Layer, ABC):
     """
     This class serves as the base class for Bayesian modules.
     Any module designed to function as a Bayesian layer should inherit

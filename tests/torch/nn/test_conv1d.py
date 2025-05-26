@@ -2,13 +2,19 @@
 This module contains the tests for the bayesian Conv1D.
 """
 
+# Standard libraries
+import os
+
+# Change Illia Backend
+os.environ["ILLIA_BACKEND"] = "torch"
+
 # 3pps
 import pytest
 import torch
 from torch.jit import RecursiveScriptModule
 
 # Own modules
-from illia.torch.nn import Conv1D
+from illia.nn import Conv1D
 
 
 class TestConv1d:

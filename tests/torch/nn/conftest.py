@@ -3,16 +3,19 @@ This module defines fixtures for illia.torch.nn.
 """
 
 # Standard libraries
+import os
 from typing import Optional, Union
+
+# Change Illia Backend
+os.environ["ILLIA_BACKEND"] = "torch"
 
 # 3pps
 import pytest
 import torch
 
 # Own modules
-from illia.torch.nn.base import BayesianModule
-from illia.torch.nn import Linear, Conv1D, Conv2D, Embedding
-from illia.torch.distributions import GaussianDistribution
+from illia.nn import BayesianModule, Linear, Conv1D, Conv2D, Embedding
+from illia.distributions import GaussianDistribution
 from tests.torch.nn.utils import ComposedModel, BayesianComposedModel
 
 

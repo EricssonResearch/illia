@@ -9,10 +9,10 @@ from typing import Optional
 import torch
 
 # Own modules
-from illia.distributions.torch.base import Distribution
+from illia.distributions.torch.base import DistributionModule
 
 
-class GaussianDistribution(Distribution):
+class GaussianDistribution(DistributionModule):
     """
     This is the class to implement a learnable Gaussian distribution.
     """

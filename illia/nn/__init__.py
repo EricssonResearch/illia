@@ -6,6 +6,7 @@ Backend-agnostic interface for neural network layers.
 from illia import BackendManager
 from illia.support import BACKEND_CAPABILITIES
 
+# Obtain parameters for nn
 _backend = BackendManager.get_backend()
 _nn_module = BackendManager.get_backend_module(_backend, "nn")
 
@@ -18,8 +19,8 @@ __all__ = sorted(
     }
 )
 
+# Check if the current backend implements a class with that name
+# and dynamically add that class to the current global namespace
 for class_name in __all__:
-    # Check if the current backend implements a class with that name
     if hasattr(_nn_module, class_name):
-        # Dynamically add that class to the current global namespace
         globals()[class_name] = getattr(_nn_module, class_name)

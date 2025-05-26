@@ -3,7 +3,7 @@ This module contains the base class for the Distributions.
 """
 
 # Standard libraries
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from typing import Optional
 
 # 3pps
@@ -11,7 +11,7 @@ import jax.numpy as jnp
 from flax import nnx
 
 
-class Distribution(nnx.Module):
+class DistributionModule(nnx.Module, ABC):
     """
     This class serves as the base class for Distributions modules.
     Any module designed to function as a distribution layer should

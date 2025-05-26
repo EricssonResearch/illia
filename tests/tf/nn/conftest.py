@@ -3,18 +3,19 @@ This module defines fixtures for illia.torch.nn.
 """
 
 # Standard libraries
+import os
 from typing import Optional, Union
+
+# Change Illia Backend
+os.environ["ILLIA_BACKEND"] = "tf"
 
 # 3pps
 import pytest
-import keras
 import tensorflow as tf
 
 # Own modules
-from illia.tf.nn.base import BayesianModule
-from illia.tf.nn import Linear, Embedding, Conv2D, Conv1D
-from illia.tf.distributions.base import Distribution
-from illia.tf.distributions import GaussianDistribution
+from illia.nn import Linear, Embedding, Conv2D, Conv1D
+from illia.distributions import GaussianDistribution
 
 
 @pytest.fixture(
@@ -41,8 +42,8 @@ def linear_fixture(request: pytest.FixtureRequest) -> tuple[Linear, tf.Tensor]:
     batch_size: int
     input_size: int
     output_size: int
-    weights_distribution: Optional[Distribution]
-    bias_distribution: Optional[Distribution]
+    weights_distribution: Optional[GaussianDistribution]
+    bias_distribution: Optional[GaussianDistribution]
     (batch_size, input_size, output_size, weights_distribution, bias_distribution) = (
         request.param
     )

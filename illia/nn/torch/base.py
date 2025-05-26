@@ -9,7 +9,7 @@ from abc import ABC
 import torch
 
 
-class BayesianModule(ABC, torch.nn.Module):
+class BayesianModule(torch.nn.Module, ABC):
     """
     This class serves as the base class for Bayesian modules.
     Any module designed to function as a Bayesian layer should inherit

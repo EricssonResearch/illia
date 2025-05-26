@@ -11,8 +11,8 @@ import tensorflow as tf
 from keras import layers, saving
 
 
-@saving.register_keras_serializable(package="BayesianModule", name="Distribution")
-class Distribution(ABC, layers.Layer):
+@saving.register_keras_serializable(package="BayesianModule", name="DistributionModule")
+class DistributionModule(layers.Layer, ABC):
     """
     This class serves as the base class for Distributions modules.
     Any module designed to function as a distribution layer should

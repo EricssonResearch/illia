@@ -20,7 +20,10 @@ class KLDivergenceLoss(losses.Loss):
     """
 
     def __init__(
-        self, reduction: Literal["mean"] = "mean", weight: float = 1.0, **kwargs: Any,
+        self,
+        reduction: Literal["mean"] = "mean",
+        weight: float = 1.0,
+        **kwargs: Any,
     ) -> None:
         """
         Initializes the KL divergence loss with specified reduction

@@ -2,13 +2,19 @@
 This module contains the code to test the GaussianDistribution.
 """
 
+# Standard libraries
+import os
+
+# Change Illia Backend
+os.environ["ILLIA_BACKEND"] = "tf"
+
 # 3pps
 import pytest
 import tensorflow as tf
 from keras.src.backend.tensorflow.core import Variable as BackendVariable
 
 # Own modules
-from illia.tf.distributions import GaussianDistribution
+from illia.distributions import GaussianDistribution
 
 
 @pytest.mark.parametrize(

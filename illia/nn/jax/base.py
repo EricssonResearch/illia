@@ -3,7 +3,7 @@ This module contains the code for the BayesianModule.
 """
 
 # Standard libraries
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 
 # 3pps
 import jax
@@ -11,7 +11,7 @@ import jax.numpy as jnp
 from flax import nnx
 
 
-class BayesianModule(nnx.Module):
+class BayesianModule(nnx.Module, ABC):
     """
     This class serves as the base class for Bayesian modules.
     Any module designed to function as a Bayesian layer should inherit

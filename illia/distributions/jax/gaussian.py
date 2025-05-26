@@ -12,10 +12,10 @@ from flax import nnx
 from flax.nnx.rnglib import Rngs
 
 # Own modules
-from illia.distributions.jax.base import Distribution
+from illia.distributions.jax.base import DistributionModule
 
 
-class GaussianDistribution(Distribution):
+class GaussianDistribution(DistributionModule):
     """
     This is the class to implement a learnable Gaussian distribution.
     """

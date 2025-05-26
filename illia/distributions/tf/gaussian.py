@@ -11,13 +11,13 @@ import tensorflow as tf
 from keras import saving
 
 # Own modules
-from illia.distributions.tf.base import Distribution
+from illia.distributions.tf.base import DistributionModule
 
 
 @saving.register_keras_serializable(
     package="BayesianModule", name="GaussianDistribution"
 )
-class GaussianDistribution(Distribution):
+class GaussianDistribution(DistributionModule):
     """
     This is the class to implement a learnable Gaussian distribution.
     """

@@ -3,7 +3,11 @@ This module contains the tests for the bayesian Conv2D.
 """
 
 # Standard libraries
+import os
 import tempfile
+
+# Change Illia Backend
+os.environ["ILLIA_BACKEND"] = "tf"
 
 # 3pps
 import pytest
@@ -11,7 +15,7 @@ import keras
 import tensorflow as tf
 
 # Own modules
-from illia.tf.nn import Conv2D
+from illia.nn import Conv2D
 
 
 class TestConv2d:

@@ -144,24 +144,6 @@ class BackendManager:
         return getattr(backend_module, class_name)
 
     @classmethod
-    def get_layer_class(cls, backend_name: str, layer_name: str) -> Any:
-        """Retrieve a specific layer class from the backend."""
-
-        return cls.get_class(backend_name, layer_name, "nn")
-
-    @classmethod
-    def get_distribution_class(cls, backend_name: str, distribution_name: str) -> Any:
-        """Retrieve a specific distribution class from the backend."""
-
-        return cls.get_class(backend_name, distribution_name, "distributions")
-
-    @classmethod
-    def get_loss_class(cls, backend_name: str, loss_name: str) -> Any:
-        """Retrieve a specific loss class from the backend."""
-
-        return cls.get_class(backend_name, loss_name, "losses")
-
-    @classmethod
     def get_available_classes(cls, backend_name: str, module_type: str) -> set[str]:
         """Return all available classes for a given backend and module type."""
 
@@ -180,30 +162,6 @@ class BackendManager:
         ]
 
     @classmethod
-    def register_backend(
-        cls,
-        name: str,
-        module_paths: Union[str, list[str]],
-        capabilities: Optional[dict[str, set[str]]] = None,
-    ) -> None:
-        """
-        Register a custom backend.
-
-        Args:
-            name: Backend name.
-            module_paths: Module path or list of paths.
-            capabilities: Optional capabilities dictionary.
-        """
-
-        paths = [module_paths] if isinstance(module_paths, str) else module_paths
-        cls._backend_modules[name] = paths
-
-        if capabilities:
-            cls._backend_capabilities[name] = capabilities
-
-        cls._loaded_backends.pop(name, None)
-
-    @classmethod
     def get_backend(
         cls,
     ) -> str:
@@ -218,6 +176,7 @@ class BackendManager:
         """
         set the backend to be used by environment variable.
         """
+
         os.environ[ENV_OS_NAME] = backend
 
     @classmethod
@@ -245,7 +204,9 @@ class BackendManager:
         return backend.lower() in [b.lower() for b in available]
 
     @classmethod
-    def version(cls) -> str:
+    def version(
+        cls,
+    ) -> str:
         """
         Check Illia version.
         """
