@@ -2,13 +2,15 @@ name: Illia Workflow
 
 on:
   push:
-    branches: [main]
+    branches: '*'
   pull_request:
     branches: [main, dev]
 
 env:
   SRC_PROJECT_FOLDER: "illia"
-  SRC_PROJECT_TESTS: "tests/torch tests/tf"
+  SRC_PROJECT_TESTS_TF: "tests/tf"
+  SRC_PROJECT_TESTS_TORCH: "tests/torch"
+  #SRC_PROJECT_TESTS_JAX: "tests/jax"
   SRC_PYTHON_VERSION: "3.11"
 
 concurrency:
@@ -35,10 +37,15 @@ jobs:
         with:
           src-project-folder: ${{ env.SRC_PROJECT_FOLDER }}
 
-      - name: Test code
+      - name: Test code Tensorflow
         uses: ./.github/actions/test-code
         with:
-          src-tests-folder: ${{ env.SRC_PROJECT_TESTS }}
+          src-tests-folder: ${{ env.SRC_PROJECT_TESTS_TF }}
+
+      - name: Test code PyTorch
+        uses: ./.github/actions/test-code
+        with:
+          src-tests-folder: ${{ env.SRC_PROJECT_TESTS_TORCH }}
 
   build-mkdocs:
     name: Build MkDocs Illia Wiki

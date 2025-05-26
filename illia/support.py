@@ -23,7 +23,7 @@ BACKEND_CAPABILITIES: dict[str, dict[str, set[str]]] = {
             "Embedding",
             "Linear",
         },
-        "distributions": {"GaussianDistribution"},
+        "distributions": {"DistributionModule", "GaussianDistribution"},
         "losses": {
             "KLDivergenceLoss",
             "ELBOLoss",
@@ -31,17 +31,18 @@ BACKEND_CAPABILITIES: dict[str, dict[str, set[str]]] = {
     },
     "tf": {
         "nn": {
+            "BayesianModule",
             "Conv1D",
             "Conv2D",
             "Embedding",
             "Linear",
         },
-        "distributions": {"GaussianDistribution"},
+        "distributions": {"DistributionModule", "GaussianDistribution"},
         "losses": {
             "KLDivergenceLoss",
             "ELBOLoss",
         },
     },
-    "jax": {"nn": {"Linear"}, "distributions": {"GaussianDistribution"}},
+    "jax": {"nn": {"Linear"}, "distributions": {"DistributionModule", "GaussianDistribution"}},
     "pyg": {"nn": {"CGConv"}},
 }

@@ -6,9 +6,9 @@
 
 # Variables
 SRC_PROJECT_NAME ?= illia
-SRC_TESTS_TF ?= tests/tf
-SRC_TESTS_TORCH ?= tests/torch
-SRC_TESTS_JAX ?= tests/jax
+SRC_PROJECT_TESTS_TF ?= tests/tf
+SRC_PROJECT_TESTS_TORCH ?= tests/torch
+SRC_PROJECT_TESTS_JAX ?= tests/jax
 
 # Allows the installation of project dependencies
 install:
@@ -28,7 +28,7 @@ clean:
 # Check code formatting and linting
 lint:
 	@echo "Running lint checks..."
-	@uv run black --check $(SRC_PROJECT_NAME)/ $(SRC_TESTS_TF)/ $(SRC_TESTS_TORCH)/ $(SRC_TESTS_JAX)/
+	@uv run black --check $(SRC_PROJECT_NAME)/ $(SRC_PROJECT_TESTS_TF)/ $(SRC_PROJECT_TESTS_TORCH)/ $(SRC_PROJECT_TESTS_JAX)/
 	@uv run flake8 $(SRC_PROJECT_NAME)/
 	@uv run pylint --fail-under=8 $(SRC_PROJECT_NAME)/
 	@echo "✅ Linting complete."
@@ -37,15 +37,15 @@ lint:
 code_check:
 	@echo "Running static code checks..."
 	@uv run complexipy -d low $(SRC_PROJECT_NAME)/
-	@uv run mypy $(SRC_PROJECT_NAME)/ $(SRC_TESTS_TF)/ $(SRC_TESTS_TORCH)/ $(SRC_TESTS_JAX)/
+	@uv run mypy $(SRC_PROJECT_NAME)/ $(SRC_PROJECT_TESTS_TF)/ $(SRC_PROJECT_TESTS_TORCH)/ $(SRC_PROJECT_TESTS_JAX)/
 	@echo "✅ Code checks complete."
 
 # Test the code, only if the tests directory exists
 tests:
 	@echo "Runing test per each backend..."
-	@uv run pytest $(SRC_TESTS_TF)
+	@uv run pytest $(SRC_PROJECT_TESTS_TF)
 	@echo "✅ Tests complete for Tensorflow."
-	@uv run pytest $(SRC_TESTS_TORCH)
+	@uv run pytest $(SRC_PROJECT_TESTS_TORCH)
 	@echo "✅ Tests complete for PyTorch."
 
 # Serve documentation locally
