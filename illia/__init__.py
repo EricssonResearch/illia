@@ -100,12 +100,12 @@ class BackendManager:
     ) -> bool:
         """Check if a specific class is available in the backend."""
 
-        return class_name in cls._backend_capabilities.get(backend_name, {}).get(
-            module_type, set()
-        )
+        return class_name in cls._backend_capabilities[backend_name][module_type]
 
     @classmethod
-    def get_class(cls, backend_name: str, class_name: str, module_type: str) -> Any:
+    def get_class(
+        cls, backend_name: str, class_name: str, module_name: str, module_path: str
+    ) -> Any:
         """
         Retrieve a class from a specific backend module with availability check.
 
@@ -122,26 +122,18 @@ class BackendManager:
             AttributeError: If the class is not implemented in the loaded module.
         """
 
-        if not cls.is_class_available(backend_name, class_name, module_type):
+        if not cls.is_class_available(backend_name, class_name, module_name):
             available_backends = [
                 b
                 for b, caps in cls._backend_capabilities.items()
-                if class_name in caps.get(module_type, set())
+                if class_name in caps.get(module_name, set())
             ]
             msg = f"Class '{class_name}' is not available in backend '{backend_name}'."
             if available_backends:
                 msg += f" Available in: {available_backends}"
-            raise ValueError(msg)
-
-        backend_module = cls.get_backend_module(backend_name, module_type)
-
-        if not hasattr(backend_module, class_name):
-            raise AttributeError(
-                f"Class '{class_name}' is not implemented in module '{module_type}' "
-                f"of backend '{backend_name}'"
-            )
-
-        return getattr(backend_module, class_name)
+            raise ImportError(msg)
+        else:
+            return getattr(module_path, class_name)
 
     @classmethod
     def get_available_classes(cls, backend_name: str, module_type: str) -> set[str]:
