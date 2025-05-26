@@ -5,7 +5,11 @@ This module lists the supported modules and available layers for each backend.
 # Source of Illia versioning
 VERSION: str = "0.0.1"
 
-# Configuration of available backends and its corresponding modules
+# Availables backends for DNNs and GNNs
+AVAILABLE_DNN_BACKENDS: frozenset[str] = frozenset(["jax", "tf", "torch"])
+AVAILABLE_GNN_BACKENDS: frozenset[str] = frozenset(["pyg"])
+
+# Configuration of available backends and their corresponding modules
 BACKEND_MODULES: dict[str, list[str]] = {
     "torch": ["illia.nn.torch", "illia.distributions.torch", "illia.losses.torch"],
     "tf": ["illia.nn.tf", "illia.distributions.tf", "illia.losses.tf"],

@@ -21,14 +21,32 @@ including **PyTorch Geometric**, **Deep Graph Library (DGL)**, and **Spektral**.
 ## Quick start example
 
 ```python
-# Import the Illia library
-from illia.nn import Linear
+# Import standard 'os' library to change the environment variable
+import os
 
-# Create a linear layer using the PyTorch backend
-linear_layer_torch = Linear(
-    input_size=3,
-    output_size=3,
+# By default PyTorch is the backend
+os.environ["ILLIA_BACKEND"] = "torch"
+
+# Import the Illia library
+import illia
+
+print(f"Illia version: {illia.__version__}")
+print(f"Illia backend: {illia.__get_backend__}")
+print(f"Illia available backends: {illia.__get_available_backends__}")
+
+# Create a convolutional layer using the PyTorch backend
+conv_layer = Conv2D(
+    input_channels=3,
+    output_channels=64,
+    kernel_size=3,
 )
+
+# Create a random tensor (B, C, H, W)
+tensor = torch.rand((1, 3, 12, 12))
+
+# Obtain the output
+output = conv_layer(tensor)
+output.shape
 ```
 
 Explore further usage examples in the backend-specific documentation.

@@ -2,25 +2,33 @@
 Backend-agnostic interface for probability distributions.
 """
 
+# Standard libraries
+from typing import Union, Any
+
 # Own modules
 from illia import BackendManager
-from illia.support import BACKEND_CAPABILITIES
 
-# Obtain parameters for distributions
-_module_name = "distributions"
-_backend = BackendManager.get_backend()
-_module_path = BackendManager.get_backend_module(_backend, _module_name)
-
-# Generate dynamically __all__ with all 'distributions' available in any backend
-__all__ = sorted(
-    {class_name for class_name in BACKEND_CAPABILITIES[_backend][_module_name]}
-)
 
 # Obtain the library to import
-def __getattr__(name: str):
+def __getattr__(name: str) -> None:
+    """
+    Dynamically import a class from backend distributions.
+
+    Args:
+        name: Name of the class to be imported.
+    """
+
+    # Obtain parameters for distributions
+    module_type: str = "distributions"
+    backend: str = BackendManager.get_backend()
+    module_path: Union[Any, dict[str, Any]] = BackendManager.get_backend_module(
+        backend, module_type
+    )
+
+    # Set class to global namespace
     globals()[name] = BackendManager.get_class(
-        backend_name=_backend,
+        backend_name=backend,
         class_name=name,
-        module_name=_module_name,
-        module_path=_module_path,
+        module_type=module_type,
+        module_path=module_path,
     )
