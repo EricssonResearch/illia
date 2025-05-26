@@ -28,8 +28,14 @@ clean:
 # Check code formatting and linting
 lint:
 	@echo "Running lint checks..."
-	@uv run black --check $(SRC_PROJECT_NAME)/ $(SRC_PROJECT_TESTS_TF)/ $(SRC_PROJECT_TESTS_TORCH)/ $(SRC_PROJECT_TESTS_JAX)/
-	@uv run flake8 $(SRC_PROJECT_NAME)/
+	@uv run black --check $(SRC_PROJECT_NAME)/ && \
+	uv run black --check $(SRC_PROJECT_TESTS_TF)/ && \
+	uv run black --check $(SRC_PROJECT_TESTS_TORCH)/ && \
+	uv run black --check $(SRC_PROJECT_TESTS_JAX)/
+	@uv run flake8 $(SRC_PROJECT_NAME)/ && \
+	uv run flake8 $(SRC_PROJECT_TESTS_TF)/ && \
+	uv run flake8 $(SRC_PROJECT_TESTS_TORCH)/ && \
+	uv run flake8 $(SRC_PROJECT_TESTS_JAX)/
 	@uv run pylint --fail-under=8 $(SRC_PROJECT_NAME)/
 	@echo "✅ Linting complete."
 
@@ -37,16 +43,15 @@ lint:
 code_check:
 	@echo "Running static code checks..."
 	@uv run complexipy -d low $(SRC_PROJECT_NAME)/
-# @uv run mypy $(SRC_PROJECT_NAME)/ $(SRC_PROJECT_TESTS_TF)/ $(SRC_PROJECT_TESTS_TORCH)/ $(SRC_PROJECT_TESTS_JAX)/
+	@uv run mypy $(SRC_PROJECT_NAME)/
 	@echo "✅ Code checks complete."
 
 # Test the code, only if the tests directory exists
 tests:
 	@echo "Runing test per each backend..."
-	@uv run pytest $(SRC_PROJECT_TESTS_TF)
-	@echo "✅ Tests complete for Tensorflow."
-	@uv run pytest $(SRC_PROJECT_TESTS_TORCH)
-	@echo "✅ Tests complete for PyTorch."
+	@uv run pytest $(SRC_PROJECT_TESTS_TF)/ && \
+	uv run pytest $(SRC_PROJECT_TESTS_TORCH)/ 
+	@echo "✅ Tests complete."
 
 # Serve documentation locally
 doc:

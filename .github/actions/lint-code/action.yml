@@ -33,8 +33,8 @@ runs:
         uv run complexipy ${{ inputs.src-project-folder }}/
       shell: bash
 
-    # - name: Check Mypy
-    #   run: |
-    #     echo "Running Mypy type checker..."
-    #     uv run mypy ${{ inputs.src-project-folder }}/
-    #   shell: bash
+    - name: Check Mypy
+      run: |
+        echo "Running Mypy type checker..."
+        uv run mypy ${{ inputs.src-project-folder }}/
+      shell: bash
