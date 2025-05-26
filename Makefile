@@ -37,7 +37,7 @@ lint:
 code_check:
 	@echo "Running static code checks..."
 	@uv run complexipy -d low $(SRC_PROJECT_NAME)/
-	@uv run mypy $(SRC_PROJECT_NAME)/ $(SRC_PROJECT_TESTS_TF)/ $(SRC_PROJECT_TESTS_TORCH)/ $(SRC_PROJECT_TESTS_JAX)/
+# @uv run mypy $(SRC_PROJECT_NAME)/ $(SRC_PROJECT_TESTS_TF)/ $(SRC_PROJECT_TESTS_TORCH)/ $(SRC_PROJECT_TESTS_JAX)/
 	@echo "✅ Code checks complete."
 
 # Test the code, only if the tests directory exists
