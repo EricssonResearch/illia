@@ -2,10 +2,8 @@
 Backend-agnostic interface for neural network layers.
 """
 
-# Standard libraries
-from typing import Union, Any
+from typing import Any, Union
 
-# Own modules
 from illia import BackendManager
 
 

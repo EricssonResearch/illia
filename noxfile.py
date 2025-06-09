@@ -4,8 +4,9 @@ The versions included are more or less up-to-date with official release support.
     https://devguide.python.org/versions/, as such end-of-life versions are not tested
     nor supported.
 """
-import nox
 import sys
+
+import nox
 
 nox.options.default_venv_backend = ["uv"]
 

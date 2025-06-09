@@ -2,15 +2,12 @@
 This module contains the code for the Gaussian distribution.
 """
 
-# Standard libraries
 import math
-from typing import Optional, Any
+from typing import Any, Optional
 
-# 3pps
 import tensorflow as tf
 from keras import saving
 
-# Own modules
 from illia.distributions.tf.base import DistributionModule
 
 

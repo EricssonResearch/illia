@@ -2,16 +2,13 @@
 This module contains the code for the bayesian Conv1D.
 """
 
-# Standard libraries
-from typing import Optional, Union, Any
+from typing import Any, Optional, Union
 
-# 3pps
 import tensorflow as tf
 from keras import saving
 
-# Own modules
-from illia.nn.tf.base import BayesianModule
 from illia.distributions.tf import GaussianDistribution
+from illia.nn.tf.base import BayesianModule
 
 
 @saving.register_keras_serializable(package="BayesianModule", name="Conv1D")

@@ -2,20 +2,18 @@
 This module defines fixtures for illia.torch.nn.
 """
 
-# Standard libraries
 import os
 from typing import Optional, Union
 
 # Change Illia Backend
 os.environ["ILLIA_BACKEND"] = "tf"
 
-# 3pps
+
 import pytest
 import tensorflow as tf
 
-# Own modules
-from illia.nn import Linear, Embedding, Conv2D, Conv1D
 from illia.distributions import GaussianDistribution
+from illia.nn import Conv1D, Conv2D, Embedding, Linear
 
 
 @pytest.fixture(

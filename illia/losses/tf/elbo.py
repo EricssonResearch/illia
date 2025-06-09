@@ -2,14 +2,11 @@
 This module contains the code for the Losses.
 """
 
-# Standard libraries
-from typing import Callable, Literal, Any
+from typing import Any, Callable, Literal
 
-# 3pps
 import tensorflow as tf
 from keras import Model, losses, saving
 
-# Own modules
 from illia.nn.tf.base import BayesianModule
 
 

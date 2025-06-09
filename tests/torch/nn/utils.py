@@ -2,16 +2,14 @@
 This module contains auxiliary code for tests.torch.nn.
 """
 
-# Standard libraries
 import os
 
 # Change Illia Backend
 os.environ["ILLIA_BACKEND"] = "torch"
 
-# 3pps
+
 import torch
 
-# Own modules
 from illia.nn import BayesianModule
 
 

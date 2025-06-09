@@ -121,6 +121,15 @@ wheels = [
 ]
 
 [[package]]
+name = "argcomplete"
+version = "3.6.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/16/0f/861e168fc813c56a78b35f3c30d91c6757d1fd185af1110f1aec784b35d0/argcomplete-3.6.2.tar.gz", hash = "sha256:d0519b1bc867f5f4f4713c41ad0aba73a4a5f007449716b16f385f2166dc6adf", size = 73403, upload-time = "2025-04-03T04:57:03.52Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/31/da/e42d7a9d8dd33fa775f467e4028a47936da2f01e4b0e561f9ba0d74cb0ca/argcomplete-3.6.2-py3-none-any.whl", hash = "sha256:65b3133a29ad53fb42c48cf5114752c7ab66c1c38544fdf6460f450c09b42591", size = 43708, upload-time = "2025-04-03T04:57:01.591Z" },
+]
+
+[[package]]
 name = "astroid"
 version = "3.3.9"
 source = { registry = "https://pypi.org/simple" }
@@ -397,6 +406,18 @@ wheels = [
 ]
 
 [[package]]
+name = "colorlog"
+version = "6.9.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "colorama", marker = "sys_platform == 'win32'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/d3/7a/359f4d5df2353f26172b3cc39ea32daa39af8de522205f512f458923e677/colorlog-6.9.0.tar.gz", hash = "sha256:bfba54a1b93b94f54e1f4fe48395725a3d92fd2a4af702f6bd70946bdc0c6ac2", size = 16624, upload-time = "2024-10-29T18:34:51.011Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e3/51/9b208e85196941db2f0654ad0357ca6388ab3ed67efdbfc799f35d1f83aa/colorlog-6.9.0-py3-none-any.whl", hash = "sha256:5906e71acd67cb07a71e779c47c4bcb45fb8c2993eebe9e5adcd6a6f1b283eff", size = 11424, upload-time = "2024-10-29T18:34:49.815Z" },
+]
+
+[[package]]
 name = "comm"
 version = "0.2.2"
 source = { registry = "https://pypi.org/simple" }
@@ -495,12 +516,33 @@ wheels = [
 ]
 
 [[package]]
+name = "dependency-groups"
+version = "1.3.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "packaging" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/62/55/f054de99871e7beb81935dea8a10b90cd5ce42122b1c3081d5282fdb3621/dependency_groups-1.3.1.tar.gz", hash = "sha256:78078301090517fd938c19f64a53ce98c32834dfe0dee6b88004a569a6adfefd", size = 10093, upload-time = "2025-05-02T00:34:29.452Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/99/c7/d1ec24fb280caa5a79b6b950db565dab30210a66259d17d5bb2b3a9f878d/dependency_groups-1.3.1-py3-none-any.whl", hash = "sha256:51aeaa0dfad72430fcfb7bcdbefbd75f3792e5919563077f30bc0d73f4493030", size = 8664, upload-time = "2025-05-02T00:34:27.085Z" },
+]
+
+[[package]]
 name = "dill"
 version = "0.3.9"
 source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/70/43/86fe3f9e130c4137b0f1b50784dd70a5087b911fe07fa81e53e0c4c47fea/dill-0.3.9.tar.gz", hash = "sha256:81aa267dddf68cbfe8029c42ca9ec6a4ab3b22371d1c450abc54422577b4512c", size = 187000, upload-time = "2024-09-29T00:03:20.958Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/46/d1/e73b6ad76f0b1fb7f23c35c6d95dbc506a9c8804f43dda8cb5b0fa6331fd/dill-0.3.9-py3-none-any.whl", hash = "sha256:468dff3b89520b474c0397703366b7b95eebe6303f108adf9b19da1f702be87a", size = 119418, upload-time = "2024-09-29T00:03:19.344Z" },
+]
+
+[[package]]
+name = "distlib"
+version = "0.3.9"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/0d/dd/1bec4c5ddb504ca60fc29472f3d27e8d4da1257a854e1d96742f15c1d02d/distlib-0.3.9.tar.gz", hash = "sha256:a60f20dea646b8a33f3e7772f74dc0b2d0772d2837ee1342a00645c81edf9403", size = 613923, upload-time = "2024-10-09T18:35:47.551Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/91/a1/cf2472db20f7ce4a6be1253a81cfdf85ad9c7885ffbed7047fb72c24cf87/distlib-0.3.9-py2.py3-none-any.whl", hash = "sha256:47f8c22fd27c27e25a65601af709b38e4f0a45ea4fc2e710f65755fa8caaaf87", size = 468973, upload-time = "2024-10-09T18:35:44.272Z" },
 ]
 
 [[package]]
@@ -854,7 +896,9 @@ pipeline = [
     { name = "complexipy" },
     { name = "flake8" },
     { name = "flake8-pyproject" },
+    { name = "isort" },
     { name = "mypy" },
+    { name = "nox" },
     { name = "pylint" },
     { name = "pytest" },
     { name = "pytest-order" },
@@ -887,7 +931,9 @@ pipeline = [
     { name = "complexipy", specifier = ">=2.1.1" },
     { name = "flake8", specifier = ">=7.2.0" },
     { name = "flake8-pyproject", specifier = "==1.2.3" },
+    { name = "isort", specifier = ">=6.0.1" },
     { name = "mypy", specifier = ">=1.15.0" },
+    { name = "nox", specifier = ">=2025.5.1" },
     { name = "pylint", specifier = ">=3.3.5" },
     { name = "pytest", specifier = ">=8.3.5" },
     { name = "pytest-order", specifier = ">=1.3.0" },
@@ -1752,6 +1798,23 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/fd/1d/06475e1cd5264c0b870ea2cc6fdb3e37177c1e565c43f56ff17a10e3937f/networkx-3.4.2.tar.gz", hash = "sha256:307c3669428c5362aab27c8a1260aa8f47c4e91d3891f48be0141738d8d053e1", size = 2151368, upload-time = "2024-10-21T12:39:38.695Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b9/54/dd730b32ea14ea797530a4479b2ed46a6fb250f682a9cfb997e968bf0261/networkx-3.4.2-py3-none-any.whl", hash = "sha256:df5d4365b724cf81b8c6a7312509d0c22386097011ad1abe274afd5e9d3bbc5f", size = 1723263, upload-time = "2024-10-21T12:39:36.247Z" },
+]
+
+[[package]]
+name = "nox"
+version = "2025.5.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "argcomplete" },
+    { name = "attrs" },
+    { name = "colorlog" },
+    { name = "dependency-groups" },
+    { name = "packaging" },
+    { name = "virtualenv" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/b4/80/47712208c410defec169992e57c179f0f4d92f5dd17ba8daca50a8077e23/nox-2025.5.1.tar.gz", hash = "sha256:2a571dfa7a58acc726521ac3cd8184455ebcdcbf26401c7b737b5bc6701427b2", size = 4023334, upload-time = "2025-05-01T16:35:48.056Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a6/be/7b423b02b09eb856beffe76fe8c4121c99852db74dd12a422dcb72d1134e/nox-2025.5.1-py3-none-any.whl", hash = "sha256:56abd55cf37ff523c254fcec4d152ed51e5fe80e2ab8317221d8b828ac970a31", size = 71753, upload-time = "2025-05-01T16:35:46.037Z" },
 ]
 
 [[package]]
@@ -3078,6 +3141,20 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/aa/63/e53da845320b757bf29ef6a9062f5c669fe997973f966045cb019c3f4b66/urllib3-2.3.0.tar.gz", hash = "sha256:f8c5449b3cf0861679ce7e0503c7b44b5ec981bec0d1d3795a07f1ba96f0204d", size = 307268, upload-time = "2024-12-22T07:47:30.032Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c8/19/4ec628951a74043532ca2cf5d97b7b14863931476d117c471e8e2b1eb39f/urllib3-2.3.0-py3-none-any.whl", hash = "sha256:1cee9ad369867bfdbbb48b7dd50374c0967a0bb7710050facf0dd6911440e3df", size = 128369, upload-time = "2024-12-22T07:47:28.074Z" },
+]
+
+[[package]]
+name = "virtualenv"
+version = "20.31.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "distlib" },
+    { name = "filelock" },
+    { name = "platformdirs" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/56/2c/444f465fb2c65f40c3a104fd0c495184c4f2336d65baf398e3c75d72ea94/virtualenv-20.31.2.tar.gz", hash = "sha256:e10c0a9d02835e592521be48b332b6caee6887f332c111aa79a09b9e79efc2af", size = 6076316, upload-time = "2025-05-08T17:58:23.811Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f3/40/b1c265d4b2b62b58576588510fc4d1fe60a86319c8de99fd8e9fec617d2c/virtualenv-20.31.2-py3-none-any.whl", hash = "sha256:36efd0d9650ee985f0cad72065001e66d49a6f24eb44d98980f630686243cf11", size = 6057982, upload-time = "2025-05-08T17:58:21.15Z" },
 ]
 
 [[package]]

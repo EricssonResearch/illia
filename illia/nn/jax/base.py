@@ -2,10 +2,8 @@
 This module contains the code for the BayesianModule.
 """
 
-# Standard libraries
 from abc import ABC, abstractmethod
 
-# 3pps
 import jax
 import jax.numpy as jnp
 from flax import nnx

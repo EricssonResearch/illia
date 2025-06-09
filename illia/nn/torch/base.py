@@ -2,10 +2,8 @@
 This module contains the code for the BayesianModule.
 """
 
-# Standard libraries
 from abc import ABC
 
-# 3pps
 import torch
 
 

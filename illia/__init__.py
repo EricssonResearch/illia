@@ -2,19 +2,17 @@
 This module defines the Illia dynamic backend manager.
 """
 
-# Standard libraries
-import os
 import importlib
+import os
 import warnings
 from typing import Any, Optional, Union
 
-# Own modules
 from illia.support import (
-    BACKEND_MODULES,
-    BACKEND_CAPABILITIES,
-    VERSION,
     AVAILABLE_DNN_BACKENDS,
     AVAILABLE_GNN_BACKENDS,
+    BACKEND_CAPABILITIES,
+    BACKEND_MODULES,
+    VERSION,
 )
 
 # Constants

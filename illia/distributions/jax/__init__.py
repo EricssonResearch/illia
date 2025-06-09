@@ -2,7 +2,6 @@
 This module defines the imports for distribution functions in JAX.
 """
 
-# Own modules
 from illia.distributions.jax.base import DistributionModule
 from illia.distributions.jax.gaussian import GaussianDistribution
 

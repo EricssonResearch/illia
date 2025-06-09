@@ -2,21 +2,19 @@
 This module defines fixtures for illia.jax.nn.
 """
 
-# Standard libraries
 import os
 from typing import Optional
 
 # Change Illia Backend
 os.environ["ILLIA_BACKEND"] = "jax"
 
-# 3pps
-import jax
-from flax import nnx
-import pytest
 
-# Own modules
-from illia.nn import Linear
+import jax
+import pytest
+from flax import nnx
+
 from illia.distributions import GaussianDistribution
+from illia.nn import Linear
 
 
 def linear_fixture(request: pytest.FixtureRequest) -> tuple[Linear, jax.Array]:

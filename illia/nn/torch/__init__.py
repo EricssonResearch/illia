@@ -2,7 +2,6 @@
 This module contains the import statements for NN layers used with PyTorch.
 """
 
-# Own modules
 from illia.nn.torch.base import BayesianModule
 from illia.nn.torch.conv1d import Conv1D
 from illia.nn.torch.conv2d import Conv2D

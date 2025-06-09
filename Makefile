@@ -9,6 +9,9 @@ SRC_PROJECT_NAME ?= illia
 SRC_PROJECT_TESTS_TF ?= tests/tf
 SRC_PROJECT_TESTS_TORCH ?= tests/torch
 SRC_PROJECT_TESTS_JAX ?= tests/jax
+SRC_ALL ?= $(SRC_PROJECT_NAME)/ $(SRC_PROJECT_TESTS_TF)/ \
+                $(SRC_PROJECT_TESTS_TORCH)/ $(SRC_PROJECT_TESTS_JAX)/
+
 
 # Allows the installation of project dependencies
 install:
@@ -28,14 +31,9 @@ clean:
 # Check code formatting and linting
 lint:
 	@echo "Running lint checks..."
-	@uv run black --check $(SRC_PROJECT_NAME)/ && \
-	uv run black --check $(SRC_PROJECT_TESTS_TF)/ && \
-	uv run black --check $(SRC_PROJECT_TESTS_TORCH)/ && \
-	uv run black --check $(SRC_PROJECT_TESTS_JAX)/
-	@uv run flake8 $(SRC_PROJECT_NAME)/ && \
-	uv run flake8 $(SRC_PROJECT_TESTS_TF)/ && \
-	uv run flake8 $(SRC_PROJECT_TESTS_TORCH)/ && \
-	uv run flake8 $(SRC_PROJECT_TESTS_JAX)/
+	@uv run black --check $(SRC_ALL)/
+	@uv run isort --check $(SRC_ALL)/
+	@uv run flake8 $(SRC_ALL)/
 	@uv run pylint --fail-under=8 $(SRC_PROJECT_NAME)/
 	@echo "✅ Linting complete."
 

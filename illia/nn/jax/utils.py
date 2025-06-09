@@ -2,7 +2,6 @@
 This module contains auxiliary functions for jax.nn.
 """
 
-# 3pps
 from flax import nnx
 
 

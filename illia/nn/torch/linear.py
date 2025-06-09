@@ -2,16 +2,13 @@
 This module contains the code for Linear Bayesian layer.
 """
 
-# Standard libraries
 from typing import Optional
 
-# 3pps
 import torch
 import torch.nn.functional as F
 
-# Own modules
-from illia.nn.torch.base import BayesianModule
 from illia.distributions.torch import GaussianDistribution
+from illia.nn.torch.base import BayesianModule
 
 
 class Linear(BayesianModule):
