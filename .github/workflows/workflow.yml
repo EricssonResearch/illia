@@ -5,6 +5,7 @@ on:
     branches: '*'
   pull_request:
     branches: [main, dev]
+  
 
 env:
   SRC_PROJECT_FOLDER: "illia"
@@ -46,6 +47,11 @@ jobs:
         uses: ./.github/actions/test-code
         with:
           src-tests-folder: ${{ env.SRC_PROJECT_TESTS_TORCH }}
+
+      - name: Run Nox (only on merge to main)
+        run: nox
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+     
 
   build-mkdocs:
     name: Build MkDocs Illia Wiki
