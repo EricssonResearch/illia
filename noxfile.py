@@ -8,7 +8,7 @@ import sys
 
 import nox
 
-nox.options.default_venv_backend = ["uv"]
+nox.options.default_venv_backend = "uv"
 
 # PYPROJECT = nox.project.load_toml("pyproject.toml")
 # PYTHON_VERSIONS = nox.project.python_versions(PYPROJECT, max_version="3.13")
