@@ -15,6 +15,12 @@ runs:
         uv run black --check ${{ inputs.src-project-folder }}/
       shell: bash
 
+    - name: Check imports with isort
+      run: |
+        echo "Running isort..."  
+        uv run isort --check ${{ inputs.src-project-folder }}/
+      shell: bash
+      
     - name: Lint with flake8
       run: |
         echo "Running Flake8 linter..."

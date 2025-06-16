@@ -31,8 +31,8 @@ clean:
 # Check code formatting and linting
 lint:
 	@echo "Running lint checks..."
-	@uv run black --check $(SRC_ALL)/
-	@uv run isort --check $(SRC_ALL)/
+	@uv run black $(SRC_ALL)/
+	@uv run isort $(SRC_ALL)/
 	@uv run flake8 $(SRC_ALL)/
 	@uv run pylint --fail-under=8 $(SRC_PROJECT_NAME)/
 	@echo "✅ Linting complete."
@@ -42,6 +42,7 @@ code_check:
 	@echo "Running static code checks..."
 	@uv run complexipy -d low $(SRC_PROJECT_NAME)/
 	@uv run mypy $(SRC_PROJECT_NAME)/
+	@uv run bandit -r $(SRC_PROJECT_NAME)/ --exclude tests/
 	@echo "✅ Code checks complete."
 
 # Test the code, only if the tests directory exists

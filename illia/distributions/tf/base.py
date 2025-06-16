@@ -2,9 +2,11 @@
 This module contains the base class for the Distributions.
 """
 
+# Standard libraries
 from abc import ABC, abstractmethod
 from typing import Optional
 
+# 3pps
 import tensorflow as tf
 from keras import layers, saving
 

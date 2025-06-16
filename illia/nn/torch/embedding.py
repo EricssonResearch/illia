@@ -2,11 +2,14 @@
 This module contains the code for bayesian Embedding layer.
 """
 
+# Standard libraries
 from typing import Any, Optional
 
+# 3pps
 import torch
 import torch.nn.functional as F
 
+# Own modules
 from illia.distributions.torch import GaussianDistribution
 from illia.nn.torch.base import BayesianModule
 

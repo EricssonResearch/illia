@@ -2,6 +2,7 @@
 This module defines fixtures for illia.torch.nn.
 """
 
+# Standard libraries
 import os
 from typing import Optional, Union
 
@@ -9,9 +10,11 @@ from typing import Optional, Union
 os.environ["ILLIA_BACKEND"] = "tf"
 
 
+# 3pps
 import pytest
 import tensorflow as tf
 
+# Own modules
 from illia.distributions import GaussianDistribution
 from illia.nn import Conv1D, Conv2D, Embedding, Linear
 

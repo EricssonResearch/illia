@@ -2,6 +2,7 @@
 This module contains the import statements for NN layers used with Tensorflow.
 """
 
+# Own modules
 from illia.nn.tf.base import BayesianModule
 from illia.nn.tf.conv1d import Conv1D
 from illia.nn.tf.conv2d import Conv2D

@@ -2,10 +2,13 @@
 This module contains the code for the Losses.
 """
 
+# Standard libraries
 from typing import Literal
 
+# 3pps
 import torch
 
+# Own modules
 from illia.nn.torch.base import BayesianModule
 
 

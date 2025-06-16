@@ -2,6 +2,7 @@
 This module defines fixtures for illia.jax.nn.
 """
 
+# Standard libraries
 import os
 from typing import Optional
 
@@ -9,10 +10,12 @@ from typing import Optional
 os.environ["ILLIA_BACKEND"] = "jax"
 
 
+# 3pps
 import jax
 import pytest
 from flax import nnx
 
+# Own modules
 from illia.distributions import GaussianDistribution
 from illia.nn import Linear
 

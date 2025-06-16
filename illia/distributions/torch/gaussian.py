@@ -2,10 +2,13 @@
 This module contains the code for the gaussian distribution.
 """
 
+# Standard libraries
 from typing import Optional
 
+# 3pps
 import torch
 
+# Own modules
 from illia.distributions.torch.base import DistributionModule
 
 

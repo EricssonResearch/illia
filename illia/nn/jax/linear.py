@@ -2,14 +2,17 @@
 This module contains the code for Linear Bayesian layer.
 """
 
+# Standard libraries
 from typing import Any, Optional
 
+# 3pps
 import jax
 import jax.numpy as jnp
 from flax.nnx.nn import dtypes
 from flax.typing import DotGeneralT, PrecisionLike
 from jax import lax
 
+# Own modules
 from illia.distributions.jax import GaussianDistribution
 from illia.nn.jax.base import BayesianModule
 

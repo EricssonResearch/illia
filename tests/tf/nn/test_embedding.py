@@ -2,6 +2,7 @@
 This module contains the tests for the Embedding layer.
 """
 
+# Standard libraries
 import os
 import tempfile
 
@@ -9,10 +10,12 @@ import tempfile
 os.environ["ILLIA_BACKEND"] = "tf"
 
 
+# 3pps
 import keras
 import pytest
 import tensorflow as tf
 
+# Own modules
 from illia.nn import Embedding
 
 

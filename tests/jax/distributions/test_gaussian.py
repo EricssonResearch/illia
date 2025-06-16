@@ -2,18 +2,21 @@
 This module contains the tests for GaussianDistribution.
 """
 
+# Standard libraries
 import copy
 import os
 
 # Change Illia Backend
 os.environ["ILLIA_BACKEND"] = "jax"
 
+# 3pps
 import flax.nnx as nnx
 import jax
 import jax.numpy as jnp
 import pytest
 from flax.nnx.rnglib import Rngs
 
+# Own modules
 from illia.distributions import GaussianDistribution
 
 

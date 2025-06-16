@@ -2,6 +2,7 @@
 This module defines fixtures for illia.torch.nn.
 """
 
+# Standard libraries
 import os
 from typing import Optional, Union
 
@@ -9,9 +10,11 @@ from typing import Optional, Union
 os.environ["ILLIA_BACKEND"] = "torch"
 
 
+# 3pps
 import pytest
 import torch
 
+# Own modules
 from illia.distributions import GaussianDistribution
 from illia.nn import BayesianModule, Conv1D, Conv2D, Embedding, Linear
 from tests.torch.nn.utils import BayesianComposedModel, ComposedModel
