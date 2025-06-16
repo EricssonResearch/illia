@@ -1,0 +1,23 @@
+{
+  "image": "mcr.microsoft.com/vscode/devcontainers/python:3.11",
+  "postCreateCommand": "curl -LsSf https://astral.sh/uv/install.sh | sh && sudo apt-get update && sudo apt-get install -y build-essential && make install",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "python.testing.pytestEnabled": true,
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.organizeImports": true
+        },
+        "[python]": {
+          "editor.defaultFormatter": "ms-python.black-formatter"
+        },
+        "editor.rulers": [88]
+      },
+      "extensions": ["ms-python.python"]
+    }
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  }
+}

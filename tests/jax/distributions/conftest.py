@@ -1,4 +1,0 @@
-""" """
-
-# 3pps
-import pytest

@@ -1,5 +1,3 @@
 # Neural Network
 
-## Convolutional operators
-
-::: illia.pyg.nn.conv.cg_conv
+::: illia.nn.pyg.cg_conv

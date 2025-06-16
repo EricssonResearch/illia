@@ -1,3 +1,3 @@
 # Neural Network
 
-::: illia.jax.nn.linear
+::: illia.nn.jax.linear

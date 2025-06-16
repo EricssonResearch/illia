@@ -2,13 +2,20 @@
 This module contains the code to test the bayesian Linear layer.
 """
 
+# Standard libraries
+import os
+
+# Change Illia Backend
+os.environ["ILLIA_BACKEND"] = "torch"
+
+
 # 3pps
 import pytest
 import torch
 from torch.jit import RecursiveScriptModule
 
 # Own modules
-from illia.torch.nn import Linear
+from illia.nn import Linear
 
 
 class TestLinear:

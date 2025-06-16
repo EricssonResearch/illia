@@ -1,5 +1,11 @@
 <p align="center">
   <a href="https://github.com/EricssonResearch/illia/actions/workflows/workflow.yml"><img src="https://github.com/EricssonResearch/illia/actions/workflows/workflow.yml/badge.svg"></a>
+  <img src="https://img.shields.io/badge/python-3.10%20|%203.11%20|%203.12-blue">
+</p>
+
+<p align="center">
+  <img src="./docs/assets/images/white_logo_illia.png" height="250"/>
+  <br/>
 </p>
 
 ### ⚠️ **Warning**

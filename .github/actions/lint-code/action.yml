@@ -1,6 +1,5 @@
 name: Lint Illia Code
 
-# Define inputs for the action, such as the project folder to lint
 inputs:
   src-project-folder:
     description: "Directory where the project is located"
@@ -10,37 +9,38 @@ inputs:
 runs:
   using: composite
   steps:
-    # Step 1: Check format with Black (code formatter)
     - name: Check format with Black
       run: |
         echo "Running Black formatter check..."  
         uv run black --check ${{ inputs.src-project-folder }}/
       shell: bash
 
-    # Step 2: Lint code with Flake8 (style checker)
+    - name: Check imports with isort
+      run: |
+        echo "Running isort..."  
+        uv run isort --check ${{ inputs.src-project-folder }}/
+      shell: bash
+      
     - name: Lint with flake8
       run: |
         echo "Running Flake8 linter..."
         uv run flake8 ${{ inputs.src-project-folder }}/
       shell: bash
 
-    # Step 3: Checking code quality with Pylint
     - name: Code quality with Pylint
       run: |
         echo "Running Pylint linter..."
         uv run pylint --fail-under=8 ${{ inputs.src-project-folder }}/
       shell: bash
 
-    # Step 4: Check the Cognitive Complexity with complexipy
     - name: Cognitive Complexity with complexipy
       run: |
         echo "Running complexipy..."
         uv run complexipy ${{ inputs.src-project-folder }}/
       shell: bash
 
-    # Step 5: Check type annotations with Mypy (type checker)
     - name: Check Mypy
       run: |
-        echo "Running Mypy type checker..." 
+        echo "Running Mypy type checker..."
         uv run mypy ${{ inputs.src-project-folder }}/
       shell: bash

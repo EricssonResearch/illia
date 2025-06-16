@@ -1,11 +1,9 @@
 # Neural Network
 
-::: illia.torch.nn.conv1d
+::: illia.nn.torch.conv1d
 
-::: illia.torch.nn.conv2d
+::: illia.nn.torch.conv2d
 
-::: illia.torch.nn.embedding
+::: illia.nn.torch.embedding
 
-::: illia.torch.nn.linear
-
-::: illia.torch.nn.losses
+::: illia.nn.torch.linear

@@ -1,3 +1,3 @@
 # Distributions
 
-::: illia.torch.distributions.gaussian
+::: illia.distributions.torch.gaussian

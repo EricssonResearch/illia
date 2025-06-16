@@ -1,3 +1,3 @@
 # Distributions
 
-::: illia.jax.distributions.gaussian
+::: illia.distributions.jax.gaussian

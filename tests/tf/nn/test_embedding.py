@@ -3,15 +3,20 @@ This module contains the tests for the Embedding layer.
 """
 
 # Standard libraries
+import os
 import tempfile
 
+# Change Illia Backend
+os.environ["ILLIA_BACKEND"] = "tf"
+
+
 # 3pps
-import pytest
 import keras
+import pytest
 import tensorflow as tf
 
-# own modules
-from illia.tf.nn import Embedding
+# Own modules
+from illia.nn import Embedding
 
 
 class TestEmbedding:

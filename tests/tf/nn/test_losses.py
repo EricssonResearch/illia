@@ -2,14 +2,20 @@
 This module contains the code to test losses.
 """
 
+# Standard libraries
+import os
+
+# Change Illia Backend
+os.environ["ILLIA_BACKEND"] = "tf"
+
 # 3pps
-import pytest
 import keras
+import pytest
 import tensorflow as tf
 
 # Own modules
-from illia.tf.nn.base import BayesianModule
-from illia.tf.nn import KLDivergenceLoss, Linear
+from illia.losses import KLDivergenceLoss
+from illia.nn import Linear
 
 
 class TestKLDivergenceLoss:

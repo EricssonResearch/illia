@@ -2,13 +2,20 @@
 This module contains the code to test losses.
 """
 
+# Standard libraries
+import os
+
+# Change Illia Backend
+os.environ["ILLIA_BACKEND"] = "torch"
+
+
 # 3pps
 import pytest
 import torch
 
 # Own modules
-from illia.torch.nn.base import BayesianModule
-from illia.torch.nn import KLDivergenceLoss, Linear
+from illia.losses import KLDivergenceLoss
+from illia.nn import BayesianModule, Linear
 
 
 class TestKLDivergenceLoss:

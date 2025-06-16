@@ -13,6 +13,7 @@ __pycache__/
 *env/
 *site/
 ./examples/illia_all_backend_all_modules_pytests.ipynb
+*.egg-info/
 
 # Files
 *.txt
@@ -30,4 +31,5 @@ __pycache__/
 *.txt
 
 # Exceptions
-!/configs/*
+!/illia/config/*
+!/.devcontainer/*

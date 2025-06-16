@@ -6,13 +6,16 @@
 
 # Variables
 SRC_PROJECT_NAME ?= illia
-SRC_TESTS ?= tests/torch tests/tf
+SRC_PROJECT_TESTS_TF ?= tests/tf
+SRC_PROJECT_TESTS_TORCH ?= tests/torch
+SRC_PROJECT_TESTS_JAX ?= tests/jax
+SRC_ALL ?= $(SRC_PROJECT_NAME)/ $(SRC_PROJECT_TESTS_TF)/ \
+                $(SRC_PROJECT_TESTS_TORCH)/ $(SRC_PROJECT_TESTS_JAX)/
+
 
 # Allows the installation of project dependencies
 install:
 	@echo "Installing dependencies..."
-	@pip install --upgrade pip
-	@pip install uv
 	@uv pip install -r pyproject.toml --all-extras
 	@echo "✅ Dependencies installed."
 
@@ -28,8 +31,9 @@ clean:
 # Check code formatting and linting
 lint:
 	@echo "Running lint checks..."
-	@uv run black --check $(SRC_PROJECT_NAME)/ $(SRC_TESTS)/
-	@uv run flake8 $(SRC_PROJECT_NAME)/
+	@uv run black $(SRC_ALL)/
+	@uv run isort $(SRC_ALL)/
+	@uv run flake8 $(SRC_ALL)/
 	@uv run pylint --fail-under=8 $(SRC_PROJECT_NAME)/
 	@echo "✅ Linting complete."
 
@@ -37,19 +41,16 @@ lint:
 code_check:
 	@echo "Running static code checks..."
 	@uv run complexipy -d low $(SRC_PROJECT_NAME)/
-	@uv run mypy $(SRC_PROJECT_NAME)/ $(SRC_TESTS)/
+	@uv run mypy $(SRC_PROJECT_NAME)/
+	@uv run bandit -r $(SRC_PROJECT_NAME)/ --exclude tests/
 	@echo "✅ Code checks complete."
 
 # Test the code, only if the tests directory exists
 tests:
-	@echo "Checking if tests directory exists..."
-	@if [ -d "$(SRC_TESTS)" ] && [ $$(find $(SRC_TESTS) -name "test_*.py" | wc -l) -gt 0 ]; then \
-		echo "Running tests..."; \
-		uv run pytest $(SRC_TESTS); \
-		echo "✅ Tests complete."; \
-	else \
-		echo "No tests directory found or no test files. Skipping tests."; \
-	fi
+	@echo "Runing test per each backend..."
+	@uv run pytest $(SRC_PROJECT_TESTS_TF)/ && \
+	uv run pytest $(SRC_PROJECT_TESTS_TORCH)/ 
+	@echo "✅ Tests complete."
 
 # Serve documentation locally
 doc:

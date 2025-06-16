@@ -2,13 +2,20 @@
 This module contains the tests for the Embedding layer.
 """
 
+# Standard libraries
+import os
+
+# Change Illia Backend
+os.environ["ILLIA_BACKEND"] = "torch"
+
+
 # 3pps
 import pytest
 import torch
 from torch.jit import RecursiveScriptModule
 
 # Own modules
-from illia.torch.nn import Embedding
+from illia.nn import Embedding
 
 
 class TestEmbedding:
