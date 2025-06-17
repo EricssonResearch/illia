@@ -112,6 +112,9 @@ extra:
       link: https://www.youtube.com/@ericsson
     - icon: fontawesome/brands/x-twitter
       link: https://x.com/ericsson
+  version:
+    provider: mike
+    default: latest
 
 extra_css:
   - assets/css/custom.css
