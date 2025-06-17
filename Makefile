@@ -1,5 +1,5 @@
 # Declare all phony targets
-.PHONY: version install clean lint code_check tests doc doc-versioning pipeline all
+.PHONY: install clean lint code_check tests doc pipeline all
 
 # Default command
 .DEFAULT_GOAL := all
@@ -12,12 +12,6 @@ SRC_PROJECT_TESTS_JAX ?= tests/jax
 SRC_ALL ?= $(SRC_PROJECT_NAME)/ $(SRC_PROJECT_TESTS_TF)/ \
                 $(SRC_PROJECT_TESTS_TORCH)/ $(SRC_PROJECT_TESTS_JAX)/
 
-# Extract variable directly
-ILLIA_VERSION := $(shell uv run python -c "exec(open('./illia/support.py').read()); print(VERSION)")
-
-# Test the output of the Illia version
-version:
-	@echo "Illia version: $(ILLIA_VERSION)"
 
 # Allows the installation of project dependencies
 install:
@@ -63,15 +57,10 @@ doc:
 	@echo "Serving documentation..."
 	@uv run mkdocs serve
 
-# Create version documentation with mike
-doc-versioning:
-	@echo "Versioning documentation with mike..."
-	@uv run mike deploy $(ILLIA_VERSION)
-
 # Run code checks and tests
 pipeline: clean lint code_check tests
 	@echo "✅ Pipeline complete."
 
 # Run full workflow including install and docs
-all: install pipeline doc-versioning
+all: install pipeline doc
 	@echo "✅ All tasks complete."

@@ -94,16 +94,8 @@ jobs:
           src-python-version: ${{ env.SRC_PYTHON_VERSION }}
           dependencies: "documentation"
 
-      - name: Get version from support.py
-        id: get_version
-        run: |
-          VERSION=$(python -c "exec(open('./${{ env.SRC_PROJECT_FOLDER }}/support.py').read()); print(VERSION)")
-          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
-
       - name: Build MkDocs
         uses: ./.github/actions/build-mkdocs
-        with:
-          library-version: ${{ steps.get_version.outputs.VERSION }}
 
   deploy-mkdocs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
