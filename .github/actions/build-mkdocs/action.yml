@@ -25,6 +25,12 @@ runs:
         restore-keys: |
           mkdocs-material-
 
+    - name: Configure Git
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+      shell: bash
+
     - name: Build and deploy MkDocs site to gh-deploy branch
       id: deploy-mkdocs
       run: |
