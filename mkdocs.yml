@@ -29,7 +29,6 @@ theme:
     - content.tooltips
     - announce.dismiss
     - navigation.tabs
-    - navigation.tabs.sticky
     - navigation.instant
     - navigation.instant.prefetch
     - navigation.instant.preview
@@ -40,7 +39,7 @@ theme:
     - navigation.indexes
     - search.suggest
     - toc.follow
-    - header.autohide
+    - toc.integrate
   logo: assets/images/white_logo_illia.png
   favicon: assets/images/white_logo_illia.png
   icon:
