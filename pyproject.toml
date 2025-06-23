@@ -10,7 +10,7 @@ authors = [
     {name = "Oscar Llorente Gonzalez", email = "oscar.llorente.gonzalez@ericsson.com"},
 ]
 maintainers = [
-    {name = "Daniel Bazo Correa", email = "daniel.bazo.correa@gmail.com"},
+    {name = "Daniel Bazo Correa", email = "daniel.bazo.correa@ericsson.com"},
     {name = "Lucia Ferrer", email = "lucia.ferrer@ericsson.com"},
 ]
 license = {file = "LICENSE"}
