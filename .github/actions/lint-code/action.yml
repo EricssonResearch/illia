@@ -4,7 +4,7 @@ inputs:
   src-project-folder:
     description: "Directory where the project is located"
     required: true
-    default: "src"
+    default: "illia"
 
 runs:
   using: composite
@@ -20,7 +20,7 @@ runs:
         echo "Running isort..."  
         uv run isort --check ${{ inputs.src-project-folder }}/
       shell: bash
-      
+
     - name: Lint with flake8
       run: |
         echo "Running Flake8 linter..."
