@@ -14,8 +14,11 @@ from illia.support import (
     AVAILABLE_GNN_BACKENDS,
     BACKEND_CAPABILITIES,
     BACKEND_MODULES,
-    VERSION,
 )
+from illia.version import __version__
+
+# Define all names to be imported
+__all__: list[str] = ["__version__"]
 
 # Constants
 ENV_OS_NAME: str = "ILLIA_BACKEND"
@@ -239,7 +242,6 @@ class BackendManager:
 
 
 # Export methods
-__version__ = VERSION
 __get_backend__ = BackendManager.get_backend()
 __get_available_backends__ = BackendManager.get_available_backends()
 is_backend_available = BackendManager.is_backend_available

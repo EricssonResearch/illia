@@ -25,7 +25,8 @@ runs:
       run: |
         echo "Activating virtual environment and installing dependencies for group(s): ${{ inputs.dependencies }}"
         source .venv/bin/activate
-        uv pip install -r pyproject.toml --group ${{ inputs.dependencies }} --all-extras
+        uv sync
+        uv pip install -r pyproject.toml --group ${{ inputs.dependencies }}
 
     - name: Verify uv and environment
       id: verify

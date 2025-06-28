@@ -1,28 +1,44 @@
 name: Build MkDocs Artifacts
+description: Build MkDocs and versioning with Mike
+
+inputs:
+  docs-version:
+    description: "Version docs"
+    required: true
 
 runs:
   using: composite
-
   steps:
-    - name: Set cache ID based on UTC week number
-      id: set-cache-id
+    - name: Configure Git
       run: |
-        echo "Calculating cache ID from UTC week number..."
-        echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
       shell: bash
 
-    - name: Cache MkDocs dependencies and .cache folder
-      id: mkdocs-cache
-      uses: actions/cache@v4
-      with:
-        key: mkdocs-material-${{ env.cache_id }}
-        path: .cache
-        restore-keys: |
-          mkdocs-material-
-
-    - name: Build and deploy MkDocs site to gh-deploy branch
-      id: deploy-mkdocs
+    - name: Setup gh-pages branch
       run: |
-        echo "Building and deploying MkDocs site..."
-        uv run mkdocs gh-deploy --config-file ./mkdocs.yml --force
+        # Check if gh-pages branch exists remotely
+        if git ls-remote --heads origin gh-pages | grep -q gh-pages; then
+          echo "gh-pages branch exists, fetching..."
+          git fetch origin gh-pages:gh-pages
+        else
+          echo "gh-pages branch doesn't exist, creating..."
+          git checkout --orphan gh-pages
+          git reset --hard
+          git commit --allow-empty -m "Initial gh-pages commit"
+          git push origin gh-pages
+          git checkout $CURRENT_BRANCH
+        fi
+      shell: bash
+
+    - name: Build and deploy docs with Mike
+      run: |
+        echo "Deploying docs version: ${{ inputs.docs-version }}"
+        uv run mike deploy --push --update-aliases ${{ inputs.docs-version }} latest
+      shell: bash
+
+    - name: Set default version
+      run: |
+        echo "Setting latest as default version"
+        uv run mike set-default --push latest
       shell: bash
