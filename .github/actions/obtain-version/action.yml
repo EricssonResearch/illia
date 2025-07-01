@@ -12,7 +12,7 @@ runs:
     - name: Get Package Version
       id: get_version
       run: |
-        VERSION=$(uv run python -c "from src import version; print(version.__version__)")
+        VERSION=$(uv run python -c "from illia import version; print(version.__version__)")
         echo "version=v$VERSION" >> $GITHUB_OUTPUT
         echo "Version: v$VERSION"
       shell: bash
