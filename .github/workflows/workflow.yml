@@ -53,9 +53,9 @@ jobs:
       matrix:
         include:
           - framework: PyTorch
-            test-folder: tests/torch
+            nox-session: test-torch
           - framework: TensorFlow
-            test-folder: tests/tf
+            nox-session: test-tf
 
     steps:
       - name: Checkout repository
@@ -67,14 +67,8 @@ jobs:
           src-python-version: ${{ env.SRC_PYTHON_VERSION }}
           dependencies: "pipeline"
 
-      - name: Test ${{ matrix.framework }} code
-        uses: ./.github/actions/test-code
-        with:
-          src-tests-folder: ${{ matrix.test-folder }}
-
-      - name: Run Nox (only on merge to main)
-        run: nox
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      - name: Run Nox tests for ${{ matrix.framework }}
+        run: uvx nox --session ${{ matrix.nox-session }} --reuse-existing-virtualenvs
 
   build-deploy-mkdocs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
