@@ -1,0 +1,9 @@
+nav:
+  - Home: index.md
+  - Frameworks: frameworks/
+  - Examples: examples/
+  - Reference: reference/
+
+sort:
+  ignore_case: true
+  type: alphabetical

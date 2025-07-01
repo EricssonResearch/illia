@@ -1,14 +1,35 @@
-# folders
+# Folders
+/data/
+/saved_objects/
+/runs/
+/models/
+__pycache__/
 .vscode/
 .mypy_cache/
-__pycache__/
-dist/
-build/
+/results/
+*build/
+*dist/
+*venv/
+*env/
+*site/
+./examples/illia_all_backend_all_modules_pytests.ipynb
 *.egg-info/
 
-# files
-*.json
-*.zip
+# Files
+*.txt
 *.csv
+*.out
 *.parquet
+*.xlsx
+*.json
 *.pkl
+*.pt
+*.ini
+*.zip
+*.json
+*.pdf
+*.txt
+
+# Exceptions
+!/illia/config/*
+!/.devcontainer/*

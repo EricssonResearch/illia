@@ -1,0 +1,163 @@
+[build-system]
+requires = ["setuptools >=80.9"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "illia"
+dynamic = ["version"]
+description = "Framework agnostic Bayesian Neural Network library"
+authors = [
+    {name = "Oscar Llorente Gonzalez", email = "oscar.llorente.gonzalez@ericsson.com"},
+]
+maintainers = [
+    {name = "Daniel Bazo Correa", email = "daniel.bazo.correa@ericsson.com"},
+    {name = "Lucia Ferrer", email = "lucia.ferrer@ericsson.com"},
+]
+license = {file = "LICENSE"}
+readme = "README.md"
+requires-python = ">=3.11"
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3 :: Only",
+]
+
+[tool.uv]
+default-groups = "all"
+
+[project.optional-dependencies]
+torch = [
+    "torch",
+]
+tensorflow = [
+    "tensorflow>=2.19.0",
+]
+jax = [
+    "flax>=0.8.4",
+    "jax",
+]
+pyg = [
+    "torch-geometric>=2.5.1",
+]
+
+[dependency-groups]
+pipeline = [
+    "black>=25.1.0",
+    "black[jupyter]",
+    "complexipy>=2.1.1",
+    "flake8>=7.2.0",
+    "Flake8-pyproject==1.2.3",
+    "isort>=6.0.1",
+    "nox>=2025.5.1",
+    "pylint>=3.3.5",
+    "pytest-order>=1.3.0",
+    "pytest>=8.3.5",
+    "mypy>=1.15.0",
+    "bandit>=1.8.3",
+]
+documentation = [
+    "mkdocs>=1.6.1",
+    "mkdocstrings[python]>=0.29.1",
+    "mkdocs-material>=9.6.10",
+    "mkdocs-git-revision-date-localized-plugin>=1.4.5",
+    "mkdocs-git-authors-plugin>=0.9.4",
+    "mkdocs-enumerate-headings-plugin>=0.6.2",
+    "mkdocs-jupyter>=0.25.1",
+    "mkdocs-awesome-nav",
+    "mike>=2.1.3",
+]
+
+[tool.uv.sources]
+torch = [
+    { index = "torch" },
+]
+torch-cluster = [
+    { index = "pyg" },
+]
+torch-scatter = [
+    { index = "pyg" },
+]
+torch-sparse = [
+    { index = "pyg" },
+]
+torch-spline-conv = [
+    { index = "pyg" },
+]
+pyg-lib = [
+    { index = "pyg" },
+]
+
+[[tool.uv.index]]
+name = "torch"
+url = "https://download.pytorch.org/whl/cu121"
+explicit = true
+
+[[tool.uv.index]]
+name = "pyg"
+url = "https://data.pyg.org/whl/torch-2.4.0+cu121.html"
+format = "flat"
+explicit = true
+
+[tool.setuptools.packages.find]
+include = ["illia*"]
+exclude = ["tests*", "docs*", "*.egg-info*"]
+
+[tool.setuptools.dynamic]
+version = {attr = "illia.__version__"}
+
+[tool.black]
+line-length = 88
+exclude = '''
+/(
+  .venv
+)/
+'''
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = "E203, W503, N812, E402"
+exclude = [
+    ".venv/"
+]
+
+[tool.mypy]
+check_untyped_defs = true
+ignore_missing_imports = true
+exclude = [
+    "^(build|dist|venv)",
+    ".venv/"
+]
+cache_dir = "/dev/null"
+
+[tool.pylint]
+max-line-length = 88
+disable = [
+    "W0201,E1102,W0221,R0901,W0223,R0801,R0912,R0913,R0914,R0915,R0917",
+    "R1711,R1732,W1203,R0902,W0707,C0114,W0613"
+]
+
+[tool.pylint.MASTER]
+ignore-paths = [
+    ".venv/"
+]
+
+[tool.pylint.typecheck]
+generated-members=["numpy.*", "torch.*"]
+
+[tool.isort]
+profile = "black"
+known_first_party = ["explanare"]
+sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+import_heading_stdlib = "Standard libraries"
+import_heading_thirdparty = "3pps"
+import_heading_firstparty = "Own modules"
+line_length = 88

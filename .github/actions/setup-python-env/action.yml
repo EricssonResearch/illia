@@ -1,0 +1,37 @@
+name: Setup Python Environment and uv
+description: Setup Python, uv, and dependencies for the project
+
+inputs:
+  src-python-version:
+    description: "Python version to set up for the project"
+    required: true
+
+  dependencies:
+    description:
+      "Dependency group(s) to install (comma-separated, for use with pyproject.toml)"
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Install uv and set the Python version
+      uses: astral-sh/setup-uv@v5
+      with:
+        python-version: ${{ inputs.src-python-version }}
+
+    - name: Install dependencies with uv
+      id: install-deps
+      shell: bash
+      run: |
+        echo "Activating virtual environment and installing dependencies for group(s): ${{ inputs.dependencies }}"
+        source .venv/bin/activate
+        uv pip install -r pyproject.toml --group ${{ inputs.dependencies }} --all-extras
+
+    - name: Verify uv and environment
+      id: verify
+      shell: bash
+      run: |
+        echo "uv version:"
+        uv --version
+        echo "Virtual environments:"
+        uv venv list

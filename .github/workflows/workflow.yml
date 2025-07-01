@@ -1,0 +1,147 @@
+name: Illia Workflow
+
+on:
+  push:
+    branches: ["*"]
+  pull_request:
+    branches: [main, dev]
+
+env:
+  SRC_PROJECT_FOLDER: "illia"
+  SRC_PROJECT_TESTS_TF: "tests/tf"
+  SRC_PROJECT_TESTS_TORCH: "tests/torch"
+  SRC_PROJECT_TESTS_JAX: "tests/jax"
+  SRC_PYTHON_VERSION: "3.11"
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  setup-lint:
+    name: Setup and Lint Illia Code
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python environment and dependencies
+        uses: ./.github/actions/setup-python-env
+        with:
+          src-python-version: ${{ env.SRC_PYTHON_VERSION }}
+          dependencies: "pipeline"
+
+      - name: Check code format, syntax and quality
+        uses: ./.github/actions/lint-code
+        with:
+          src-project-folder: ${{ env.SRC_PROJECT_FOLDER }}
+
+      - name: Run Bandit Security Scan
+        uses: ./.github/actions/security
+        with:
+          src-project-folder: ${{ env.SRC_PROJECT_FOLDER }}
+          src-exclude: "tests/"
+
+  test-frameworks:
+    name: Test ${{ matrix.framework }} code
+    runs-on: ubuntu-latest
+    needs: setup-lint
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - framework: PyTorch
+            test-folder: tests/torch
+          - framework: TensorFlow
+            test-folder: tests/tf
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python environment and dependencies
+        uses: ./.github/actions/setup-python-env
+        with:
+          src-python-version: ${{ env.SRC_PYTHON_VERSION }}
+          dependencies: "pipeline"
+
+      - name: Test ${{ matrix.framework }} code
+        uses: ./.github/actions/test-code
+        with:
+          src-tests-folder: ${{ matrix.test-folder }}
+
+      - name: Run Nox (only on merge to main)
+        run: nox
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+  build-deploy-mkdocs:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    name: Build MkDocs Documentation
+    runs-on: ubuntu-latest
+    needs: test-frameworks
+
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python & Install Dependencies
+        uses: ./.github/actions/setup-python-env
+        with:
+          src-python-version: ${{ env.SRC_PYTHON_VERSION }}
+          dependencies: "documentation"
+
+      - name: Get Version
+        id: version
+        uses: ./.github/actions/obtain-version
+
+      - name: Build MkDocs Site with Mike
+        uses: ./.github/actions/build-mkdocs
+        with:
+          docs-version: ${{ steps.version.outputs.version }}
+
+  create-release:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    name: Create Release
+    runs-on: ubuntu-latest
+    needs: build-deploy-mkdocs
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python & Install Dependencies
+        uses: ./.github/actions/setup-python-env
+        with:
+          src-python-version: ${{ env.SRC_PYTHON_VERSION }}
+          dependencies: "pipeline"
+
+      - name: Get Version
+        id: version
+        uses: ./.github/actions/obtain-version
+
+      - name: Create Release
+        id: release
+        uses: ./.github/actions/create-release
+        with:
+          version: ${{ steps.version.outputs.version }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Release Summary
+        run: |
+          echo "# Release Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version:** ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Created:** ${{ steps.release.outputs.created }}" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,16 @@
+name: Test Illia Code
+
+inputs:
+  src-tests-folder:
+    description: "Directory where the project tests are located"
+    required: true
+    default: "tests"
+
+runs:
+  using: composite
+  steps:
+    - name: Pytest
+      run: |
+        echo "Running tests with Pytest..."
+        uv run pytest ${{ inputs.src-tests-folder }}/
+      shell: bash

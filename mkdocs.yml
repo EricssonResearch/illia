@@ -1,0 +1,119 @@
+site_name: illia
+site_description: Framework agnostic Bayesian Neural Network library
+repo_name: EricssonResearch/illia
+repo_url: https://github.com/EricssonResearch/illia
+copyright: © Telefonaktiebolaget LM Ericsson 1994-2025
+
+theme:
+  name: "material"
+  language: en
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: white
+      accent: white
+      toggle:
+        icon: material/weather-sunny
+        name: "Switch to dark mode"
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: white
+      accent: white
+      toggle:
+        icon: material/weather-night
+        name: "Switch to light mode"
+  features:
+    - content.tabs.link
+    - content.code.annotate
+    - content.code.copy
+    - content.tooltips
+    - announce.dismiss
+    - navigation.tabs
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.instant.preview
+    - navigation.instant.progress
+    - navigation.sections
+    - navigation.top
+    - navigation.tracking
+    - navigation.indexes
+    - search.suggest
+    - toc.follow
+    - toc.integrate
+  logo: assets/images/black_logo_illia.png
+  favicon: assets/images/white_logo_illia.png
+  icon:
+    repo: fontawesome/brands/github
+
+use_directory_urls: false
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - attr_list
+  - md_in_html
+  - abbr
+  - pymdownx.snippets
+  - pymdownx.arithmatex:
+      generic: true
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+
+plugins:
+  - search:
+      lang: en
+  - mkdocstrings:
+      enabled: !ENV [ENABLE_MKDOCSTRINGS, true]
+      default_handler: python
+      handlers:
+        python:
+          options:
+            summary: false
+            merge_init_into_class: true
+            docstring_style: google
+            show_root_heading: true
+            show_source: true
+            show_bases: false
+            show_root_full_path: false
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            modernize_annotations: true
+            show_submodules: false
+            filters: ["!get_config", "!build", "!^_[^_]"]
+            extra:
+              ignore_init_summary: true
+              show_special_methods: false
+  - git-revision-date-localized
+  - git-authors:
+      show_email_address: false
+  - enumerate-headings:
+      toc_depth: 0
+      exclude:
+        - index.md
+  - mkdocs-jupyter
+  - awesome-nav
+
+extra:
+  status:
+    new: Recently added
+    deprecated: Deprecated
+  social:
+    - icon: fontawesome/brands/linkedin
+      link: https://www.linkedin.com/company/ericsson/
+    - icon: fontawesome/brands/youtube
+      link: https://www.youtube.com/@ericsson
+    - icon: fontawesome/brands/x-twitter
+      link: https://x.com/ericsson
+  version:
+    provider: mike
+    default: latest
+
+extra_css:
+  - assets/css/custom.css

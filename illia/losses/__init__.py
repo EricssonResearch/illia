@@ -1,5 +1,5 @@
 """
-Backend-agnostic interface for probability distributions.
+Backend-agnostic interface for loss functions.
 """
 
 # Standard libraries
@@ -18,8 +18,8 @@ def __getattr__(name: str) -> None:
         name: Name of the class to be imported.
     """
 
-    # Obtain parameters for distributions
-    module_type: str = "distributions"
+    # Obtain parameters for losses
+    module_type: str = "losses"
     backend: str = BackendManager.get_backend()
     module_path: Union[Any, dict[str, Any]] = BackendManager.get_backend_module(
         backend, module_type

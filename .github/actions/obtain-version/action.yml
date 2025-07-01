@@ -1,0 +1,18 @@
+name: Obtain Version
+description: Get package version from version.py file
+
+outputs:
+  version:
+    description: "The version of the package with prefix"
+    value: ${{ steps.get_version.outputs.version }}
+
+runs:
+  using: composite
+  steps:
+    - name: Get Package Version
+      id: get_version
+      run: |
+        VERSION=$(uv run python -c "from src import version; print(version.__version__)")
+        echo "version=v$VERSION" >> $GITHUB_OUTPUT
+        echo "Version: v$VERSION"
+      shell: bash
