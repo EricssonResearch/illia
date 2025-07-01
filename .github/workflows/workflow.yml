@@ -72,8 +72,8 @@ jobs:
         with:
           src-tests-folder: ${{ matrix.test-folder }}
 
-      - name: Run Nox (only on merge to main)
-        run: nox
+      - name: Run Nox
+        run: uvx nox --default-venv-backend=uv --reuse-venv=yes
 
   build-deploy-mkdocs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
