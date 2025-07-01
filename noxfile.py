@@ -53,3 +53,52 @@ def tensorflow(session, tf):
     tf_version = f"tensorflow=={tf}"
     session.install("pytest", "pytest-order", tf_version)
     session.run("pytest", "tests/tf/")
+
+
+# Framework-specific sessions for GitHub Actions matrix
+@nox.session(python=PYTHON_VERSIONS, name="test-torch")
+def test_torch(session):
+    """Run all PyTorch tests across compatible versions."""
+    # Install dependencies
+    # session.install(*nox.project.dependency_groups(PYPROJECT, "pipeline"))
+    session.install("pytest", "pytest-order")
+    
+    # Test with latest compatible torch version for the Python version
+    py_version = session.python
+    latest_torch = None
+    
+    # Find the latest torch version compatible with current Python version
+    for torch_ver in sorted(TORCH_COMPAT.keys(), reverse=True):
+        if py_version in TORCH_COMPAT[torch_ver]:
+            latest_torch = torch_ver
+            break
+    
+    if latest_torch:
+        session.install(f"torch=={latest_torch}")
+        session.run("pytest", "tests/torch/")
+    else:
+        session.skip(f"No compatible PyTorch version found for Python {py_version}")
+
+
+@nox.session(python=PYTHON_VERSIONS, name="test-tf")
+def test_tf(session):
+    """Run all TensorFlow tests across compatible versions."""
+    # Install dependencies
+    # session.install(*nox.project.dependency_groups(PYPROJECT, "pipeline"))
+    session.install("pytest", "pytest-order")
+    
+    # Test with latest compatible tf version for the Python version
+    py_version = session.python
+    latest_tf = None
+    
+    # Find the latest tf version compatible with current Python version
+    for tf_ver in sorted(TF_COMPAT.keys(), reverse=True):
+        if py_version in TF_COMPAT[tf_ver]:
+            latest_tf = tf_ver
+            break
+    
+    if latest_tf:
+        session.install(f"tensorflow=={latest_tf}")
+        session.run("pytest", "tests/tf/")
+    else:
+        session.skip(f"No compatible TensorFlow version found for Python {py_version}")
