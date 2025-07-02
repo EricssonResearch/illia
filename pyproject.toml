@@ -155,7 +155,7 @@ generated-members=["numpy.*", "torch.*"]
 
 [tool.isort]
 profile = "black"
-known_first_party = ["explanare"]
+known_first_party = ["illia"]
 sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
 import_heading_stdlib = "Standard libraries"
 import_heading_thirdparty = "3pps"
