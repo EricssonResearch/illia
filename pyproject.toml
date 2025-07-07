@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "illia"
-dynamic = ["version"]
+version = "0.1.0"
 description = "Framework agnostic Bayesian Neural Network library"
 authors = [
     {name = "Oscar Llorente Gonzalez", email = "oscar.llorente.gonzalez@ericsson.com"},
@@ -33,6 +33,7 @@ classifiers = [
 
 [tool.uv]
 default-groups = "all"
+cache-keys = [{ file = "pyproject.toml" }, { git = { commit = true } }]
 
 [project.optional-dependencies]
 torch = [
@@ -55,7 +56,7 @@ pipeline = [
     "black[jupyter]",
     "complexipy>=2.1.1",
     "flake8>=7.2.0",
-    "Flake8-pyproject==1.2.3",
+    "Flake8-pyproject>=1.2.3",
     "isort>=6.0.1",
     "nox>=2025.5.1",
     "pylint>=3.3.5",
@@ -110,9 +111,6 @@ explicit = true
 [tool.setuptools.packages.find]
 include = ["illia*"]
 exclude = ["tests*", "docs*", "*.egg-info*"]
-
-[tool.setuptools.dynamic]
-version = {attr = "illia.__version__"}
 
 [tool.black]
 line-length = 88

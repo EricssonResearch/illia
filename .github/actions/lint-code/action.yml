@@ -36,7 +36,7 @@ runs:
     - name: Cognitive Complexity with complexipy
       run: |
         echo "Running complexipy..."
-        uv run complexipy ${{ inputs.src-project-folder }}/
+        uv run complexipy -d low ${{ inputs.src-project-folder }}/
       shell: bash
 
     - name: Check Mypy

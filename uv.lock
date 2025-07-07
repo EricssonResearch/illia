@@ -877,6 +877,7 @@ wheels = [
 
 [[package]]
 name = "illia"
+version = "0.1.0"
 source = { editable = "." }
 
 [package.optional-dependencies]
@@ -948,7 +949,7 @@ pipeline = [
     { name = "black", extras = ["jupyter"] },
     { name = "complexipy", specifier = ">=2.1.1" },
     { name = "flake8", specifier = ">=7.2.0" },
-    { name = "flake8-pyproject", specifier = "==1.2.3" },
+    { name = "flake8-pyproject", specifier = ">=1.2.3" },
     { name = "isort", specifier = ">=6.0.1" },
     { name = "mypy", specifier = ">=1.15.0" },
     { name = "nox", specifier = ">=2025.5.1" },
