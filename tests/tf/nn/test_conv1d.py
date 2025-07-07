@@ -95,12 +95,12 @@ class TestConv1d:
         inputs: tf.Tensor
         model, inputs, _ = conv1d_fixture
 
-        # # Skip gradient test if running on CPU
-        # if len(tf.config.list_physical_devices("GPU")) == 0:
-        #     pytest.skip(
-        #         "Skipping backward test because grouped convolution "
-        #         "gradients are not supported on CPU."
-        #     )
+        # Skip gradient test if running on CPU
+        if len(tf.config.list_physical_devices("GPU")) == 0:
+            pytest.skip(
+                "Skipping backward test because grouped convolution "
+                "gradients are not supported on CPU."
+            )
 
         # Check parameters length
         with tf.GradientTape() as tape:
