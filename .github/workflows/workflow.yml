@@ -23,16 +23,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Python environment and dependencies
+      - name: Setup Python & Install Dependencies
         uses: ./.github/actions/setup-python-env
         with:
           src-python-version: ${{ env.SRC_PYTHON_VERSION }}
           dependencies: "pipeline"
 
-      - name: Check code format, syntax and quality
+      - name: Check Code Format, Syntax and Quality
         uses: ./.github/actions/lint-code
         with:
           src-project-folder: ${{ env.SRC_PROJECT_FOLDER }}
@@ -58,10 +58,10 @@ jobs:
             nox-session: test-tf
 
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Python environment and dependencies
+      - name: Setup Python & Install Dependencies
         uses: ./.github/actions/setup-python-env
         with:
           src-python-version: ${{ env.SRC_PYTHON_VERSION }}

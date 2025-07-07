@@ -5,9 +5,6 @@ The versions included are more or less up-to-date with official release support.
     nor supported.
 """
 
-# Standard libraries
-import sys
-
 # 3pps
 import nox
 
@@ -28,22 +25,38 @@ TF_COMPAT = {
 
 @nox.session(python=PYTHON_VERSIONS)
 @nox.parametrize("torch", ["2.1.2", "2.2.2", "2.5.1"])
-def pytorch(session, torch):
+def pytorch(session: nox.Session, torch: str) -> None:
+    """
+    Test compatibility and execute tests for specified torch version.
+
+    Args:
+        session: The Nox session object.
+        torch: The version of PyTorch to be tested.
+    """
+
     # Ensure correct compatibility test
     py_version = session.python
     if py_version not in TORCH_COMPAT[torch]:
         session.skip(f"{torch=} is not compatible with {py_version=}")
 
     # Install dependencies and specific torch version
-    # session.install(*nox.project.dependency_groups(PYPROJECT, "pipeline"))
     torch_version = f"torch=={torch}"
     session.install("pytest", "pytest-order", torch_version)
     session.run("pytest", "tests/torch/")
 
+    return None
 
 @nox.session(python=PYTHON_VERSIONS)
 @nox.parametrize("tf", ["2.16.1", "2.19.0"])
-def tensorflow(session, tf):
+def tensorflow(session: nox.Session, tf: str) -> None:
+    """
+    Test compatibility and execute tests for specified TensorFlow version.
+
+    Args:
+        session: The Nox session object.
+        tf: The version of TensorFlow to be tested.
+    """
+
     # Ensure only correct matrix compatibility
     py_version = session.python
     if py_version not in TF_COMPAT[tf]:
@@ -54,13 +67,19 @@ def tensorflow(session, tf):
     session.install("pytest", "pytest-order", tf_version)
     session.run("pytest", "tests/tf/")
 
+    return None
 
 # Framework-specific sessions for GitHub Actions matrix
 @nox.session(python=PYTHON_VERSIONS, name="test-torch")
-def test_torch(session):
-    """Run all PyTorch tests across compatible versions."""
+def test_torch(session: nox.Session) -> None:
+    """
+    Run all PyTorch tests across compatible versions.
+
+    Args:
+        session: The Nox session object.
+    """
+
     # Install dependencies
-    # session.install(*nox.project.dependency_groups(PYPROJECT, "pipeline"))
     session.install("pytest", "pytest-order")
     
     # Test with latest compatible torch version for the Python version
@@ -81,10 +100,15 @@ def test_torch(session):
 
 
 @nox.session(python=PYTHON_VERSIONS, name="test-tf")
-def test_tf(session):
-    """Run all TensorFlow tests across compatible versions."""
+def test_tf(session: nox.Session) -> None:
+    """
+    Run all TensorFlow tests across compatible versions.
+
+    Args:
+        session: The Nox session object.
+    """
+    
     # Install dependencies
-    # session.install(*nox.project.dependency_groups(PYPROJECT, "pipeline"))
     session.install("pytest", "pytest-order")
     
     # Test with latest compatible tf version for the Python version

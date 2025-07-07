@@ -1,2 +1,6 @@
-# Source of Illia versioning
-__version__: str = "0.1.0"
+"""Source of Illia versioning"""
+
+# Standard libraries
+import importlib.metadata
+
+__version__: str = importlib.metadata.version("illia")
