@@ -31,6 +31,11 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3 :: Only",
 ]
+keywords = ["bayesian", "neural networks", "machine learning", "backend agnostic", "bnn"]
+
+[project.urls]
+Home = "https://github.com/EricssonResearch/illia"
+Repository = "https://github.com/EricssonResearch/illia"
 
 [tool.uv]
 default-groups = "all"

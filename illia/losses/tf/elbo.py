@@ -7,7 +7,7 @@ from typing import Any, Callable, Literal
 
 # 3pps
 import tensorflow as tf
-from keras import Model, losses, saving
+from keras import losses, saving
 
 # Own modules
 from illia.nn.tf.base import BayesianModule
@@ -60,17 +60,21 @@ class KLDivergenceLoss(losses.Loss):
         # Combine both configurations
         return {**base_config, **custom_config}
 
-    def __call__(self, model: Model) -> tf.Tensor:
+    def __call__(self, *args: Any, **kwargs: Any) -> tf.Tensor:
         """
-        Computes the KL divergence loss across all Bayesian layers in
-        the model.
+        Computes the ELBO loss, averaging over multiple samples.
 
         Args:
-            model: TensorFlow model containing Bayesian layers.
+            *args: Positional arguments, may be ignored.
+            **kwargs: Additional keyword arguments, including 'model'.
 
         Returns:
-            KL divergence cost scaled by the specified weight.
+            Average ELBO loss across samples.
         """
+
+        model = kwargs.get("model")
+        if model is None:
+            raise ValueError("Model must be provided as a keyword argument")
 
         kl_global_cost: tf.Tensor = tf.constant(0.0, dtype=tf.float32)
         num_params_global: int = 0
@@ -146,18 +150,25 @@ class ELBOLoss(losses.Loss):
         # Combine both configurations
         return {**base_config, **custom_config}
 
-    def __call__(self, y_true: tf.Tensor, y_pred: tf.Tensor, model: Model) -> tf.Tensor:
+    def __call__(
+        self, y_true: tf.Tensor, y_pred: tf.Tensor, *args: Any, **kwargs: Any
+    ) -> tf.Tensor:
         """
         Computes the ELBO loss, averaging over multiple samples.
 
         Args:
             y_true: True labels.
             y_pred: Predictions from the model.
-            model: TensorFlow model containing Bayesian layers.
+            *args: Positional arguments, may be ignored.
+            **kwargs: Additional keyword arguments, including 'model'.
 
         Returns:
             Average ELBO loss across samples.
         """
+
+        model = kwargs.get("model")
+        if model is None:
+            raise ValueError("Model must be provided as a keyword argument")
 
         loss_value: tf.Tensor = tf.constant(0.0, dtype=tf.float32)
 
