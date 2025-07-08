@@ -26,7 +26,8 @@ jobs:
         uses: ./.github/actions/setup-python-env
         with:
           src-python-version: ${{ env.SRC_PYTHON_VERSION }}
-          dependencies: "pipeline"
+          uv-group: "pipeline"
+          uv-extras: "--all-extras"
 
       - name: Check Code Format, Syntax and Quality
         uses: ./.github/actions/lint-code
@@ -50,8 +51,10 @@ jobs:
         include:
           - framework: PyTorch
             nox-session: test-torch
+            uv-extra: torch
           - framework: TensorFlow
             nox-session: test-tf
+            uv-extra: tensorflow
 
     steps:
       - name: Checkout Repository
@@ -61,7 +64,8 @@ jobs:
         uses: ./.github/actions/setup-python-env
         with:
           src-python-version: ${{ env.SRC_PYTHON_VERSION }}
-          dependencies: "pipeline"
+          uv-group: "pipeline"
+          uv-extra: ${{ matrix.uv-extra }}
 
       - name: Run Nox tests for ${{ matrix.framework }}
         run: uvx nox --session ${{ matrix.nox-session }} --reuse-existing-virtualenvs
@@ -87,7 +91,7 @@ jobs:
         uses: ./.github/actions/setup-python-env
         with:
           src-python-version: ${{ env.SRC_PYTHON_VERSION }}
-          dependencies: "documentation"
+          uv-group: "documentation"
 
       - name: Get Version
         id: version
@@ -119,7 +123,7 @@ jobs:
         uses: ./.github/actions/setup-python-env
         with:
           src-python-version: ${{ env.SRC_PYTHON_VERSION }}
-          dependencies: "pipeline"
+          uv-group: "pipeline"
 
       - name: Get Version
         id: version

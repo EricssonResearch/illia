@@ -6,10 +6,13 @@ inputs:
     description: "Python version to set up for the project"
     required: true
 
-  dependencies:
-    description:
-      "Dependency group(s) to install (comma-separated, for use with pyproject.toml)"
-    required: true
+  uv-group:
+    description: "Dependency group to install"
+    required: false
+
+  uv-extra:
+    description: "Dependency extra to install"
+    required: false
 
 runs:
   using: composite
@@ -23,9 +26,21 @@ runs:
       id: install-deps
       shell: bash
       run: |
-        echo "Activating virtual environment and installing dependencies for group(s): ${{ inputs.dependencies }}"
-        source .venv/bin/activate
-        uv sync --group ${{ inputs.dependencies }} --all-extras
+        if [ "${{ inputs.uv-extra }}" = "--all-extras" ]; then
+          echo "Installing all extras (default)..."
+          uv sync --all-extras
+        else
+          echo "Installing with group: ${{ inputs.uv-group }}, and extra: ${{ inputs.uv-extra }}..."
+          if [ -n "${{ inputs.uv-group }}" ] && [ -n "${{ inputs.uv-extra }}" ]; then
+            uv sync --group ${{ inputs.uv-group }} --extra ${{ inputs.uv-extra }}
+          elif [ -n "${{ inputs.uv-group }}" ]; then
+            uv sync --group ${{ inputs.uv-group }}
+          elif [ -n "${{ inputs.uv-extra }}" ]; then
+            uv sync --extra ${{ inputs.uv-extra }}
+          else
+            uv sync
+          fi
+        fi
 
     - name: Verify uv and environment
       id: verify
@@ -35,3 +50,5 @@ runs:
         uv --version
         echo "Virtual environments:"
         uv venv list
+        echo "Python version:"
+        uv run python --version
