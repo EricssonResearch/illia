@@ -13,10 +13,6 @@ env:
   SRC_PROJECT_TESTS_JAX: "tests/jax"
   SRC_PYTHON_VERSION: "3.11"
 
-concurrency:
-  group: "pages"
-  cancel-in-progress: true
-
 jobs:
   setup-lint:
     name: Setup and Lint Illia Code
@@ -30,7 +26,8 @@ jobs:
         uses: ./.github/actions/setup-python-env
         with:
           src-python-version: ${{ env.SRC_PYTHON_VERSION }}
-          dependencies: "pipeline"
+          uv-group: "pipeline"
+          uv-extra: "--all-extras"
 
       - name: Check Code Format, Syntax and Quality
         uses: ./.github/actions/lint-code
@@ -54,8 +51,10 @@ jobs:
         include:
           - framework: PyTorch
             nox-session: test-torch
+            uv-extra: torch
           - framework: TensorFlow
             nox-session: test-tf
+            uv-extra: tensorflow
 
     steps:
       - name: Checkout Repository
@@ -65,7 +64,7 @@ jobs:
         uses: ./.github/actions/setup-python-env
         with:
           src-python-version: ${{ env.SRC_PYTHON_VERSION }}
-          dependencies: "pipeline"
+          uv-extra: ${{ matrix.uv-extra }}
 
       - name: Run Nox tests for ${{ matrix.framework }}
         run: uvx nox --session ${{ matrix.nox-session }} --reuse-existing-virtualenvs
@@ -91,11 +90,13 @@ jobs:
         uses: ./.github/actions/setup-python-env
         with:
           src-python-version: ${{ env.SRC_PYTHON_VERSION }}
-          dependencies: "documentation"
+          uv-group: "documentation"
 
       - name: Get Version
         id: version
         uses: ./.github/actions/obtain-version
+        with:
+          src-project-folder: ${{ env.SRC_PROJECT_FOLDER }}
 
       - name: Build MkDocs Site with Mike
         uses: ./.github/actions/build-mkdocs
@@ -121,11 +122,13 @@ jobs:
         uses: ./.github/actions/setup-python-env
         with:
           src-python-version: ${{ env.SRC_PYTHON_VERSION }}
-          dependencies: "pipeline"
+          uv-group: "pipeline"
 
       - name: Get Version
         id: version
         uses: ./.github/actions/obtain-version
+        with:
+          src-project-folder: ${{ env.SRC_PROJECT_FOLDER }}
 
       - name: Create Release
         id: release

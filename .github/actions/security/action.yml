@@ -1,22 +1,23 @@
 name: Check Security Code
+description: Security Scan Python Code with Bandit
 
 inputs:
   src-project-folder:
-    description: "Directory where the project is located"
+    description: "Project Directory"
     required: true
     default: "src"
 
   src-exclude:
-    description: "Directory to exclude from security checks"
+    description: "Directory to Exclude from Security Checks"
     required: true
     default: "tests"
 
 runs:
   using: composite
   steps:
-    - name: Security scan with Bandit
+    - name: Security Scan with Bandit
       id: bandit
-      run: |
-        echo "Running Bandit..." 
-        uv run bandit -r ${{ inputs.src-project-folder }}/ --exclude ${{ inputs.src-exclude }}
       shell: bash
+      run: |
+        echo "Running Bandit Security Scanner..." 
+        uv run bandit -r "${{ inputs.src-project-folder }}/" --exclude "${{ inputs.src-exclude }}"

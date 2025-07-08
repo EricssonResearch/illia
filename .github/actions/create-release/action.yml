@@ -1,51 +1,52 @@
 name: Create Release
-description: Creates a GitHub release from provided version
+description: Creates a GitHub Release from Provided Version
 
 inputs:
   version:
-    description: "The version of the package"
+    description: "Package Version"
     required: true
   token:
-    description: "GitHub token for authentication"
+    description: "GitHub Token for Authentication"
     required: true
 
 outputs:
   version:
-    description: "The version that was released"
+    description: "The Version Released"
     value: ${{ inputs.version }}
   created:
-    description: "Whether a new release was created"
+    description: "New Release Created"
     value: ${{ steps.check_release.outputs.exists == 'false' }}
 
 runs:
   using: composite
   steps:
-    - name: Check if release exists
+    - name: Check Release
       id: check_release
+      shell: bash
       run: |
-        if gh release view ${{ inputs.version }} >/dev/null 2>&1; then
+        if gh release view "${{ inputs.version }}" >/dev/null 2>&1; then
           echo "exists=true" >> $GITHUB_OUTPUT
           echo "Release ${{ inputs.version }} already exists"
         else
           echo "exists=false" >> $GITHUB_OUTPUT
-          echo "Release ${{ inputs.version }} does not exist"
+          echo "Release ${{ inputs.version }} doesn't exist"
         fi
       env:
         GH_TOKEN: ${{ inputs.token }}
-      shell: bash
 
-    - name: Generate release notes
+    - name: Generate Release Notes
       if: steps.check_release.outputs.exists == 'false'
+      shell: bash
       run: |
         echo "Generating release notes..."
         LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
 
         if [ -z "$LAST_TAG" ]; then
-          echo "No previous tags found, using last 10 commits"
+          echo "No previous tags found, using last 10 commits..."
           COMMITS=$(git log --pretty=format:"- %s" --no-merges -10)
         else
           echo "Previous tag found: $LAST_TAG"
-          COMMITS=$(git log ${LAST_TAG}..HEAD --pretty=format:"- %s" --no-merges)
+          COMMITS=$(git log "${LAST_TAG}..HEAD" --pretty=format:"- %s" --no-merges)
         fi
 
         cat > release-notes.md << EOF
@@ -56,22 +57,21 @@ runs:
 
         echo "Release notes generated:"
         cat release-notes.md
-      shell: bash
 
-    - name: Create GitHub Release
+    - name: Create Release
       if: steps.check_release.outputs.exists == 'false'
+      shell: bash
       run: |
         echo "Creating release ${{ inputs.version }}..."
-        gh release create ${{ inputs.version }} \
+        gh release create "${{ inputs.version }}" \
           --title "${{ inputs.version }}" \
           --notes-file release-notes.md
         echo "Release ${{ inputs.version }} created successfully"
       env:
         GH_TOKEN: ${{ inputs.token }}
-      shell: bash
 
-    - name: Skip release creation
+    - name: Skip Release
       if: steps.check_release.outputs.exists == 'true'
+      shell: bash
       run: |
         echo "Skipping release creation - ${{ inputs.version }} already exists"
-      shell: bash

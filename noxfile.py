@@ -10,7 +10,7 @@ import nox
 
 nox.options.default_venv_backend = "uv"
 
-PYTHON_VERSIONS = ["3.10", "3.12"]
+PYTHON_VERSIONS = ["3.10", "3.11", "3.12"]
 TORCH_COMPAT = {
     "2.1.2": {"3.8", "3.9", "3.10", "3.11"},
     "2.2.2": {"3.8", "3.9", "3.10", "3.11", "3.12"},

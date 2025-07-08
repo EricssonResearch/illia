@@ -4,18 +4,26 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/EricssonResearch/illia/actions/workflows/workflow.yml"><img src="https://github.com/EricssonResearch/illia/actions/workflows/workflow.yml/badge.svg"></a>
-  <img src="https://img.shields.io/badge/python-3.10%20|%203.11%20|%203.12-blue">
-  <a href="https://github.com/EricssonResearch/illia/blob/main/LICENSE" target="_blank">
-      <img src="https://img.shields.io/github/license/EricssonResearch/illia" alt="License">
+  <a href="https://github.com/EricssonResearch/illia/actions/workflows/workflow.yml">
+    <img src="https://github.com/EricssonResearch/illia/actions/workflows/workflow.yml/badge.svg" alt="CI Status">
+  </a>
+  <img src="https://img.shields.io/badge/python-3.10%20|%203.11%20|%203.12-blue" alt="Python versions">
+  <a href="https://github.com/EricssonResearch/illia/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/EricssonResearch/illia" alt="License">
+  </a>
+  <a href="https://github.com/EricssonResearch/illia/releases/latest">
+    <img src="https://img.shields.io/github/release-date/EricssonResearch/illia?display_date=published_at" alt="Last Release">
+  </a>
+  <a href="https://github.com/EricssonResearch/illia/issues">
+    <img src="https://img.shields.io/github/issues/EricssonResearch/illia" alt="GitHub Issues">
   </a>
 </p>
 
-### ⚠️ **Warning**
-
-**Illia is under active development.** The library is evolving rapidly to ensure stable
-support across all frameworks and backends. Expect ongoing changes as we improve
-functionality and performance.
+> [!WARNING]
+>
+> **Illia is under active development.** The library is evolving rapidly to ensure stable
+> support across all frameworks and backends. Expect ongoing changes as we improve
+> functionality and performance.
 
 ## Introduction
 
@@ -47,8 +55,8 @@ using our streamlined `Makefile`:
    make
    ```
 
-   This command updates `pip`, installs `uv`, and sets up all project dependencies
-   automatically.
+   This command sets up all project dependencies automatically using
+   [uv](https://docs.astral.sh/uv/).
 
 ## License
 

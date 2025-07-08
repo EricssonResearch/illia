@@ -1,9 +1,15 @@
 name: Obtain Version
-description: Get package version from version.py file
+description: Get Package Version from version.py File
+
+inputs:
+  src-project-folder:
+    description: "Project Directory"
+    required: true
+    default: "src"
 
 outputs:
   version:
-    description: "The version of the package with prefix"
+    description: "Package Version"
     value: ${{ steps.get_version.outputs.version }}
 
 runs:
@@ -11,8 +17,8 @@ runs:
   steps:
     - name: Get Package Version
       id: get_version
-      run: |
-        VERSION=$(uv run python -c "from illia import version; print(version.__version__)")
-        echo "version=v$VERSION" >> $GITHUB_OUTPUT
-        echo "Version: v$VERSION"
       shell: bash
+      run: |
+        VERSION=$(uv run python -c "from ${{ inputs.src-project-folder }} import version; print(version.__version__)")
+        echo "version=v$VERSION" >> $GITHUB_OUTPUT
+        echo "Package Version: v$VERSION"

@@ -12,7 +12,6 @@ SRC_PROJECT_TESTS_JAX ?= tests/jax
 SRC_ALL ?= $(SRC_PROJECT_NAME)/ $(SRC_PROJECT_TESTS_TF)/ \
                 $(SRC_PROJECT_TESTS_TORCH)/ $(SRC_PROJECT_TESTS_JAX)/
 
-
 # Allows the installation of project dependencies
 install:
 	@echo "Installing dependencies..."
