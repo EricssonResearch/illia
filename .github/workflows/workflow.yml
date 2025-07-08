@@ -13,10 +13,6 @@ env:
   SRC_PROJECT_TESTS_JAX: "tests/jax"
   SRC_PYTHON_VERSION: "3.11"
 
-concurrency:
-  group: "pages"
-  cancel-in-progress: true
-
 jobs:
   setup-lint:
     name: Setup and Lint Illia Code

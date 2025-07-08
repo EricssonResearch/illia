@@ -11,11 +11,11 @@
   </a>
 </p>
 
-### ⚠️ **Warning**
-
-**Illia is under active development.** The library is evolving rapidly to ensure stable
-support across all frameworks and backends. Expect ongoing changes as we improve
-functionality and performance.
+> [!WARNING]
+>
+> **Illia is under active development.** The library is evolving rapidly to ensure stable
+> support across all frameworks and backends. Expect ongoing changes as we improve
+> functionality and performance.
 
 ## Introduction
 
@@ -47,8 +47,8 @@ using our streamlined `Makefile`:
    make
    ```
 
-   This command updates `pip`, installs `uv`, and sets up all project dependencies
-   automatically.
+   This command sets up all project dependencies
+   automatically using [uv](https://docs.astral.sh/uv/).
 
 ## License
 

@@ -10,12 +10,13 @@ authors = [
     {name = "Oscar Llorente Gonzalez", email = "oscar.llorente.gonzalez@ericsson.com"},
 ]
 maintainers = [
+    {name = "Anubhab Samal", email = "anubhab.samal@ericsson.com"},
     {name = "Daniel Bazo Correa", email = "daniel.bazo.correa@ericsson.com"},
     {name = "Lucia Ferrer", email = "lucia.ferrer@ericsson.com"},
 ]
 license = {file = "LICENSE"}
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.10"
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
     "Intended Audience :: Developers",
