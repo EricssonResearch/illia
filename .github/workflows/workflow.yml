@@ -96,6 +96,8 @@ jobs:
       - name: Get Version
         id: version
         uses: ./.github/actions/obtain-version
+        with:
+          src-project-folder: ${{ env.SRC_PROJECT_FOLDER }}
 
       - name: Build MkDocs Site with Mike
         uses: ./.github/actions/build-mkdocs
@@ -126,6 +128,8 @@ jobs:
       - name: Get Version
         id: version
         uses: ./.github/actions/obtain-version
+        with:
+          src-project-folder: ${{ env.SRC_PROJECT_FOLDER }}
 
       - name: Create Release
         id: release

@@ -1,23 +1,27 @@
 name: Build MkDocs Artifacts
-description: Build MkDocs and versioning with Mike
+description: Build MkDocs and Versioning with Mike
 
 inputs:
   docs-version:
-    description: "Version docs"
+    description: "Docs Version"
     required: true
 
 runs:
   using: composite
   steps:
     - name: Configure Git
+      shell: bash
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-      shell: bash
 
-    - name: Setup gh-pages branch
+    - name: Setup gh-pages Branch
+      shell: bash
       run: |
-        # Check if gh-pages branch exists remotely
+        # Store current branch
+        CURRENT_BRANCH=$(git branch --show-current)
+
+        # Check if gh-pages branch exists
         if git ls-remote --heads origin gh-pages | grep -q gh-pages; then
           echo "gh-pages branch exists, fetching..."
           git fetch origin gh-pages:gh-pages
@@ -27,18 +31,17 @@ runs:
           git reset --hard
           git commit --allow-empty -m "Initial gh-pages commit"
           git push origin gh-pages
-          git checkout $CURRENT_BRANCH
+          git checkout "$CURRENT_BRANCH"
         fi
-      shell: bash
 
-    - name: Build and deploy docs with Mike
-      run: |
-        echo "Deploying docs version: ${{ inputs.docs-version }}"
-        uv run mike deploy --push --update-aliases ${{ inputs.docs-version }} latest
+    - name: Build and Deploy Docs with Mike
       shell: bash
-
-    - name: Set default version
       run: |
-        echo "Setting latest as default version"
+        echo "Deploying Docs Version: ${{ inputs.docs-version }}"
+        uv run mike deploy --push --update-aliases "${{ inputs.docs-version }}" latest
+
+    - name: Set Default Version
+      shell: bash
+      run: |
+        echo "Setting 'Latest' as Default Version"
         uv run mike set-default --push latest
-      shell: bash
