@@ -27,7 +27,7 @@ jobs:
         with:
           src-python-version: ${{ env.SRC_PYTHON_VERSION }}
           uv-group: "pipeline"
-          uv-extras: "--all-extras"
+          uv-extra: "--all-extras"
 
       - name: Check Code Format, Syntax and Quality
         uses: ./.github/actions/lint-code
