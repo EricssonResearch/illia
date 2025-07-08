@@ -633,11 +633,7 @@ function, sample count, and KL weight.</p>
 </table>
 <details class="quote">
 <summary>Source code in <code>illia/losses/tf/elbo.py</code></summary>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">101</span>
-<span class="normal">102</span>
-<span class="normal">103</span>
-<span class="normal">104</span>
-<span class="normal">105</span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">105</span>
 <span class="normal">106</span>
 <span class="normal">107</span>
 <span class="normal">108</span>
@@ -658,7 +654,11 @@ function, sample count, and KL weight.</p>
 <span class="normal">123</span>
 <span class="normal">124</span>
 <span class="normal">125</span>
-<span class="normal">126</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">loss_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span>
     <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
@@ -689,7 +689,7 @@ function, sample count, and KL weight.</p>
 <div class="doc doc-children">
 <div class="doc doc-object doc-function">
 <h4 class="doc doc-heading" id="illia.losses.tf.elbo.ELBOLoss.__call__"><span class="enumerate-headings-plugin enumerate-heading-plugin">7.1.1.1</span> 
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code> <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code> <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 </h4>
 <div class="doc doc-contents">
 <p>Computes the ELBO loss, averaging over multiple samples.</p>
@@ -738,18 +738,34 @@ function, sample count, and KL weight.</p>
 </tr>
 <tr class="doc-section-item">
 <td>
-<code>model</code>
+<code>*args</code>
 </td>
 <td>
-<code><span title="keras.Model">Model</span></code>
+<code><span title="typing.Any">Any</span></code>
 </td>
 <td>
 <div class="doc-md-description">
-<p>TensorFlow model containing Bayesian layers.</p>
+<p>Positional arguments, may be ignored.</p>
 </div>
 </td>
 <td>
-<em>required</em>
+<code>()</code>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>**kwargs</code>
+</td>
+<td>
+<code><span title="typing.Any">Any</span></code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Additional keyword arguments, including 'model'.</p>
+</div>
+</td>
+<td>
+<code>{}</code>
 </td>
 </tr>
 </tbody>
@@ -777,11 +793,7 @@ function, sample count, and KL weight.</p>
 </table>
 <details class="quote">
 <summary>Source code in <code>illia/losses/tf/elbo.py</code></summary>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">149</span>
-<span class="normal">150</span>
-<span class="normal">151</span>
-<span class="normal">152</span>
-<span class="normal">153</span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">153</span>
 <span class="normal">154</span>
 <span class="normal">155</span>
 <span class="normal">156</span>
@@ -799,18 +811,36 @@ function, sample count, and KL weight.</p>
 <span class="normal">168</span>
 <span class="normal">169</span>
 <span class="normal">170</span>
-<span class="normal">171</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_true</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">Model</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span> <span class="n">y_true</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Computes the ELBO loss, averaging over multiple samples.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        y_true: True labels.</span>
 <span class="sd">        y_pred: Predictions from the model.</span>
-<span class="sd">        model: TensorFlow model containing Bayesian layers.</span>
+<span class="sd">        *args: Positional arguments, may be ignored.</span>
+<span class="sd">        **kwargs: Additional keyword arguments, including 'model'.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Average ELBO loss across samples.</span>
 <span class="sd">    """</span>
+
+    <span class="n">model</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"model"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Model must be provided as a keyword argument"</span><span class="p">)</span>
 
     <span class="n">loss_value</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 
@@ -951,11 +981,10 @@ is supported.</p>
 <div class="doc doc-children">
 <div class="doc doc-object doc-function">
 <h4 class="doc doc-heading" id="illia.losses.tf.elbo.KLDivergenceLoss.__call__"><span class="enumerate-headings-plugin enumerate-heading-plugin">7.1.2.1</span> 
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code> <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">model</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code> <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 </h4>
 <div class="doc doc-contents">
-<p>Computes the KL divergence loss across all Bayesian layers in
-the model.</p>
+<p>Computes the ELBO loss, averaging over multiple samples.</p>
 <p><span class="doc-section-title">Parameters:</span></p>
 <table>
 <thead>
@@ -969,18 +998,34 @@ the model.</p>
 <tbody>
 <tr class="doc-section-item">
 <td>
-<code>model</code>
+<code>*args</code>
 </td>
 <td>
-<code><span title="keras.Model">Model</span></code>
+<code><span title="typing.Any">Any</span></code>
 </td>
 <td>
 <div class="doc-md-description">
-<p>TensorFlow model containing Bayesian layers.</p>
+<p>Positional arguments, may be ignored.</p>
 </div>
 </td>
 <td>
-<em>required</em>
+<code>()</code>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>**kwargs</code>
+</td>
+<td>
+<code><span title="typing.Any">Any</span></code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Additional keyword arguments, including 'model'.</p>
+</div>
+</td>
+<td>
+<code>{}</code>
 </td>
 </tr>
 </tbody>
@@ -1000,7 +1045,7 @@ the model.</p>
 </td>
 <td>
 <div class="doc-md-description">
-<p>KL divergence cost scaled by the specified weight.</p>
+<p>Average ELBO loss across samples.</p>
 </div>
 </td>
 </tr>
@@ -1036,17 +1081,25 @@ the model.</p>
 <span class="normal">88</span>
 <span class="normal">89</span>
 <span class="normal">90</span>
-<span class="normal">91</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">Model</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="normal">91</span>
+<span class="normal">92</span>
+<span class="normal">93</span>
+<span class="normal">94</span>
+<span class="normal">95</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Computes the KL divergence loss across all Bayesian layers in</span>
-<span class="sd">    the model.</span>
+<span class="sd">    Computes the ELBO loss, averaging over multiple samples.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        model: TensorFlow model containing Bayesian layers.</span>
+<span class="sd">        *args: Positional arguments, may be ignored.</span>
+<span class="sd">        **kwargs: Additional keyword arguments, including 'model'.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        KL divergence cost scaled by the specified weight.</span>
+<span class="sd">        Average ELBO loss across samples.</span>
 <span class="sd">    """</span>
+
+    <span class="n">model</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"model"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Model must be provided as a keyword argument"</span><span class="p">)</span>
 
     <span class="n">kl_global_cost</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
     <span class="n">num_params_global</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
