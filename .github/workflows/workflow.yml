@@ -64,7 +64,6 @@ jobs:
         uses: ./.github/actions/setup-python-env
         with:
           src-python-version: ${{ env.SRC_PYTHON_VERSION }}
-          uv-group: "pipeline"
           uv-extra: ${{ matrix.uv-extra }}
 
       - name: Run Nox tests for ${{ matrix.framework }}
