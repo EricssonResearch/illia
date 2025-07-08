@@ -26,8 +26,8 @@ runs:
       id: install-deps
       shell: bash
       run: |
-        if [ "${{ inputs.uv-extra }}" = "--all-extras" ]; then
-          echo "Installing all extras (default)..."
+        if [ -z "${{ inputs.uv-group }}" ] && [ -z "${{ inputs.uv-extra }}" ]; then
+          echo "Installing all extras (default when no group or extra specified)..."
           uv sync --all-extras
         else
           echo "Installing with group: ${{ inputs.uv-group }}, and extra: ${{ inputs.uv-extra }}..."
