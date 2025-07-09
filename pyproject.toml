@@ -34,7 +34,7 @@ classifiers = [
 keywords = ["bayesian", "neural networks", "machine learning", "backend agnostic", "bnn"]
 
 [project.urls]
-Home = "https://github.com/EricssonResearch/illia"
+Home = "https://ericssonresearch.github.io/illia/latest/"
 Repository = "https://github.com/EricssonResearch/illia"
 
 [tool.uv]
