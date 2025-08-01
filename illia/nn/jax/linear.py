@@ -28,7 +28,6 @@ class Linear(BayesianModule):
         output_size: int,
         weights_distribution: Optional[GaussianDistribution] = None,
         bias_distribution: Optional[GaussianDistribution] = None,
-        *,
         use_bias: bool = True,
         precision: PrecisionLike = None,
         dot_general: DotGeneralT = lax.dot_general,
@@ -52,7 +51,7 @@ class Linear(BayesianModule):
 
         # Set attributes
         self.backend_params: dict[str, Any] = {
-            "use_bias": True,
+            "use_bias": use_bias,
             "precision": precision,
             "dot_general": dot_general,
         }

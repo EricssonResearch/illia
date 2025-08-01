@@ -6,6 +6,7 @@ This module contains the code to test the bayesian Linear layer.
 import os
 import tempfile
 
+
 # Change Illia Backend
 os.environ["ILLIA_BACKEND"] = "tf"
 

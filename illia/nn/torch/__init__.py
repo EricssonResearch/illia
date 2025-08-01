@@ -9,6 +9,7 @@ from illia.nn.torch.conv2d import Conv2D
 from illia.nn.torch.embedding import Embedding
 from illia.nn.torch.linear import Linear
 
+
 # Define all names to be imported
 __all__: list[str] = [
     "BayesianModule",

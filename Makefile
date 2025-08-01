@@ -15,7 +15,7 @@ SRC_ALL ?= $(SRC_PROJECT_NAME)/ $(SRC_PROJECT_TESTS_TF)/ \
 # Allows the installation of project dependencies
 install:
 	@echo "Installing dependencies..."
-	@uv pip install -r pyproject.toml --all-extras
+	@uv sync --all-extras
 	@echo "✅ Dependencies installed."
 
 # Clean cache and temporary files

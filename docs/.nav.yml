@@ -2,7 +2,9 @@ nav:
   - Home: index.md
   - Frameworks: frameworks/
   - Examples: examples/
-  - Reference: reference/
+  - Reference:
+      - Bayesian Neural Networks: reference/bayesian_neural_networks.md
+      - Bibliography: reference/bibliography.md
 
 sort:
   ignore_case: true

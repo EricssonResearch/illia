@@ -6,6 +6,7 @@ This module contains the tests for GaussianDistribution.
 import copy
 import os
 
+
 # Change Illia Backend
 os.environ["ILLIA_BACKEND"] = "jax"
 
