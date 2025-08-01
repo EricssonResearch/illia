@@ -55,6 +55,9 @@ jobs:
           - framework: TensorFlow
             nox-session: test-tf
             uv-extra: tensorflow
+          - framework: Jax
+            nox-session: test-jax
+            uv-extra: jax
 
     steps:
       - name: Checkout Repository

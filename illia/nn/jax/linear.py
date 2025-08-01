@@ -102,7 +102,9 @@ class Linear(BayesianModule):
             precision=self.precision,  # type: ignore
         )
         if self.backend_params["use_bias"]:
-            outputs += jnp.reshape(self.bias, (1,) * (outputs.ndim - 1) + (-1,))
+            outputs += jnp.reshape(
+                jnp.asarray(self.bias), (1,) * (outputs.ndim - 1) + (-1,)
+            )
 
         return outputs
 

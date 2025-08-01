@@ -50,12 +50,8 @@ class GaussianDistribution(DistributionModule):
         self.std_prior = std_prior
 
         # Define initial mu and rho
-        self.mu = nnx.Param(
-            mu_init + rho_init * jax.random.normal(rngs.params(), shape)
-        )
-        self.rho = nnx.Param(
-            mu_init + rho_init * jax.random.normal(rngs.params(), shape)
-        )
+        self.mu = nnx.Param(mu_init + 0.1 * jax.random.normal(rngs.params(), shape))
+        self.rho = nnx.Param(rho_init + 0.1 * jax.random.normal(rngs.params(), shape))
 
     def sample(self, rngs: Rngs = nnx.Rngs(0)) -> jax.Array:
         """
@@ -70,7 +66,7 @@ class GaussianDistribution(DistributionModule):
 
         # Compute epsilon and sigma
         eps: jax.Array = jax.random.normal(rngs.params(), self.rho.shape)
-        sigma: jax.Array = jnp.log1p(jnp.exp(self.rho))  # type: ignore
+        sigma: jax.Array = jnp.log1p(jnp.exp(jnp.asarray(self.rho)))
 
         return self.mu + sigma * eps
 

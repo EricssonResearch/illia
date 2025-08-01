@@ -126,3 +126,20 @@ def test_tf(session: nox.Session) -> None:
         session.run("pytest", "tests/tf/")
     else:
         session.skip(f"No compatible TensorFlow version found for Python {py_version}")
+
+@nox.session(python=PYTHON_VERSIONS, name="test-jax", tags=["test-jax-backend"])
+def test_jax(session: nox.Session) -> None:
+    """
+    Test compatibility and execute tests for specified jax version.
+
+    Args:
+        session: The Nox session object.
+    """
+
+    # Install dependencies with tensorflow extras
+    session.run("uv", "sync", "--extra", "jax", "--active")
+
+    # Run pytest
+    session.run("pytest", "tests/jax/", external=True)
+
+    return None

@@ -48,7 +48,8 @@ code_check:
 tests:
 	@echo "Runing test per each backend..."
 	@uv run pytest $(SRC_PROJECT_TESTS_TF)/ && \
-	uv run pytest $(SRC_PROJECT_TESTS_TORCH)/ 
+	uv run pytest $(SRC_PROJECT_TESTS_TORCH)/ && \
+	uv run pytest $(SRC_PROJECT_TESTS_JAX)/
 	@echo "✅ Tests complete."
 
 # Serve documentation locally

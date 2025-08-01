@@ -45,7 +45,12 @@ BACKEND_CAPABILITIES: dict[str, dict[str, set[str]]] = {
         },
     },
     "jax": {
-        "nn": {"BayesianModule", "Linear"},
+        "nn": {
+            "BayesianModule",
+            "Conv1D",
+            "Conv2D",
+            "Linear",
+        },
         "distributions": {"DistributionModule", "GaussianDistribution"},
     },
     "pyg": {"nn": {"CGConv"}},
