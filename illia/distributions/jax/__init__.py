@@ -1,5 +1,5 @@
 """
-This module defines the imports for distribution functions in JAX.
+This module defines the imports for distribution functions in Jax.
 """
 
 # Own modules

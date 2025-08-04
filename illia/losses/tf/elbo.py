@@ -39,7 +39,7 @@ class KLDivergenceLoss(losses.Loss):
         # Call super class constructor
         super().__init__(**kwargs)
 
-        # Set parameters
+        # Set attributes
         self.reduction = reduction
         self.weight = weight
 

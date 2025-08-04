@@ -38,10 +38,9 @@ class Conv2D(BayesianModule):
             kernel_size: Size of the convolving kernel.
             stride: Stride of the convolution. Deafults to 1.
             padding: Padding added to all four sides of the input.
-                Defaults to 0.
             dilation: Spacing between kernel elements.
             groups: Number of blocked connections from input channels
-                to output channels. Defaults to 1.
+                to output channels.
             weights_distribution: The distribution for the weights.
             bias_distribution: The distribution for the bias.
         """

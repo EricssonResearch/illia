@@ -33,7 +33,7 @@ class KLDivergenceLoss(torch.nn.Module):
         # call super class constructor
         super().__init__()
 
-        # Set parameters
+        # Set attributes
         self.reduction = reduction
         self.weight = weight
 
@@ -99,6 +99,7 @@ class ELBOLoss(torch.nn.Module):
         # Call super class constructor
         super().__init__()
 
+        # Set attributes
         self.loss_function = loss_function
         self.num_samples = num_samples
         self.kl_weight = kl_weight

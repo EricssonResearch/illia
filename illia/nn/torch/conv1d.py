@@ -32,7 +32,7 @@ class Conv1D(BayesianModule):
         bias_distribution: Optional[GaussianDistribution] = None,
     ) -> None:
         """
-        Definition of a Bayesian Convolution 2D layer.
+        Definition of a Bayesian Convolution 1D layer.
 
         Args:
             input_channels: Number of channels in the input image.

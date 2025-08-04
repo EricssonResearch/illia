@@ -3,7 +3,7 @@ This module contains the code for the bayesian Conv1D.
 """
 
 # Standard libraries
-from typing import Any, Optional
+from typing import Optional
 
 # 3pps
 import jax
@@ -35,14 +35,25 @@ class Conv1D(BayesianModule):
         use_bias: bool = True,
         rngs: Rngs = nnx.Rngs(0),
     ) -> None:
+        """
+        Definition of a Bayesian Convolution 1D layer.
+
+        Args:
+            input_channels: Number of input feature channels.
+            output_channels: Number of output feature channels.
+            kernel_size: Size of the convolutional kernel.
+            stride: Stride of the convolution operation.
+            padding: Amount of zero-padding added to both sides.
+            dilation: Spacing between kernel elements.
+            groups: Number of blocked connections between input and output.
+            weights_distribution: Distribution to initialize weights.
+            bias_distribution: Distribution to initialize bias.
+            use_bias: Whether to include a bias term.
+            rngs: Random number generators for reproducibility.
+        """
 
         # Call super class constructor
         super().__init__()
-
-        # Set attributes
-        self.backend_params: dict[str, Any] = {
-            "use_bias": use_bias,
-        }
 
         # Set attributes
         self.input_channels = input_channels
@@ -52,6 +63,7 @@ class Conv1D(BayesianModule):
         self.padding = padding
         self.dilation = dilation
         self.groups = groups
+        self.use_bias = use_bias
         self.rngs = rngs
 
         # Set weights prior
@@ -68,19 +80,25 @@ class Conv1D(BayesianModule):
             self.weights_distribution = weights_distribution
 
         # Set bias prior
-        if bias_distribution is None:
-            self.bias_distribution: GaussianDistribution = GaussianDistribution(
-                shape=(self.output_channels,),
-                rngs=self.rngs,
-            )
+        if self.use_bias:
+            if bias_distribution is None:
+                self.bias_distribution: GaussianDistribution = GaussianDistribution(
+                    shape=(self.output_channels,),
+                    rngs=self.rngs,
+                )
+            else:
+                self.bias_distribution = bias_distribution
         else:
-            self.bias_distribution = bias_distribution
+            self.bias_distribution = None  # type: ignore
 
         # Sample initial weights
         self.weights = nnx.Param(self.weights_distribution.sample(self.rngs))
-        self.bias = nnx.Param(
-            self.bias_distribution.sample(self.rngs) if use_bias else None
-        )
+
+        # Sample initial bias only if using bias
+        if self.use_bias:
+            self.bias = nnx.Param(self.bias_distribution.sample(self.rngs))
+        else:
+            self.bias = None  # type: ignore
 
     def freeze(self) -> None:
         """
@@ -93,15 +111,16 @@ class Conv1D(BayesianModule):
 
         # Sample weights if they are undefined
         if self.weights is None:  # type: ignore
-            self.weights = self.weights_distribution.sample(self.rngs)
+            self.weights = nnx.Param(self.weights_distribution.sample(self.rngs))
 
-        # Sample bias is they are undefined
-        if self.bias is None and self.backend_params["use_bias"]:
-            self.bias = self.bias_distribution.sample(self.rngs)
+        # Sample bias if they are undefined and bias is used
+        if self.use_bias and self.bias is None:
+            self.bias = nnx.Param(self.bias_distribution.sample(self.rngs))
 
         # Stop gradient computation (more similar to detach) weights and bias
         self.weights = jax.lax.stop_gradient(self.weights)
-        self.bias = jax.lax.stop_gradient(self.bias)
+        if self.use_bias and self.bias is not None:
+            self.bias = jax.lax.stop_gradient(self.bias)
 
     def kl_cost(self) -> tuple[jax.Array, int]:
         """
@@ -113,30 +132,45 @@ class Conv1D(BayesianModule):
             parameters.
         """
 
-        # Compute log probs
+        # Compute log probs for weights
         log_probs: jax.Array = self.weights_distribution.log_prob(
             jnp.asarray(self.weights)
-        ) + self.bias_distribution.log_prob(jnp.asarray(self.bias))
+        )
+
+        # Add bias log probs only if using bias
+        if self.use_bias and self.bias is not None:
+            log_probs += self.bias_distribution.log_prob(jnp.asarray(self.bias))
 
         # Compute number of parameters
-        num_params: int = (
-            self.weights_distribution.num_params + self.bias_distribution.num_params
-        )
+        num_params: int = self.weights_distribution.num_params
+        if self.use_bias:
+            num_params += self.bias_distribution.num_params
 
         return log_probs, num_params
 
     def __call__(self, inputs: jax.Array) -> jax.Array:
+        """
+        Applies the convolution operation to the inputs using current weights
+        and bias. If the model is not frozen, samples new weights and bias
+        before computation.
+
+        Args:
+            inputs: Input array to be convolved.
+
+        Returns:
+            Output array after applying convolution and bias.
+        """
 
         # Sample if model not frozen
         if not self.frozen:
             # Sample weights
             self.weights = nnx.Param(self.weights_distribution.sample(self.rngs))
 
-            # Sample bias
-            if self.backend_params["use_bias"]:
+            # Sample bias only if using bias
+            if self.use_bias:
                 self.bias = nnx.Param(self.bias_distribution.sample(self.rngs))
 
-        # Compute ouputs
+        # Compute outputs
         outputs = jax.lax.conv_general_dilated(
             lhs=inputs,
             rhs=jnp.asarray(self.weights),
@@ -152,7 +186,8 @@ class Conv1D(BayesianModule):
             feature_group_count=self.groups,
         )
 
-        if self.backend_params["use_bias"] and self.bias is not None:
+        # Add bias only if using bias
+        if self.use_bias and self.bias is not None:
             outputs += jnp.reshape(
                 a=jnp.asarray(self.bias), shape=(1, self.output_channels, 1)
             )
