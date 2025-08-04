@@ -164,6 +164,7 @@ class Conv2D(BayesianModule):
                 self.bias = self.bias_distribution.sample()
 
         # Execute torch forward
+        # pylint: disable=E1102
         return F.conv2d(
             input=inputs,
             weight=self.weights,

@@ -133,7 +133,8 @@ class CGConv(MessagePassing):
         else:
             z = torch.cat([x_i, x_j, edge_attr], dim=-1)
 
-        return self.lin_f(z).sigmoid() * F.softplus(self.lin_s(z))
+        # pylint: disable=E1102
+        return self.lin_f(z).sigmoid() * F.softplus(input=self.lin_s(z))
 
     def __repr__(self) -> str:
         """

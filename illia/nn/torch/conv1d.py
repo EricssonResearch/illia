@@ -152,4 +152,5 @@ class Conv1D(BayesianModule):
             raise ValueError("Module has been frozen with undefined weights")
 
         # Execute torch forward
+        # pylint: disable=E1102
         return F.conv1d(inputs, self.weights, self.bias, *self.conv_params)

@@ -130,7 +130,8 @@ class Linear(BayesianModule):
         elif self.weights is None or self.bias is None:
             raise ValueError("Module has been frozen with undefined weights")
 
-        # compute outputs
+        # Compute outputs
+        # pylint: disable=E1102
         outputs: torch.Tensor = F.linear(inputs, self.weights, self.bias)
 
         return outputs
