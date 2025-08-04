@@ -19,6 +19,8 @@ class Embedding(BayesianModule):
     This class is the bayesian implementation of the Embedding class.
     """
 
+    weights: torch.Tensor
+
     def __init__(
         self,
         num_embeddings: int,
@@ -88,7 +90,7 @@ class Embedding(BayesianModule):
         self.frozen = True
 
         # sample weights if they are undefined
-        if self.weights is None:  # type: ignore
+        if self.weights is None:
             self.weights = self.weights_distribution.sample()
 
         # detach weights
@@ -135,7 +137,7 @@ class Embedding(BayesianModule):
 
         # Run torch forward
         outputs: torch.Tensor = F.embedding(
-            inputs, self.weights, *self.embedding_params  # type: ignore
+            inputs, self.weights, *self.embedding_params
         )
 
         return outputs

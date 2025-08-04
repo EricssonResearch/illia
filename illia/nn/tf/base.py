@@ -1,5 +1,7 @@
 """
 This module contains the code for the BayesianModule.
+
+Defines an abstract base class for Bayesian layers using Keras's layers.
 """
 
 # Standard libraries
@@ -13,17 +15,18 @@ from keras import layers, saving
 @saving.register_keras_serializable(package="BayesianModule", name="BayesianModule")
 class BayesianModule(layers.Layer, ABC):
     """
-    This class serves as the base class for Bayesian modules.
-    Any module designed to function as a Bayesian layer should inherit
-    from this class.
+    Abstract base class for Bayesian layers in Keras.
+
+    Any custom Bayesian layer should inherit from this class and
+    implement the `kl_cost()` method.
     """
 
     def __init__(self, **kwargs) -> None:
         """
-        This method is the constructor for BayesianModule.
+        Initializes the BayesianModule.
 
         Args:
-            **kwargs: Additional keyword arguments.
+            **kwargs: Additional keyword arguments for the Layer base class.
         """
 
         # Call super class constructor
@@ -37,8 +40,8 @@ class BayesianModule(layers.Layer, ABC):
 
     def freeze(self) -> None:
         """
-        Freezes the current module and all submodules that are instances
-        of BayesianModule. Sets the frozen state to True.
+        Freezes the current module by setting its `frozen` flag to True.
+        This flag can be used in derived classes to disable updates.
         """
 
         # Set frozen indicator to true for current layer
@@ -46,8 +49,7 @@ class BayesianModule(layers.Layer, ABC):
 
     def unfreeze(self) -> None:
         """
-        Unfreezes the current module and all submodules that are
-        instances of BayesianModule. Sets the frozen state to False.
+        Unfreezes the current module by setting its `frozen` flag to False.
         """
 
         # Set frozen indicator to false for current layer
@@ -55,12 +57,13 @@ class BayesianModule(layers.Layer, ABC):
 
     def kl_cost(self) -> tuple[tf.Tensor, int]:
         """
-        Computes the Kullback-Leibler (KL) divergence cost for the
-        layer's weights and bias.
+        Computes the KL divergence between posterior and prior distributions
+        for the module's learnable parameters.
 
         Returns:
-            Tuple containing KL divergence cost and total number of
-            parameters.
+            A tuple containing:
+                - kl_cost: The KL divergence as a JAX array.
+                - num_params: The number of contributing parameters.
         """
 
         return tf.Tensor([0.0]), 0

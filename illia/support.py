@@ -10,7 +10,7 @@ AVAILABLE_GNN_BACKENDS: frozenset[str] = frozenset(["pyg"])
 BACKEND_MODULES: dict[str, list[str]] = {
     "torch": ["illia.nn.torch", "illia.distributions.torch", "illia.losses.torch"],
     "tf": ["illia.nn.tf", "illia.distributions.tf", "illia.losses.tf"],
-    "jax": ["illia.nn.jax", "illia.distributions.jax"],
+    "jax": ["illia.nn.jax", "illia.distributions.jax", "illia.losses.jax"],
     "pyg": ["illia.nn.pyg"],
 }
 
@@ -52,6 +52,10 @@ BACKEND_CAPABILITIES: dict[str, dict[str, set[str]]] = {
             "Linear",
         },
         "distributions": {"DistributionModule", "GaussianDistribution"},
+        "losses": {
+            "KLDivergenceLoss",
+            "ELBOLoss",
+        },
     },
     "pyg": {"nn": {"CGConv"}},
 }

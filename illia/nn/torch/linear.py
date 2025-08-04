@@ -19,6 +19,9 @@ class Linear(BayesianModule):
     This class is the bayesian implementation of the torch Linear layer.
     """
 
+    weights: torch.Tensor
+    bias: torch.Tensor
+
     def __init__(
         self,
         input_size: int,
@@ -43,17 +46,13 @@ class Linear(BayesianModule):
 
         # Set weights distribution
         if weights_distribution is None:
-            self.weights_distribution: GaussianDistribution = GaussianDistribution(
-                (output_size, input_size)
-            )
+            self.weights_distribution = GaussianDistribution((output_size, input_size))
         else:
             self.weights_distribution = weights_distribution
 
         # Set bias distribution
         if bias_distribution is None:
-            self.bias_distribution: GaussianDistribution = GaussianDistribution(
-                (output_size,)
-            )
+            self.bias_distribution = GaussianDistribution((output_size,))
         else:
             self.bias_distribution = bias_distribution
 
@@ -76,11 +75,11 @@ class Linear(BayesianModule):
         self.frozen = True
 
         # Sample weights if they are undefined
-        if self.weights is None:  # type: ignore
+        if self.weights is None:
             self.weights = self.weights_distribution.sample()
 
         # Sample bias is they are undefined
-        if self.bias is None:  # type: ignore
+        if self.bias is None:
             self.bias = self.bias_distribution.sample()
 
         # Detach weights and bias

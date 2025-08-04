@@ -21,14 +21,17 @@ class Conv2D(BayesianModule):
     This class is the bayesian implementation of the Conv2D class.
     """
 
+    bias_distribution: Optional[GaussianDistribution] = None
+    bias: Optional[nnx.Param] = None
+
     def __init__(
         self,
         input_channels: int,
         output_channels: int,
         kernel_size: Union[int, tuple[int, int]],
-        stride: list[int] = [1, 1],
+        stride: tuple[int, int] = (1, 1),
         padding: tuple[int, int] = (0, 0),
-        dilation: list[int] = [1, 1],
+        dilation: tuple[int, int] = (1, 1),
         groups: int = 1,
         weights_distribution: Optional[GaussianDistribution] = None,
         bias_distribution: Optional[GaussianDistribution] = None,
@@ -87,23 +90,23 @@ class Conv2D(BayesianModule):
         if self.use_bias:
             if bias_distribution is None:
                 # Define weights distribution
-                self.bias_distribution: GaussianDistribution = GaussianDistribution(
+                self.bias_distribution = GaussianDistribution(
                     shape=(self.output_channels,),
                     rngs=self.rngs,
                 )
             else:
                 self.bias_distribution = bias_distribution
         else:
-            self.bias_distribution = None  # type: ignore
+            self.bias_distribution = None
 
         # Sample initial weights
         self.weights = nnx.Param(self.weights_distribution.sample(self.rngs))
 
         # Sample initial bias only if using bias
-        if self.use_bias:
+        if self.use_bias and self.bias_distribution:
             self.bias = nnx.Param(self.bias_distribution.sample(self.rngs))
         else:
-            self.bias = None  # type: ignore
+            self.bias = None
 
     def freeze(self) -> None:
         """
@@ -115,11 +118,11 @@ class Conv2D(BayesianModule):
         self.frozen = True
 
         # Sample weights if they are undefined
-        if self.weights is None:  # type: ignore
+        if self.weights is None:
             self.weights = nnx.Param(self.weights_distribution.sample(self.rngs))
 
         # Sample bias if they are undefined and bias is used
-        if self.use_bias and self.bias is None:
+        if self.use_bias and self.bias and self.bias_distribution:
             self.bias = nnx.Param(self.bias_distribution.sample(self.rngs))
 
         # Stop gradient computation (more similar to detach) weights and bias
@@ -143,12 +146,12 @@ class Conv2D(BayesianModule):
         )
 
         # Add bias log probs only if using bias
-        if self.use_bias and self.bias is not None:
+        if self.use_bias and self.bias and self.bias_distribution:
             log_probs += self.bias_distribution.log_prob(jnp.asarray(self.bias))
 
         # Compute number of parameters
         num_params: int = self.weights_distribution.num_params
-        if self.use_bias:
+        if self.use_bias and self.bias_distribution:
             num_params += self.bias_distribution.num_params
 
         return log_probs, num_params
@@ -172,7 +175,7 @@ class Conv2D(BayesianModule):
             self.weights = nnx.Param(self.weights_distribution.sample(self.rngs))
 
             # Sample bias only if using bias
-            if self.use_bias:
+            if self.bias is None and self.use_bias and self.bias_distribution:
                 self.bias = nnx.Param(self.bias_distribution.sample(self.rngs))
 
         # Compute ouputs
@@ -192,7 +195,7 @@ class Conv2D(BayesianModule):
         )
 
         # Add bias only if using bias
-        if self.use_bias and self.bias is not None:
+        if self.use_bias and self.bias:
             outputs += jnp.reshape(
                 a=jnp.asarray(self.bias), shape=(1, self.output_channels, 1, 1)
             )

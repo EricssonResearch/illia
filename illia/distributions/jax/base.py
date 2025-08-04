@@ -11,7 +11,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 
 # 3pps
-import jax.numpy as jnp
+import jax
 from flax import nnx
 
 
@@ -27,7 +27,7 @@ class DistributionModule(nnx.Module, ABC):
     """
 
     @abstractmethod
-    def sample(self) -> jnp.ndarray:
+    def sample(self) -> jax.Array:
         """
         Samples a tensor from the distribution.
 
@@ -37,7 +37,7 @@ class DistributionModule(nnx.Module, ABC):
         """
 
     @abstractmethod
-    def log_prob(self, x: Optional[jnp.ndarray] = None) -> jnp.ndarray:
+    def log_prob(self, x: Optional[jax.Array] = None) -> jax.Array:
         """
         Computes the log-probability of a given sample.
 

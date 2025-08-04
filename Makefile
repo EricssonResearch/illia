@@ -9,8 +9,7 @@ SRC_PROJECT_NAME ?= illia
 SRC_PROJECT_TESTS_TF ?= tests/tf
 SRC_PROJECT_TESTS_TORCH ?= tests/torch
 SRC_PROJECT_TESTS_JAX ?= tests/jax
-SRC_ALL ?= $(SRC_PROJECT_NAME)/ $(SRC_PROJECT_TESTS_TF)/ \
-    $(SRC_PROJECT_TESTS_TORCH)/ $(SRC_PROJECT_TESTS_JAX)/
+SRC_ALL ?= .
 
 # Allows the installation of project dependencies
 install:

@@ -1,5 +1,8 @@
 """
 This module contains the code for the Losses.
+
+Implements the KL divergence loss and the Evidence Lower Bound
+(ELBO) loss for Bayesian neural networks in TensorFlow.
 """
 
 # Standard libraries
@@ -16,7 +19,10 @@ from illia.nn.tf.base import BayesianModule
 @saving.register_keras_serializable(package="BayesianModule", name="KLDivergenceLoss")
 class KLDivergenceLoss(losses.Loss):
     """
-    Computes the KL divergence loss for Bayesian modules within a model.
+    Computes the KL divergence loss across all Bayesian modules
+    in a model.
+
+    Supports configurable reduction and scaling.
     """
 
     def __init__(
@@ -26,13 +32,12 @@ class KLDivergenceLoss(losses.Loss):
         **kwargs: Any,
     ) -> None:
         """
-        Initializes the KL divergence loss with specified reduction
-        method and weight.
+        Initializes the KL divergence loss.
 
         Args:
-            reduction: Method to reduce the loss, currently only "mean"
-                is supported.
-            weight: Scaling factor for the KL divergence loss.
+            reduction: Reduction method for loss. Only "mean"
+                currently supported.
+            weight: Weight to scale the KL divergence.
             **kwargs: Additional keyword arguments.
         """
 
@@ -45,10 +50,10 @@ class KLDivergenceLoss(losses.Loss):
 
     def get_config(self) -> dict:
         """
-        Retrieves the configuration of the KL divergence loss.
+        Returns the configuration of the KL divergence loss.
 
         Returns:
-            Dictionary containing loss configuration.
+            Dictionary containing configuration values.
         """
 
         # Get the base configuration
@@ -62,14 +67,14 @@ class KLDivergenceLoss(losses.Loss):
 
     def __call__(self, *args: Any, **kwargs: Any) -> tf.Tensor:
         """
-        Computes the ELBO loss, averaging over multiple samples.
+        Computes KL divergence across Bayesian modules in the model.
 
         Args:
-            *args: Positional arguments, may be ignored.
-            **kwargs: Additional keyword arguments, including 'model'.
+            *args: Unused positional arguments.
+            **kwargs: Must include 'model' as a keyword argument.
 
         Returns:
-            Average ELBO loss across samples.
+            Scalar tensor representing KL loss.
         """
 
         model = kwargs.get("model")
@@ -98,8 +103,10 @@ class KLDivergenceLoss(losses.Loss):
 @saving.register_keras_serializable(package="BayesianModule", name="ELBOLoss")
 class ELBOLoss(losses.Loss):
     """
-    Computes the Evidence Lower Bound (ELBO) loss, combining a
-    likelihood loss and KL divergence.
+    Computes the Evidence Lower Bound (ELBO) loss.
+
+    Combines a reconstruction loss and KL divergence, optionally
+    using Monte Carlo sampling.
     """
 
     def __init__(
@@ -110,13 +117,12 @@ class ELBOLoss(losses.Loss):
         **kwargs: Any,
     ) -> None:
         """
-        Initializes the ELBO loss with specified likelihood loss
-        function, sample count, and KL weight.
+        Initializes the ELBO loss function.
 
         Args:
-            loss_function: Loss function for computing likelihood loss.
-            num_samples: Number of samples for Monte Carlo approximation.
-            kl_weight: Scaling factor for the KL divergence component.
+            loss_function: Callable computing likelihood loss.
+            num_samples: Number of samples for MC estimation.
+            kl_weight: Scaling factor for KL divergence term.
             **kwargs: Additional keyword arguments.
         """
 
@@ -131,10 +137,10 @@ class ELBOLoss(losses.Loss):
 
     def get_config(self) -> dict:
         """
-        Retrieves the configuration of the ELBO loss.
+        Returns the configuration of the ELBO loss.
 
         Returns:
-            Dictionary containing ELBO loss configuration.
+            Dictionary with configuration values.
         """
 
         # Get the base configuration
@@ -154,16 +160,16 @@ class ELBOLoss(losses.Loss):
         self, y_true: tf.Tensor, y_pred: tf.Tensor, *args: Any, **kwargs: Any
     ) -> tf.Tensor:
         """
-        Computes the ELBO loss, averaging over multiple samples.
+        Computes the ELBO loss using KL regularization and reconstruction error.
 
         Args:
-            y_true: True labels.
-            y_pred: Predictions from the model.
-            *args: Positional arguments, may be ignored.
-            **kwargs: Additional keyword arguments, including 'model'.
+            y_true: Ground truth targets.
+            y_pred: Model predictions.
+            *args: Unused positional arguments.
+            **kwargs: Must include 'model' containing Bayesian layers.
 
         Returns:
-            Average ELBO loss across samples.
+            Scalar tensor representing the total ELBO loss.
         """
 
         model = kwargs.get("model")

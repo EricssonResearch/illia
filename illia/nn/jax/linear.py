@@ -23,6 +23,9 @@ class Linear(BayesianModule):
     This class is the bayesian implementation of the Linear class.
     """
 
+    bias_distribution: Optional[GaussianDistribution] = None
+    bias: Optional[nnx.Param] = None
+
     def __init__(
         self,
         input_size: int,
@@ -76,7 +79,7 @@ class Linear(BayesianModule):
             else:
                 self.bias_distribution = bias_distribution
         else:
-            self.bias_distribution = None  # type: ignore
+            self.bias_distribution = None
 
         # Sample initial weights
         self.weights = nnx.Param(self.weights_distribution.sample(self.rngs))
@@ -85,7 +88,7 @@ class Linear(BayesianModule):
         if self.use_bias and self.bias_distribution:
             self.bias = nnx.Param(self.bias_distribution.sample(self.rngs))
         else:
-            self.bias = None  # type: ignore
+            self.bias = None
 
     def freeze(self) -> None:
         """
@@ -97,11 +100,11 @@ class Linear(BayesianModule):
         self.frozen = True
 
         # Sample weights if they are undefined
-        if self.weights is None:  # type: ignore
+        if self.weights is None:
             self.weights = nnx.Param(self.weights_distribution.sample(self.rngs))
 
         # Sample bias if they are undefined and bias is used
-        if self.use_bias and self.bias is None and self.bias_distribution:
+        if self.use_bias and self.bias and self.bias_distribution:
             self.bias = nnx.Param(self.bias_distribution.sample(self.rngs))
 
         # Stop gradient computation (more similar to detach) weights and bias
@@ -125,7 +128,7 @@ class Linear(BayesianModule):
         )
 
         # Add bias log probs only if using bias
-        if self.use_bias and self.bias is not None and self.bias_distribution:
+        if self.use_bias and self.bias and self.bias_distribution:
             log_probs += self.bias_distribution.log_prob(jnp.asarray(self.bias))
 
         # Compute number of parameters
@@ -152,14 +155,14 @@ class Linear(BayesianModule):
             self.weights = nnx.Param(self.weights_distribution.sample(self.rngs))
 
             # Sample bias only if using bias
-            if self.use_bias and self.bias_distribution:
+            if self.bias is None and self.use_bias and self.bias_distribution:
                 self.bias = nnx.Param(self.bias_distribution.sample(self.rngs))
 
         # Compute outputs
         outputs = inputs @ self.weights.T
 
         # Add bias only if using bias
-        if self.use_bias and self.bias is not None:
+        if self.use_bias and self.bias:
             outputs += jnp.reshape(
                 jnp.asarray(self.bias), (1,) * (outputs.ndim - 1) + (-1,)
             )

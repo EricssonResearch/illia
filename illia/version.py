@@ -1,4 +1,6 @@
-"""Source of Illia versioning"""
+"""
+Source of Illia versioning
+"""
 
 # Standard libraries
 import importlib.metadata

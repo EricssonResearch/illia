@@ -160,16 +160,16 @@ def conv1d_fixture(request: pytest.FixtureRequest) -> tuple[Conv1D, jax.Array]:
             3,
             9,
             3,
-            [1, 1],
+            (1, 1),
             (0, 0),
-            [1, 1],
+            (1, 1),
             1,
             GaussianDistribution((9, 3, 3, 3)),
             GaussianDistribution((9,)),
             32,
             32,
         ),
-        (64, 6, 6, (4, 4), [2, 1], (3, 1), [2, 1], 2, None, None, 64, 64),
+        (64, 6, 6, (4, 4), (2, 1), (3, 1), (2, 1), 2, None, None, 64, 64),
     ]
 )
 def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2D, jax.Array]:
@@ -192,9 +192,9 @@ def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2D, jax.Array]:
     input_channels: int
     output_channels: int
     kernel_size: Union[int, tuple[int, int]]
-    stride: list[int]
+    stride: tuple[int]
     padding: tuple[int, int]
-    dilation: list[int]
+    dilation: tuple[int]
     groups: int
     weights_distribution: Optional[GaussianDistribution]
     bias_distribution: Optional[GaussianDistribution]

@@ -110,7 +110,7 @@ class GaussianDistribution(DistributionModule):
         )
 
         # Compute sigma
-        sigma: jax.Array = jnp.log1p(jnp.exp(self.rho))  # type: ignore
+        sigma: jax.Array = jnp.log1p(jnp.exp(jnp.asarray(self.rho)))
 
         # Compute log posteriors
         log_posteriors = (

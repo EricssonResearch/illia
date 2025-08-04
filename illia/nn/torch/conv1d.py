@@ -19,6 +19,9 @@ class Conv1D(BayesianModule):
     This class is the bayesian implementation of the Conv1D class.
     """
 
+    weights: torch.Tensor
+    bias: torch.Tensor
+
     def __init__(
         self,
         input_channels: int,
@@ -58,7 +61,7 @@ class Conv1D(BayesianModule):
         # Set weights distribution
         if weights_distribution is None:
             # Define weights distribution
-            self.weights_distribution: GaussianDistribution = GaussianDistribution(
+            self.weights_distribution = GaussianDistribution(
                 (output_channels, input_channels // groups, kernel_size)
             )
         else:
@@ -67,9 +70,7 @@ class Conv1D(BayesianModule):
         # Set bias distribution
         if bias_distribution is None:
             # Define weights distribution
-            self.bias_distribution: GaussianDistribution = GaussianDistribution(
-                (output_channels,)
-            )
+            self.bias_distribution = GaussianDistribution((output_channels,))
         else:
             self.bias_distribution = bias_distribution
 
@@ -92,11 +93,11 @@ class Conv1D(BayesianModule):
         self.frozen = True
 
         # Sample weights if they are undefined
-        if self.weights is None:  # type: ignore
+        if self.weights is None:
             self.weights = self.weights_distribution.sample()
 
         # Sample bias is they are undefined
-        if self.bias is None:  # type: ignore
+        if self.bias is None:
             self.bias = self.bias_distribution.sample()
 
         # Detach weights and bias
@@ -151,6 +152,4 @@ class Conv1D(BayesianModule):
             raise ValueError("Module has been frozen with undefined weights")
 
         # Execute torch forward
-        return F.conv1d(
-            inputs, self.weights, self.bias, *self.conv_params  # type: ignore
-        )
+        return F.conv1d(inputs, self.weights, self.bias, *self.conv_params)
