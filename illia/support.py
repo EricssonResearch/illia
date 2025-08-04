@@ -49,6 +49,7 @@ BACKEND_CAPABILITIES: dict[str, dict[str, set[str]]] = {
             "BayesianModule",
             "Conv1D",
             "Conv2D",
+            "Embedding",
             "Linear",
         },
         "distributions": {"DistributionModule", "GaussianDistribution"},

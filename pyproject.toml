@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "illia"
-version = "0.1.1"
+version = "0.2.0"
 description = "Framework agnostic Bayesian Neural Network library"
 authors = [
     {name = "Oscar Llorente Gonzalez", email = "oscar.llorente.gonzalez@ericsson.com"},

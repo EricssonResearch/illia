@@ -53,31 +53,32 @@ class TestKLDivergenceLoss:
             loss_value.shape == ()
         ), f"Incorrect shape, got {loss_value.shape} and got ()"
 
-    # @pytest.mark.order(2)
-    # def test_backward_single(self, linear_fixture: tuple[Linear, jax.Array]) -> None:
-    #     """
-    #     This method is the test for the backward pass.
+    @pytest.mark.order(2)
+    def test_backward_single(self, linear_fixture: tuple[Linear, jax.Array]) -> None:
+        """
+        This method is the test for the backward pass.
 
-    #     Args:
-    #         linear_fixture: tuple of instance of Linear and inputs to
-    #             use.
-    #     """
+        Args:
+            linear_fixture: tuple of instance of Linear and inputs to
+                use.
+        """
 
-    #     # Get model and inputs
-    #     model: Linear
-    #     model, _ = linear_fixture
+        # Get model and inputs
+        model: Linear
+        model, _ = linear_fixture
 
-    #     # Define loss and compute value
-    #     loss: nnx.Module = KLDivergenceLoss()
+        # Define loss and compute value
+        loss: nnx.Module = KLDivergenceLoss()
 
-    #     with tf.GradientTape() as tape:
-    #         loss_value: jax.Array = loss(model=model)
-    #     gradients = tape.gradient(loss_value, model.trainable_variables)
+        # Define loss function and compute gradients
+        def loss_fn(loss, model):
+            return loss(model)
 
-    #     # Check type of outputs
-    #     for i, gradient in enumerate(gradients):
-    #         # Check if parameter is none
-    #         assert gradient is not None, (
-    #             f"Incorrect backward computation, gradient of "
-    #             f"{model.trainable_variables[i]} shouldn't be None"
-    #         )
+        # TODO: Compute gradients (equivalent to backward() ??)
+        _, grads = nnx.value_and_grad(loss_fn)(loss, model)
+
+        # Check gradients exist for all parameters
+        flat_params, _ = jax.tree_util.tree_flatten(grads)
+
+        # Check nones
+        assert not any(p is None for p in flat_params), "Gradients with Nones"

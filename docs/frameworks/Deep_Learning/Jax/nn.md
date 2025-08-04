@@ -1,7 +1,9 @@
 # Neural Network
 
-::: illia.nn.torch.conv1d
+::: illia.nn.jax.conv1d
 
-::: illia.nn.torch.conv2d
+::: illia.nn.jax.conv2d
 
-::: illia.nn.torch.linear
+::: illia.nn.jax.embedding
+
+::: illia.nn.jax.linear

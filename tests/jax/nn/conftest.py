@@ -18,7 +18,7 @@ from flax import nnx
 
 # Own modules
 from illia.distributions import GaussianDistribution
-from illia.nn import Conv1D, Conv2D, Linear
+from illia.nn import Conv1D, Conv2D, Embedding, Linear
 
 
 @pytest.fixture(
@@ -231,6 +231,73 @@ def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2D, jax.Array]:
     # Define inputs
     inputs: jax.Array = jax.random.normal(
         rngs.params(), (batch_size, input_channels, height, width)
+    )
+
+    return model, inputs
+
+
+@pytest.fixture(
+    params=[
+        (64, 100, 16, None, None, 2.0, True, False, None),
+        (32, 50, 32, 0, 5.0, 1.0, False, True, GaussianDistribution((50, 32))),
+    ]
+)
+def embedding_fixture(request: pytest.FixtureRequest) -> tuple[Embedding, jax.Array]:
+    """
+    This function is the fixture for bayesian Embedding layer.
+
+    Args:
+        request: Pytest fixture request.
+
+    Returns:
+        Embedding instance.
+        Inputs compatible with Embedding instance.
+    """
+
+    # Create RNG
+    rngs = nnx.Rngs(42)
+
+    # Get parameters
+    batch_size: int
+    num_embeddings: int
+    embeddings_dim: int
+    padding_idx: Optional[int]
+    max_norm: Optional[float]
+    norm_type: float
+    scale_grad_by_freq: bool
+    sparse: bool
+    weights_distribution: Optional[GaussianDistribution]
+    (
+        batch_size,
+        num_embeddings,
+        embeddings_dim,
+        padding_idx,
+        max_norm,
+        norm_type,
+        scale_grad_by_freq,
+        sparse,
+        weights_distribution,
+    ) = request.param
+
+    # Define model
+    model: Embedding = Embedding(
+        num_embeddings,
+        embeddings_dim,
+        padding_idx,
+        max_norm,
+        norm_type,
+        scale_grad_by_freq,
+        sparse,
+        weights_distribution,
+        rngs,
+    )
+
+    # Define inputs
+    inputs: jax.Array = jax.random.randint(
+        key=jax.random.PRNGKey(42),
+        shape=(batch_size,),
+        minval=0,
+        maxval=num_embeddings,
     )
 
     return model, inputs
