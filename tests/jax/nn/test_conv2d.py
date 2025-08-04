@@ -75,42 +75,34 @@ class TestConv2d:
             f"{(inputs.shape[0], model.weights.shape[0])} and got {outputs.shape}"
         )
 
-    # @pytest.mark.order(3)
-    # def test_backward(self, conv2d_fixture: tuple[Conv2D, jax.Array]) -> None:
-    #     """
-    #     This method is the test for the Conv2D backward pass.
+    @pytest.mark.order(3)
+    def test_backward(self, conv2d_fixture: tuple[Conv2D, jax.Array]) -> None:
+        """
+        This method is the test for the Conv2D backward pass.
 
-    #     Args:
-    #         conv2d_fixture: tuple of instance of Conv2D and inputs to
-    #             use.
-    #     """
+        Args:
+            conv2d_fixture: tuple of instance of Conv2D and inputs to
+                use.
+        """
 
-    #     # Get model and inputs
-    #     model: Conv2D
-    #     inputs: jax.Array
-    #     model, inputs = conv2d_fixture
+        # Get model and inputs
+        model: Conv2D
+        inputs: jax.Array
+        model, inputs = conv2d_fixture
 
-    #     # Define loss function and compute gradients
-    #     def loss_fn(model, inputs):
-    #         outputs = model(inputs)
-    #         return jnp.sum(outputs)
+        # Define loss function and compute gradients
+        def loss_fn(model, inputs):
+            outputs = model(inputs)
+            return jnp.sum(outputs)
 
-    #     # TODO: Compute gradients (equivalent to backward() ??)
-    #     _, grads = nnx.value_and_grad(loss_fn)(model, inputs)
+        # TODO: Compute gradients (equivalent to backward() ??)
+        _, grads = nnx.value_and_grad(loss_fn)(model, inputs)
 
-    #     # Check gradients exist for all parameters
-    #     params = nnx.state(model, nnx.Param)
-    #     grad_params = nnx.state(grads, nnx.Param)
+        # Check gradients exist for all parameters
+        flat_params, _ = jax.tree_util.tree_flatten(grads)
 
-    #     for name in params.keys():
-    #         assert name in grad_params, (
-    #             f"Incorrect backward computation, gradient of {name} shouldn't be "
-    #             f"None"
-    #         )
-    #         assert grad_params[name] is not None, (
-    #             f"Incorrect backward computation, gradient of {name} shouldn't be "
-    #             f"None"
-    #         )
+        # Check nones
+        assert not any(p is None for p in flat_params), "Gradients with Nones"
 
     @pytest.mark.order(4)
     def test_freeze(self, conv2d_fixture: tuple[Conv2D, jax.Array]) -> None:

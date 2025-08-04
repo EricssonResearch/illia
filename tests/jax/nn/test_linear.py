@@ -75,32 +75,34 @@ class TestLinear:
             f"{(inputs.shape[0], model.weights.shape[0])} and got {outputs.shape}"
         )
 
-    # @pytest.mark.order(3)
-    # def test_backward(self, linear_fixture: tuple[Linear, jax.Array]) -> None:
-    #     """
-    #     This method is the test for the Linear backward pass.
+    @pytest.mark.order(3)
+    def test_backward(self, linear_fixture: tuple[Linear, jax.Array]) -> None:
+        """
+        This method is the test for the Linear backward pass.
 
-    #     Args:
-    #         linear_fixture: tuple of instance of Linear and inputs to
-    #             use.
-    #     """
+        Args:
+            linear_fixture: tuple of instance of Linear and inputs to
+                use.
+        """
 
-    #     # Get model and inputs
-    #     model: Linear
-    #     inputs: jax.Array
-    #     model, inputs = linear_fixture
+        # Get model and inputs
+        model: Linear
+        inputs: jax.Array
+        model, inputs = linear_fixture
 
-    #     # check parameters length
-    #     outputs: jax.Array = model(inputs)
-    #     outputs.sum().backward()
+        # Define loss function and compute gradients
+        def loss_fn(model, inputs):
+            outputs = model(inputs)
+            return jnp.sum(outputs)
 
-    #     # Check type of outputs
-    #     for name, parameter in model.named_parameters():
-    #         # check if parameter is none
-    #         assert parameter.grad is not None, (
-    #             f"Incorrect backward computation, gradient of {name} shouldn't be "
-    #             f"None"
-    #         )
+        # TODO: Compute gradients (equivalent to backward() ??)
+        _, grads = nnx.value_and_grad(loss_fn)(model, inputs)
+
+        # Check gradients exist for all parameters
+        flat_params, _ = jax.tree_util.tree_flatten(grads)
+
+        # Check nones
+        assert not any(p is None for p in flat_params), "Gradients with Nones"
 
     @pytest.mark.order(4)
     def test_freeze(self, linear_fixture: tuple[Linear, jax.Array]) -> None:
