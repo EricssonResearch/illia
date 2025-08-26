@@ -45,6 +45,8 @@ os.environ["ILLIA_BACKEND"] = "torch"
 
 # Import the Illia library
 import illia
+from illia.nn import Conv2D
+import torch
 
 print(f"Illia version: {illia.__version__}")
 print(f"Illia backend: {illia.__get_backend__}")

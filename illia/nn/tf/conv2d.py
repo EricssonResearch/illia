@@ -3,7 +3,7 @@ This module contains the code for the bayesian Conv2D.
 """
 
 # Standard libraries
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 # 3pps
 import tensorflow as tf
@@ -24,10 +24,10 @@ class Conv2D(BayesianModule):
         self,
         input_channels: int,
         output_channels: int,
-        kernel_size: Union[int, list[int]],
-        stride: Union[int, list[int]] = 1,
-        padding: Union[str, list[int]] = "VALID",
-        dilation: Optional[Union[int, list[int]]] = None,
+        kernel_size: int | list[int],
+        stride: int | list[int] = 1,
+        padding: str | list[int] = "VALID",
+        dilation: Optional[int | list[int]] = None,
         groups: int = 1,
         data_format: Optional[str] = "NHWC",
         weights_distribution: Optional[GaussianDistribution] = None,
@@ -103,7 +103,14 @@ class Conv2D(BayesianModule):
         else:
             self.bias_distribution = bias_distribution
 
-    def _check_params(self, kernel_size, groups, stride, dilation, data_format) -> None:
+    def _check_params(
+        self,
+        kernel_size: int | list[int],
+        groups: int,
+        stride: int | list[int],
+        dilation: Optional[int | list[int]],
+        data_format: Optional[str],
+    ) -> None:
         """
         Checks the validity of the parameters for the convolution
         operation.
@@ -203,10 +210,10 @@ class Conv2D(BayesianModule):
         self,
         inputs: tf.Tensor,
         weight: tf.Tensor,
-        stride: Union[int, list[int]],
-        padding: Union[str, list[int]],
+        stride: int | list[int],
+        padding: str | list[int],
         data_format: Optional[str] = "NHWC",
-        dilation: Optional[Union[int, list[int]]] = None,
+        dilation: Optional[int | list[int]] = None,
     ) -> tf.Tensor:
         """
         Applies a 2D convolution operation to the input tensor.

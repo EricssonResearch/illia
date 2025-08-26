@@ -3,7 +3,7 @@ This module contains the code for bayesian Embedding layer.
 """
 
 # Standard libraries
-from typing import Optional
+from typing import Any, Optional
 
 # 3pps
 import jax
@@ -32,6 +32,7 @@ class Embedding(BayesianModule):
         sparse: bool = False,
         weights_distribution: Optional[GaussianDistribution] = None,
         rngs: Rngs = nnx.Rngs(0),
+        **kwargs: Any,
     ) -> None:
         """
         This method is the constructor of the embedding class.
@@ -56,7 +57,7 @@ class Embedding(BayesianModule):
         """
 
         # Call super class constructor
-        super().__init__()
+        super().__init__(**kwargs)
 
         # Set attributes
         self.num_embeddings = num_embeddings

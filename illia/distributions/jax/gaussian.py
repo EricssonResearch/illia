@@ -7,7 +7,7 @@ nnx.Module system.
 """
 
 # Standard libraries
-from typing import Optional
+from typing import Any, Optional
 
 # 3pps
 import jax
@@ -39,6 +39,7 @@ class GaussianDistribution(DistributionModule):
         mu_init: float = 0.0,
         rho_init: float = -7.0,
         rngs: Rngs = nnx.Rngs(0),
+        **kwargs: Any,
     ) -> None:
         """
         Initializes the GaussianDistribution module.
@@ -53,7 +54,7 @@ class GaussianDistribution(DistributionModule):
         """
 
         # Call super-class constructor
-        super().__init__()
+        super().__init__(**kwargs)
 
         # Define priors
         self.mu_prior = mu_prior

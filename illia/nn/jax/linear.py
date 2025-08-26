@@ -3,7 +3,7 @@ This module contains the code for Linear Bayesian layer.
 """
 
 # Standard libraries
-from typing import Optional
+from typing import Any, Optional
 
 # 3pps
 import jax
@@ -36,6 +36,7 @@ class Linear(BayesianModule):
         precision: PrecisionLike = None,
         dot_general: DotGeneralT = lax.dot_general,
         rngs: Rngs = nnx.Rngs(0),
+        **kwargs: Any,
     ) -> None:
         """
         This is the constructor of the Linear class.
@@ -52,7 +53,7 @@ class Linear(BayesianModule):
         """
 
         # Call super class constructor
-        super().__init__()
+        super().__init__(**kwargs)
 
         # Set attributes
         self.input_size = input_size

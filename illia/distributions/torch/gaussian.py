@@ -7,7 +7,7 @@ estimation.
 """
 
 # Standard libraries
-from typing import Optional
+from typing import Any, Optional
 
 # 3pps
 import torch
@@ -32,6 +32,7 @@ class GaussianDistribution(DistributionModule):
         std_prior: float = 0.1,
         mu_init: float = 0.0,
         rho_init: float = -7.0,
+        **kwargs: Any,
     ) -> None:
         """
         Initializes the Gaussian distribution with priors and initial
@@ -46,7 +47,7 @@ class GaussianDistribution(DistributionModule):
         """
 
         # Call super-class constructor
-        super().__init__()
+        super().__init__(**kwargs)
 
         # Define priors
         self.register_buffer("mu_prior", torch.tensor([mu_prior]))

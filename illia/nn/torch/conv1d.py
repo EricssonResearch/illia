@@ -3,7 +3,7 @@ This module contains the code for the bayesian Conv1D.
 """
 
 # Standard libraries
-from typing import Optional
+from typing import Any, Optional
 
 # 3pps
 import torch
@@ -33,6 +33,7 @@ class Conv1D(BayesianModule):
         groups: int = 1,
         weights_distribution: Optional[GaussianDistribution] = None,
         bias_distribution: Optional[GaussianDistribution] = None,
+        **kwargs: Any,
     ) -> None:
         """
         Definition of a Bayesian Convolution 1D layer.
@@ -53,7 +54,7 @@ class Conv1D(BayesianModule):
         """
 
         # Call super class constructor
-        super().__init__()
+        super().__init__(**kwargs)
 
         # Set attributes
         self.conv_params: tuple[int, ...] = (stride, padding, dilation, groups)

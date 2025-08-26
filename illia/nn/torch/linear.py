@@ -3,7 +3,7 @@ This module contains the code for Linear Bayesian layer.
 """
 
 # Standard libraries
-from typing import Optional
+from typing import Any, Optional
 
 # 3pps
 import torch
@@ -28,6 +28,7 @@ class Linear(BayesianModule):
         output_size: int,
         weights_distribution: Optional[GaussianDistribution] = None,
         bias_distribution: Optional[GaussianDistribution] = None,
+        **kwargs: Any,
     ) -> None:
         """
         This is the constructor of the Linear class.
@@ -42,7 +43,7 @@ class Linear(BayesianModule):
         """
 
         # Call super-class constructor
-        super().__init__()
+        super().__init__(**kwargs)
 
         # Set weights distribution
         if weights_distribution is None:

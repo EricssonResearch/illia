@@ -3,7 +3,7 @@ This module contains the code for the bayesian Conv1D.
 """
 
 # Standard libraries
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 # 3pps
 import tensorflow as tf
@@ -25,9 +25,9 @@ class Conv1D(BayesianModule):
         input_channels: int,
         output_channels: int,
         kernel_size: int,
-        stride: Union[int, list[int]] = 1,
+        stride: int | list[int] = 1,
         padding: str = "VALID",
-        dilation: Union[int, list[int]] = 1,
+        dilation: int | list[int] = 1,
         groups: int = 1,
         data_format: Optional[str] = "NWC",
         weights_distribution: Optional[GaussianDistribution] = None,
@@ -98,7 +98,14 @@ class Conv1D(BayesianModule):
         else:
             self.bias_distribution = bias_distribution
 
-    def _check_params(self, kernel_size, groups, stride, dilation, data_format) -> None:
+    def _check_params(
+        self,
+        kernel_size: int,
+        groups: int,
+        stride: int | list[int],
+        dilation: int | list[int],
+        data_format: Optional[str],
+    ) -> None:
         """
         Checks the validity of the parameters for the convolution
         operation.
@@ -196,10 +203,10 @@ class Conv1D(BayesianModule):
         self,
         inputs: tf.Tensor,
         weight: tf.Tensor,
-        stride: Union[int, list[int]],
+        stride: int | list[int],
         padding: str,
         data_format: Optional[str] = "NWC",
-        dilation: Optional[Union[int, list[int]]] = None,
+        dilation: Optional[int | list[int]] = None,
     ) -> tf.Tensor:
         """
         Applies a 1D convolution operation to the input tensor.
@@ -275,7 +282,7 @@ class Conv1D(BayesianModule):
         layer. If the layer is not frozen, it samples weights and bias
         from their respective distributions. If the layer is frozen
         and the weights or bias are not initialized, it also performs
-        sampling.
+        sampling.str
 
         Args:
             inputs: Input tensor to the layer.

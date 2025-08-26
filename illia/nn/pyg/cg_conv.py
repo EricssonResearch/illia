@@ -4,7 +4,7 @@ operator.
 """
 
 # Standard libraries
-from typing import Union
+from typing import Any
 
 # 3pps
 import torch
@@ -24,11 +24,11 @@ class CGConv(MessagePassing):
 
     def __init__(
         self,
-        channels: Union[int, tuple[int, int]],
+        channels: int | tuple[int, int],
         dim: int = 0,
         aggr: str = "add",
-        **kwargs,
-    ):
+        **kwargs: Any,
+    ) -> None:
         r"""
         "Crystal Graph Convolutional Neural Networks for an Accurate
         and Interpretable Prediction of Material Properties"
@@ -81,7 +81,7 @@ class CGConv(MessagePassing):
         self.lin_f = Linear(sum(channels) + dim, channels[1])
         self.lin_s = Linear(sum(channels) + dim, channels[1])
 
-    def reset_parameters(self):
+    def reset_parameters(self) -> None:
         """
         Resets the parameters of the linear layers.
         """
@@ -92,7 +92,7 @@ class CGConv(MessagePassing):
             self.bn.reset_parameters()
 
     def forward(
-        self, x: Union[Tensor, PairTensor], edge_index: Adj, edge_attr: OptTensor = None
+        self, x: Tensor | PairTensor, edge_index: Adj, edge_attr: OptTensor = None
     ) -> Tensor:
         """
         Performs a forward pass of the convolutional layer.

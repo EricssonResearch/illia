@@ -6,7 +6,7 @@ loss for Bayesian neural networks in PyTorch.
 """
 
 # Standard libraries
-from typing import Literal
+from typing import Any, Literal
 
 # 3pps
 import torch
@@ -23,7 +23,10 @@ class KLDivergenceLoss(torch.nn.Module):
     """
 
     def __init__(
-        self, reduction: Literal["mean"] = "mean", weight: float = 1.0
+        self,
+        reduction: Literal["mean"] = "mean",
+        weight: float = 1.0,
+        **kwargs: Any,
     ) -> None:
         """
         Initializes the KL divergence loss.
@@ -35,7 +38,7 @@ class KLDivergenceLoss(torch.nn.Module):
         """
 
         # call super class constructor
-        super().__init__()
+        super().__init__(**kwargs)
 
         # Set attributes
         self.reduction = reduction
@@ -88,6 +91,7 @@ class ELBOLoss(torch.nn.Module):
         loss_function: torch.nn.Module,
         num_samples: int = 1,
         kl_weight: float = 1e-3,
+        **kwargs: Any,
     ) -> None:
         """
         Initializes the ELBO loss function.
@@ -99,7 +103,7 @@ class ELBOLoss(torch.nn.Module):
         """
 
         # Call super class constructor
-        super().__init__()
+        super().__init__(**kwargs)
 
         # Set attributes
         self.loss_function = loss_function

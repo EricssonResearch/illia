@@ -105,7 +105,7 @@ class GaussianDistribution(DistributionModule):
         # Call super-class build method
         super().build(input_shape)
 
-    def get_config(self):
+    def get_config(self) -> dict:
         """
         Returns the configuration for serialization.
 

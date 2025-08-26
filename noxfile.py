@@ -30,6 +30,9 @@ def pytorch(session: nox.Session, torch: str) -> None:
     Args:
         session: The Nox session object.
         torch: The version of PyTorch to be tested.
+
+    Returns:
+        None.
     """
 
     # Ensure correct compatibility test
@@ -42,8 +45,6 @@ def pytorch(session: nox.Session, torch: str) -> None:
     session.install("pytest", "pytest-order", torch_version)
     session.run("pytest", "tests/torch/")
 
-    return None
-
 
 @nox.session(python=PYTHON_VERSIONS)
 @nox.parametrize("tf", ["2.16.1", "2.19.0"])
@@ -54,6 +55,9 @@ def tensorflow(session: nox.Session, tf: str) -> None:
     Args:
         session: The Nox session object.
         tf: The version of TensorFlow to be tested.
+
+    Returns:
+        None.
     """
 
     # Ensure only correct matrix compatibility
@@ -66,8 +70,6 @@ def tensorflow(session: nox.Session, tf: str) -> None:
     session.install("pytest", "pytest-order", tf_version)
     session.run("pytest", "tests/tf/")
 
-    return None
-
 
 # Framework-specific sessions for GitHub Actions matrix
 @nox.session(python=PYTHON_VERSIONS, name="test-torch")
@@ -77,6 +79,9 @@ def test_torch(session: nox.Session) -> None:
 
     Args:
         session: The Nox session object.
+
+    Returns:
+        None.
     """
 
     # Install dependencies
@@ -106,6 +111,9 @@ def test_tf(session: nox.Session) -> None:
 
     Args:
         session: The Nox session object.
+
+    Returns:
+        None.
     """
 
     # Install dependencies
@@ -135,6 +143,9 @@ def test_jax(session: nox.Session) -> None:
 
     Args:
         session: The Nox session object.
+
+    Returns:
+        None.
     """
 
     # Install dependencies with tensorflow extras
@@ -142,5 +153,3 @@ def test_jax(session: nox.Session) -> None:
 
     # Run pytest
     session.run("pytest", "tests/jax/", external=True)
-
-    return None

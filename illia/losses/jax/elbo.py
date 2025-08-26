@@ -7,7 +7,7 @@ networks.
 """
 
 # Standard libraries
-from typing import Callable, Literal
+from typing import Any, Callable, Literal
 
 # 3pps
 import jax
@@ -26,7 +26,10 @@ class KLDivergenceLoss(nnx.Module):
     """
 
     def __init__(
-        self, reduction: Literal["mean"] = "mean", weight: float = 1.0
+        self,
+        reduction: Literal["mean"] = "mean",
+        weight: float = 1.0,
+        **kwargs: Any,
     ) -> None:
         """
         Initializes the KL divergence loss computation.
@@ -38,7 +41,7 @@ class KLDivergenceLoss(nnx.Module):
         """
 
         # Call super class constructor
-        super().__init__()
+        super().__init__(**kwargs)
 
         # Set attributes
         self.reduction = reduction
@@ -86,6 +89,7 @@ class ELBOLoss(nnx.Module):
         loss_function: Callable[[jax.Array, jax.Array], jax.Array],
         num_samples: int = 1,
         kl_weight: float = 1e-3,
+        **kwargs: Any,
     ) -> None:
         """
         Initializes the ELBO loss with sampling and KL scaling.
@@ -97,7 +101,7 @@ class ELBOLoss(nnx.Module):
         """
 
         # Call super class constructor
-        super().__init__()
+        super().__init__(**kwargs)
 
         # Set attributes
         self.loss_function = loss_function

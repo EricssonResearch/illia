@@ -3,7 +3,7 @@ This module contains the code for the bayesian Conv2D.
 """
 
 # Standard libraries
-from typing import Optional, Union
+from typing import Any, Optional
 
 # 3pps
 import jax
@@ -28,7 +28,7 @@ class Conv2D(BayesianModule):
         self,
         input_channels: int,
         output_channels: int,
-        kernel_size: Union[int, tuple[int, int]],
+        kernel_size: int | tuple[int, int],
         stride: tuple[int, int] = (1, 1),
         padding: tuple[int, int] = (0, 0),
         dilation: tuple[int, int] = (1, 1),
@@ -37,6 +37,7 @@ class Conv2D(BayesianModule):
         bias_distribution: Optional[GaussianDistribution] = None,
         use_bias: bool = True,
         rngs: Rngs = nnx.Rngs(0),
+        **kwargs: Any,
     ) -> None:
         """
         Definition of a Bayesian Convolution 2D layer.
@@ -56,7 +57,7 @@ class Conv2D(BayesianModule):
         """
 
         # Call super class constructor
-        super().__init__()
+        super().__init__(**kwargs)
 
         # Set attributes
         self.input_channels = input_channels

@@ -3,7 +3,7 @@ This module contains the code for the bayesian Conv1D.
 """
 
 # Standard libraries
-from typing import Optional
+from typing import Any, Optional
 
 # 3pps
 import jax
@@ -37,6 +37,7 @@ class Conv1D(BayesianModule):
         bias_distribution: Optional[GaussianDistribution] = None,
         use_bias: bool = True,
         rngs: Rngs = nnx.Rngs(0),
+        **kwargs: Any,
     ) -> None:
         """
         Definition of a Bayesian Convolution 1D layer.
@@ -56,7 +57,7 @@ class Conv1D(BayesianModule):
         """
 
         # Call super class constructor
-        super().__init__()
+        super().__init__(**kwargs)
 
         # Set attributes
         self.input_channels = input_channels
