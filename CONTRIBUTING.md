@@ -96,7 +96,7 @@ make
 This will:
 
 - Install dependencies
-- Run linters (`black`, `isort`, `ruff`, ...)
+- Run linters (`black`, `isort`, ...)
 - Run static analysis (`complexipy`)
 - Run tests
 - Serve the documentation locally
