@@ -108,7 +108,7 @@ class Linear(BayesianModule):
         if self.use_bias and self.bias is None and self.bias_distribution:
             self.bias = nnx.Param(self.bias_distribution.sample(self.rngs))
 
-        # Stop gradient computation (more similar to detach) weights and bias
+        # Stop gradient computation
         self.weights = jax.lax.stop_gradient(self.weights)
         if self.use_bias and self.bias:
             self.bias = jax.lax.stop_gradient(self.bias)

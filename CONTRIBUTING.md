@@ -1,7 +1,7 @@
 # Contributing to illia
 
-Hello and welcome! We're excited that you're interested in contributing to the
-illia project.
+Hello and welcome! We're excited that you're interested in contributing to the illia
+project.
 
 We appreciate all types of contributions whether it's code, documentation, bug reports,
 or feature requests.
@@ -123,5 +123,5 @@ Not a fan of writing code? You can still help by:
 - Suggesting features or usability improvements
 - Helping triage and respond to issues
 
-Thank you for being part of illia's journey. We’re thrilled to have
-you here. If you have questions, feel free to reach out or open an issue.
+Thank you for being part of illia's journey. We’re thrilled to have you here. If you have
+questions, feel free to reach out or open an issue.

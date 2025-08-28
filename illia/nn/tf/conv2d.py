@@ -20,6 +20,8 @@ class Conv2D(BayesianModule):
     This class is the bayesian implementation of the Conv2D class.
     """
 
+    bias_distribution: Optional[GaussianDistribution] = None
+
     def __init__(
         self,
         input_channels: int,
@@ -32,6 +34,7 @@ class Conv2D(BayesianModule):
         data_format: Optional[str] = "NHWC",
         weights_distribution: Optional[GaussianDistribution] = None,
         bias_distribution: Optional[GaussianDistribution] = None,
+        use_bias: bool = True,
         **kwargs: Any,
     ) -> None:
         """
@@ -71,6 +74,7 @@ class Conv2D(BayesianModule):
         self.padding = padding
         self.dilation = dilation
         self.groups = groups
+        self.use_bias = use_bias
 
         # Check if kernel_size is a list and unpack it if necessary
         kernel_shape = (
@@ -98,10 +102,13 @@ class Conv2D(BayesianModule):
             self.weights_distribution = weights_distribution
 
         # Set bias distribution
-        if bias_distribution is None:
-            self.bias_distribution = GaussianDistribution((output_channels,))
+        if self.use_bias:
+            if bias_distribution is None:
+                self.bias_distribution = GaussianDistribution((output_channels,))
+            else:
+                self.bias_distribution = bias_distribution
         else:
-            self.bias_distribution = bias_distribution
+            self.bias_distribution = None
 
     def _check_params(
         self,
@@ -168,14 +175,16 @@ class Conv2D(BayesianModule):
             shape=self._weights_distribution_shape,
             trainable=False,
         )
-        self.b = self.add_weight(
-            name="bias",
-            initializer=tf.constant_initializer(
-                self.bias_distribution.sample().numpy()
-            ),
-            shape=(self.output_channels,),
-            trainable=False,
-        )
+
+        if self.use_bias and self.bias_distribution:
+            self.b = self.add_weight(
+                name="bias",
+                initializer=tf.constant_initializer(
+                    self.bias_distribution.sample().numpy()
+                ),
+                shape=(self.output_channels,),
+                trainable=False,
+            )
 
         # Call super-class build method
         super().build(input_shape)
@@ -258,8 +267,13 @@ class Conv2D(BayesianModule):
             self.w = self.weights_distribution.sample()
 
         # Sample bias is they are undefined
-        if self.b is None:
+        if self.use_bias is None and self.bias_distribution:
             self.b = self.bias_distribution.sample()
+
+        # Stop gradient computation
+        self.w = tf.stop_gradient(self.w)
+        if self.use_bias:
+            self.b = tf.stop_gradient(self.b)
 
     def kl_cost(self) -> tuple[tf.Tensor, int]:
         """
@@ -272,14 +286,16 @@ class Conv2D(BayesianModule):
         """
 
         # Compute log probs
-        log_probs: tf.Tensor = self.weights_distribution.log_prob(
-            self.w
-        ) + self.bias_distribution.log_prob(self.b)
+        log_probs: tf.Tensor = self.weights_distribution.log_prob(self.w)
 
-        # Compute the number of parameters
-        num_params: int = (
-            self.weights_distribution.num_params + self.bias_distribution.num_params
-        )
+        # Add bias log probs only if using bias
+        if self.use_bias and self.bias_distribution:
+            log_probs += self.bias_distribution.log_prob(self.b)
+
+        # Compute number of parameters
+        num_params: int = self.weights_distribution.num_params
+        if self.use_bias and self.bias_distribution:
+            num_params += self.bias_distribution.num_params
 
         return log_probs, num_params
 
@@ -303,7 +319,10 @@ class Conv2D(BayesianModule):
         # Check if layer is frozen
         if not self.frozen:
             self.w = self.weights_distribution.sample()
-            self.b = self.bias_distribution.sample()
+
+            # Sample bias only if using bias
+            if self.use_bias and self.bias_distribution:
+                self.b = self.bias_distribution.sample()
         elif self.w is None or self.b is None:
             raise ValueError(
                 "Module has been frozen with undefined weights and/or bias."
@@ -319,11 +338,12 @@ class Conv2D(BayesianModule):
             dilation=self.dilation,
         )
 
-        # Add bias
-        outputs = tf.nn.bias_add(
-            value=outputs,
-            bias=self.b,
-            data_format="N..C" if self.data_format == "NHWC" else "NC..",
-        )
+        # Add bias only if using bias
+        if self.use_bias is not None:
+            outputs = tf.nn.bias_add(
+                value=outputs,
+                bias=self.b,
+                data_format="N..C" if self.data_format == "NHWC" else "NC..",
+            )
 
         return outputs

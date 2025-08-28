@@ -72,12 +72,14 @@ class CGConv(MessagePassing):
         # Call super class constructor
         super().__init__(aggr=aggr, **kwargs)
 
+        # Set attributes
         self.channels = channels
         self.dim = dim
 
         if isinstance(channels, int):
             channels = (channels, channels)
 
+        # Define linear layers
         self.lin_f = Linear(sum(channels) + dim, channels[1])
         self.lin_s = Linear(sum(channels) + dim, channels[1])
 

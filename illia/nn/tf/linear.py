@@ -20,12 +20,15 @@ class Linear(BayesianModule):
     This class is the bayesian implementation of the Linear class.
     """
 
+    bias_distribution: Optional[GaussianDistribution] = None
+
     def __init__(
         self,
         input_size: int,
         output_size: int,
         weights_distribution: Optional[GaussianDistribution] = None,
         bias_distribution: Optional[GaussianDistribution] = None,
+        use_bias: bool = True,
         **kwargs: Any,
     ) -> None:
         """
@@ -47,6 +50,7 @@ class Linear(BayesianModule):
         # Set parameters
         self.input_size = input_size
         self.output_size = output_size
+        self.use_bias = use_bias
 
         # Set weights distribution
         if weights_distribution is None:
@@ -55,10 +59,13 @@ class Linear(BayesianModule):
             self.weights_distribution = weights_distribution
 
         # Set bias distribution
-        if bias_distribution is None:
-            self.bias_distribution = GaussianDistribution((output_size,))
+        if self.use_bias:
+            if bias_distribution is None:
+                self.bias_distribution = GaussianDistribution((output_size,))
+            else:
+                self.bias_distribution = bias_distribution
         else:
-            self.bias_distribution = bias_distribution
+            self.bias_distribution = None
 
     def build(self, input_shape: tf.TensorShape) -> None:
         """
@@ -77,14 +84,16 @@ class Linear(BayesianModule):
             shape=(self.output_size, self.input_size),
             trainable=False,
         )
-        self.b = self.add_weight(
-            name="bias",
-            initializer=tf.constant_initializer(
-                self.bias_distribution.sample().numpy()
-            ),
-            shape=(self.output_size,),
-            trainable=False,
-        )
+
+        if self.use_bias and self.bias_distribution:
+            self.b = self.add_weight(
+                name="bias",
+                initializer=tf.constant_initializer(
+                    self.bias_distribution.sample().numpy()
+                ),
+                shape=(self.output_size,),
+                trainable=False,
+            )
 
         # Call super-class build method
         super().build(input_shape)
@@ -123,8 +132,13 @@ class Linear(BayesianModule):
             self.w = self.weights_distribution.sample()
 
         # Sample bias is they are undefined
-        if self.b is None:
+        if self.use_bias and self.bias_distribution:
             self.b = self.bias_distribution.sample()
+
+        # Stop gradient computation (more similar to detach) weights and bias
+        self.w = tf.stop_gradient(self.w)
+        if self.use_bias:
+            self.b = tf.stop_gradient(self.b)
 
     def kl_cost(self) -> tuple[tf.Tensor, int]:
         """
@@ -137,14 +151,16 @@ class Linear(BayesianModule):
         """
 
         # Compute log probs
-        log_probs: tf.Tensor = self.weights_distribution.log_prob(
-            self.w
-        ) + self.bias_distribution.log_prob(self.b)
+        log_probs: tf.Tensor = self.weights_distribution.log_prob(self.w)
 
-        # Compute the number of parameters
-        num_params: int = (
-            self.weights_distribution.num_params + self.bias_distribution.num_params
-        )
+        # Add bias log probs only if using bias
+        if self.use_bias and self.bias_distribution:
+            log_probs += self.bias_distribution.log_prob(self.b)
+
+        # Compute number of parameters
+        num_params: int = self.weights_distribution.num_params
+        if self.use_bias and self.bias_distribution:
+            num_params += self.bias_distribution.num_params
 
         return log_probs, num_params
 
@@ -169,15 +185,20 @@ class Linear(BayesianModule):
         # Check if layer is frozen
         if not self.frozen:
             self.w = self.weights_distribution.sample()
-            self.b = self.bias_distribution.sample()
+
+            # Sample bias only if using bias
+            if self.use_bias and self.bias_distribution:
+                self.b = self.bias_distribution.sample()
         elif self.w is None or self.b is None:
             raise ValueError(
                 "Module has been frozen with undefined weights and/or bias."
             )
 
         # Compute outputs
-        outputs: tf.Tensor = tf.nn.bias_add(
-            tf.linalg.matmul(inputs, self.w, transpose_b=True), self.b
-        )
+        outputs: tf.Tensor = tf.linalg.matmul(inputs, self.w, transpose_b=True)
+
+        # Add bias only if using bias
+        if self.use_bias is not None:
+            outputs = tf.nn.bias_add(outputs, self.b)
 
         return outputs

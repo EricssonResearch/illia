@@ -29,7 +29,6 @@ class Embedding(BayesianModule):
         max_norm: Optional[float] = None,
         norm_type: float = 2.0,
         scale_grad_by_freq: bool = False,
-        sparse: bool = False,
         weights_distribution: Optional[GaussianDistribution] = None,
         rngs: Rngs = nnx.Rngs(0),
         **kwargs: Any,
@@ -49,8 +48,6 @@ class Embedding(BayesianModule):
             scale_grad_by_freq: If given, this will scale gradients by
                 the inverse of frequency of the words in the
                 mini-batch.
-            sparse: If True, gradient w.r.t. weight matrix will be a
-                sparse tensor.
             weights_distribution: distribution for the weights of the
                 layer.
             rngs: Random number generators for reproducibility.
@@ -66,7 +63,6 @@ class Embedding(BayesianModule):
         self.max_norm = max_norm
         self.norm_type = norm_type
         self.scale_grad_by_freq = scale_grad_by_freq
-        self.sparse = sparse
         self.rngs = rngs
 
         # Set weights distribution
@@ -93,7 +89,7 @@ class Embedding(BayesianModule):
         if self.weights is None:
             self.weights = nnx.Param(self.weights_distribution.sample(self.rngs))
 
-        # Stop gradient computation (more similar to detach) weights
+        # Stop gradient computation
         self.weights = jax.lax.stop_gradient(self.weights)
 
     def kl_cost(self) -> tuple[jax.Array, int]:

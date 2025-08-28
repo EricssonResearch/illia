@@ -238,8 +238,8 @@ def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2D, jax.Array]:
 
 @pytest.fixture(
     params=[
-        (64, 100, 16, None, None, 2.0, True, False, None),
-        (32, 50, 32, 0, 5.0, 1.0, False, True, GaussianDistribution((50, 32))),
+        (64, 100, 16, None, None, 2.0, False, None),
+        (32, 50, 32, 0, 5.0, 1.0, False, GaussianDistribution((50, 32))),
     ]
 )
 def embedding_fixture(request: pytest.FixtureRequest) -> tuple[Embedding, jax.Array]:
@@ -265,7 +265,6 @@ def embedding_fixture(request: pytest.FixtureRequest) -> tuple[Embedding, jax.Ar
     max_norm: Optional[float]
     norm_type: float
     scale_grad_by_freq: bool
-    sparse: bool
     weights_distribution: Optional[GaussianDistribution]
     (
         batch_size,
@@ -275,7 +274,6 @@ def embedding_fixture(request: pytest.FixtureRequest) -> tuple[Embedding, jax.Ar
         max_norm,
         norm_type,
         scale_grad_by_freq,
-        sparse,
         weights_distribution,
     ) = request.param
 
@@ -287,7 +285,6 @@ def embedding_fixture(request: pytest.FixtureRequest) -> tuple[Embedding, jax.Ar
         max_norm,
         norm_type,
         scale_grad_by_freq,
-        sparse,
         weights_distribution,
         rngs,
     )
