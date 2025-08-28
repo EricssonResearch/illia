@@ -89,7 +89,7 @@ def test_jax(session: nox.Session) -> None:
         None.
     """
 
-    # Install dependencies with jax extras
+    # Install dependencies with tensorflow extras
     session.run("uv", "sync", "--extra", "jax", "--active")
 
     # Run pytest
