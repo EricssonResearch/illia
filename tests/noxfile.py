@@ -5,70 +5,11 @@ This file contains the pytests calls with different versions of python.
 # 3pps
 import nox
 
+# Own modules
+from illia.support import PYTHON_VERSIONS, TF_COMPAT, TORCH_COMPAT
+
 
 nox.options.default_venv_backend = "uv"
-
-PYTHON_VERSIONS = ["3.10", "3.11", "3.12"]
-TORCH_COMPAT = {
-    "2.1.2": {"3.8", "3.9", "3.10", "3.11"},
-    "2.2.2": {"3.8", "3.9", "3.10", "3.11", "3.12"},
-    "2.5.1": {"3.8", "3.9", "3.10", "3.11", "3.12"},
-}
-TF_COMPAT = {
-    "2.11.0": {"3.8", "3.9", "3.10", "3.11"},
-    "2.16.1": {"3.10", "3.11", "3.12"},
-    "2.19.0": {"3.10", "3.11", "3.12"},
-}
-
-
-@nox.session(python=PYTHON_VERSIONS)
-@nox.parametrize("torch", ["2.1.2", "2.2.2", "2.5.1"])
-def pytorch(session: nox.Session, torch: str) -> None:
-    """
-    Test compatibility and execute tests for specified torch version.
-
-    Args:
-        session: The Nox session object.
-        torch: The version of PyTorch to be tested.
-
-    Returns:
-        None.
-    """
-
-    # Ensure correct compatibility test
-    py_version = session.python
-    if py_version not in TORCH_COMPAT[torch]:
-        session.skip(f"{torch=} is not compatible with {py_version=}")
-
-    # Install dependencies and specific torch version
-    torch_version = f"torch=={torch}"
-    session.install("pytest", "pytest-order", torch_version)
-    session.run("pytest", "torch/")
-
-
-@nox.session(python=PYTHON_VERSIONS)
-@nox.parametrize("tf", ["2.16.1", "2.19.0"])
-def tensorflow(session: nox.Session, tf: str) -> None:
-    """
-    Test compatibility and execute tests for specified TensorFlow version.
-
-    Args:
-        session: The Nox session object.
-        tf: The version of TensorFlow to be tested.
-
-    Returns:
-        None.
-    """
-
-    # Ensure only correct matrix compatibility
-    py_version = session.python
-    if py_version not in TF_COMPAT[tf]:
-        session.skip(f"{tf=} not compatible with {py_version=}")
-
-    # Install dependencies & tf specific version
-    tf_version = f"tensorflow=={tf}"
-    session.install("pytest", "pytest-order", tf_version)
-    session.run("pytest", "tf/")
 
 
 # Framework-specific sessions for GitHub Actions matrix
@@ -148,7 +89,7 @@ def test_jax(session: nox.Session) -> None:
         None.
     """
 
-    # Install dependencies with tensorflow extras
+    # Install dependencies with jax extras
     session.run("uv", "sync", "--extra", "jax", "--active")
 
     # Run pytest
