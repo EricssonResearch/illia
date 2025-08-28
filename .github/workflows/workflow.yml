@@ -11,6 +11,7 @@ env:
   SRC_PROJECT_TESTS_TF: "tests/tf"
   SRC_PROJECT_TESTS_TORCH: "tests/torch"
   SRC_PROJECT_TESTS_JAX: "tests/jax"
+  SRC_NOX_FILE: "tests/noxfile.py"
   SRC_PYTHON_VERSION: "3.11"
 
 jobs:
@@ -71,7 +72,8 @@ jobs:
 
       - name: Run Nox tests for ${{ matrix.framework }}
         run:
-          uv run nox --session ${{ matrix.nox-session }} --reuse-existing-virtualenvs
+          uv run nox -f ${{ env.SRC_NOX_FILE }} --session ${{ matrix.nox-session }}
+          --reuse-existing-virtualenvs
 
   build-deploy-mkdocs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
