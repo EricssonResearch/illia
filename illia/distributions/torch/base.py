@@ -1,5 +1,9 @@
 """
-This module contains the base class for the Distributions.
+This module contains the base class for distribution modules.
+
+It defines a standard interface for sampling, evaluating log
+probabilities, and querying the number of parameters in
+distribution layers built with PyTorch's `nn.Module`.
 """
 
 # Standard libraries
@@ -12,41 +16,45 @@ import torch
 
 class DistributionModule(torch.nn.Module, ABC):
     """
-    This class serves as the base class for Distributions modules.
-    Any module designed to function as a distribution layer should
-    inherit from this class.
+    Base class for all distribution modules using PyTorch's nn API.
+
+    Any subclass must implement sampling, log-probability computation,
+    and report the number of learnable parameters in the distribution.
+
+    Notes:
+        This class is abstract and should not be instantiated directly.
     """
 
     @abstractmethod
     def sample(self) -> torch.Tensor:
         """
-        This method samples a tensor from the distribution.
+        Samples a tensor from the distribution.
 
         Returns:
-            Sampled tensor. Dimensions: [*] (same ones as the mu and
-                std parameters).
+            A sampled tensor with the same shape as the distribution's
+            parameters (e.g., mean and std).
         """
 
     @abstractmethod
     def log_prob(self, x: Optional[torch.Tensor] = None) -> torch.Tensor:
         """
-        This method computes the log prob of the distribution.
+        Computes the log-probability of a given sample.
+
+        If no input is provided, a sample is drawn internally from the
+        distribution before computing its log-probability.
 
         Args:
-            x: Output already sampled. If no output is introduced,
-                first we will sample a tensor from the current
-                distribution.
+            x: Optional sample tensor.
 
         Returns:
-            Log prob calculated as a tensor. Dimensions: [].
+            A scalar tensor representing the log-probability.
         """
 
     @abstractmethod
     def num_params(self) -> int:
         """
-        This method computes the number of parameters of the
-        distribution.
+        Returns the number of learnable parameters in the distribution.
 
         Returns:
-            Number of parameters.
+            An integer representing the number of parameters.
         """

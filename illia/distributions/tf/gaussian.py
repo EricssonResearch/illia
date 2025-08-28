@@ -1,5 +1,9 @@
 """
 This module contains the code for the Gaussian distribution.
+
+Implements a learnable Gaussian distribution in TensorFlow using
+Keras layers and supports serialization and log-probability
+evaluation.
 """
 
 # Standard libraries
@@ -19,7 +23,11 @@ from illia.distributions.tf.base import DistributionModule
 )
 class GaussianDistribution(DistributionModule):
     """
-    This is the class to implement a learnable Gaussian distribution.
+    Implements a learnable Gaussian distribution for TensorFlow models.
+
+    The distribution uses trainable parameters `mu` and `rho`, where
+    the standard deviation is obtained via a softplus transformation
+    of `rho`. Supports KL divergence via the `log_prob` method.
     """
 
     def __init__(
@@ -32,21 +40,21 @@ class GaussianDistribution(DistributionModule):
         **kwargs: Any,
     ) -> None:
         """
-        Constructor for GaussianDistribution.
+        Initializes the Gaussian distribution layer.
 
         Args:
-            shape: The shape of the distribution.
-            mu_prior: The mean for the prior distribution.
-            std_prior: The standard deviation for the prior distribution.
-            mu_init: The initial mean for the distribution.
-            rho_init: The initial value for the rho parameter.
-            **kwargs: Additional keyword arguments.
+            shape: Shape of the learnable parameters.
+            mu_prior: Prior mean for KL divergence computation.
+            std_prior: Prior std for KL divergence computation.
+            mu_init: Initial value for the mean.
+            rho_init: Initial value for the rho parameter.
+            **kwargs: Additional arguments passed to the base class.
         """
 
         # Call super class constructor
         super().__init__(**kwargs)
 
-        # Set parameters
+        # Set attributes
         self.shape = shape
         self.mu_prior_value = mu_prior
         self.std_prior_value = std_prior
@@ -54,14 +62,14 @@ class GaussianDistribution(DistributionModule):
         self.rho_init = rho_init
 
         # Call build method
-        self.build(shape)
+        self.build(self.shape)
 
     def build(self, input_shape: tf.TensorShape) -> None:
         """
-        Builds the Gaussian Distribution layer.
+        Builds trainable and non-trainable parameters.
 
         Args:
-            input_shape: Input shape of the layer.
+            input_shape: Input shape used to trigger layer building.
         """
 
         # Define non-trainable priors variables
@@ -97,12 +105,12 @@ class GaussianDistribution(DistributionModule):
         # Call super-class build method
         super().build(input_shape)
 
-    def get_config(self):
+    def get_config(self) -> dict:
         """
-        Retrieves the configuration of the Gaussian Distribution layer.
+        Returns the configuration for serialization.
 
         Returns:
-            Dictionary containing layer configuration.
+            A dictionary containing the layer's config.
         """
 
         base_config = super().get_config()
@@ -119,11 +127,10 @@ class GaussianDistribution(DistributionModule):
 
     def sample(self) -> tf.Tensor:
         """
-        This method samples a tensor from the distribution.
+        Draws a sample from the distribution using reparameterization.
 
         Returns:
-            Sampled tensor. Dimensions: [*] (same ones as the mu and
-                std parameters).
+            A sample tensor with the same shape as the parameters.
         """
 
         # Sampling with reparametrization trick
@@ -134,15 +141,16 @@ class GaussianDistribution(DistributionModule):
 
     def log_prob(self, x: Optional[tf.Tensor] = None) -> tf.Tensor:
         """
-        This method computes the log prob of the distribution.
+        Computes KL divergence between posterior and prior.
+
+        If no sample is provided, one is drawn from the current
+        distribution.
 
         Args:
-            x: Output already sampled. If no output is introduced,
-                first we will sample a tensor from the current
-                distribution.
+            x: Optional input sample tensor.
 
         Returns:
-            Log prob calculated as a tensor. Dimensions: [].
+            A scalar tensor representing the KL divergence.
         """
 
         # Sample if x is None
@@ -179,11 +187,10 @@ class GaussianDistribution(DistributionModule):
     @property
     def num_params(self) -> int:
         """
-        This method computes the number of parameters of the
-        distribution.
+        Returns the number of learnable parameters.
 
         Returns:
-            Number of parameters.
+            Total number of parameters in the distribution.
         """
 
         return int(tf.size(self.mu))

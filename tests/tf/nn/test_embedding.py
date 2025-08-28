@@ -6,6 +6,7 @@ This module contains the tests for the Embedding layer.
 import os
 import tempfile
 
+
 # Change Illia Backend
 os.environ["ILLIA_BACKEND"] = "tf"
 

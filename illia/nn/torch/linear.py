@@ -3,7 +3,7 @@ This module contains the code for Linear Bayesian layer.
 """
 
 # Standard libraries
-from typing import Optional
+from typing import Any, Optional
 
 # 3pps
 import torch
@@ -19,12 +19,16 @@ class Linear(BayesianModule):
     This class is the bayesian implementation of the torch Linear layer.
     """
 
+    weights: torch.Tensor
+    bias: torch.Tensor
+
     def __init__(
         self,
         input_size: int,
         output_size: int,
         weights_distribution: Optional[GaussianDistribution] = None,
         bias_distribution: Optional[GaussianDistribution] = None,
+        **kwargs: Any,
     ) -> None:
         """
         This is the constructor of the Linear class.
@@ -39,21 +43,17 @@ class Linear(BayesianModule):
         """
 
         # Call super-class constructor
-        super().__init__()
+        super().__init__(**kwargs)
 
         # Set weights distribution
         if weights_distribution is None:
-            self.weights_distribution: GaussianDistribution = GaussianDistribution(
-                (output_size, input_size)
-            )
+            self.weights_distribution = GaussianDistribution((output_size, input_size))
         else:
             self.weights_distribution = weights_distribution
 
         # Set bias distribution
         if bias_distribution is None:
-            self.bias_distribution: GaussianDistribution = GaussianDistribution(
-                (output_size,)
-            )
+            self.bias_distribution = GaussianDistribution((output_size,))
         else:
             self.bias_distribution = bias_distribution
 
@@ -76,11 +76,11 @@ class Linear(BayesianModule):
         self.frozen = True
 
         # Sample weights if they are undefined
-        if self.weights is None:  # type: ignore
+        if self.weights is None:
             self.weights = self.weights_distribution.sample()
 
         # Sample bias is they are undefined
-        if self.bias is None:  # type: ignore
+        if self.bias is None:
             self.bias = self.bias_distribution.sample()
 
         # Detach weights and bias
@@ -131,7 +131,8 @@ class Linear(BayesianModule):
         elif self.weights is None or self.bias is None:
             raise ValueError("Module has been frozen with undefined weights")
 
-        # compute outputs
+        # Compute outputs
+        # pylint: disable=E1102
         outputs: torch.Tensor = F.linear(inputs, self.weights, self.bias)
 
         return outputs

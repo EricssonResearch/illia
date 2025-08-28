@@ -6,6 +6,7 @@ This module contains the tests for the bayesian Conv1D.
 import os
 import tempfile
 
+
 # Change Illia Backend
 os.environ["ILLIA_BACKEND"] = "tf"
 

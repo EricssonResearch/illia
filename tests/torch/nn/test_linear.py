@@ -5,6 +5,7 @@ This module contains the code to test the bayesian Linear layer.
 # Standard libraries
 import os
 
+
 # Change Illia Backend
 os.environ["ILLIA_BACKEND"] = "torch"
 

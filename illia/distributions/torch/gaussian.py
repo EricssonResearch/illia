@@ -1,9 +1,13 @@
 """
 This module contains the code for the gaussian distribution.
+
+Defines a learnable diagonal Gaussian distribution for use in
+Bayesian models using PyTorch, including sampling and log-prob
+estimation.
 """
 
 # Standard libraries
-from typing import Optional
+from typing import Any, Optional
 
 # 3pps
 import torch
@@ -14,7 +18,11 @@ from illia.distributions.torch.base import DistributionModule
 
 class GaussianDistribution(DistributionModule):
     """
-    This is the class to implement a learnable Gaussian distribution.
+    Implements a learnable Gaussian distribution using PyTorch.
+
+    Parameters are the mean and a softplus-transformed standard
+    deviation. Provides methods for sampling and computing the
+    KL divergence via `log_prob`.
     """
 
     def __init__(
@@ -24,20 +32,27 @@ class GaussianDistribution(DistributionModule):
         std_prior: float = 0.1,
         mu_init: float = 0.0,
         rho_init: float = -7.0,
+        **kwargs: Any,
     ) -> None:
         """
-        Constructor for GaussianDistribution.
+        Initializes the Gaussian distribution with priors and initial
+        values.
 
         Args:
-            shape: Shape of the distribution.
-            mu_prior: Mean for the prior distribution.
-            std_prior: Standard deviation for the prior distribution.
-            mu_init: Initial mean for mu.
-            rho_init: Initial mean for rho.
+            shape: Shape of the learnable parameters.
+            mu_prior: Mean of the Gaussian prior.
+            std_prior: Standard deviation of the prior.
+            mu_init: Initial value for the mean parameter.
+            rho_init: Initial value for the rho parameter.
         """
 
         # Call super-class constructor
-        super().__init__()
+        super().__init__(**kwargs)
+
+        # Set attributes
+        self.shape = shape
+        self.mu_init = mu_init
+        self.rho_init = rho_init
 
         # Define priors
         self.register_buffer("mu_prior", torch.tensor([mu_prior]))
@@ -45,20 +60,19 @@ class GaussianDistribution(DistributionModule):
 
         # Define initial mu and rho
         self.mu: torch.Tensor = torch.nn.Parameter(
-            torch.randn(shape).normal_(mu_init, 0.1)
+            torch.randn(self.shape).normal_(self.mu_init, 0.1)
         )
         self.rho: torch.Tensor = torch.nn.Parameter(
-            torch.randn(shape).normal_(rho_init, 0.1)
+            torch.randn(self.shape).normal_(self.rho_init, 0.1)
         )
 
     @torch.jit.export
     def sample(self) -> torch.Tensor:
         """
-        This method samples a tensor from the distribution.
+        Draws a sample from the distribution using reparameterization.
 
         Returns:
-            Sampled tensor. Dimensions: [*] (same ones as the mu and
-                std parameters).
+            A sample tensor with the same shape as `mu` and `rho`.
         """
 
         # Sampling with reparametrization trick
@@ -70,15 +84,15 @@ class GaussianDistribution(DistributionModule):
     @torch.jit.export
     def log_prob(self, x: Optional[torch.Tensor] = None) -> torch.Tensor:
         """
-        This method computes the log prob of the distribution.
+        Computes the KL divergence between posterior and prior.
+
+        If no sample is given, one is drawn from the distribution.
 
         Args:
-            x: Output already sampled. If no output is introduced,
-                first we will sample a tensor from the current
-                distribution.
+            x: Optional sample tensor. If None, generates a new sample.
 
         Returns:
-            Log prob calculated as a tensor. Dimensions: [].
+            A scalar tensor representing the KL divergence.
         """
 
         # Sample if x is None
@@ -116,11 +130,10 @@ class GaussianDistribution(DistributionModule):
     @torch.no_grad()
     def num_params(self) -> int:
         """
-        This method computes the number of parameters of the
-        distribution.
+        Returns the number of learnable parameters in the distribution.
 
         Returns:
-            Number of parameters.
+            Total number of parameters as an integer.
         """
 
         return len(self.mu.view(-1))

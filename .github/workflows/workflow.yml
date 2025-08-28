@@ -11,6 +11,7 @@ env:
   SRC_PROJECT_TESTS_TF: "tests/tf"
   SRC_PROJECT_TESTS_TORCH: "tests/torch"
   SRC_PROJECT_TESTS_JAX: "tests/jax"
+  SRC_NOX_FILE: "tests/noxfile.py"
   SRC_PYTHON_VERSION: "3.11"
 
 jobs:
@@ -55,6 +56,9 @@ jobs:
           - framework: TensorFlow
             nox-session: test-tf
             uv-extra: tensorflow
+          - framework: Jax
+            nox-session: test-jax
+            uv-extra: jax
 
     steps:
       - name: Checkout Repository
@@ -67,7 +71,9 @@ jobs:
           uv-extra: ${{ matrix.uv-extra }}
 
       - name: Run Nox tests for ${{ matrix.framework }}
-        run: uvx nox --session ${{ matrix.nox-session }} --reuse-existing-virtualenvs
+        run:
+          uv run nox -f ${{ env.SRC_NOX_FILE }} --session ${{ matrix.nox-session }}
+          --reuse-existing-virtualenvs
 
   build-deploy-mkdocs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -95,8 +101,6 @@ jobs:
       - name: Get Version
         id: version
         uses: ./.github/actions/obtain-version
-        with:
-          src-project-folder: ${{ env.SRC_PROJECT_FOLDER }}
 
       - name: Build MkDocs Site with Mike
         uses: ./.github/actions/build-mkdocs
@@ -127,8 +131,6 @@ jobs:
       - name: Get Version
         id: version
         uses: ./.github/actions/obtain-version
-        with:
-          src-project-folder: ${{ env.SRC_PROJECT_FOLDER }}
 
       - name: Create Release
         id: release

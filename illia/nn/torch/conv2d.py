@@ -3,7 +3,7 @@ This module contains the code for the bayesian Conv2D.
 """
 
 # Standard libraries
-from typing import Optional, Union
+from typing import Any, Optional
 
 # 3pps
 import torch
@@ -19,17 +19,21 @@ class Conv2D(BayesianModule):
     This class is the bayesian implementation of the Conv2D class.
     """
 
+    weights: torch.Tensor
+    bias: torch.Tensor
+
     def __init__(
         self,
         input_channels: int,
         output_channels: int,
-        kernel_size: Union[int, tuple[int, int]],
-        stride: Union[int, tuple[int, int]] = 1,
-        padding: Union[int, tuple[int, int]] = 0,
-        dilation: Union[int, tuple[int, int]] = 1,
+        kernel_size: int | tuple[int, int],
+        stride: int | tuple[int, int] = 1,
+        padding: int | tuple[int, int] = 0,
+        dilation: int | tuple[int, int] = 1,
         groups: int = 1,
         weights_distribution: Optional[GaussianDistribution] = None,
         bias_distribution: Optional[GaussianDistribution] = None,
+        **kwargs: Any,
     ) -> None:
         """
         Definition of a Bayesian Convolution 2D layer.
@@ -38,34 +42,38 @@ class Conv2D(BayesianModule):
             kernel_size: Size of the convolving kernel.
             stride: Stride of the convolution. Deafults to 1.
             padding: Padding added to all four sides of the input.
-                Defaults to 0.
             dilation: Spacing between kernel elements.
             groups: Number of blocked connections from input channels
-                to output channels. Defaults to 1.
+                to output channels.
             weights_distribution: The distribution for the weights.
             bias_distribution: The distribution for the bias.
         """
 
         # Call super class constructor
-        super().__init__()
+        super().__init__(**kwargs)
 
         # Set attributes
-        self.conv_params: tuple[Union[int, tuple[int, int]], ...] = (
-            stride,
-            padding,
-            dilation,
-            groups,
-        )
+        self.input_channels = input_channels
+        self.output_channels = output_channels
+        self.kernel_size = kernel_size
+        self.stride = stride
+        self.padding = padding
+        self.dilation = dilation
+        self.groups = groups
 
         # Set weights distribution
         if weights_distribution is None:
             # Extend kernel if we only have 1 value
-            if isinstance(kernel_size, int):
-                kernel_size = (kernel_size, kernel_size)
+            if isinstance(self.kernel_size, int):
+                self.kernel_size = (self.kernel_size, self.kernel_size)
 
             # Define weights distribution
-            self.weights_distribution: GaussianDistribution = GaussianDistribution(
-                (output_channels, input_channels // groups, *kernel_size)
+            self.weights_distribution = GaussianDistribution(
+                (
+                    self.output_channels,
+                    self.input_channels // self.groups,
+                    *self.kernel_size,
+                )
             )
         else:
             self.weights_distribution = weights_distribution
@@ -73,9 +81,7 @@ class Conv2D(BayesianModule):
         # Set bias distribution
         if bias_distribution is None:
             # Define weights distribution
-            self.bias_distribution: GaussianDistribution = GaussianDistribution(
-                (output_channels,)
-            )
+            self.bias_distribution = GaussianDistribution((self.output_channels,))
         else:
             self.bias_distribution = bias_distribution
 
@@ -98,11 +104,11 @@ class Conv2D(BayesianModule):
         self.frozen = True
 
         # Sample weights if they are undefined
-        if self.weights is None:  # type: ignore
+        if self.weights is None:
             self.weights = self.weights_distribution.sample()
 
         # Sample bias is they are undefined
-        if self.bias is None:  # type: ignore
+        if self.bias is None:
             self.bias = self.bias_distribution.sample()
 
         # Detach weights and bias
@@ -159,6 +165,13 @@ class Conv2D(BayesianModule):
                 self.bias = self.bias_distribution.sample()
 
         # Execute torch forward
-        return F.conv2d(  # pylint: disable=E1102
-            inputs, self.weights, self.bias, *self.conv_params  # type: ignore
+        # pylint: disable=E1102
+        return F.conv2d(
+            input=inputs,
+            weight=self.weights,
+            bias=self.bias,
+            stride=self.stride,
+            padding=self.padding,
+            dilation=self.dilation,
+            groups=self.groups,
         )

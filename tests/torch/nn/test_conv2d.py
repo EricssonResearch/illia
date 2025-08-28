@@ -5,6 +5,7 @@ This module contains the tests for the bayesian Conv2D.
 # Standard libraries
 import os
 
+
 # Change Illia Backend
 os.environ["ILLIA_BACKEND"] = "torch"
 

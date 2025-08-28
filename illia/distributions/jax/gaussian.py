@@ -1,9 +1,13 @@
 """
 This module contains the code for the Gaussian distribution.
+
+Defines a learnable Gaussian distribution with methods for
+sampling and computing log-probabilities, built on Flax's
+nnx.Module system.
 """
 
 # Standard libraries
-from typing import Optional
+from typing import Any, Optional
 
 # 3pps
 import jax
@@ -17,7 +21,14 @@ from illia.distributions.jax.base import DistributionModule
 
 class GaussianDistribution(DistributionModule):
     """
-    This is the class to implement a learnable Gaussian distribution.
+    Implements a learnable Gaussian distribution using Flax's nnx API.
+
+    The distribution is parameterized by a learnable mean and standard
+    deviation derived from `rho`, which is transformed via softplus.
+
+    Notes:
+        The class assumes a diagonal Gaussian distribution and computes
+        KL divergence via log-prob differences in `log_prob`.
     """
 
     def __init__(
@@ -28,72 +39,67 @@ class GaussianDistribution(DistributionModule):
         mu_init: float = 0.0,
         rho_init: float = -7.0,
         rngs: Rngs = nnx.Rngs(0),
+        **kwargs: Any,
     ) -> None:
         """
-        Constructor for GaussianDistribution.
+        Initializes the GaussianDistribution module.
 
         Args:
-            shape: The shape of the parameters.
-            mu_prior: The mean prior value.
-            std_prior: The standard deviation prior value.
-            mu_init: The initial mean value.
-            rho_init: The initial rho value, which affects the initial
-                standard deviation.
-            rngs: Nnx rng container. Defaults to nnx.Rngs(0).
+            shape: Shape of the learnable parameters.
+            mu_prior: Mean of the Gaussian prior.
+            std_prior: Standard deviation of the prior.
+            mu_init: Initial value for the learnable mean.
+            rho_init: Initial value for the learnable rho parameter.
+            rngs: RNG container for parameter initialization.
         """
 
         # Call super-class constructor
-        super().__init__()
+        super().__init__(**kwargs)
 
-        # Define priors
+        # Set attributes
+        self.shape = shape
         self.mu_prior = mu_prior
         self.std_prior = std_prior
+        self.mu_init = mu_init
+        self.rho_init = rho_init
 
         # Define initial mu and rho
         self.mu = nnx.Param(
-            mu_init + rho_init * jax.random.normal(rngs.params(), shape)
+            self.mu_init + 0.1 * jax.random.normal(rngs.params(), self.shape)
         )
         self.rho = nnx.Param(
-            mu_init + rho_init * jax.random.normal(rngs.params(), shape)
+            self.rho_init + 0.1 * jax.random.normal(rngs.params(), self.shape)
         )
 
     def sample(self, rngs: Rngs = nnx.Rngs(0)) -> jax.Array:
         """
-        Samples from the distribution using the current parameters.
+        Draws a sample from the Gaussian distribution.
 
         Args:
-            rngs: Nnx rng container. Defaults to nnx.Rngs(0).
+            rngs: RNG container used for sampling.
 
         Returns:
-            A sampled JAX array.
+            A sample drawn from the distribution as a JAX array.
         """
 
         # Compute epsilon and sigma
         eps: jax.Array = jax.random.normal(rngs.params(), self.rho.shape)
-        sigma: jax.Array = jnp.log1p(jnp.exp(self.rho))  # type: ignore
+        sigma: jax.Array = jnp.log1p(jnp.exp(jnp.asarray(self.rho)))
 
         return self.mu + sigma * eps
 
-    def __call__(self) -> jax.Array:
-        """
-        Performs the forward pass of the module.
-
-        Returns:
-            A sampled JAX array.
-        """
-
-        return self.sample()
-
     def log_prob(self, x: Optional[jax.Array] = None) -> jax.Array:
         """
-        Computes the log probability of a given sample.
+        Computes the KL divergence between posterior and prior.
+
+        If no input is provided, a sample is generated from the
+        current distribution.
 
         Args:
-            x: An optional sampled array. If None, a sample is
-                generated.
+            x: Optional sample for evaluating the log-probability.
 
         Returns:
-            The log probability of the sample as a JAX array.
+            The KL divergence as a scalar JAX array.
         """
 
         # Sample if x is None
@@ -112,7 +118,7 @@ class GaussianDistribution(DistributionModule):
         )
 
         # Compute sigma
-        sigma: jax.Array = jnp.log1p(jnp.exp(self.rho))  # type: ignore
+        sigma: jax.Array = jnp.log1p(jnp.exp(jnp.asarray(self.rho)))
 
         # Compute log posteriors
         log_posteriors = (
@@ -130,10 +136,20 @@ class GaussianDistribution(DistributionModule):
     @property
     def num_params(self) -> int:
         """
-        Returns the number of parameters in the module.
+        Returns the number of learnable parameters.
 
         Returns:
-            The number of parameters as an integer.
+            The total number of parameters in the distribution.
         """
 
         return len(self.mu.reshape(-1))
+
+    def __call__(self) -> jax.Array:
+        """
+        Performs a forward pass by sampling from the distribution.
+
+        Returns:
+            A sample from the distribution.
+        """
+
+        return self.sample()

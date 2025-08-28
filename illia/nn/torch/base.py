@@ -1,5 +1,7 @@
 """
 This module contains the code for the BayesianModule.
+
+Defines an abstract base class for Bayesian layers using PyTorch's nn.
 """
 
 # Standard libraries
@@ -11,14 +13,16 @@ import torch
 
 class BayesianModule(torch.nn.Module, ABC):
     """
-    This class serves as the base class for Bayesian modules.
-    Any module designed to function as a Bayesian layer should inherit
-    from this class.
+    Abstract base class for all Bayesian modules.
+
+    Any layer intended to function as a Bayesian component should
+    inherit from this class and implement the `kl_cost` method.
     """
 
     def __init__(self):
         """
-        This method is the constructor for BayesianModule.
+        Initializes the BayesianModule.
+        Sets default properties for identifying and freezing Bayesian layers.
         """
 
         # Call super class constructor
@@ -33,8 +37,8 @@ class BayesianModule(torch.nn.Module, ABC):
     @torch.jit.export
     def freeze(self) -> None:
         """
-        Freezes the current module and all submodules that are instances
-        of BayesianModule. Sets the frozen state to True.
+        Freezes the current module by setting its `frozen` flag to True.
+        This flag can be used in derived classes to disable updates.
         """
 
         # Set frozen indicator to true for current layer
@@ -43,8 +47,7 @@ class BayesianModule(torch.nn.Module, ABC):
     @torch.jit.export
     def unfreeze(self) -> None:
         """
-        Unfreezes the current module and all submodules that are
-        instances of BayesianModule. Sets the frozen state to False.
+        Unfreezes the current module by setting its `frozen` flag to False.
         """
 
         # Set frozen indicator to false for current layer
@@ -53,12 +56,13 @@ class BayesianModule(torch.nn.Module, ABC):
     @torch.jit.export
     def kl_cost(self) -> tuple[torch.Tensor, int]:
         """
-        Computes the Kullback-Leibler (KL) divergence cost for the
-        layer's weights and bias.
+        Computes the KL divergence between posterior and prior distributions
+        for the module's learnable parameters.
 
         Returns:
-            Tuple containing KL divergence cost and total number of
-            parameters.
+            A tuple containing:
+                - kl_cost: The KL divergence as a JAX array.
+                - num_params: The number of contributing parameters.
         """
 
         return torch.tensor(0.0), 0

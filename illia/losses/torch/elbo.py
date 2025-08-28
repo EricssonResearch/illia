@@ -1,9 +1,12 @@
 """
 This module contains the code for the Losses.
+
+Implements the KL divergence loss and the Evidence Lower Bound (ELBO)
+loss for Bayesian neural networks in PyTorch.
 """
 
 # Standard libraries
-from typing import Literal
+from typing import Any, Literal
 
 # 3pps
 import torch
@@ -14,39 +17,42 @@ from illia.nn.torch.base import BayesianModule
 
 class KLDivergenceLoss(torch.nn.Module):
     """
-    Computes the KL divergence loss for Bayesian modules within a model.
+    Computes the KL divergence loss across all Bayesian modules in a model.
+
+    Supports reduction and scaling by a configurable weight.
     """
 
     def __init__(
-        self, reduction: Literal["mean"] = "mean", weight: float = 1.0
+        self,
+        reduction: Literal["mean"] = "mean",
+        weight: float = 1.0,
+        **kwargs: Any,
     ) -> None:
         """
-        Initializes the KL Divergence Loss with specified reduction
-        method and weight.
+        Initializes the KL divergence loss.
 
         Args:
-            reduction: Method to reduce the loss, currently only "mean"
-                is supported.
-            weight: Scaling factor for the KL divergence loss.
+            reduction: Reduction method for the loss.
+                Only "mean" is currently supported.
+            weight: Scalar to scale the KL divergence term.
         """
 
         # call super class constructor
-        super().__init__()
+        super().__init__(**kwargs)
 
-        # Set parameters
+        # Set attributes
         self.reduction = reduction
         self.weight = weight
 
     def forward(self, model: torch.nn.Module) -> torch.Tensor:
         """
-        Computes the KL divergence loss across all Bayesian modules in
-        the model.
+        Computes KL divergence loss across Bayesian modules in the model.
 
         Args:
-            model: PyTorch model containing Bayesian modules.
+            model: A PyTorch model containing BayesianModule instances.
 
         Returns:
-            KL divergence cost scaled by the specified weight.
+            KL divergence loss scaled by the given weight.
         """
 
         # Get device and dtype
@@ -74,8 +80,10 @@ class KLDivergenceLoss(torch.nn.Module):
 
 class ELBOLoss(torch.nn.Module):
     """
-    Computes the Evidence Lower Bound (ELBO) loss, combining a
-    reconstruction loss and KL divergence.
+    Computes the Evidence Lower Bound (ELBO) loss.
+
+    Combines a reconstruction loss with KL divergence regularization,
+    optionally using Monte Carlo sampling.
     """
 
     def __init__(
@@ -83,22 +91,21 @@ class ELBOLoss(torch.nn.Module):
         loss_function: torch.nn.Module,
         num_samples: int = 1,
         kl_weight: float = 1e-3,
+        **kwargs: Any,
     ) -> None:
         """
-        Initializes the ELBO loss with specified reconstruction loss
-        function, sample count, and KL weight.
+        Initializes the ELBO loss function.
 
         Args:
-            loss_function: Loss function for computing reconstruction
-                loss.
-            num_samples: Number of samples for Monte Carlo
-                approximation.
-            kl_weight: Scaling factor for the KL divergence component.
+            loss_function: Callable loss used for reconstruction (e.g. MSELoss).
+            num_samples: Number of samples for Monte Carlo estimation.
+            kl_weight: Scalar weight for the KL divergence term.
         """
 
         # Call super class constructor
-        super().__init__()
+        super().__init__(**kwargs)
 
+        # Set attributes
         self.loss_function = loss_function
         self.num_samples = num_samples
         self.kl_weight = kl_weight
@@ -108,20 +115,21 @@ class ELBOLoss(torch.nn.Module):
         self, outputs: torch.Tensor, targets: torch.Tensor, model: torch.nn.Module
     ) -> torch.Tensor:
         """
-        Computes the ELBO loss, averaging over multiple samples.
+        Computes the ELBO loss over a number of samples.
 
         Args:
-            outputs: Predicted values from the model.
-            targets: True target values.
-            model: PyTorch model containing Bayesian modules.
+            outputs: Model predictions.
+            targets: Ground truth values.
+            model: A PyTorch model containing BayesianModule layers.
 
         Returns:
-            Average ELBO loss across samples.
+            Average ELBO loss across all samples.
         """
 
         loss_value = torch.tensor(
             0, device=next(model.parameters()).device, dtype=torch.float32
         )
+
         for _ in range(self.num_samples):
             loss_value += self.loss_function(outputs, targets) + self.kl_loss(model)
 
