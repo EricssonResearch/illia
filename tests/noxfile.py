@@ -43,7 +43,7 @@ def pytorch(session: nox.Session, torch: str) -> None:
     # Install dependencies and specific torch version
     torch_version = f"torch=={torch}"
     session.install("pytest", "pytest-order", torch_version)
-    session.run("pytest", "tests/torch/")
+    session.run("pytest", "torch/")
 
 
 @nox.session(python=PYTHON_VERSIONS)
@@ -68,7 +68,7 @@ def tensorflow(session: nox.Session, tf: str) -> None:
     # Install dependencies & tf specific version
     tf_version = f"tensorflow=={tf}"
     session.install("pytest", "pytest-order", tf_version)
-    session.run("pytest", "tests/tf/")
+    session.run("pytest", "tf/")
 
 
 # Framework-specific sessions for GitHub Actions matrix
@@ -99,7 +99,7 @@ def test_torch(session: nox.Session) -> None:
 
     if latest_torch:
         session.install(f"torch=={latest_torch}")
-        session.run("pytest", "tests/torch/")
+        session.run("pytest", "torch/")
     else:
         session.skip(f"No compatible PyTorch version found for Python {py_version}")
 
@@ -131,7 +131,7 @@ def test_tf(session: nox.Session) -> None:
 
     if latest_tf:
         session.install(f"tensorflow=={latest_tf}")
-        session.run("pytest", "tests/tf/")
+        session.run("pytest", "tf/")
     else:
         session.skip(f"No compatible TensorFlow version found for Python {py_version}")
 
@@ -152,4 +152,4 @@ def test_jax(session: nox.Session) -> None:
     session.run("uv", "sync", "--extra", "jax", "--active")
 
     # Run pytest
-    session.run("pytest", "tests/jax/", external=True)
+    session.run("pytest", "jax/", external=True)
