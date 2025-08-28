@@ -9,7 +9,6 @@ from abc import ABC, abstractmethod
 
 # 3pps
 import jax
-import jax.numpy as jnp
 from flax import nnx
 
 
@@ -36,14 +35,12 @@ class BayesianModule(nnx.Module, ABC):
         # Create attribute to know is a bayesian layer
         self.is_bayesian: bool = True
 
+    @abstractmethod
     def freeze(self) -> None:
         """
         Freezes the current module by setting its `frozen` flag to True.
         This flag can be used in derived classes to disable updates.
         """
-
-        # Set frozen indicator to true for current layer
-        self.frozen = True
 
     def unfreeze(self) -> None:
         """
@@ -64,5 +61,3 @@ class BayesianModule(nnx.Module, ABC):
                 - kl_cost: The KL divergence as a JAX array.
                 - num_params: The number of contributing parameters.
         """
-
-        return jnp.array(0), 0

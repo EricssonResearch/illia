@@ -49,16 +49,21 @@ class GaussianDistribution(DistributionModule):
         # Call super-class constructor
         super().__init__(**kwargs)
 
+        # Set attributes
+        self.shape = shape
+        self.mu_init = mu_init
+        self.rho_init = rho_init
+
         # Define priors
         self.register_buffer("mu_prior", torch.tensor([mu_prior]))
         self.register_buffer("std_prior", torch.tensor([std_prior]))
 
         # Define initial mu and rho
         self.mu: torch.Tensor = torch.nn.Parameter(
-            torch.randn(shape).normal_(mu_init, 0.1)
+            torch.randn(self.shape).normal_(self.mu_init, 0.1)
         )
         self.rho: torch.Tensor = torch.nn.Parameter(
-            torch.randn(shape).normal_(rho_init, 0.1)
+            torch.randn(self.shape).normal_(self.rho_init, 0.1)
         )
 
     @torch.jit.export

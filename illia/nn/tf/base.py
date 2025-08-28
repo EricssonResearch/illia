@@ -5,7 +5,7 @@ Defines an abstract base class for Bayesian layers using Keras's layers.
 """
 
 # Standard libraries
-from abc import ABC
+from abc import ABC, abstractmethod
 
 # 3pps
 import tensorflow as tf
@@ -38,14 +38,12 @@ class BayesianModule(layers.Layer, ABC):
         # Create attribute to know is a bayesian layer
         self.is_bayesian: bool = True
 
+    @abstractmethod
     def freeze(self) -> None:
         """
         Freezes the current module by setting its `frozen` flag to True.
         This flag can be used in derived classes to disable updates.
         """
-
-        # Set frozen indicator to true for current layer
-        self.frozen = True
 
     def unfreeze(self) -> None:
         """
@@ -55,6 +53,7 @@ class BayesianModule(layers.Layer, ABC):
         # Set frozen indicator to false for current layer
         self.frozen = False
 
+    @abstractmethod
     def kl_cost(self) -> tuple[tf.Tensor, int]:
         """
         Computes the KL divergence between posterior and prior distributions
@@ -65,5 +64,3 @@ class BayesianModule(layers.Layer, ABC):
                 - kl_cost: The KL divergence as a JAX array.
                 - num_params: The number of contributing parameters.
         """
-
-        return tf.Tensor([0.0]), 0

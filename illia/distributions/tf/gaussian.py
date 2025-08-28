@@ -54,7 +54,7 @@ class GaussianDistribution(DistributionModule):
         # Call super class constructor
         super().__init__(**kwargs)
 
-        # Set parameters
+        # Set attributes
         self.shape = shape
         self.mu_prior_value = mu_prior
         self.std_prior_value = std_prior
@@ -62,7 +62,7 @@ class GaussianDistribution(DistributionModule):
         self.rho_init = rho_init
 
         # Call build method
-        self.build(shape)
+        self.build(self.shape)
 
     def build(self, input_shape: tf.TensorShape) -> None:
         """

@@ -56,13 +56,20 @@ class GaussianDistribution(DistributionModule):
         # Call super-class constructor
         super().__init__(**kwargs)
 
-        # Define priors
+        # Set attributes
+        self.shape = shape
         self.mu_prior = mu_prior
         self.std_prior = std_prior
+        self.mu_init = mu_init
+        self.rho_init = rho_init
 
         # Define initial mu and rho
-        self.mu = nnx.Param(mu_init + 0.1 * jax.random.normal(rngs.params(), shape))
-        self.rho = nnx.Param(rho_init + 0.1 * jax.random.normal(rngs.params(), shape))
+        self.mu = nnx.Param(
+            self.mu_init + 0.1 * jax.random.normal(rngs.params(), self.shape)
+        )
+        self.rho = nnx.Param(
+            self.rho_init + 0.1 * jax.random.normal(rngs.params(), self.shape)
+        )
 
     def sample(self, rngs: Rngs = nnx.Rngs(0)) -> jax.Array:
         """

@@ -129,6 +129,7 @@ class ELBOLoss(torch.nn.Module):
         loss_value = torch.tensor(
             0, device=next(model.parameters()).device, dtype=torch.float32
         )
+
         for _ in range(self.num_samples):
             loss_value += self.loss_function(outputs, targets) + self.kl_loss(model)
 
