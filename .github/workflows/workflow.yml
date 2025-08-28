@@ -71,7 +71,7 @@ jobs:
 
       - name: Run Nox tests for ${{ matrix.framework }}
         run:
-          uv nox --session ${{ matrix.nox-session }} --reuse-existing-virtualenvs
+          uv run nox --session ${{ matrix.nox-session }} --reuse-existing-virtualenvs
 
   build-deploy-mkdocs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
