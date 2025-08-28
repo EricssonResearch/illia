@@ -3,7 +3,7 @@ This module contains the code for the bayesian Conv1D.
 """
 
 # Standard libraries
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 # 3pps
 import tensorflow as tf
@@ -20,18 +20,21 @@ class Conv1D(BayesianModule):
     This class is the bayesian implementation of the Conv1D class.
     """
 
+    bias_distribution: Optional[GaussianDistribution] = None
+
     def __init__(
         self,
         input_channels: int,
         output_channels: int,
         kernel_size: int,
-        stride: Union[int, list[int]] = 1,
+        stride: int = 1,
         padding: str = "VALID",
-        dilation: Union[int, list[int]] = 1,
+        dilation: int = 1,
         groups: int = 1,
         data_format: Optional[str] = "NWC",
         weights_distribution: Optional[GaussianDistribution] = None,
         bias_distribution: Optional[GaussianDistribution] = None,
+        use_bias: bool = True,
         **kwargs: Any,
     ) -> None:
         """
@@ -54,6 +57,7 @@ class Conv1D(BayesianModule):
                 weights, if applicable.
             bias_distribution: The Gaussian distribution for the bias,
                 if applicable.
+            use_bias: Whether to include a bias term.
             **kwargs: Additional keyword arguments.
         """
 
@@ -71,6 +75,7 @@ class Conv1D(BayesianModule):
         self.padding = padding
         self.dilation = dilation
         self.groups = groups
+        self.use_bias = use_bias
 
         # Adjust the weights distribution based on the channel format
         self.data_format = (
@@ -93,12 +98,22 @@ class Conv1D(BayesianModule):
             self.weights_distribution = weights_distribution
 
         # Set bias distribution
-        if bias_distribution is None:
-            self.bias_distribution = GaussianDistribution((output_channels,))
+        if self.use_bias:
+            if bias_distribution is None:
+                self.bias_distribution = GaussianDistribution((output_channels,))
+            else:
+                self.bias_distribution = bias_distribution
         else:
-            self.bias_distribution = bias_distribution
+            self.bias_distribution = None
 
-    def _check_params(self, kernel_size, groups, stride, dilation, data_format) -> None:
+    def _check_params(
+        self,
+        kernel_size: int,
+        groups: int,
+        stride: int,
+        dilation: int,
+        data_format: Optional[str],
+    ) -> None:
         """
         Checks the validity of the parameters for the convolution
         operation.
@@ -154,14 +169,16 @@ class Conv1D(BayesianModule):
             shape=self._weights_distribution_shape,
             trainable=False,
         )
-        self.b = self.add_weight(
-            name="bias",
-            initializer=tf.constant_initializer(
-                self.bias_distribution.sample().numpy()
-            ),
-            shape=(self.output_channels,),
-            trainable=False,
-        )
+
+        if self.use_bias and self.bias_distribution:
+            self.b = self.add_weight(
+                name="bias",
+                initializer=tf.constant_initializer(
+                    self.bias_distribution.sample().numpy()
+                ),
+                shape=(self.output_channels,),
+                trainable=False,
+            )
 
         # Call super-class build method
         super().build(input_shape)
@@ -196,10 +213,10 @@ class Conv1D(BayesianModule):
         self,
         inputs: tf.Tensor,
         weight: tf.Tensor,
-        stride: Union[int, list[int]],
+        stride: int | list[int],
         padding: str,
         data_format: Optional[str] = "NWC",
-        dilation: Optional[Union[int, list[int]]] = None,
+        dilation: Optional[int | list[int]] = None,
     ) -> tf.Tensor:
         """
         Applies a 1D convolution operation to the input tensor.
@@ -244,8 +261,13 @@ class Conv1D(BayesianModule):
             self.w = self.weights_distribution.sample()
 
         # Sample bias is they are undefined
-        if self.b is None:
+        if self.use_bias and self.bias_distribution:
             self.b = self.bias_distribution.sample()
+
+        # Stop gradient computation
+        self.w = tf.stop_gradient(self.w)
+        if self.use_bias:
+            self.b = tf.stop_gradient(self.b)
 
     def kl_cost(self) -> tuple[tf.Tensor, int]:
         """
@@ -258,14 +280,16 @@ class Conv1D(BayesianModule):
         """
 
         # Compute log probs
-        log_probs: tf.Tensor = self.weights_distribution.log_prob(
-            self.w
-        ) + self.bias_distribution.log_prob(self.b)
+        log_probs: tf.Tensor = self.weights_distribution.log_prob(self.w)
 
-        # Compute the number of parameters
-        num_params: int = (
-            self.weights_distribution.num_params + self.bias_distribution.num_params
-        )
+        # Add bias log probs only if using bias
+        if self.use_bias and self.bias_distribution:
+            log_probs += self.bias_distribution.log_prob(self.b)
+
+        # Compute number of parameters
+        num_params: int = self.weights_distribution.num_params
+        if self.use_bias and self.bias_distribution:
+            num_params += self.bias_distribution.num_params
 
         return log_probs, num_params
 
@@ -275,7 +299,7 @@ class Conv1D(BayesianModule):
         layer. If the layer is not frozen, it samples weights and bias
         from their respective distributions. If the layer is frozen
         and the weights or bias are not initialized, it also performs
-        sampling.
+        sampling.str
 
         Args:
             inputs: Input tensor to the layer.
@@ -287,7 +311,11 @@ class Conv1D(BayesianModule):
         # Check if layer is frozen
         if not self.frozen:
             self.w = self.weights_distribution.sample()
-            self.b = self.bias_distribution.sample()
+
+            # Sample bias only if using bias
+            if self.b is None and self.use_bias and self.bias_distribution:
+                self.b = self.bias_distribution.sample()
+
         elif self.w is None or self.b is None:
             raise ValueError(
                 "Module has been frozen with undefined weights and/or bias."
@@ -303,11 +331,12 @@ class Conv1D(BayesianModule):
             dilation=self.dilation,
         )
 
-        # Add bias
-        outputs = tf.nn.bias_add(
-            value=outputs,
-            bias=self.b,
-            data_format="N..C" if self.data_format == "NWC" else "NC..",
-        )
+        # Add bias only if using bias
+        if self.use_bias is not None:
+            outputs = tf.nn.bias_add(
+                value=outputs,
+                bias=self.b,
+                data_format="N..C" if self.data_format == "NWC" else "NC..",
+            )
 
         return outputs

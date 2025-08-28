@@ -10,15 +10,15 @@ theme:
   palette:
     - media: "(prefers-color-scheme: light)"
       scheme: default
-      primary: white
-      accent: white
+      primary: black
+      accent: black
       toggle:
         icon: material/weather-sunny
         name: "Switch to dark mode"
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
-      primary: white
-      accent: white
+      primary: black
+      accent: black
       toggle:
         icon: material/weather-night
         name: "Switch to light mode"
@@ -40,7 +40,7 @@ theme:
     - search.suggest
     - toc.follow
     - toc.integrate
-  logo: assets/images/black_logo_illia.png
+  logo: assets/images/white_logo_illia.png
   favicon: assets/images/white_logo_illia.png
   icon:
     repo: fontawesome/brands/github

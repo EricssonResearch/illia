@@ -9,13 +9,12 @@ SRC_PROJECT_NAME ?= illia
 SRC_PROJECT_TESTS_TF ?= tests/tf
 SRC_PROJECT_TESTS_TORCH ?= tests/torch
 SRC_PROJECT_TESTS_JAX ?= tests/jax
-SRC_ALL ?= $(SRC_PROJECT_NAME)/ $(SRC_PROJECT_TESTS_TF)/ \
-                $(SRC_PROJECT_TESTS_TORCH)/ $(SRC_PROJECT_TESTS_JAX)/
+SRC_ALL ?= .
 
 # Allows the installation of project dependencies
 install:
 	@echo "Installing dependencies..."
-	@uv pip install -r pyproject.toml --all-extras
+	@uv sync --all-extras
 	@echo "✅ Dependencies installed."
 
 # Clean cache and temporary files
@@ -48,7 +47,8 @@ code_check:
 tests:
 	@echo "Runing test per each backend..."
 	@uv run pytest $(SRC_PROJECT_TESTS_TF)/ && \
-	uv run pytest $(SRC_PROJECT_TESTS_TORCH)/ 
+	uv run pytest $(SRC_PROJECT_TESTS_TORCH)/ && \
+	uv run pytest $(SRC_PROJECT_TESTS_JAX)/
 	@echo "✅ Tests complete."
 
 # Serve documentation locally

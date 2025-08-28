@@ -6,6 +6,7 @@ This module contains the tests for GaussianDistribution.
 import copy
 import os
 
+
 # Change Illia Backend
 os.environ["ILLIA_BACKEND"] = "jax"
 
@@ -67,8 +68,6 @@ class TestGaussianDistribution:
             num_params == 2
         ), f"Incorrect number of parameters, expected 2 and got {num_params}"
 
-        return None
-
     @pytest.mark.order(2)
     def test_sample(
         self,
@@ -121,8 +120,6 @@ class TestGaussianDistribution:
             sample_equal, sample_nequal
         ), "Unequal samples with same seed"
 
-        return None
-
     @pytest.mark.order(3)
     def test_call(
         self,
@@ -165,8 +162,6 @@ class TestGaussianDistribution:
         assert (
             outputs.shape == shape
         ), f"Incorrect shape, expected {shape} and got {outputs.shape}"
-
-        return None
 
     @pytest.mark.order(4)
     def test_log_prob(
@@ -211,8 +206,6 @@ class TestGaussianDistribution:
             log_prob.shape == ()
         ), f"Incorrect shape of log probs, expected {()} and got {log_prob.shape}"
 
-        return None
-
     @pytest.mark.order(5)
     def test_num_params(
         self,
@@ -250,5 +243,3 @@ class TestGaussianDistribution:
         assert isinstance(
             num_params, int
         ), f"Incorrect type, expected {int} and got {type(num_params)}"
-
-        return None

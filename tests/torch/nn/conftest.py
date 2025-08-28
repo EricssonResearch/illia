@@ -6,6 +6,7 @@ This module defines fixtures for illia.torch.nn.
 import os
 from typing import Optional, Union
 
+
 # Change Illia Backend
 os.environ["ILLIA_BACKEND"] = "torch"
 
@@ -22,7 +23,7 @@ from tests.torch.nn.utils import BayesianComposedModel, ComposedModel
 
 @pytest.fixture(
     params=[
-        ((32, 30, 20, None, None)),
+        (32, 30, 20, None, None),
         (64, 20, 30, GaussianDistribution((30, 20)), GaussianDistribution((30,))),
     ]
 )

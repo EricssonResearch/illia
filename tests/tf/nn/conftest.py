@@ -6,6 +6,7 @@ This module defines fixtures for illia.torch.nn.
 import os
 from typing import Optional, Union
 
+
 # Change Illia Backend
 os.environ["ILLIA_BACKEND"] = "tf"
 
@@ -21,7 +22,7 @@ from illia.nn import Conv1D, Conv2D, Embedding, Linear
 
 @pytest.fixture(
     params=[
-        ((32, 30, 20, None, None)),
+        (32, 30, 20, None, None),
         (64, 20, 30, GaussianDistribution((30, 20)), GaussianDistribution((30,))),
     ]
 )

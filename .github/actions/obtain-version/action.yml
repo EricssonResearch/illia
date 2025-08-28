@@ -1,11 +1,5 @@
 name: Obtain Version
-description: Get Package Version from version.py File
-
-inputs:
-  src-project-folder:
-    description: "Project Directory"
-    required: true
-    default: "src"
+description: Get Package Version
 
 outputs:
   version:
@@ -19,6 +13,6 @@ runs:
       id: get_version
       shell: bash
       run: |
-        VERSION=$(uv run python -c "from ${{ inputs.src-project-folder }} import version; print(version.__version__)")
+        VERSION=$(uv version --short)
         echo "version=v$VERSION" >> $GITHUB_OUTPUT
         echo "Package Version: v$VERSION"

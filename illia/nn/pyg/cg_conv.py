@@ -4,7 +4,7 @@ operator.
 """
 
 # Standard libraries
-from typing import Union
+from typing import Any
 
 # 3pps
 import torch
@@ -24,11 +24,11 @@ class CGConv(MessagePassing):
 
     def __init__(
         self,
-        channels: Union[int, tuple[int, int]],
+        channels: int | tuple[int, int],
         dim: int = 0,
         aggr: str = "add",
-        **kwargs,
-    ):
+        **kwargs: Any,
+    ) -> None:
         r"""
         "Crystal Graph Convolutional Neural Networks for an Accurate
         and Interpretable Prediction of Material Properties"
@@ -72,16 +72,18 @@ class CGConv(MessagePassing):
         # Call super class constructor
         super().__init__(aggr=aggr, **kwargs)
 
+        # Set attributes
         self.channels = channels
         self.dim = dim
 
         if isinstance(channels, int):
             channels = (channels, channels)
 
+        # Define linear layers
         self.lin_f = Linear(sum(channels) + dim, channels[1])
         self.lin_s = Linear(sum(channels) + dim, channels[1])
 
-    def reset_parameters(self):
+    def reset_parameters(self) -> None:
         """
         Resets the parameters of the linear layers.
         """
@@ -92,7 +94,7 @@ class CGConv(MessagePassing):
             self.bn.reset_parameters()
 
     def forward(
-        self, x: Union[Tensor, PairTensor], edge_index: Adj, edge_attr: OptTensor = None
+        self, x: Tensor | PairTensor, edge_index: Adj, edge_attr: OptTensor = None
     ) -> Tensor:
         """
         Performs a forward pass of the convolutional layer.
@@ -133,7 +135,8 @@ class CGConv(MessagePassing):
         else:
             z = torch.cat([x_i, x_j, edge_attr], dim=-1)
 
-        return self.lin_f(z).sigmoid() * F.softplus(self.lin_s(z))
+        # pylint: disable=E1102
+        return self.lin_f(z).sigmoid() * F.softplus(input=self.lin_s(z))
 
     def __repr__(self) -> str:
         """

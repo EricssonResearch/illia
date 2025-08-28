@@ -178,6 +178,9 @@ class Embedding(BayesianModule):
         if self.w is None:
             self.w = self.weights_distribution.sample()
 
+        # Stop gradient computation
+        self.w = tf.stop_gradient(self.w)
+
     def kl_cost(self) -> tuple[tf.Tensor, int]:
         """
         Computes the Kullback-Leibler (KL) divergence cost for the

@@ -5,9 +5,6 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/EricssonResearch/illia/actions/workflows/workflow.yml">
-    <img src="https://github.com/EricssonResearch/illia/actions/workflows/workflow.yml/badge.svg" alt="CI Status">
-  </a>
   <img src="https://img.shields.io/badge/python-3.10%20|%203.11%20|%203.12-blue" alt="Python versions">
   <a href="https://github.com/EricssonResearch/illia/blob/main/LICENSE">
     <img src="https://img.shields.io/github/license/EricssonResearch/illia" alt="License">
@@ -15,9 +12,7 @@
   <a href="https://github.com/EricssonResearch/illia/releases/latest">
     <img src="https://img.shields.io/github/release-date/EricssonResearch/illia?display_date=published_at" alt="Last Release">
   </a>
-  <a href="https://github.com/EricssonResearch/illia/issues">
-    <img src="https://img.shields.io/github/issues/EricssonResearch/illia" alt="GitHub Issues">
-  </a>
+  <a href="https://github.com/EricssonResearch/illia/releases"><img alt="GitHub release" src="https://img.shields.io/github/release/EricssonResearch/illia.svg"></a>
 </p>
 
 # Home
@@ -45,6 +40,8 @@ os.environ["ILLIA_BACKEND"] = "torch"
 
 # Import the Illia library
 import illia
+from illia.nn import Conv2D
+import torch
 
 print(f"Illia version: {illia.__version__}")
 print(f"Illia backend: {illia.__get_backend__}")
@@ -75,17 +72,17 @@ using our streamlined `Makefile`:
 1. **Clone the repository** Ensure your system is updated and `make` is installed. On
    most Linux systems:
 
-   ```bash
-   sudo apt-get update
-   sudo apt-get install build-essential
-   ```
+    ```bash
+    sudo apt-get update
+    sudo apt-get install build-essential
+    ```
 
 2. **Set up your environment** Navigate to the cloned directory, create a Python
    environment, activate it, and run:
 
-   ```bash
-   make
-   ```
+    ```bash
+    make
+    ```
 
    This command updates `pip`, installs `uv`, and sets up all project dependencies
    automatically.
