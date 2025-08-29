@@ -1,0 +1,67 @@
+name: "Feature or New Layer Proposal"
+description: Suggest a new feature, model, or layer for illia.
+labels: ["Feature request", "New layer"]
+body:
+  - type: textarea
+    id: proposal-summary
+    attributes:
+      label: Proposal Summary
+      description:
+        "Describe your proposal clearly. Specify if it's a new feature, model, or layer.
+        Include relevant papers, blog posts, and code links if available."
+      placeholder: |
+        Example:
+        - Type: New BNN layer improvement
+        - Feature: New future to support
+        - Paper: https://arxiv.org/...
+        - Code: https://github.com/...
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description:
+        "Explain why this proposal is valuable. Is it solving a limitation or adding a
+        unique advantage? If it's related to another GitHub issue, please link it."
+      placeholder: |
+        Example:
+        - Problem: Current architecture struggles with [...]
+        - Benefit: Improves training speed by [...]
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: open-source-status
+    attributes:
+      label: Open Source Status
+      description: "This helps assess implementation feasibility."
+      options:
+        - label: "Implementation code is available"
+
+  - type: textarea
+    id: useful-links
+    attributes:
+      label: Useful Links & References
+      description:
+        "Provide additional resources or relevant repositories. Mention authors with
+        @username if known."
+      placeholder: |
+        - Implementation repo: ...
+        - Paper link: ...
+        - Author: @gh-username
+
+  - type: textarea
+    id: contribution
+    attributes:
+      label: Contribution Possibility
+      description:
+        "Can you help implement this? Please review the [Contribution
+        Guide](https://github.com/EricssonResearch/illia/blob/main/CONTRIBUTING.md)
+        before offering code."
+      placeholder:
+        "Yes, I can submit a PR / No, but I can help with testing / No, but I can help
+        with design"
+    validations:
+      required: true

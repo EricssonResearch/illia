@@ -1,5 +1,5 @@
 """
-This module defines the Illia dynamic backend manager.
+This module defines the illia dynamic backend manager.
 """
 
 # Standard libraries
@@ -15,16 +15,9 @@ from illia.support import (
     AVAILABLE_GNN_BACKENDS,
     BACKEND_CAPABILITIES,
     BACKEND_MODULES,
+    DEFAULT_BACKEND,
+    ENV_OS_NAME,
 )
-from illia.version import __version__
-
-
-# Define all names to be imported
-__all__: list[str] = ["__version__"]
-
-# Constants
-ENV_OS_NAME: str = "ILLIA_BACKEND"
-DEFAULT_BACKEND: str = "torch"
 
 
 class BackendManager:
@@ -379,6 +372,8 @@ def __getattr__(name: str) -> Any:
         return BackendManager.get_backend()
     if name == "__get_available_backends__":
         return BackendManager.get_available_backends()
+    if name == "__version__":
+        return importlib.metadata.version("illia")
     raise AttributeError(f"module '{__name__}' has no attribute '{name}'")
 
 

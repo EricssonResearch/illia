@@ -1,0 +1,66 @@
+name: "Bug Report"
+description: Report a bug to help us improve illia.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to report a bug!
+
+        For more information, please refer to our [Contribution Guide](https://github.com/EricssonResearch/illia/blob/main/CONTRIBUTING.md).
+
+  - type: textarea
+    id: system-info
+    attributes:
+      label: System Information
+      description: Please provide details about your system configuration.
+      placeholder: |
+        illia version: 
+        Platform/OS: 
+        Python version: 
+        Backend:
+    validations:
+      required: true
+
+  - type: textarea
+    id: who-can-help
+    attributes:
+      label: Who Can Help?
+      description: |
+        If you know the relevant maintainer, please tag them (e.g., @username). If not, leave blank and a core maintainer will assign it.
+      placeholder: "@Username ..."
+
+  - type: checkboxes
+    id: information-scripts-examples
+    attributes:
+      label: Code Source
+      description: Where did the code causing the issue come from?
+      options:
+        - label: "Official example scripts"
+        - label: "My own modified scripts"
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: |
+        Provide a **minimal, reproducible example** with any relevant configuration. Use code blocks for formatting. Avoid screenshots as they can’t be easily copied.
+      placeholder: |
+        Steps to reproduce:
+        1.
+        2.
+        3.
+        Code snippet / Colab link:
+        ```python
+        # your code here
+        ```
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: Clearly describe what you expected to happen.
+    validations:
+      required: true
