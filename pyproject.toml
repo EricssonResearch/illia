@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "illia"
-version = "0.2.0"
+version = "0.2.1"
 description = "Framework agnostic Bayesian Neural Network library"
 authors = [
     {name = "Oscar Llorente Gonzalez", email = "oscar.llorente.gonzalez@ericsson.com"},
@@ -42,13 +42,19 @@ Repository = "https://github.com/EricssonResearch/illia"
 [tool.uv]
 default-groups = "all"
 cache-keys = [{ file = "pyproject.toml" }, { git = { commit = true } }]
+required-environments = [
+    "sys_platform == 'darwin' and platform_machine == 'x86_64'",
+    "sys_platform == 'linux' and platform_machine == 'x86_64'",
+]
 
 [project.optional-dependencies]
 torch = [
-    "torch==2.4.0",
+    "torch==2.2.2; sys_platform == 'darwin'",
+    "torch==2.4.0; sys_platform != 'darwin'",
 ]
 tensorflow = [
-    "tensorflow==2.19.0",
+    "tensorflow==2.16.2; sys_platform == 'darwin'",
+    "tensorflow==2.19.0; sys_platform != 'darwin'",
 ]
 jax = [
     "flax==0.10.1",
@@ -84,29 +90,40 @@ documentation = [
     "mkdocs-awesome-nav==3.1.2",
     "mike==2.1.3",
 ]
+examples = [
+    "matplotlib>=3.10.5",
+    "torchvision>=0.17.2",
+]
 
 [tool.uv.sources]
 torch = [
-    { index = "torch" },
+    { index = "torch-cuda", marker = "sys_platform == 'linux'" },
+    { index = "torch-cuda", marker = "sys_platform == 'win32'" },
+    { index = "torch-cpu", marker = "sys_platform == 'darwin'" },
 ]
 torch-cluster = [
-    { index = "pyg" },
+    { index = "pyg", marker = "sys_platform == 'linux'" },
+    { index = "pyg", marker = "sys_platform == 'win32'" },
 ]
 torch-scatter = [
-    { index = "pyg" },
+    { index = "pyg", marker = "sys_platform == 'linux'" },
+    { index = "pyg", marker = "sys_platform == 'win32'" },
 ]
 torch-sparse = [
-    { index = "pyg" },
+    { index = "pyg", marker = "sys_platform == 'linux'" },
+    { index = "pyg", marker = "sys_platform == 'win32'" },
 ]
 torch-spline-conv = [
-    { index = "pyg" },
+    { index = "pyg", marker = "sys_platform == 'linux'" },
+    { index = "pyg", marker = "sys_platform == 'win32'" },
 ]
 pyg-lib = [
-    { index = "pyg" },
+    { index = "pyg", marker = "sys_platform == 'linux'" },
+    { index = "pyg", marker = "sys_platform == 'win32'" },
 ]
 
 [[tool.uv.index]]
-name = "torch"
+name = "torch-cuda"
 url = "https://download.pytorch.org/whl/cu121"
 explicit = true
 
@@ -114,6 +131,11 @@ explicit = true
 name = "pyg"
 url = "https://data.pyg.org/whl/torch-2.4.0+cu121.html"
 format = "flat"
+explicit = true
+
+[[tool.uv.index]]
+name = "torch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
 explicit = true
 
 [tool.setuptools.packages.find]

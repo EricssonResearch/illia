@@ -1,7 +1,7 @@
-# AGENTS.md — Guide for Illia
+# AGENTS.md — Guide for illia
 
 This document provides clear instructions for developers and code agents working with the
-**Illia** codebase.
+**illia** codebase.
 
 ## 1. Project Structure
 
