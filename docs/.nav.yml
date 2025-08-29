@@ -1,10 +1,11 @@
 nav:
   - Home: index.md
-  - Frameworks: frameworks/
+  - API: api/
   - Examples: examples/
   - Reference:
       - Bayesian Neural Networks: reference/bayesian_neural_networks.md
       - Bibliography: reference/bibliography.md
+  - Ericsson Cognitive Labs: https://ericsson.github.io/cognitive-labs/
 
 sort:
   ignore_case: true

@@ -97,7 +97,10 @@ plugins:
       toc_depth: 0
       exclude:
         - index.md
-  - mkdocs-jupyter
+        - examples/*
+        - reference/*
+  - mkdocs-jupyter:
+      ignore_h1_titles: True
   - awesome-nav
 
 extra:
