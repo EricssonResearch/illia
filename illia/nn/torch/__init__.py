@@ -8,6 +8,7 @@ from illia.nn.torch.conv1d import Conv1D
 from illia.nn.torch.conv2d import Conv2D
 from illia.nn.torch.embedding import Embedding
 from illia.nn.torch.linear import Linear
+from illia.nn.torch.lstm import LSTM
 
 
 # Define all names to be imported
@@ -17,4 +18,5 @@ __all__: list[str] = [
     "Conv2D",
     "Embedding",
     "Linear",
+    "LSTM",
 ]

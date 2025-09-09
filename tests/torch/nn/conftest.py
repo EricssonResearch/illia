@@ -17,7 +17,7 @@ import torch
 
 # Own modules
 from illia.distributions import GaussianDistribution
-from illia.nn import BayesianModule, Conv1D, Conv2D, Embedding, Linear
+from illia.nn import LSTM, BayesianModule, Conv1D, Conv2D, Embedding, Linear
 from tests.torch.nn.utils import BayesianComposedModel, ComposedModel
 
 
@@ -306,3 +306,55 @@ def composed_fixture(
     bayesian_composed_model: BayesianModule = BayesianComposedModel(model, num_models)
 
     return bayesian_composed_model, composed_model, inputs
+
+
+@pytest.fixture(
+    params=[
+        (32, 128, 1, 64, 15, 20, 30, None, None, 2.0, False, False),
+    ]
+)
+def lstm_fixture(request: pytest.FixtureRequest) -> tuple[LSTM, torch.Tensor]:
+    """
+    Fixture for the Bayesian LSTM layer.
+
+    Args:
+        request: Pytest fixture request with parameters:
+            batch_size, seq_len, input_size, hidden_size,
+            batch_first, hidden_state_distribution, cell_state_distribution.
+
+    Returns:
+        LSTM instance and a random input tensor.
+    """
+
+    (
+        batch_size,
+        seq_len,
+        input_size,
+        num_embeddings,
+        embeddings_dim,
+        hidden_size,
+        output_size,
+        padding_idx,
+        max_norm,
+        norm_type,
+        scale_grad_by_freq,
+        sparse,
+    ) = request.param
+
+    # Define modelo
+    model: LSTM = LSTM(
+        num_embeddings=num_embeddings,
+        embeddings_dim=embeddings_dim,
+        hidden_size=hidden_size,
+        output_size=output_size,
+        padding_idx=padding_idx,
+        max_norm=max_norm,
+        norm_type=norm_type,
+        scale_grad_by_freq=scale_grad_by_freq,
+        sparse=sparse,
+    )
+
+    # Define inputs
+    inputs: torch.Tensor = torch.rand((batch_size, seq_len, input_size))
+
+    return model, inputs
