@@ -105,9 +105,9 @@ class LSTM(BayesianModule):
 
         # Final gate
         self.wv_distribution = GaussianDistribution(
-            (self.hidden_size, self.embeddings_dim + self.hidden_size)
+            (self.output_size, self.hidden_size)
         )
-        self.bv_distribution = GaussianDistribution((self.hidden_size,))
+        self.bv_distribution = GaussianDistribution((self.output_size,))
 
         # Sample initial weights and register buffers
         # Forget gate
@@ -149,6 +149,9 @@ class LSTM(BayesianModule):
 
         # Set indicator
         self.frozen = True
+
+        # Freeze embedding layer
+        self.embedding.freeze()
 
         # Forget gate
         if self.wf is None:
@@ -243,11 +246,11 @@ class LSTM(BayesianModule):
         return log_probs, num_params
 
     def forward(
-        self, inputs: torch.Tensor, init_states: Optional[torch.Tensor] = None
+        self, inputs: torch.Tensor, init_states: Optional[tuple[torch.Tensor, torch.Tensor]] = None
     ) -> tuple[torch.Tensor, tuple[torch.Tensor, torch.Tensor]]:
         """
-        Performs a forward pass through the Bayesian Convolution 2D
-        layer. If the layer is not frozen, it samples weights and bias
+        Performs a forward pass through the Bayesian LSTM layer.
+        If the layer is not frozen, it samples weights and bias
         from their respective distributions. If the layer is frozen
         and the weights or bias are not initialized, it also performs
         sampling.
@@ -294,14 +297,10 @@ class LSTM(BayesianModule):
         # Initialize h_t and c_t if init_states is None
         if init_states is None:
             device = inputs.device
-            h_t = torch.zeros(
-                batch_size, self.hidden_size, device=device, requires_grad=True
-            )
-            c_t = torch.zeros(
-                batch_size, self.hidden_size, device=device, requires_grad=True
-            )
+            h_t = torch.zeros(batch_size, self.hidden_size, device=device)
+            c_t = torch.zeros(batch_size, self.hidden_size, device=device)
         else:
-            h_t, c_t = init_states
+            h_t, c_t = init_states[0], init_states[1]
 
         for t in range(seq_len):
             # Shape: (batch_size, embedding_dim)

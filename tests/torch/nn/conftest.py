@@ -310,7 +310,7 @@ def composed_fixture(
 
 @pytest.fixture(
     params=[
-        (32, 128, 1, 64, 15, 20, 30, None, None, 2.0, False, False),
+        (32, 128, 15, 20, 30, 10, None, None, 2.0, False, False),
     ]
 )
 def lstm_fixture(request: pytest.FixtureRequest) -> tuple[LSTM, torch.Tensor]:
@@ -319,17 +319,17 @@ def lstm_fixture(request: pytest.FixtureRequest) -> tuple[LSTM, torch.Tensor]:
 
     Args:
         request: Pytest fixture request with parameters:
-            batch_size, seq_len, input_size, hidden_size,
-            batch_first, hidden_state_distribution, cell_state_distribution.
+            batch_size, seq_len, num_embeddings, embeddings_dim, 
+            hidden_size, output_size, padding_idx, max_norm, norm_type,
+            scale_grad_by_freq, sparse.
 
     Returns:
-        LSTM instance and a random input tensor.
+        LSTM instance and a random input tensor with token indices.
     """
 
     (
         batch_size,
         seq_len,
-        input_size,
         num_embeddings,
         embeddings_dim,
         hidden_size,
@@ -341,7 +341,7 @@ def lstm_fixture(request: pytest.FixtureRequest) -> tuple[LSTM, torch.Tensor]:
         sparse,
     ) = request.param
 
-    # Define modelo
+    # Define model
     model: LSTM = LSTM(
         num_embeddings=num_embeddings,
         embeddings_dim=embeddings_dim,
@@ -354,7 +354,10 @@ def lstm_fixture(request: pytest.FixtureRequest) -> tuple[LSTM, torch.Tensor]:
         sparse=sparse,
     )
 
-    # Define inputs
-    inputs: torch.Tensor = torch.rand((batch_size, seq_len, input_size))
+    # Create integer token indices for embedding layer
+    # Shape: (batch_size, seq_len, 1)
+    inputs: torch.Tensor = torch.randint(
+        0, num_embeddings, (batch_size, seq_len, 1), dtype=torch.long
+    )
 
     return model, inputs
