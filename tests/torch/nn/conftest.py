@@ -319,7 +319,7 @@ def lstm_fixture(request: pytest.FixtureRequest) -> tuple[LSTM, torch.Tensor]:
 
     Args:
         request: Pytest fixture request with parameters:
-            batch_size, seq_len, num_embeddings, embeddings_dim, 
+            batch_size, seq_len, num_embeddings, embeddings_dim,
             hidden_size, output_size, padding_idx, max_norm, norm_type,
             scale_grad_by_freq, sparse.
 

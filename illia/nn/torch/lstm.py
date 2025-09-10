@@ -246,7 +246,9 @@ class LSTM(BayesianModule):
         return log_probs, num_params
 
     def forward(
-        self, inputs: torch.Tensor, init_states: Optional[tuple[torch.Tensor, torch.Tensor]] = None
+        self,
+        inputs: torch.Tensor,
+        init_states: Optional[tuple[torch.Tensor, torch.Tensor]] = None,
     ) -> tuple[torch.Tensor, tuple[torch.Tensor, torch.Tensor]]:
         """
         Performs a forward pass through the Bayesian LSTM layer.
