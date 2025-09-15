@@ -7,3 +7,5 @@
 ::: illia.nn.tf.embedding
 
 ::: illia.nn.tf.linear
+
+::: illia.nn.tf.lstm

@@ -10,7 +10,7 @@ import tensorflow as tf
 from keras import saving
 
 # Own modules
-from illia.distributions.tf import GaussianDistribution
+from illia.distributions.tf.gaussian import GaussianDistribution
 from illia.nn.tf.base import BayesianModule
 
 

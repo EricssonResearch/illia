@@ -18,7 +18,7 @@ from flax import nnx
 
 # Own modules
 from illia.distributions import GaussianDistribution
-from illia.nn import Conv1D, Conv2D, Embedding, Linear
+from illia.nn import Conv1d, Conv2d, Embedding, Linear
 
 
 @pytest.fixture(
@@ -91,16 +91,16 @@ def linear_fixture(request: pytest.FixtureRequest) -> tuple[Linear, jax.Array]:
         (64, 6, 6, 4, 2, 3, 2, 2, None, None, 16),
     ]
 )
-def conv1d_fixture(request: pytest.FixtureRequest) -> tuple[Conv1D, jax.Array]:
+def conv1d_fixture(request: pytest.FixtureRequest) -> tuple[Conv1d, jax.Array]:
     """
-    This function is the fixture for bayesian Conv1D layer.
+    This function is the fixture for bayesian Conv1d layer.
 
     Args:
         request: Pytest fixture request.
 
     Returns:
-        Conv1D instance.
-        Inputs compatible with Conv1D instance.
+        Conv1d instance.
+        Inputs compatible with Conv1d instance.
     """
 
     # Create RNG
@@ -133,7 +133,7 @@ def conv1d_fixture(request: pytest.FixtureRequest) -> tuple[Conv1D, jax.Array]:
     ) = request.param
 
     # Define model
-    model: Conv1D = Conv1D(
+    model: Conv1d = Conv1d(
         input_channels=input_channels,
         output_channels=output_channels,
         kernel_size=kernel_size,
@@ -172,16 +172,16 @@ def conv1d_fixture(request: pytest.FixtureRequest) -> tuple[Conv1D, jax.Array]:
         (64, 6, 6, (4, 4), (2, 1), (3, 1), (2, 1), 2, None, None, 64, 64),
     ]
 )
-def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2D, jax.Array]:
+def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2d, jax.Array]:
     """
-    This function is the fixture for bayesian Conv2D layer.
+    This function is the fixture for bayesian Conv2d layer.
 
     Args:
         request: Pytest fixture request.
 
     Returns:
-        Conv2D instance.
-        Inputs compatible with Conv2D instance.
+        Conv2d instance.
+        Inputs compatible with Conv2d instance.
     """
 
     # Create RNG
@@ -216,7 +216,7 @@ def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2D, jax.Array]:
     ) = request.param
 
     # Define model
-    model: Conv2D = Conv2D(
+    model: Conv2d = Conv2d(
         input_channels,
         output_channels,
         kernel_size,

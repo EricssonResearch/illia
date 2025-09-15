@@ -1,5 +1,5 @@
 """
-This module contains the code for the bayesian Conv2D.
+This module contains the code for the bayesian Conv2d.
 """
 
 # Standard libraries
@@ -10,14 +10,14 @@ import tensorflow as tf
 from keras import saving
 
 # Own modules
-from illia.distributions.tf import GaussianDistribution
+from illia.distributions.tf.gaussian import GaussianDistribution
 from illia.nn.tf.base import BayesianModule
 
 
-@saving.register_keras_serializable(package="BayesianModule", name="Conv2D")
-class Conv2D(BayesianModule):
+@saving.register_keras_serializable(package="BayesianModule", name="Conv2d")
+class Conv2d(BayesianModule):
     """
-    This class is the bayesian implementation of the Conv2D class.
+    This class is the bayesian implementation of the Conv2d class.
     """
 
     bias_distribution: Optional[GaussianDistribution] = None
@@ -38,7 +38,7 @@ class Conv2D(BayesianModule):
         **kwargs: Any,
     ) -> None:
         """
-        Initializes a Bayesian Conv2D layer.
+        Initializes a Bayesian Conv2d layer.
 
         Args:
             input_channels: The number of channels in the input image.
@@ -160,7 +160,7 @@ class Conv2D(BayesianModule):
 
     def build(self, input_shape: tf.TensorShape) -> None:
         """
-        Builds the Conv2D layer.
+        Builds the Conv2d layer.
 
         Args:
             input_shape: Input shape of the layer.
@@ -191,7 +191,7 @@ class Conv2D(BayesianModule):
 
     def get_config(self) -> dict:
         """
-        Retrieves the configuration of the Conv2D layer.
+        Retrieves the configuration of the Conv2d layer.
 
         Returns:
             Dictionary containing layer configuration.

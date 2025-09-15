@@ -1,5 +1,5 @@
 """
-This module contains the code for the bayesian Conv1D.
+This module contains the code for the bayesian Conv1d.
 """
 
 # Standard libraries
@@ -10,14 +10,14 @@ import tensorflow as tf
 from keras import saving
 
 # Own modules
-from illia.distributions.tf import GaussianDistribution
+from illia.distributions.tf.gaussian import GaussianDistribution
 from illia.nn.tf.base import BayesianModule
 
 
-@saving.register_keras_serializable(package="BayesianModule", name="Conv1D")
-class Conv1D(BayesianModule):
+@saving.register_keras_serializable(package="BayesianModule", name="Conv1d")
+class Conv1d(BayesianModule):
     """
-    This class is the bayesian implementation of the Conv1D class.
+    This class is the bayesian implementation of the Conv1d class.
     """
 
     bias_distribution: Optional[GaussianDistribution] = None
@@ -38,7 +38,7 @@ class Conv1D(BayesianModule):
         **kwargs: Any,
     ) -> None:
         """
-        Initializes a Bayesian Conv1D layer.
+        Initializes a Bayesian Conv1d layer.
 
         Args:
             input_channels: The number of channels in the input image.
@@ -154,7 +154,7 @@ class Conv1D(BayesianModule):
 
     def build(self, input_shape: tf.TensorShape) -> None:
         """
-        Builds the Conv1D layer.
+        Builds the Conv1d layer.
 
         Args:
             input_shape: Input shape of the layer.
@@ -185,7 +185,7 @@ class Conv1D(BayesianModule):
 
     def get_config(self) -> dict:
         """
-        Retrieves the configuration of the Conv1D layer.
+        Retrieves the configuration of the Conv1d layer.
 
         Returns:
             Dictionary containing layer configuration.

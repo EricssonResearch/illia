@@ -1,5 +1,5 @@
 """
-This module contains the code for the bayesian Conv2D.
+This module contains the code for the bayesian Conv2d.
 """
 
 # Standard libraries
@@ -12,13 +12,13 @@ from flax import nnx
 from flax.nnx.rnglib import Rngs
 
 # Own modules
-from illia.distributions.jax import GaussianDistribution
+from illia.distributions.jax.gaussian import GaussianDistribution
 from illia.nn.jax.base import BayesianModule
 
 
-class Conv2D(BayesianModule):
+class Conv2d(BayesianModule):
     """
-    This class is the bayesian implementation of the Conv2D class.
+    This class is the bayesian implementation of the Conv2d class.
     """
 
     bias_distribution: Optional[GaussianDistribution] = None

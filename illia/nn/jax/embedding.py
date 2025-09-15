@@ -12,7 +12,7 @@ from flax import nnx
 from flax.nnx.rnglib import Rngs
 
 # Own modules
-from illia.distributions.jax import GaussianDistribution
+from illia.distributions.jax.gaussian import GaussianDistribution
 from illia.nn.jax.base import BayesianModule
 
 

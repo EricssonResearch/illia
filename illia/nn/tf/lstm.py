@@ -10,7 +10,7 @@ import tensorflow as tf
 from keras import saving
 
 # Own modules
-from illia.distributions.tf import GaussianDistribution
+from illia.distributions.tf.gaussian import GaussianDistribution
 from illia.nn.tf.base import BayesianModule
 from illia.nn.tf.embedding import Embedding
 
@@ -179,7 +179,7 @@ class LSTM(BayesianModule):
 
     def get_config(self) -> dict:
         """
-        Retrieves the configuration of the Conv2D layer.
+        Retrieves the configuration of the Conv2d layer.
 
         Returns:
             Dictionary containing layer configuration.

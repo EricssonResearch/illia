@@ -1,5 +1,5 @@
 """
-This module contains the code for the bayesian Conv2D.
+This module contains the code for the bayesian Conv2d.
 """
 
 # Standard libraries
@@ -10,13 +10,13 @@ import torch
 import torch.nn.functional as F
 
 # Own modules
-from illia.distributions.torch import GaussianDistribution
+from illia.distributions.torch.gaussian import GaussianDistribution
 from illia.nn.torch.base import BayesianModule
 
 
-class Conv2D(BayesianModule):
+class Conv2d(BayesianModule):
     """
-    This class is the bayesian implementation of the Conv2D class.
+    This class is the bayesian implementation of the Conv2d class.
     """
 
     weights: torch.Tensor

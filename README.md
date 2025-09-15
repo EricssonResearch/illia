@@ -22,16 +22,63 @@
 
 ## Introduction
 
-**illia** is an innovative library for **Bayesian Neural Networks**, designed to support
-multiple backends and integrate seamlessly with popular deep learning ecosystems such as
-**PyTorch**, **TensorFlow**, and **JAX**, as well as graph neural network libraries
-including **PyTorch Geometric**, **Deep Graph Library (DGL)**, and **Spektral**.
+**illia** is a cutting-edge library for **Bayesian Neural Networks** that brings
+uncertainty quantification to deep learning. Designed with flexibility in mind, it
+seamlessly integrates with multiple backends and popular frameworks.
 
 For full documentation, please visit the site:
 [https://ericssonresearch.github.io/illia/](https://ericssonresearch.github.io/illia/)
+
+## Why Choose illia?
+
+- **Multi-Backend Support**: Works with PyTorch, TensorFlow, and JAX.
+- **Graph Neural Networks**: Integrated with PyTorch Geometric, DGL, and Spektral.
+- **Developer Friendly**: Intuitive API design and comprehensive documentation.
+
+## Quick Start
+
+Get started with illia in just a few lines of code:
+
+```python
+import os
+import torch
+
+# Configure backend (PyTorch is default)
+os.environ["ILLIA_BACKEND"] = "torch"
+
+import illia
+from illia.nn import Conv2d
+
+# Create a Bayesian convolutional layer
+conv_layer = Conv2d(
+    input_channels=3,
+    output_channels=64,
+    kernel_size=3,
+    bias=True
+)
+
+# Forward pass with uncertainty
+input_tensor = torch.rand(1, 3, 32, 32)
+output_mean, output_std = conv_layer(input_tensor)
+
+print(f"Output shape: {output_mean.shape}")
+print(f"Uncertainty quantified: {output_std.mean():.4f}")
+```
+
+## Contributing
+
+We welcome contributions from the community! Whether you're fixing bugs, adding features,
+or improving documentation:
+
+1. **Read our
+   [contributing guide](https://github.com/EricssonResearch/illia/blob/main/CONTRIBUTING.md)**
+   for development setup.
+2. **Check [open issues](https://github.com/EricssonResearch/illia/issues)** for ways to
+   help.
+3. **Submit bug reports** using our issue templates.
 
 ## License
 
 illia is released under the
 [MIT License](https://github.com/EricssonResearch/illia/blob/main/LICENSE). We hope you
-find it useful and inspiring.
+find it useful and inspiring for your projects!

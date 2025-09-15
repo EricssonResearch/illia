@@ -3,7 +3,8 @@ This module specifies the loss function imports used in PyTorch.
 """
 
 # Own modules
-from illia.losses.torch.elbo import ELBOLoss, KLDivergenceLoss
+from illia.losses.torch.elbo import ELBOLoss
+from illia.losses.torch.kl import KLDivergenceLoss
 
 
 # Define all names to be imported
