@@ -8,9 +8,9 @@ body:
       value: |
         Thank you for taking the time to report a bug! This helps make illia better for everyone.
 
-        **Before submitting:** Please check if a similar issue already exists in our [Issues](https://github.com/EricssonResearch/illia/issues) page.
+        **Before submitting:** Please check if a similar issue already exists in our [issues](https://github.com/EricssonResearch/illia/issues) page.
 
-        For more information about contributing, see our [Contribution Guide](https://github.com/EricssonResearch/illia/blob/main/CONTRIBUTING.md).
+        For more information about contributing, see our [contribution guide](https://github.com/EricssonResearch/illia/blob/main/CONTRIBUTING.md).
 
   - type: textarea
     id: bug-description

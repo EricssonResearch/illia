@@ -8,9 +8,9 @@ body:
       value: |
         Thank you for suggesting a new feature! Your ideas help make illia better for the community.
 
-        **Before submitting:** Please check if a similar feature request already exists in our [Issues](https://github.com/EricssonResearch/illia/issues) page.
+        **Before submitting:** Please check if a similar feature request already exists in our [issues](https://github.com/EricssonResearch/illia/issues) page.
 
-        See our [Contribution Guide](https://github.com/EricssonResearch/illia/blob/main/CONTRIBUTING.md) for implementation guidelines.
+        See our [contribution guide](https://github.com/EricssonResearch/illia/blob/main/CONTRIBUTING.md) for implementation guidelines.
 
   - type: dropdown
     id: proposal-type

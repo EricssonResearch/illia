@@ -204,12 +204,12 @@ class LSTM(BayesianModule):
         # Combine both configurations
         return {**base_config, **custom_config}
 
-    @tf.function
     def freeze(self) -> None:
         """
         Freezes the current module and all submodules that are instances
         of BayesianModule. Sets the frozen state to True.
         """
+
         # Set indicator
         self.frozen = True
 
@@ -270,15 +270,19 @@ class LSTM(BayesianModule):
         log_probs_f = self.wf_distribution.log_prob(
             self.wf
         ) + self.bf_distribution.log_prob(self.bf)
+
         log_probs_i = self.wi_distribution.log_prob(
             self.wi
         ) + self.bi_distribution.log_prob(self.bi)
+        
         log_probs_c = self.wc_distribution.log_prob(
             self.wc
         ) + self.bc_distribution.log_prob(self.bc)
+        
         log_probs_o = self.wo_distribution.log_prob(
             self.wo
         ) + self.bo_distribution.log_prob(self.bo)
+        
         log_probs_v = self.wv_distribution.log_prob(
             self.wv
         ) + self.bv_distribution.log_prob(self.bv)
@@ -302,7 +306,6 @@ class LSTM(BayesianModule):
 
         return log_probs, num_params
 
-    @tf.function
     def call(
         self,
         inputs: tf.Tensor,

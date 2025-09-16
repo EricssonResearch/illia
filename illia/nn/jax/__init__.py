@@ -8,6 +8,7 @@ from illia.nn.jax.conv1d import Conv1d
 from illia.nn.jax.conv2d import Conv2d
 from illia.nn.jax.embedding import Embedding
 from illia.nn.jax.linear import Linear
+from illia.nn.jax.lstm import LSTM
 
 
 # Define all names to be imported
@@ -17,4 +18,5 @@ __all__: list[str] = [
     "Conv2d",
     "Embedding",
     "Linear",
+    "LSTM",
 ]

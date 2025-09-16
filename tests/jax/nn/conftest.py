@@ -18,7 +18,7 @@ from flax import nnx
 
 # Own modules
 from illia.distributions import GaussianDistribution
-from illia.nn import Conv1d, Conv2d, Embedding, Linear
+from illia.nn import LSTM, Conv1d, Conv2d, Embedding, Linear
 
 
 @pytest.fixture(
@@ -293,6 +293,65 @@ def embedding_fixture(request: pytest.FixtureRequest) -> tuple[Embedding, jax.Ar
     inputs: jax.Array = jax.random.randint(
         key=jax.random.PRNGKey(42),
         shape=(batch_size,),
+        minval=0,
+        maxval=num_embeddings,
+    )
+
+    return model, inputs
+
+
+@pytest.fixture(
+    params=[
+        (32, 128, 15, 20, 30, 10, None, None, 2.0, False),
+    ]
+)
+def lstm_fixture(request: pytest.FixtureRequest) -> tuple[LSTM, jax.Array]:
+    """
+    Fixture for the Bayesian LSTM layer.
+
+    Args:
+        request: Pytest fixture request with parameters:
+            batch_size, seq_len, num_embeddings, embeddings_dim,
+            hidden_size, output_size, padding_idx, max_norm, norm_type,
+            scale_grad_by_freq, sparse.
+
+    Returns:
+        LSTM instance and a random input tensor with token indices.
+    """
+
+    # Create RNG
+    rngs = nnx.Rngs(42)
+
+    (
+        batch_size,
+        seq_len,
+        num_embeddings,
+        embeddings_dim,
+        hidden_size,
+        output_size,
+        padding_idx,
+        max_norm,
+        norm_type,
+        scale_grad_by_freq,
+    ) = request.param
+
+    # Define model
+    model: LSTM = LSTM(
+        num_embeddings=num_embeddings,
+        embeddings_dim=embeddings_dim,
+        hidden_size=hidden_size,
+        output_size=output_size,
+        padding_idx=padding_idx,
+        max_norm=max_norm,
+        norm_type=norm_type,
+        scale_grad_by_freq=scale_grad_by_freq,
+        rngs=rngs,
+    )
+
+    # Define inputs
+    inputs: jax.Array = jax.random.randint(
+        key=jax.random.PRNGKey(42),
+        shape=(batch_size, seq_len, 1),
         minval=0,
         maxval=num_embeddings,
     )

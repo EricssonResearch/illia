@@ -8,6 +8,7 @@ from illia.nn.tf.conv1d import Conv1d
 from illia.nn.tf.conv2d import Conv2d
 from illia.nn.tf.embedding import Embedding
 from illia.nn.tf.linear import Linear
+from illia.nn.tf.lstm import LSTM
 
 
 # Define all names to be imported
@@ -17,4 +18,5 @@ __all__: list[str] = [
     "Conv2d",
     "Embedding",
     "Linear",
+    "LSTM",
 ]
