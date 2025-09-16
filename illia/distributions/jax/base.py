@@ -1,9 +1,14 @@
 """
-This module contains the base class for distribution modules.
+Base class for building distribution modules using Flax and JAX.
 
-It defines a standard interface for sampling, evaluating log
-probabilities, and querying the number of parameters in
-distribution layers built with Flax's `nnx.Module`.
+Provides a standardized interface for sampling, computing log
+probabilities, and reporting the number of parameters in custom
+probabilistic layers.
+
+Notes:
+    This class is abstract and should not be instantiated directly.
+    Subclasses must implement all abstract methods to specify
+    distribution behavior.
 """
 
 # Standard libraries
@@ -13,50 +18,59 @@ from typing import Optional
 # 3pps
 import jax
 from flax import nnx
+from flax.nnx.rnglib import Rngs
 
 
 class DistributionModule(nnx.Module, ABC):
     """
-    Base class for all distribution modules using Flax's nnx API.
+    Abstract base for Flax-based probabilistic distribution modules.
 
-    Any subclass must implement sampling, log-probability computation,
-    and report the number of learnable parameters in the distribution.
+    Defines a required interface for sampling, computing log-probabilities,
+    and retrieving parameter counts. Subclasses must implement all
+    abstract methods to provide specific distribution logic.
 
     Notes:
-        This class is abstract and should not be instantiated directly.
+        Avoid direct instantiation, this serves as a blueprint for
+        derived classes.
     """
 
     @abstractmethod
-    def sample(self) -> jax.Array:
+    def sample(self, rngs: Rngs = nnx.Rngs(0)) -> jax.Array:
         """
-        Samples a tensor from the distribution.
+        Generates and returns a sample from the underlying distribution.
+
+        Args:
+            rngs: RNG container used for sampling.
 
         Returns:
-            A sampled tensor with the same shape as the distribution's
-            parameters (e.g., mean and std).
+            Sample array matching the shape and structure defined by
+            the distribution parameters.
         """
 
     @abstractmethod
     def log_prob(self, x: Optional[jax.Array] = None) -> jax.Array:
         """
-        Computes the log-probability of a given sample.
-
-        If no input is provided, a sample is drawn internally from the
-        distribution before computing its log-probability.
+        Computes the log-probability of an input sample.
+        If no sample is provided, a new one is drawn internally from the
+        current distribution before computing the log-probability.
 
         Args:
-            x: Optional sample tensor.
+            x: Optional sample tensor to evaluate.
 
         Returns:
-            A scalar tensor representing the log-probability.
+            Scalar tensor representing the computed log-probability.
+
+        Notes:
+            This method supports both user-supplied samples and internally
+            generated ones for convenience when evaluating likelihoods.
         """
 
     @property
     @abstractmethod
     def num_params(self) -> int:
         """
-        Returns the number of learnable parameters in the distribution.
+        Returns the total number of learnable parameters in the distribution.
 
         Returns:
-            An integer representing the number of parameters.
+            Integer representing the total number of learnable parameters.
         """

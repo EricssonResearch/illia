@@ -1,9 +1,8 @@
 """
-This module contains the code for the Gaussian distribution.
-
-Defines a learnable Gaussian distribution with methods for
-sampling and computing log-probabilities, built on Flax's
-nnx.Module system.
+Defines a Gaussian (Normal) distribution using Flax
+with trainable mean and standard deviation parameters. Includes
+methods for sampling from the distribution and computing
+log-probabilities of given inputs.
 """
 
 # Standard libraries
@@ -21,14 +20,16 @@ from illia.distributions.jax.base import DistributionModule
 
 class GaussianDistribution(DistributionModule):
     """
-    Implements a learnable Gaussian distribution using Flax's nnx API.
+    Learnable Gaussian distribution using Flax.
 
-    The distribution is parameterized by a learnable mean and standard
-    deviation derived from `rho`, which is transformed via softplus.
+    Represents a diagonal Gaussian distribution with trainable mean and
+    standard deviation parameters. The standard deviation is derived from
+    `rho` using a softplus transformation to ensure positivity.
 
     Notes:
-        The class assumes a diagonal Gaussian distribution and computes
-        KL divergence via log-prob differences in `log_prob`.
+        Assumes a diagonal covariance matrix. KL divergence between
+        distributions can be computed using log-probability differences
+        obtained from `log_prob`.
     """
 
     def __init__(
@@ -51,6 +52,10 @@ class GaussianDistribution(DistributionModule):
             mu_init: Initial value for the learnable mean.
             rho_init: Initial value for the learnable rho parameter.
             rngs: RNG container for parameter initialization.
+            **kwargs: Additional arguments passed to the base class.
+
+        Returns:
+            None.
         """
 
         # Call super-class constructor
@@ -73,13 +78,14 @@ class GaussianDistribution(DistributionModule):
 
     def sample(self, rngs: Rngs = nnx.Rngs(0)) -> jax.Array:
         """
-        Draws a sample from the Gaussian distribution.
+        Generates and returns a sample from the Gaussian distribution.
 
         Args:
             rngs: RNG container used for sampling.
 
         Returns:
-            A sample drawn from the distribution as a JAX array.
+            Sample array matching the shape and structure defined by
+            the distribution parameters.
         """
 
         # Compute epsilon and sigma
@@ -90,16 +96,19 @@ class GaussianDistribution(DistributionModule):
 
     def log_prob(self, x: Optional[jax.Array] = None) -> jax.Array:
         """
-        Computes the KL divergence between posterior and prior.
-
-        If no input is provided, a sample is generated from the
-        current distribution.
+        Computes the log-probability of an input sample.
+        If no sample is provided, a new one is drawn internally from the
+        current distribution before computing the log-probability.
 
         Args:
-            x: Optional sample for evaluating the log-probability.
+            x: Optional sample tensor to evaluate.
 
         Returns:
-            The KL divergence as a scalar JAX array.
+            Scalar tensor representing the computed log-probability.
+
+        Notes:
+            This method supports both user-supplied samples and internally
+            generated ones for convenience when evaluating likelihoods.
         """
 
         # Sample if x is None
@@ -136,10 +145,10 @@ class GaussianDistribution(DistributionModule):
     @property
     def num_params(self) -> int:
         """
-        Returns the number of learnable parameters.
+        Returns the total number of learnable parameters in the distribution.
 
         Returns:
-            The total number of parameters in the distribution.
+            Integer representing the total number of learnable parameters.
         """
 
         return len(self.mu.reshape(-1))

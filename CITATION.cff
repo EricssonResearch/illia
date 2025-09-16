@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+title: illia
+message: >-
+  If you use this software, please cite it using the metadata from this file
+type: software
+authors:
+  - given-names: Ericsson Research
+    family-names: Geometric Artficial Intelligence
+identifiers:
+repository-code: "https://github.com/EricssonResearch/illia"
+url: "https://ericssonresearch.github.io/illia"
+abstract: >-
+  Framework agnostic Bayesian Neural Network library
+keywords:
+  - illia
+  - BNN
+  - Bayesian
+  - Deep Learning
+  - Machine Learning
+license: MIT

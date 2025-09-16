@@ -1,9 +1,12 @@
 """
-This module specifies the loss function imports used in Jax.
+This module consolidates and exposes losses-related classes
+implemented in JAX. It imports core base classes and specific
+losses implementations for easier access in other modules.
 """
 
 # Own modules
-from illia.losses.jax.elbo import ELBOLoss, KLDivergenceLoss
+from illia.losses.jax.elbo import ELBOLoss
+from illia.losses.jax.kl import KLDivergenceLoss
 
 
 # Define all names to be imported

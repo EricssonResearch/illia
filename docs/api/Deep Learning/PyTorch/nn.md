@@ -7,3 +7,5 @@
 ::: illia.nn.torch.embedding
 
 ::: illia.nn.torch.linear
+
+::: illia.nn.torch.lstm

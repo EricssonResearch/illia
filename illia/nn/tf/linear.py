@@ -10,11 +10,11 @@ import tensorflow as tf
 from keras import saving
 
 # Own modules
-from illia.distributions.tf import GaussianDistribution
+from illia.distributions.tf.gaussian import GaussianDistribution
 from illia.nn.tf.base import BayesianModule
 
 
-@saving.register_keras_serializable(package="BayesianModule", name="Linear")
+@saving.register_keras_serializable(package="illia", name="Linear")
 class Linear(BayesianModule):
     """
     This class is the bayesian implementation of the Linear class.

@@ -7,3 +7,5 @@
 ::: illia.nn.jax.embedding
 
 ::: illia.nn.jax.linear
+
+::: illia.nn.jax.lstm

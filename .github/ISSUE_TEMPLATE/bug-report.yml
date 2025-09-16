@@ -1,66 +1,125 @@
 name: "Bug Report"
-description: Report a bug to help us improve illia.
-labels: ["bug"]
+description: "Report a bug to help us improve illia"
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thank you for taking the time to report a bug!
+        Thank you for taking the time to report a bug! This helps make illia better for everyone.
 
-        For more information, please refer to our [Contribution Guide](https://github.com/EricssonResearch/illia/blob/main/CONTRIBUTING.md).
+        **Before submitting:** Please check if a similar issue already exists in our [issues](https://github.com/EricssonResearch/illia/issues) page.
+
+        For more information about contributing, see our [contribution guide](https://github.com/EricssonResearch/illia/blob/main/CONTRIBUTING.md).
 
   - type: textarea
-    id: system-info
+    id: bug-description
     attributes:
-      label: System Information
-      description: Please provide details about your system configuration.
-      placeholder: |
-        illia version: 
-        Platform/OS: 
-        Python version: 
-        Backend:
+      label: "Bug Description"
+      description: "A clear and concise description of what the bug is."
+      placeholder: "Describe the issue you're experiencing..."
     validations:
       required: true
 
   - type: textarea
-    id: who-can-help
+    id: system-info
     attributes:
-      label: Who Can Help?
-      description: |
-        If you know the relevant maintainer, please tag them (e.g., @username). If not, leave blank and a core maintainer will assign it.
-      placeholder: "@Username ..."
-
-  - type: checkboxes
-    id: information-scripts-examples
-    attributes:
-      label: Code Source
-      description: Where did the code causing the issue come from?
-      options:
-        - label: "Official example scripts"
-        - label: "My own modified scripts"
+      label: "System Information"
+      description:
+        "Please provide details about your system configuration. More details help us
+        locate the problem and provide a more effective solution."
+      placeholder: |
+        illia version: 
+        Platform/OS: 
+        Python version: 
+        Backend: 
+        Additional dependencies:
+    validations:
+      required: true
 
   - type: textarea
-    id: reproduction
+    id: reproduction-steps
     attributes:
-      label: Steps to Reproduce
+      label: "Steps to Reproduce"
       description: |
-        Provide a **minimal, reproducible example** with any relevant configuration. Use code blocks for formatting. Avoid screenshots as they can’t be easily copied.
+        Provide a **minimal, reproducible example** with clear steps. Use code blocks for formatting.
+        The more specific you are, the easier it will be to fix the issue.
       placeholder: |
-        Steps to reproduce:
-        1.
-        2.
-        3.
-        Code snippet / Colab link:
+        1. Go to '...'
+        2. Click on '....'
+        3. Execute the following code:
         ```python
-        # your code here
+        # your minimal reproducible code here
         ```
+        4. See error
     validations:
       required: true
 
   - type: textarea
     id: expected-behavior
     attributes:
-      label: Expected Behavior
-      description: Clearly describe what you expected to happen.
+      label: "Expected Behavior"
+      description: "A clear description of what you expected to happen."
+      placeholder: "I expected..."
     validations:
       required: true
+
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: "Actual Behavior"
+      description:
+        "What actually happened instead? Include any error messages or unexpected
+        outputs."
+      placeholder: |
+        What actually happened:
+
+        Error message (if any):
+        ```
+        paste error message here
+        ```
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: code-source
+    attributes:
+      label: "Code Source"
+      description: "Where did the code causing the issue come from?"
+      options:
+        - label: "Official example scripts"
+        - label: "My own modified scripts"
+        - label: "Third-party tutorial or example"
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: "Additional Context"
+      description:
+        "Add any other context, screenshots, or relevant information about the problem
+        here."
+      placeholder: "Any additional information that might help..."
+
+  - type: textarea
+    id: who-can-help
+    attributes:
+      label: "Who Can Help?"
+      description: |
+        If you know which maintainer might be relevant for this issue, please tag them (e.g., @username).
+        If not, leave blank and a core maintainer will assign it.
+      placeholder: "@username (optional)"
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: "Checklist"
+      description: "Please confirm the following:"
+      options:
+        - label: "I have searched for existing issues that describe the same problem"
+          required: true
+        - label: "I have provided a minimal, reproducible example"
+          required: true
+        - label: "I have included relevant system information"
+          required: true

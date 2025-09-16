@@ -17,7 +17,7 @@ import torch
 
 # Own modules
 from illia.distributions import GaussianDistribution
-from illia.nn import BayesianModule, Conv1D, Conv2D, Embedding, Linear
+from illia.nn import LSTM, BayesianModule, Conv1d, Conv2d, Embedding, Linear
 from tests.torch.nn.utils import BayesianComposedModel, ComposedModel
 
 
@@ -85,16 +85,16 @@ def linear_fixture(request: pytest.FixtureRequest) -> tuple[Linear, torch.Tensor
         (64, 6, 6, (4, 4), (2, 1), (3, 1), (2, 1), 2, None, None, 64, 64),
     ]
 )
-def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2D, torch.Tensor]:
+def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2d, torch.Tensor]:
     """
-    This function is the fixture for bayesian Conv2D layer.
+    This function is the fixture for bayesian Conv2d layer.
 
     Args:
         request: Pytest fixture request.
 
     Returns:
-        Conv2D instance.
-        Inputs compatible with Conv2D instance.
+        Conv2d instance.
+        Inputs compatible with Conv2d instance.
     """
 
     # Get parameters
@@ -126,7 +126,7 @@ def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2D, torch.Tensor
     ) = request.param
 
     # Define model
-    model: Conv2D = Conv2D(
+    model: Conv2d = Conv2d(
         input_channels,
         output_channels,
         kernel_size,
@@ -162,16 +162,16 @@ def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2D, torch.Tensor
         (64, 6, 6, 4, 2, 3, 2, 2, None, None, 16),
     ]
 )
-def conv1d_fixture(request: pytest.FixtureRequest) -> tuple[Conv1D, torch.Tensor]:
+def conv1d_fixture(request: pytest.FixtureRequest) -> tuple[Conv1d, torch.Tensor]:
     """
-    This function is the fixture for bayesian Conv1D layer.
+    This function is the fixture for bayesian Conv1d layer.
 
     Args:
         request: Pytest fixture request.
 
     Returns:
-        Conv1D instance.
-        Inputs compatible with Conv1D instance.
+        Conv1d instance.
+        Inputs compatible with Conv1d instance.
     """
 
     # Get parameters
@@ -201,7 +201,7 @@ def conv1d_fixture(request: pytest.FixtureRequest) -> tuple[Conv1D, torch.Tensor
     ) = request.param
 
     # Define model
-    model: Conv1D = Conv1D(
+    model: Conv1d = Conv1d(
         input_channels,
         output_channels,
         kernel_size,
@@ -306,3 +306,58 @@ def composed_fixture(
     bayesian_composed_model: BayesianModule = BayesianComposedModel(model, num_models)
 
     return bayesian_composed_model, composed_model, inputs
+
+
+@pytest.fixture(
+    params=[
+        (32, 128, 15, 20, 30, 10, None, None, 2.0, False, False),
+    ]
+)
+def lstm_fixture(request: pytest.FixtureRequest) -> tuple[LSTM, torch.Tensor]:
+    """
+    Fixture for the Bayesian LSTM layer.
+
+    Args:
+        request: Pytest fixture request with parameters:
+            batch_size, seq_len, num_embeddings, embeddings_dim,
+            hidden_size, output_size, padding_idx, max_norm, norm_type,
+            scale_grad_by_freq, sparse.
+
+    Returns:
+        LSTM instance and a random input tensor with token indices.
+    """
+
+    (
+        batch_size,
+        seq_len,
+        num_embeddings,
+        embeddings_dim,
+        hidden_size,
+        output_size,
+        padding_idx,
+        max_norm,
+        norm_type,
+        scale_grad_by_freq,
+        sparse,
+    ) = request.param
+
+    # Define model
+    model: LSTM = LSTM(
+        num_embeddings=num_embeddings,
+        embeddings_dim=embeddings_dim,
+        hidden_size=hidden_size,
+        output_size=output_size,
+        padding_idx=padding_idx,
+        max_norm=max_norm,
+        norm_type=norm_type,
+        scale_grad_by_freq=scale_grad_by_freq,
+        sparse=sparse,
+    )
+
+    # Create integer token indices for embedding layer
+    # Shape: (batch_size, seq_len, 1)
+    inputs: torch.Tensor = torch.randint(
+        0, num_embeddings, (batch_size, seq_len, 1), dtype=torch.long
+    )
+
+    return model, inputs

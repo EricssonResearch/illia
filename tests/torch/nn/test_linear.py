@@ -93,7 +93,7 @@ class TestLinear:
 
         # Check type of outputs
         for name, parameter in model.named_parameters():
-            # check if parameter is none
+            # Check if parameter is none
             assert parameter.grad is not None, (
                 f"Incorrect backward computation, gradient of {name} shouldn't be "
                 f"None"

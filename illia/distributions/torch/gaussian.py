@@ -1,9 +1,8 @@
 """
-This module contains the code for the gaussian distribution.
-
-Defines a learnable diagonal Gaussian distribution for use in
-Bayesian models using PyTorch, including sampling and log-prob
-estimation.
+Defines a Gaussian (Normal) distribution using PyTorch
+with trainable mean and standard deviation parameters. Includes
+methods for sampling from the distribution and computing
+log-probabilities of given inputs.
 """
 
 # Standard libraries
@@ -18,11 +17,16 @@ from illia.distributions.torch.base import DistributionModule
 
 class GaussianDistribution(DistributionModule):
     """
-    Implements a learnable Gaussian distribution using PyTorch.
+    Learnable Gaussian distribution using PyTorch.
 
-    Parameters are the mean and a softplus-transformed standard
-    deviation. Provides methods for sampling and computing the
-    KL divergence via `log_prob`.
+    Represents a diagonal Gaussian distribution with trainable mean and
+    standard deviation parameters. The standard deviation is derived from
+    `rho` using a softplus transformation to ensure positivity.
+
+    Notes:
+        Assumes a diagonal covariance matrix. KL divergence between
+        distributions can be computed using log-probability differences
+        obtained from `log_prob`.
     """
 
     def __init__(
@@ -35,8 +39,7 @@ class GaussianDistribution(DistributionModule):
         **kwargs: Any,
     ) -> None:
         """
-        Initializes the Gaussian distribution with priors and initial
-        values.
+        Initializes the Gaussian distribution layer.
 
         Args:
             shape: Shape of the learnable parameters.
@@ -44,6 +47,9 @@ class GaussianDistribution(DistributionModule):
             std_prior: Standard deviation of the prior.
             mu_init: Initial value for the mean parameter.
             rho_init: Initial value for the rho parameter.
+
+        Returns:
+            None.
         """
 
         # Call super-class constructor
