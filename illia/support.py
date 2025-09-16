@@ -44,13 +44,7 @@ BACKEND_MODULES: dict[str, list[str]] = {
 # Dictionary describing the layers and capabilities supported by each backend
 BACKEND_CAPABILITIES: dict[str, dict[str, set[str]]] = {
     "torch": {
-        "nn": {
-            "BayesianModule",
-            "Conv1D",
-            "Conv2D",
-            "Embedding",
-            "Linear",
-        },
+        "nn": {"BayesianModule", "Conv1d", "Conv2d", "Embedding", "Linear", "LSTM"},
         "distributions": {"DistributionModule", "GaussianDistribution"},
         "losses": {
             "KLDivergenceLoss",
@@ -58,13 +52,7 @@ BACKEND_CAPABILITIES: dict[str, dict[str, set[str]]] = {
         },
     },
     "tf": {
-        "nn": {
-            "BayesianModule",
-            "Conv1D",
-            "Conv2D",
-            "Embedding",
-            "Linear",
-        },
+        "nn": {"BayesianModule", "Conv1d", "Conv2d", "Embedding", "Linear", "LSTM"},
         "distributions": {"DistributionModule", "GaussianDistribution"},
         "losses": {
             "KLDivergenceLoss",
@@ -72,13 +60,7 @@ BACKEND_CAPABILITIES: dict[str, dict[str, set[str]]] = {
         },
     },
     "jax": {
-        "nn": {
-            "BayesianModule",
-            "Conv1D",
-            "Conv2D",
-            "Embedding",
-            "Linear",
-        },
+        "nn": {"BayesianModule", "Conv1d", "Conv2d", "Embedding", "Linear", "LSTM"},
         "distributions": {"DistributionModule", "GaussianDistribution"},
         "losses": {
             "KLDivergenceLoss",

@@ -171,7 +171,7 @@ class BackendManager:
         return cls._loaded_backends[backend_name]
 
     @classmethod
-    @lru_cache(maxsize=128)
+    @lru_cache
     def is_class_available(
         cls, backend_name: str, class_name: str, module_type: str
     ) -> bool:
@@ -235,7 +235,7 @@ class BackendManager:
         return getattr(module_path, class_name)
 
     @classmethod
-    @lru_cache(maxsize=32)
+    @lru_cache
     def get_available_classes(
         cls, backend_name: str, module_type: str
     ) -> frozenset[str]:
@@ -259,7 +259,7 @@ class BackendManager:
         )
 
     @classmethod
-    @lru_cache(maxsize=128)
+    @lru_cache
     def get_all_available_backends_for_class(
         cls, class_name: str, module_type: str
     ) -> tuple[str, ...]:
@@ -316,7 +316,7 @@ class BackendManager:
         return cls._available_backends.copy()
 
     @classmethod
-    @lru_cache(maxsize=32)
+    @lru_cache
     def is_backend_available(cls, backend: str) -> bool:
         """
         Verify if a backend is available for a given network type.

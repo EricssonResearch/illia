@@ -36,8 +36,10 @@ classifiers = [
 keywords = ["illia", "bayesian neural networks", "machine learning"]
 
 [project.urls]
-Home = "https://ericssonresearch.github.io/illia/latest/"
+Homepage = "https://github.com/EricssonResearch/illia"
+Documentation = "https://ericssonresearch.github.io/illia/latest/"
 Repository = "https://github.com/EricssonResearch/illia"
+Issues = "https://github.com/EricssonResearch/illia/issues"
 
 [tool.uv]
 default-groups = "all"
@@ -68,15 +70,15 @@ pyg = [
 pipeline = [
     "black==25.1.0",
     "black[jupyter]",
-    "complexipy==4.0.2",
+    "complexipy==4.1.0",
     "flake8==7.3.0",
     "Flake8-pyproject==1.2.3",
     "isort==6.0.1",
     "nox==2025.5.1",
     "pylint==3.3.7",
     "pytest-order==1.3.0",
-    "pytest==8.4.1",
-    "mypy==1.17.0",
+    "pytest==8.4.2",
+    "mypy==1.18.1",
     "bandit==1.8.6",
 ]
 documentation = [
@@ -87,7 +89,7 @@ documentation = [
     "mkdocs-git-authors-plugin==0.10.0",
     "mkdocs-enumerate-headings-plugin==0.6.2",
     "mkdocs-jupyter==0.25.1",
-    "mkdocs-awesome-nav==3.1.2",
+    "mkdocs-awesome-nav==3.2.0",
     "mike==2.1.3",
 ]
 examples = [

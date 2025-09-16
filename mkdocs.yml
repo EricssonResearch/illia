@@ -78,12 +78,13 @@ plugins:
             summary: false
             merge_init_into_class: true
             docstring_style: google
-            show_root_heading: true
+            show_root_heading: false
             show_source: true
             show_bases: false
             show_root_full_path: false
             show_symbol_type_heading: true
             show_symbol_type_toc: true
+            show_root_toc_entry: false
             modernize_annotations: true
             show_submodules: false
             filters: ["!get_config", "!build", "!^_[^_]"]

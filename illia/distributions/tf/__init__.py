@@ -1,5 +1,7 @@
 """
-This module defines the imports for distribution functions in Tensorflow.
+This module consolidates and exposes distribution-related classes
+implemented in Tensorflow. It imports core base classes and specific
+distribution implementations for easier access in other modules.
 """
 
 # Own modules

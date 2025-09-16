@@ -12,7 +12,7 @@ from flax import nnx
 from flax.nnx.rnglib import Rngs
 
 # Own modules
-from illia.distributions.jax import GaussianDistribution
+from illia.distributions.jax.gaussian import GaussianDistribution
 from illia.nn.jax.base import BayesianModule
 
 
@@ -51,6 +51,9 @@ class Embedding(BayesianModule):
             weights_distribution: distribution for the weights of the
                 layer.
             rngs: Random number generators for reproducibility.
+
+        Returns:
+            None.
         """
 
         # Call super class constructor
@@ -80,6 +83,9 @@ class Embedding(BayesianModule):
         """
         Freezes the current module and all submodules that are instances
         of BayesianModule. Sets the frozen state to True.
+
+        Returns:
+            None.
         """
 
         # Set indicator

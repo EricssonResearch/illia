@@ -1,5 +1,5 @@
-name: Lint Illia Code
-description: Lint and Format Check Illia Python Code
+name: Lint Code
+description: Lint and Format Check Python Code
 
 inputs:
   src-project-folder:

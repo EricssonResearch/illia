@@ -12,83 +12,76 @@
   <a href="https://github.com/EricssonResearch/illia/releases/latest">
     <img src="https://img.shields.io/github/release-date/EricssonResearch/illia?display_date=published_at" alt="Last Release">
   </a>
-  <a href="https://github.com/EricssonResearch/illia/releases"><img alt="GitHub release" src="https://img.shields.io/github/release/EricssonResearch/illia.svg"></a>
+  <a href="https://github.com/EricssonResearch/illia/releases">
+    <img alt="GitHub release" src="https://img.shields.io/github/release/EricssonResearch/illia.svg">
+  </a>
 </p>
 
-# Home
+!!! info
 
-!!! warning
-
-    Illia is currently undergoing active development to achieve stability across all
-    frameworks and backends. The library is subject to ongoing changes.
+    illia is actively developed and maintained. While we're working
+    toward full stability across all backends, the core functionality is production-ready.
+    Join our community to stay updated!
 
 ## Introduction
 
-**Illia** is an innovative library for **Bayesian Neural Networks**, designed to support
-multiple backends and integrate seamlessly with popular deep learning ecosystems such as
-**PyTorch**, **TensorFlow**, and **JAX**, as well as graph neural network libraries
-including **PyTorch Geometric**, **Deep Graph Library (DGL)**, and **Spektral**.
+**illia** is a cutting-edge library for **Bayesian Neural Networks** that brings
+uncertainty quantification to deep learning. Designed with flexibility in mind, it
+seamlessly integrates with multiple backends and popular frameworks.
 
-## Quick start example
+For full documentation, please visit the site:
+[https://ericssonresearch.github.io/illia/](https://ericssonresearch.github.io/illia/)
+
+## Why Choose illia?
+
+- **Multi-Backend Support**: Works with PyTorch, TensorFlow, and JAX.
+- **Graph Neural Networks**: Integrated with PyTorch Geometric, DGL, and Spektral.
+- **Developer Friendly**: Intuitive API design and comprehensive documentation.
+
+## Quick Start
+
+Get started with illia in just a few lines of code:
 
 ```python
-# Import standard 'os' library to change the environment variable
 import os
-
-# By default PyTorch is the backend
-os.environ["ILLIA_BACKEND"] = "torch"
-
-# Import the Illia library
-import illia
-from illia.nn import Conv2D
 import torch
 
-print(f"Illia version: {illia.__version__}")
-print(f"Illia backend: {illia.__get_backend__}")
-print(f"Illia available backends: {illia.__get_available_backends__}")
+# Configure backend (PyTorch is default)
+os.environ["ILLIA_BACKEND"] = "torch"
 
-# Create a convolutional layer using the PyTorch backend
-conv_layer = Conv2D(
+import illia
+from illia.nn import Conv2d
+
+# Create a Bayesian convolutional layer
+conv_layer = Conv2d(
     input_channels=3,
     output_channels=64,
     kernel_size=3,
+    bias=True
 )
 
-# Create a random tensor (B, C, H, W)
-tensor = torch.rand((1, 3, 12, 12))
+# Forward pass with uncertainty
+input_tensor = torch.rand(1, 3, 32, 32)
+output_mean, output_std = conv_layer(input_tensor)
 
-# Obtain the output
-output = conv_layer(tensor)
-output.shape
+print(f"Output shape: {output_mean.shape}")
+print(f"Uncertainty quantified: {output_std.mean():.4f}")
 ```
-
-Explore further usage examples in the backend-specific documentation.
 
 ## Contributing
 
-We welcome contributions from the community! To get started quickly, follow these steps
-using our streamlined `Makefile`:
+We welcome contributions from the community! Whether you're fixing bugs, adding features,
+or improving documentation:
 
-1. **Clone the repository** Ensure your system is updated and `make` is installed. On
-   most Linux systems:
-
-    ```bash
-    sudo apt-get update
-    sudo apt-get install build-essential
-    ```
-
-2. **Set up your environment** Navigate to the cloned directory, create a Python
-   environment, activate it, and run:
-
-    ```bash
-    make
-    ```
-
-   This command updates `pip`, installs `uv`, and sets up all project dependencies
-   automatically.
+1. **Read our
+   [contributing guide](https://github.com/EricssonResearch/illia/blob/main/CONTRIBUTING.md)**
+   for development setup.
+2. **Check [open issues](https://github.com/EricssonResearch/illia/issues)** for ways to
+   help.
+3. **Submit bug reports** using our issue templates.
 
 ## License
 
-Illia is released under the
+illia is released under the
 [MIT License](https://github.com/EricssonResearch/illia/blob/main/LICENSE). We hope you
-find it useful and inspiring.
+find it useful and inspiring for your projects!

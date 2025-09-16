@@ -1,67 +1,157 @@
-name: "Feature or New Layer Proposal"
-description: Suggest a new feature, model, or layer for illia.
-labels: ["Feature request", "New layer"]
+name: "Feature Request"
+description: "Propose a new feature, model, or layer for illia"
+title: "[Feature]: "
+labels: ["feature-request", "needs-review"]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting a new feature! Your ideas help make illia better for the community.
+
+        **Before submitting:** Please check if a similar feature request already exists in our [issues](https://github.com/EricssonResearch/illia/issues) page.
+
+        See our [contribution guide](https://github.com/EricssonResearch/illia/blob/main/CONTRIBUTING.md) for implementation guidelines.
+
+  - type: dropdown
+    id: proposal-type
+    attributes:
+      label: "Proposal Type"
+      description: "What type of addition are you proposing?"
+      options:
+        - "New Feature"
+        - "New Model/Architecture"
+        - "New Layer"
+        - "Enhancement to Existing Feature"
+        - "Performance Improvement"
+        - "Other"
+    validations:
+      required: true
+
   - type: textarea
     id: proposal-summary
     attributes:
-      label: Proposal Summary
+      label: "Proposal Summary"
       description:
-        "Describe your proposal clearly. Specify if it's a new feature, model, or layer.
-        Include relevant papers, blog posts, and code links if available."
+        "Provide a clear, concise description of your proposal. Include the main
+        functionality and expected behavior."
       placeholder: |
-        Example:
-        - Type: New BNN layer improvement
-        - Feature: New future to support
-        - Paper: https://arxiv.org/...
-        - Code: https://github.com/...
+        Brief description of the feature...
+
+        Key functionality:
+        - Feature 1: Description
+        - Feature 2: Description
+
+        Expected behavior: How should it work?
     validations:
       required: true
 
   - type: textarea
     id: motivation
     attributes:
-      label: Motivation
+      label: "Motivation & Use Case"
       description:
-        "Explain why this proposal is valuable. Is it solving a limitation or adding a
-        unique advantage? If it's related to another GitHub issue, please link it."
+        "Why is this feature needed? What problem does it solve? Include specific use
+        cases and benefits."
       placeholder: |
-        Example:
-        - Problem: Current architecture struggles with [...]
-        - Benefit: Improves training speed by [...]
+        **Problem it solves:**
+        Current limitations or pain points...
+
+        **Benefits:**
+        - Performance improvement: X% faster
+        - Usability: Simplifies workflow by...
+        - Compatibility: Enables support for...
+
+        **Use cases:**
+        1. Scenario 1: Description
+        2. Scenario 2: Description
+
+        **Related issues:** #123 (if applicable)
     validations:
       required: true
+
+  - type: textarea
+    id: technical-details
+    attributes:
+      label: "Technical Details"
+      description:
+        "Provide technical specifications, API design, or implementation approach if you
+        have ideas."
+      placeholder: |
+        **Proposed API (if applicable):**
+        ```python
+        # Example usage
+        ```
+
+        **Technical considerations:**
+        - Dependencies: ...
+        - Performance impact: ...
+        - Compatibility: ...
+
+  - type: textarea
+    id: references
+    attributes:
+      label: "References & Related Work"
+      description:
+        "Include papers, blog posts, existing implementations, or related repositories."
+      placeholder: |
+        **Papers:**
+        - [Title](https://arxiv.org/...) by Author et al.
+
+        **Existing implementations:**
+        - [Repository](https://github.com/...) by @username
+
+        **Blog posts/articles:**
+        - [Title](https://...) 
+
+        **Authors to mention:** @username (optional)
 
   - type: checkboxes
-    id: open-source-status
+    id: implementation-availability
     attributes:
-      label: Open Source Status
-      description: "This helps assess implementation feasibility."
+      label: "Implementation Status"
+      description: "This helps assess feasibility and implementation approach."
       options:
-        - label: "Implementation code is available"
+        - label: "Reference implementation exists and is open source"
+        - label: "Reference implementation exists but is proprietary"
+        - label: "No existing implementation, but detailed specification available"
+        - label: "Concept stage - no implementation yet"
 
-  - type: textarea
-    id: useful-links
+  - type: dropdown
+    id: contribution-level
     attributes:
-      label: Useful Links & References
-      description:
-        "Provide additional resources or relevant repositories. Mention authors with
-        @username if known."
-      placeholder: |
-        - Implementation repo: ...
-        - Paper link: ...
-        - Author: @gh-username
-
-  - type: textarea
-    id: contribution
-    attributes:
-      label: Contribution Possibility
-      description:
-        "Can you help implement this? Please review the [Contribution
-        Guide](https://github.com/EricssonResearch/illia/blob/main/CONTRIBUTING.md)
-        before offering code."
-      placeholder:
-        "Yes, I can submit a PR / No, but I can help with testing / No, but I can help
-        with design"
+      label: "Your Contribution Level"
+      description: "How can you help with this feature?"
+      options:
+        - "I can implement this feature and submit a PR"
+        - "I can help with implementation but need guidance"
+        - "I can help with testing and validation"
+        - "I can help with documentation"
+        - "I can provide domain expertise/feedback"
+        - "I'm suggesting but cannot contribute to implementation"
     validations:
       required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: "Additional Context"
+      description:
+        "Any other relevant information, screenshots, diagrams, or considerations."
+      placeholder: "Add any additional context, mockups, or considerations here..."
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: "Checklist"
+      description: "Please confirm the following:"
+      options:
+        - label: "I have searched for similar feature requests"
+          required: true
+        - label: "I have provided clear motivation and use cases"
+          required: true
+        - label: "I have included relevant references (if available)"
+          required: true
+        - label:
+            "I understand this is a suggestion and implementation depends on maintainer
+            priorities"
+          required: true
