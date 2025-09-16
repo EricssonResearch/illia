@@ -14,13 +14,14 @@ from keras import losses, saving
 from illia.losses.tf.kl import KLDivergenceLoss
 
 
-@saving.register_keras_serializable(package="BayesianModule", name="ELBOLoss")
+@saving.register_keras_serializable(package="illia", name="ELBOLoss")
 class ELBOLoss(losses.Loss):
     """
-    Computes the Evidence Lower Bound (ELBO) loss.
+    Computes the Evidence Lower Bound (ELBO) loss function for
+    Bayesian neural networks.
 
-    Combines a reconstruction loss and KL divergence, optionally
-    using Monte Carlo sampling.
+    This combines a reconstruction loss and a KL divergence term,
+    estimated using Monte Carlo sampling.
     """
 
     def __init__(
@@ -31,14 +32,13 @@ class ELBOLoss(losses.Loss):
         **kwargs: Any,
     ) -> None:
         """
-        Initializes the ELBO loss function.
+        Initializes the ELBO loss with sampling and KL scaling.
 
         Args:
-            loss_function: Callable computing likelihood loss.
-            num_samples: Number of samples for MC estimation.
-            kl_weight: Scaling factor for KL divergence term.
-            **kwargs: Additional keyword arguments.
-        
+            loss_function: Module for computing reconstruction loss.
+            num_samples: Number of MC samples for estimation.
+            kl_weight: Weight applied to the KL loss.
+
         Returns:
             None.
         """

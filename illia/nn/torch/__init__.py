@@ -1,5 +1,7 @@
 """
-This module contains the import statements for NN layers used with PyTorch.
+This module consolidates and exposes layers-related classes
+implemented in PyTorch. It imports core base classes and specific
+layers implementations for easier access in other modules.
 """
 
 # Own modules

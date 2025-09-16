@@ -1,7 +1,7 @@
 """
-This module contains the code for the BayesianModule.
-
-Defines an abstract base class for Bayesian layers using Flax's nnx.
+This module defines an abstract base class for Bayesian layers using
+Flax's nnx. It facilitates identifying, freezing, and computing KL
+costs for Bayesian-aware modules.
 """
 
 # Standard libraries
@@ -14,17 +14,14 @@ from flax import nnx
 
 class BayesianModule(nnx.Module, ABC):
     """
-    Abstract base class for all Bayesian modules.
-
-    Any layer intended to function as a Bayesian component should
-    inherit from this class and implement the `kl_cost` method.
+    Abstract base for Bayesian-aware modules in Flax's nnx framework.
+    Any Bayesian layer should inherit from this class.
     """
 
     def __init__(self) -> None:
         """
-        Initializes the BayesianModule.
-        Sets default properties for identifying and freezing Bayesian layers.
-        
+        Initializes the module with default Bayesian-specific flags.
+
         Returns:
             None.
         """
@@ -51,7 +48,7 @@ class BayesianModule(nnx.Module, ABC):
     def unfreeze(self) -> None:
         """
         Unfreezes the current module by setting its `frozen` flag to False.
-        
+
         Returns:
             None.
         """
@@ -62,11 +59,12 @@ class BayesianModule(nnx.Module, ABC):
     @abstractmethod
     def kl_cost(self) -> tuple[jax.Array, int]:
         """
-        Computes the KL divergence between posterior and prior distributions
-        for the module's learnable parameters.
+        Computes the Kullback-Leibler divergence between
+        posterior and prior distributions for the module's
+        learnable parameters.
 
         Returns:
             A tuple containing:
-                - kl_cost: The KL divergence as a JAX array.
+                - kl_cost: The Kullback-Leibler divergence.
                 - num_params: The number of contributing parameters.
         """

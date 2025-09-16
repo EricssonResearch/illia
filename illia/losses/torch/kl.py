@@ -15,9 +15,8 @@ from illia.nn.torch.base import BayesianModule
 
 class KLDivergenceLoss(torch.nn.Module):
     """
-    Computes the KL divergence loss across all Bayesian modules in a model.
-
-    Supports reduction and scaling by a configurable weight.
+    Computes the Kullback-Leibler divergence loss across
+    all Bayesian modules.
     """
 
     def __init__(
@@ -27,13 +26,12 @@ class KLDivergenceLoss(torch.nn.Module):
         **kwargs: Any,
     ) -> None:
         """
-        Initializes the KL divergence loss.
+        Initializes the Kullback-Leibler divergence loss computation.
 
         Args:
             reduction: Reduction method for the loss.
-                Only "mean" is currently supported.
-            weight: Scalar to scale the KL divergence term.
-        
+            weight: Scaling factor applied to the total KL loss.
+
         Returns:
             None.
         """
@@ -47,13 +45,14 @@ class KLDivergenceLoss(torch.nn.Module):
 
     def forward(self, model: torch.nn.Module) -> torch.Tensor:
         """
-        Computes KL divergence loss across Bayesian modules in the model.
+        Computes Kullback-Leibler divergence for all Bayesian
+        modules in the model.
 
         Args:
-            model: A PyTorch model containing BayesianModule instances.
+            model: Model containing Bayesian submodules.
 
         Returns:
-            KL divergence loss scaled by the given weight.
+            Scaled Kullback-Leibler divergence loss as a scalar array.
         """
 
         # Get device and dtype

@@ -51,7 +51,7 @@ class Embedding(BayesianModule):
             weights_distribution: distribution for the weights of the
                 layer.
             rngs: Random number generators for reproducibility.
-        
+
         Returns:
             None.
         """
@@ -83,7 +83,7 @@ class Embedding(BayesianModule):
         """
         Freezes the current module and all submodules that are instances
         of BayesianModule. Sets the frozen state to True.
-        
+
         Returns:
             None.
         """

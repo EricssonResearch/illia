@@ -36,8 +36,10 @@ classifiers = [
 keywords = ["illia", "bayesian neural networks", "machine learning"]
 
 [project.urls]
-Home = "https://ericssonresearch.github.io/illia/latest/"
+Homepage = "https://github.com/EricssonResearch/illia"
+Documentation = "https://ericssonresearch.github.io/illia/latest/"
 Repository = "https://github.com/EricssonResearch/illia"
+Issues = "https://github.com/EricssonResearch/illia/issues"
 
 [tool.uv]
 default-groups = "all"

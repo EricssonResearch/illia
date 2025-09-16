@@ -20,6 +20,7 @@ import jax
 from flax import nnx
 from flax.nnx.rnglib import Rngs
 
+
 class DistributionModule(nnx.Module, ABC):
     """
     Abstract base for Flax-based probabilistic distribution modules.
@@ -27,7 +28,7 @@ class DistributionModule(nnx.Module, ABC):
     Defines a required interface for sampling, computing log-probabilities,
     and retrieving parameter counts. Subclasses must implement all
     abstract methods to provide specific distribution logic.
-        
+
     Notes:
         Avoid direct instantiation, this serves as a blueprint for
         derived classes.
@@ -63,7 +64,6 @@ class DistributionModule(nnx.Module, ABC):
             This method supports both user-supplied samples and internally
             generated ones for convenience when evaluating likelihoods.
         """
-
 
     @property
     @abstractmethod

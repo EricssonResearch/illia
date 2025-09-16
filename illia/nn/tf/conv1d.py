@@ -14,7 +14,7 @@ from illia.distributions.tf.gaussian import GaussianDistribution
 from illia.nn.tf.base import BayesianModule
 
 
-@saving.register_keras_serializable(package="BayesianModule", name="Conv1d")
+@saving.register_keras_serializable(package="illia", name="Conv1d")
 class Conv1d(BayesianModule):
     """
     This class is the bayesian implementation of the Conv1d class.

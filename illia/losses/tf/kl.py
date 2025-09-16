@@ -14,13 +14,11 @@ from keras import losses, saving
 from illia.nn.tf.base import BayesianModule
 
 
-@saving.register_keras_serializable(package="BayesianModule", name="KLDivergenceLoss")
+@saving.register_keras_serializable(package="illia", name="KLDivergenceLoss")
 class KLDivergenceLoss(losses.Loss):
     """
-    Computes the KL divergence loss across all Bayesian modules
-    in a model.
-
-    Supports configurable reduction and scaling.
+    Computes the Kullback-Leibler divergence loss across
+    all Bayesian modules.
     """
 
     def __init__(
@@ -30,14 +28,13 @@ class KLDivergenceLoss(losses.Loss):
         **kwargs: Any,
     ) -> None:
         """
-        Initializes the KL divergence loss.
+        Initializes the Kullback-Leibler divergence loss computation.
 
         Args:
-            reduction: Reduction method for loss. Only "mean"
-                currently supported.
-            weight: Weight to scale the KL divergence.
+            reduction: Reduction method for the loss.
+            weight: Scaling factor applied to the total KL loss.
             **kwargs: Additional keyword arguments.
-        
+
         Returns:
             None.
         """
@@ -51,7 +48,8 @@ class KLDivergenceLoss(losses.Loss):
 
     def get_config(self) -> dict:
         """
-        Returns the configuration of the KL divergence loss.
+        Returns the configuration of the Kullback-Leibler
+        divergence loss.
 
         Returns:
             Dictionary containing configuration values.
@@ -68,14 +66,15 @@ class KLDivergenceLoss(losses.Loss):
 
     def __call__(self, *args: Any, **kwargs: Any) -> tf.Tensor:
         """
-        Computes KL divergence across Bayesian modules in the model.
+        Computes Kullback-Leibler divergence for all Bayesian
+        modules in the model.
 
         Args:
             *args: Unused positional arguments.
             **kwargs: Must include 'model' as a keyword argument.
 
         Returns:
-            Scalar tensor representing KL loss.
+            Scaled Kullback-Leibler divergence loss as a scalar array.
         """
 
         model = kwargs.get("model")

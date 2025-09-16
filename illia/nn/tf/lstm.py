@@ -15,7 +15,7 @@ from illia.nn.tf.base import BayesianModule
 from illia.nn.tf.embedding import Embedding
 
 
-@saving.register_keras_serializable(package="BayesianModule", name="LSTM")
+@saving.register_keras_serializable(package="illia", name="LSTM")
 class LSTM(BayesianModule):
     """
     This class is the bayesian implementation of the TensorFlow LSTM layer.

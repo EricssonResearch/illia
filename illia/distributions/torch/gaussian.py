@@ -47,7 +47,7 @@ class GaussianDistribution(DistributionModule):
             std_prior: Standard deviation of the prior.
             mu_init: Initial value for the mean parameter.
             rho_init: Initial value for the rho parameter.
-        
+
         Returns:
             None.
         """

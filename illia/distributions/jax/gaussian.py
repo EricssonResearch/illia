@@ -5,7 +5,6 @@ methods for sampling from the distribution and computing
 log-probabilities of given inputs.
 """
 
-
 # Standard libraries
 from typing import Any, Optional
 
@@ -54,7 +53,7 @@ class GaussianDistribution(DistributionModule):
             rho_init: Initial value for the learnable rho parameter.
             rngs: RNG container for parameter initialization.
             **kwargs: Additional arguments passed to the base class.
-            
+
         Returns:
             None.
         """

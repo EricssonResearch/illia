@@ -137,7 +137,7 @@ class LSTM(BayesianModule):
         Returns:
             None.
         """
-        
+
         # Set indicator
         self.frozen = True
 

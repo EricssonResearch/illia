@@ -18,7 +18,7 @@ import tensorflow as tf
 from keras import layers, saving
 
 
-@saving.register_keras_serializable(package="BayesianModule", name="DistributionModule")
+@saving.register_keras_serializable(package="illia", name="DistributionModule")
 class DistributionModule(layers.Layer, ABC):
     """
     Abstract base for Tensorflow-based probabilistic distribution modules.
@@ -26,7 +26,7 @@ class DistributionModule(layers.Layer, ABC):
     Defines a required interface for sampling, computing log-probabilities,
     and retrieving parameter counts. Subclasses must implement all
     abstract methods to provide specific distribution logic.
-        
+
     Notes:
         Avoid direct instantiation, this serves as a blueprint for
         derived classes.

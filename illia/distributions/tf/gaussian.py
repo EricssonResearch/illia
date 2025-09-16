@@ -17,9 +17,7 @@ from keras import saving
 from illia.distributions.tf.base import DistributionModule
 
 
-@saving.register_keras_serializable(
-    package="BayesianModule", name="GaussianDistribution"
-)
+@saving.register_keras_serializable(package="illia", name="GaussianDistribution")
 class GaussianDistribution(DistributionModule):
     """
     Learnable Gaussian distribution using Tensorflow.
@@ -53,7 +51,7 @@ class GaussianDistribution(DistributionModule):
             mu_init: Initial value for the mean.
             rho_init: Initial value for the rho parameter.
             **kwargs: Additional arguments passed to the base class.
-            
+
         Returns:
             None.
         """
@@ -77,6 +75,9 @@ class GaussianDistribution(DistributionModule):
 
         Args:
             input_shape: Input shape used to trigger layer building.
+
+        Returns:
+            None.
         """
 
         # Define non-trainable priors variables

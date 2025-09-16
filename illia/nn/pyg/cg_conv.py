@@ -61,7 +61,7 @@ class CGConv(MessagePassing):
 
         Returns:
             None.
-            
+
         Shapes:
             - **input:**
             node features \((|\mathcal{V}|, F)\) or \(((|\mathcal{V_s}|,

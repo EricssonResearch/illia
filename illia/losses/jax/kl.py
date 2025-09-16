@@ -17,9 +17,8 @@ from illia.nn.jax.base import BayesianModule
 
 class KLDivergenceLoss(nnx.Module):
     """
-    Computes the KL divergence loss across all Bayesian modules.
-
-    Supports optional weighting and currently only "mean" reduction.
+    Computes the Kullback-Leibler divergence loss across
+    all Bayesian modules.
     """
 
     def __init__(
@@ -29,11 +28,10 @@ class KLDivergenceLoss(nnx.Module):
         **kwargs: Any,
     ) -> None:
         """
-        Initializes the KL divergence loss computation.
+        Initializes the Kullback-Leibler divergence loss computation.
 
         Args:
-            reduction: Reduction method for the loss. Only "mean"
-                supported.
+            reduction: Reduction method for the loss.
             weight: Scaling factor applied to the total KL loss.
 
         Returns:
@@ -49,13 +47,14 @@ class KLDivergenceLoss(nnx.Module):
 
     def __call__(self, model: nnx.Module) -> jax.Array:
         """
-        Computes KL divergence for all Bayesian modules in the model.
+        Computes Kullback-Leibler divergence for all Bayesian
+        modules in the model.
 
         Args:
-            model: NNX model containing Bayesian submodules.
+            model: Model containing Bayesian submodules.
 
         Returns:
-            Scaled KL divergence loss as a scalar array.
+            Scaled Kullback-Leibler divergence loss as a scalar array.
         """
 
         # Init kl cost and params

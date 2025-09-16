@@ -26,7 +26,7 @@ class DistributionModule(torch.nn.Module, ABC):
     Defines a required interface for sampling, computing log-probabilities,
     and retrieving parameter counts. Subclasses must implement all
     abstract methods to provide specific distribution logic.
-        
+
     Notes:
         Avoid direct instantiation, this serves as a blueprint for
         derived classes.
