@@ -24,6 +24,9 @@ class BayesianModule(nnx.Module, ABC):
         """
         Initializes the BayesianModule.
         Sets default properties for identifying and freezing Bayesian layers.
+        
+        Returns:
+            None.
         """
 
         # Call super class constructor
@@ -40,11 +43,17 @@ class BayesianModule(nnx.Module, ABC):
         """
         Freezes the current module by setting its `frozen` flag to True.
         This flag can be used in derived classes to disable updates.
+
+        Returns:
+            None.
         """
 
     def unfreeze(self) -> None:
         """
         Unfreezes the current module by setting its `frozen` flag to False.
+        
+        Returns:
+            None.
         """
 
         # Set frozen indicator to false for current layer

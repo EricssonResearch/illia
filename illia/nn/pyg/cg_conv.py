@@ -59,6 +59,9 @@ class CGConv(MessagePassing):
             **kwargs (optional): Additional arguments for
                 :class:`torch_geometric.nn.conv.MessagePassing`.
 
+        Returns:
+            None.
+            
         Shapes:
             - **input:**
             node features \((|\mathcal{V}|, F)\) or \(((|\mathcal{V_s}|,

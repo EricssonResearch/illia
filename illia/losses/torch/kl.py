@@ -33,6 +33,9 @@ class KLDivergenceLoss(torch.nn.Module):
             reduction: Reduction method for the loss.
                 Only "mean" is currently supported.
             weight: Scalar to scale the KL divergence term.
+        
+        Returns:
+            None.
         """
 
         # call super class constructor

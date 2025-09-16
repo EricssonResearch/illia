@@ -50,6 +50,9 @@ class Linear(BayesianModule):
             precision: Precision used in dot product operations.
             dot_general: Function for computing generalized dot
                 products.
+        
+        Returns:
+            None.
         """
 
         # Call super class constructor
@@ -95,6 +98,9 @@ class Linear(BayesianModule):
         """
         Freezes the current module and all submodules that are instances
         of BayesianModule. Sets the frozen state to True.
+        
+        Returns:
+            None.
         """
 
         # Set indicator

@@ -37,6 +37,9 @@ class KLDivergenceLoss(losses.Loss):
                 currently supported.
             weight: Weight to scale the KL divergence.
             **kwargs: Additional keyword arguments.
+        
+        Returns:
+            None.
         """
 
         # Call super class constructor

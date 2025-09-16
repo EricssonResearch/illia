@@ -1,5 +1,7 @@
 """
-This module defines the imports for distribution functions in PyTorch.
+This module consolidates and exposes distribution-related classes
+implemented in PyTorch. It imports core base classes and specific
+distribution implementations for easier access in other modules.
 """
 
 # Own modules

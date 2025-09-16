@@ -35,6 +35,9 @@ class ELBOLoss(torch.nn.Module):
             loss_function: Callable loss used for reconstruction (e.g. MSELoss).
             num_samples: Number of samples for Monte Carlo estimation.
             kl_weight: Scalar weight for the KL divergence term.
+        
+        Returns:
+            None.
         """
 
         # Call super class constructor

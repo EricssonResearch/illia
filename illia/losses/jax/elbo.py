@@ -37,6 +37,9 @@ class ELBOLoss(nnx.Module):
             loss_function: Module for computing reconstruction loss.
             num_samples: Number of MC samples for estimation.
             kl_weight: Weight applied to the KL loss.
+
+        Returns:
+            None.
         """
 
         # Call super class constructor

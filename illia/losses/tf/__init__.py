@@ -1,5 +1,7 @@
 """
-This module specifies the loss function imports used in Tensorflow.
+This module consolidates and exposes losses-related classes
+implemented in Tensorflow. It imports core base classes and specific
+losses implementations for easier access in other modules.
 """
 
 # Own modules

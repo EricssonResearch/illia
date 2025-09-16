@@ -38,6 +38,9 @@ class ELBOLoss(losses.Loss):
             num_samples: Number of samples for MC estimation.
             kl_weight: Scaling factor for KL divergence term.
             **kwargs: Additional keyword arguments.
+        
+        Returns:
+            None.
         """
 
         # Call super class constructor

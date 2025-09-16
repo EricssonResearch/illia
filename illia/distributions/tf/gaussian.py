@@ -1,9 +1,8 @@
 """
-This module contains the code for the Gaussian distribution.
-
-Implements a learnable Gaussian distribution in TensorFlow using
-Keras layers and supports serialization and log-probability
-evaluation.
+Defines a Gaussian (Normal) distribution using Tensorflow
+with trainable mean and standard deviation parameters. Includes
+methods for sampling from the distribution and computing
+log-probabilities of given inputs.
 """
 
 # Standard libraries
@@ -23,11 +22,16 @@ from illia.distributions.tf.base import DistributionModule
 )
 class GaussianDistribution(DistributionModule):
     """
-    Implements a learnable Gaussian distribution for TensorFlow models.
+    Learnable Gaussian distribution using Tensorflow.
 
-    The distribution uses trainable parameters `mu` and `rho`, where
-    the standard deviation is obtained via a softplus transformation
-    of `rho`. Supports KL divergence via the `log_prob` method.
+    Represents a diagonal Gaussian distribution with trainable mean and
+    standard deviation parameters. The standard deviation is derived from
+    `rho` using a softplus transformation to ensure positivity.
+
+    Notes:
+        Assumes a diagonal covariance matrix. KL divergence between
+        distributions can be computed using log-probability differences
+        obtained from `log_prob`.
     """
 
     def __init__(
@@ -49,6 +53,9 @@ class GaussianDistribution(DistributionModule):
             mu_init: Initial value for the mean.
             rho_init: Initial value for the rho parameter.
             **kwargs: Additional arguments passed to the base class.
+            
+        Returns:
+            None.
         """
 
         # Call super class constructor

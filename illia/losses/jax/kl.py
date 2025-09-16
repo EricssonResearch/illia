@@ -35,6 +35,9 @@ class KLDivergenceLoss(nnx.Module):
             reduction: Reduction method for the loss. Only "mean"
                 supported.
             weight: Scaling factor applied to the total KL loss.
+
+        Returns:
+            None.
         """
 
         # Call super class constructor
