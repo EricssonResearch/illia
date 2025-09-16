@@ -30,7 +30,7 @@ class TestLSTM:
         """
         Test the LSTM constructor.
         """
-        
+
         model, _ = lstm_fixture
 
         # Check that distributions are properly initialized

@@ -460,4 +460,7 @@ def lstm_fixture(request: pytest.FixtureRequest) -> tuple[LSTM, tf.Tensor]:
         shape=(batch_size, seq_len, 1), minval=0, maxval=num_embeddings, dtype=tf.int32
     )
 
+    # Build model
+    model.build(inputs.shape)
+
     return model, inputs

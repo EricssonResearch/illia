@@ -158,8 +158,8 @@ class TestLSTM:
         """
         This method is the test for the kl_cost method of LSTM layer.
         """
-        
-        model, _ = lstm_fixture
+
+        model, inputs = lstm_fixture
 
         # Compute KL cost
         kl_cost, num_params = model.kl_cost()

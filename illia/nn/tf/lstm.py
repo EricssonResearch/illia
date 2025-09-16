@@ -274,15 +274,15 @@ class LSTM(BayesianModule):
         log_probs_i = self.wi_distribution.log_prob(
             self.wi
         ) + self.bi_distribution.log_prob(self.bi)
-        
+
         log_probs_c = self.wc_distribution.log_prob(
             self.wc
         ) + self.bc_distribution.log_prob(self.bc)
-        
+
         log_probs_o = self.wo_distribution.log_prob(
             self.wo
         ) + self.bo_distribution.log_prob(self.bo)
-        
+
         log_probs_v = self.wv_distribution.log_prob(
             self.wv
         ) + self.bv_distribution.log_prob(self.bv)
