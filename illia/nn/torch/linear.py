@@ -41,15 +41,21 @@ class Linear(BayesianModule):
         # Call super-class constructor
         super().__init__(**kwargs)
 
+        # Set attributes
+        self.input_size = input_size
+        self.output_size = output_size
+
         # Set weights distribution
         if weights_distribution is None:
-            self.weights_distribution = GaussianDistribution((output_size, input_size))
+            self.weights_distribution = GaussianDistribution(
+                (self.output_size, self.input_size)
+            )
         else:
             self.weights_distribution = weights_distribution
 
         # Set bias distribution
         if bias_distribution is None:
-            self.bias_distribution = GaussianDistribution((output_size,))
+            self.bias_distribution = GaussianDistribution((self.output_size,))
         else:
             self.bias_distribution = bias_distribution
 
@@ -133,6 +139,8 @@ class Linear(BayesianModule):
 
         # Compute outputs
         # pylint: disable=E1102
-        outputs: torch.Tensor = F.linear(inputs, self.weights, self.bias)
+        outputs: torch.Tensor = F.linear(
+            input=inputs, weight=self.weights, bias=self.bias
+        )
 
         return outputs

@@ -53,13 +53,23 @@ class Conv1d(BayesianModule):
         super().__init__(**kwargs)
 
         # Set attributes
-        self.conv_params: tuple[int, ...] = (stride, padding, dilation, groups)
+        self.input_channels = input_channels
+        self.output_channels = output_channels
+        self.kernel_size = kernel_size
+        self.stride = stride
+        self.padding = padding
+        self.dilation = dilation
+        self.groups = groups
 
         # Set weights distribution
         if weights_distribution is None:
             # Define weights distribution
             self.weights_distribution = GaussianDistribution(
-                (output_channels, input_channels // groups, kernel_size)
+                (
+                    self.output_channels,
+                    self.input_channels // self.groups,
+                    self.kernel_size,
+                )
             )
         else:
             self.weights_distribution = weights_distribution
@@ -67,7 +77,7 @@ class Conv1d(BayesianModule):
         # Set bias distribution
         if bias_distribution is None:
             # Define weights distribution
-            self.bias_distribution = GaussianDistribution((output_channels,))
+            self.bias_distribution = GaussianDistribution((self.output_channels,))
         else:
             self.bias_distribution = bias_distribution
 
@@ -154,4 +164,12 @@ class Conv1d(BayesianModule):
 
         # Execute torch forward
         # pylint: disable=E1102
-        return F.conv1d(inputs, self.weights, self.bias, *self.conv_params)
+        return F.conv1d(
+            input=inputs,
+            weight=self.weights,
+            bias=self.bias,
+            stride=self.stride,
+            padding=self.padding,
+            dilation=self.dilation,
+            groups=self.groups,
+        )
