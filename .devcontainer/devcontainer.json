@@ -10,13 +10,16 @@
         "python.linting.enables": true,
         "editor.formatOnSaveMode": "file",
         "editor.formatOnSave": true,
-        "editor.codeActionsOnSave": {
-          "source.organizeImports": true
-        },
-        "[python]": {
-          "editor.defaultFormatter": "ms-python.black-formatter"
-        },
-        "editor.rulers": [88]
+        "editor.rulers": [
+          {
+            "column": 72,
+            "color": "#4a4f63"
+          },
+          {
+            "column": 88,
+            "color": "#7a8ad1"
+          }
+        ]
       },
       "extensions": [
         "ms-python.python",

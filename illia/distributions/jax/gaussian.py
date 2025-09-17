@@ -1,8 +1,7 @@
 """
-Defines a Gaussian (Normal) distribution using Flax
-with trainable mean and standard deviation parameters. Includes
-methods for sampling from the distribution and computing
-log-probabilities of given inputs.
+Defines a Gaussian (Normal) distribution using Flax with trainable
+mean and standard deviation parameters. Supports sampling and
+computing log-probabilities of inputs.
 """
 
 # Standard libraries
@@ -20,16 +19,15 @@ from illia.distributions.jax.base import DistributionModule
 
 class GaussianDistribution(DistributionModule):
     """
-    Learnable Gaussian distribution using Flax.
+    Learnable Gaussian distribution with diagonal covariance.
 
-    Represents a diagonal Gaussian distribution with trainable mean and
-    standard deviation parameters. The standard deviation is derived from
-    `rho` using a softplus transformation to ensure positivity.
+    Represents a Gaussian with trainable mean and standard deviation.
+    Standard deviation is derived from `rho` using a softplus
+    transformation to ensure positivity.
 
     Notes:
-        Assumes a diagonal covariance matrix. KL divergence between
-        distributions can be computed using log-probability differences
-        obtained from `log_prob`.
+        Assumes diagonal covariance. KL divergence can be computed
+        using log-probability differences from `log_prob`.
     """
 
     def __init__(
@@ -43,7 +41,7 @@ class GaussianDistribution(DistributionModule):
         **kwargs: Any,
     ) -> None:
         """
-        Initializes the GaussianDistribution module.
+        Initializes the Gaussian distribution layer.
 
         Args:
             shape: Shape of the learnable parameters.
@@ -78,14 +76,16 @@ class GaussianDistribution(DistributionModule):
 
     def sample(self, rngs: Rngs = nnx.Rngs(0)) -> jax.Array:
         """
-        Generates and returns a sample from the Gaussian distribution.
+        Generate a sample from the Gaussian distribution.
 
         Args:
             rngs: RNG container used for sampling.
 
         Returns:
-            Sample array matching the shape and structure defined by
-            the distribution parameters.
+            Array containing a sample matching the distribution shape.
+
+        Notes:
+            This method should be deterministic given the same RNG.
         """
 
         # Compute epsilon and sigma
@@ -96,19 +96,18 @@ class GaussianDistribution(DistributionModule):
 
     def log_prob(self, x: Optional[jax.Array] = None) -> jax.Array:
         """
-        Computes the log-probability of an input sample.
-        If no sample is provided, a new one is drawn internally from the
-        current distribution before computing the log-probability.
+        Compute the log-probability of a given sample. If no sample is
+        provided, a new one is drawn internally from the distribution.
 
         Args:
             x: Optional sample tensor to evaluate.
 
         Returns:
-            Scalar tensor representing the computed log-probability.
+            Scalar array containing the log-probability.
 
         Notes:
-            This method supports both user-supplied samples and internally
-            generated ones for convenience when evaluating likelihoods.
+            Supports both user-supplied and internally generated
+                samples.
         """
 
         # Sample if x is None
@@ -145,20 +144,21 @@ class GaussianDistribution(DistributionModule):
     @property
     def num_params(self) -> int:
         """
-        Returns the total number of learnable parameters in the distribution.
+        Return the total number of learnable parameters in the
+        distribution.
 
         Returns:
-            Integer representing the total number of learnable parameters.
+            Integer count of all learnable parameters.
         """
 
         return len(self.mu.reshape(-1))
 
     def __call__(self) -> jax.Array:
         """
-        Performs a forward pass by sampling from the distribution.
+        Perform a forward pass by sampling from the distribution.
 
         Returns:
-            A sample from the distribution.
+            A sample from the Gaussian distribution.
         """
 
         return self.sample()

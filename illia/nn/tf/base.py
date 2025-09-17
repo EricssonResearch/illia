@@ -1,7 +1,7 @@
 """
-This module defines an abstract base class for Bayesian layers using
-Tensorflow. It facilitates identifying, freezing, and computing KL
-costs for Bayesian-aware modules.
+Abstract base class for Bayesian layers using TensorFlow.
+Provides common functionality for identifying Bayesian modules,
+freezing/unfreezing parameters, and computing KL divergence costs.
 """
 
 # Standard libraries
@@ -16,13 +16,19 @@ from keras import layers, saving
 @saving.register_keras_serializable(package="illia", name="BayesianModule")
 class BayesianModule(layers.Layer, ABC):
     """
-    Abstract base for Bayesian-aware modules in Flax's nnx framework.
-    Any Bayesian layer should inherit from this class.
+    Abstract base for Bayesian-aware modules in TensorFlow.
+    Any Bayesian layer should inherit from this class. It tracks
+    whether the module is Bayesian and provides freezing/unfreezing
+    mechanisms for controlling parameter updates.
+
+    Notes:
+        Derived classes must implement `freeze` and `kl_cost`.
     """
 
     def __init__(self, **kwargs: Any) -> None:
         """
-        Initializes the module with default Bayesian-specific flags.
+        Initialize the module with default Bayesian-specific flags.
+        Sets `frozen` to False and `is_bayesian` to True.
 
         Args:
             **kwargs: Additional keyword arguments for the Layer base class.
@@ -31,20 +37,16 @@ class BayesianModule(layers.Layer, ABC):
             None.
         """
 
-        # Call super class constructor
         super().__init__(**kwargs)
 
-        # Set freeze false by default
         self.frozen: bool = False
-
-        # Create attribute to know is a bayesian layer
         self.is_bayesian: bool = True
 
     @abstractmethod
     def freeze(self) -> None:
         """
-        Freezes the current module by setting its `frozen` flag to True.
-        This flag can be used in derived classes to disable updates.
+        Freeze the module by setting its `frozen` flag to True.
+        Derived classes can use this flag to disable parameter updates.
 
         Returns:
             None.
@@ -52,24 +54,21 @@ class BayesianModule(layers.Layer, ABC):
 
     def unfreeze(self) -> None:
         """
-        Unfreezes the current module by setting its `frozen` flag to False.
+        Unfreeze the module by setting its `frozen` flag to False.
 
         Returns:
             None.
         """
-
-        # Set frozen indicator to false for current layer
+        
         self.frozen = False
 
     @abstractmethod
     def kl_cost(self) -> tuple[tf.Tensor, int]:
         """
-        Computes the Kullback-Leibler divergence between
-        posterior and prior distributions for the module's
-        learnable parameters.
+        Compute the KL divergence between posterior and prior distributions.
 
         Returns:
-            A tuple containing:
-                - kl_cost: The Kullback-Leibler divergence.
-                - num_params: The number of contributing parameters.
+            Tuple containing:
+                - kl_cost: Kullback-Leibler divergence for this module.
+                - num_params: Number of parameters contributing to KL.
         """

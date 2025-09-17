@@ -1,4 +1,4 @@
-# Neural Network
+# Neural Network Layers
 
 ::: illia.nn.jax.conv1d
 

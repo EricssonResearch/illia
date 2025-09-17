@@ -1,8 +1,7 @@
 """
-Defines a Gaussian (Normal) distribution using PyTorch
-with trainable mean and standard deviation parameters. Includes
-methods for sampling from the distribution and computing
-log-probabilities of given inputs.
+Defines a Gaussian (Normal) distribution using PyTorch with trainable
+mean and standard deviation parameters. Supports sampling and
+computing log-probabilities of inputs.
 """
 
 # Standard libraries
@@ -17,16 +16,15 @@ from illia.distributions.torch.base import DistributionModule
 
 class GaussianDistribution(DistributionModule):
     """
-    Learnable Gaussian distribution using PyTorch.
+    Learnable Gaussian distribution with diagonal covariance.
 
-    Represents a diagonal Gaussian distribution with trainable mean and
-    standard deviation parameters. The standard deviation is derived from
-    `rho` using a softplus transformation to ensure positivity.
+    Represents a Gaussian with trainable mean and standard deviation.
+    Standard deviation is derived from `rho` using a softplus
+    transformation to ensure positivity.
 
     Notes:
-        Assumes a diagonal covariance matrix. KL divergence between
-        distributions can be computed using log-probability differences
-        obtained from `log_prob`.
+        Assumes diagonal covariance. KL divergence can be computed
+        using log-probability differences from `log_prob`.
     """
 
     def __init__(
@@ -45,8 +43,9 @@ class GaussianDistribution(DistributionModule):
             shape: Shape of the learnable parameters.
             mu_prior: Mean of the Gaussian prior.
             std_prior: Standard deviation of the prior.
-            mu_init: Initial value for the mean parameter.
-            rho_init: Initial value for the rho parameter.
+            mu_init: Initial value for the learnable mean.
+            rho_init: Initial value for the learnable rho parameter.
+            **kwargs: Additional arguments passed to the base class.
 
         Returns:
             None.
@@ -75,10 +74,10 @@ class GaussianDistribution(DistributionModule):
     @torch.jit.export
     def sample(self) -> torch.Tensor:
         """
-        Draws a sample from the distribution using reparameterization.
+        Generate a sample from the Gaussian distribution.
 
         Returns:
-            A sample tensor with the same shape as `mu` and `rho`.
+            Array containing a sample matching the distribution shape.
         """
 
         # Sampling with reparametrization trick
@@ -90,15 +89,18 @@ class GaussianDistribution(DistributionModule):
     @torch.jit.export
     def log_prob(self, x: Optional[torch.Tensor] = None) -> torch.Tensor:
         """
-        Computes the KL divergence between posterior and prior.
-
-        If no sample is given, one is drawn from the distribution.
+        Compute the log-probability of a given sample. If no sample is
+        provided, a new one is drawn internally from the distribution.
 
         Args:
-            x: Optional sample tensor. If None, generates a new sample.
+            x: Optional sample tensor to evaluate.
 
         Returns:
-            A scalar tensor representing the KL divergence.
+            Scalar array containing the log-probability.
+
+        Notes:
+            Supports both user-supplied and internally generated
+                samples.
         """
 
         # Sample if x is None
@@ -136,10 +138,11 @@ class GaussianDistribution(DistributionModule):
     @torch.no_grad()
     def num_params(self) -> int:
         """
-        Returns the number of learnable parameters in the distribution.
+        Return the total number of learnable parameters in the
+        distribution.
 
         Returns:
-            Total number of parameters as an integer.
+            Integer count of all learnable parameters.
         """
 
         return len(self.mu.view(-1))

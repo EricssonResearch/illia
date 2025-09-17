@@ -32,7 +32,8 @@ For full documentation, please visit the site:
 ## Why Choose illia?
 
 - **Multi-Backend Support**: Works with PyTorch, TensorFlow, and JAX.
-- **Graph Neural Networks**: Integrated with PyTorch Geometric, DGL, and Spektral.
+- **Graph Neural Networks**: Currently integrated with PyTorch Geometric, with planned
+  support for DGL and/or Spektral in future releases.
 - **Developer Friendly**: Intuitive API design and comprehensive documentation.
 
 ## Quick Start

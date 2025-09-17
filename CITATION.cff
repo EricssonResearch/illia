@@ -1,20 +1,26 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
 cff-version: 1.2.0
 title: illia
 message: >-
   If you use this software, please cite it using the metadata from this file
 type: software
 authors:
-  - given-names: Ericsson Research
-    family-names: Geometric Artficial Intelligence
+  - name: Ericsson Research
+    location: Sweden
+    email: labs@ericsson.com
+    website: "http://www.ericsson.com/research-blog"
 identifiers:
+  - type: url
+    value: "https://ericsson.github.io/cognitive-labs/"
+    description: Official web page of Ericsson Cognitive Labs
 repository-code: "https://github.com/EricssonResearch/illia"
 url: "https://ericssonresearch.github.io/illia"
-abstract: >-
-  Framework agnostic Bayesian Neural Network library
+abstract: Framework agnostic Bayesian Neural Network library
 keywords:
-  - illia
-  - BNN
-  - Bayesian
-  - Deep Learning
-  - Machine Learning
+  - machine learning
+  - deep learning
+  - bayesian
+  - bayesian neural networks
 license: MIT

@@ -16,6 +16,9 @@ def __getattr__(name: str) -> None:
 
     Args:
         name: Name of the class to be imported.
+
+    Returns:
+        None.
     """
 
     # Obtain parameters for losses

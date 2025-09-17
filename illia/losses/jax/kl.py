@@ -1,6 +1,8 @@
 """
-This module implements the Kullback-Leibler (KL) divergence
-loss for Bayesian neural networks in Jax.
+Implements the Kullback-Leibler (KL) divergence loss for Bayesian
+networks. This module computes the KL divergence across all Bayesian
+modules in a model, providing a regularization term for variational
+inference.
 """
 
 # Standard libraries
@@ -17,8 +19,13 @@ from illia.nn.jax.base import BayesianModule
 
 class KLDivergenceLoss(nnx.Module):
     """
-    Computes the Kullback-Leibler divergence loss across
-    all Bayesian modules.
+    Computes Kullback-Leibler divergence across Bayesian modules.
+    This loss sums the KL divergence from all Bayesian layers in the
+    model. It can be reduced by averaging and scaled by a weight factor.
+
+    Notes:
+        Assumes the model contains submodules derived from
+        `BayesianModule`.
     """
 
     def __init__(
@@ -28,11 +35,12 @@ class KLDivergenceLoss(nnx.Module):
         **kwargs: Any,
     ) -> None:
         """
-        Initializes the Kullback-Leibler divergence loss computation.
+        Initialize the KL divergence loss computation.
 
         Args:
-            reduction: Reduction method for the loss.
+            reduction: Method for reducing the KL loss.
             weight: Scaling factor applied to the total KL loss.
+            **kwargs: Additional arguments passed to the base class.
 
         Returns:
             None.
@@ -47,14 +55,17 @@ class KLDivergenceLoss(nnx.Module):
 
     def __call__(self, model: nnx.Module) -> jax.Array:
         """
-        Computes Kullback-Leibler divergence for all Bayesian
-        modules in the model.
+        Compute KL divergence for all Bayesian modules in a model.
 
         Args:
             model: Model containing Bayesian submodules.
 
         Returns:
-            Scaled Kullback-Leibler divergence loss as a scalar array.
+            Scalar array representing the weighted KL divergence loss.
+
+        Notes:
+            The loss is averaged over the number of parameters and
+            scaled by the `weight` attribute.
         """
 
         # Init kl cost and params

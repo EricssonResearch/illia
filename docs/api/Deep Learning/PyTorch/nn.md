@@ -1,4 +1,4 @@
-# Neural Network
+# Neural Network Layers
 
 ::: illia.nn.torch.conv1d
 
