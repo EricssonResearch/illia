@@ -1,9 +1,3 @@
-"""
-Implements the Evidence Lower Bound (ELBO) loss for Bayesian networks.
-This module defines an ELBO loss that combines a reconstruction loss
-and a KL divergence term, estimated using Monte Carlo sampling.
-"""
-
 # Standard libraries
 from typing import Any
 

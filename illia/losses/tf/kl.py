@@ -1,10 +1,3 @@
-"""
-Implements the Kullback-Leibler (KL) divergence loss for Bayesian
-networks. This module computes the KL divergence across all Bayesian
-modules in a model, providing a regularization term for variational
-inference.
-"""
-
 # Standard libraries
 from typing import Any, Literal
 

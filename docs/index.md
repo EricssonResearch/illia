@@ -17,11 +17,11 @@
   </a>
 </p>
 
-!!! info
+!!! warning
 
-    illia is actively developed and maintained. While we're working
-    toward full stability across all backends, the core functionality is production-ready.
-    Join our community to stay updated!
+    The library is evolving rapidly to ensure stable support across all
+    frameworks and backends. Expect ongoing changes as we improve
+    functionality and performance.
 
 ## Introduction
 

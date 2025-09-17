@@ -1,9 +1,3 @@
-"""
-Defines a Gaussian (Normal) distribution using Tensorflow with trainable
-mean and standard deviation parameters. Supports sampling and
-computing log-probabilities of inputs.
-"""
-
 # Standard libraries
 import math
 from typing import Any, Optional
@@ -20,7 +14,6 @@ from illia.distributions.tf.base import DistributionModule
 class GaussianDistribution(DistributionModule):
     """
     Learnable Gaussian distribution with diagonal covariance.
-
     Represents a Gaussian with trainable mean and standard deviation.
     Standard deviation is derived from `rho` using a softplus
     transformation to ensure positivity.

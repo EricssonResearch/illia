@@ -1,7 +1,3 @@
-"""
-This module contains the code for Linear Bayesian layer.
-"""
-
 # Standard libraries
 from typing import Any, Optional
 
@@ -20,7 +16,10 @@ from illia.nn.jax.base import BayesianModule
 
 class Linear(BayesianModule):
     """
-    This class is the bayesian implementation of the Linear class.
+    Bayesian linear layer with optional bias and weight priors.
+    Functions like a standard fully connected layer but treats weights and
+    bias as probabilistic variables. Freezing the layer fixes the parameters
+    and stops gradient computation.
     """
 
     bias_distribution: Optional[GaussianDistribution] = None
@@ -39,7 +38,7 @@ class Linear(BayesianModule):
         **kwargs: Any,
     ) -> None:
         """
-        This is the constructor of the Linear class.
+        Initializes a Linear layer.
 
         Args:
             input_size: Size of the input features.
@@ -53,6 +52,10 @@ class Linear(BayesianModule):
 
         Returns:
             None.
+
+        Notes:
+            If distributions are not provided, Gaussian distributions are
+            used by default.
         """
 
         # Call super class constructor
@@ -96,8 +99,9 @@ class Linear(BayesianModule):
 
     def freeze(self) -> None:
         """
-        Freezes the current module and all submodules that are instances
-        of BayesianModule. Sets the frozen state to True.
+        Freezes the layer parameters by stopping gradient computation.
+        If the weights or bias are not already sampled, they are sampled
+        before freezing. Once frozen, no further sampling occurs.
 
         Returns:
             None.
@@ -121,12 +125,16 @@ class Linear(BayesianModule):
 
     def kl_cost(self) -> tuple[jax.Array, int]:
         """
-        Computes the Kullback-Leibler (KL) divergence cost for the
-        layer's weights and bias.
+        Computes the KL divergence cost for weights and bias.
 
         Returns:
-            Tuple containing KL divergence cost and total number of
-            parameters.
+            A tuple containing:
+                - KL divergence cost.
+                - Total number of parameters in the layer.
+
+        Notes:
+            Includes bias in the KL computation only if use_bias is
+            True.
         """
 
         # Compute log probs for weights
@@ -147,13 +155,17 @@ class Linear(BayesianModule):
 
     def __call__(self, inputs: jax.Array) -> jax.Array:
         """
-        This method is the forward pass of the model.
+        Performs a forward pass using current weights and bias.
 
         Args:
-            inputs: Inputs of the model. Dimensions: [*, input size].
+            inputs: Input array with shape [*, input_size].
 
         Returns:
-            Output tensor. Dimension: [*, output size].
+            Output array with shape [*, output_size].
+
+        Notes:
+            If the layer is not frozen, new weights and bias are sampled
+            before computation.
         """
 
         # Sample if model not frozen

@@ -1,9 +1,3 @@
-"""
-Abstract base class for Bayesian layers using TensorFlow.
-Provides common functionality for identifying Bayesian modules,
-freezing/unfreezing parameters, and computing KL divergence costs.
-"""
-
 # Standard libraries
 from abc import ABC, abstractmethod
 from typing import Any
@@ -45,8 +39,9 @@ class BayesianModule(layers.Layer, ABC):
     @abstractmethod
     def freeze(self) -> None:
         """
-        Freeze the module by setting its `frozen` flag to True.
-        Derived classes can use this flag to disable parameter updates.
+        Freezes the layer parameters by stopping gradient computation.
+        If the weights or bias are not already sampled, they are sampled
+        before freezing. Once frozen, no further sampling occurs.
 
         Returns:
             None.
@@ -59,16 +54,16 @@ class BayesianModule(layers.Layer, ABC):
         Returns:
             None.
         """
-        
+
         self.frozen = False
 
     @abstractmethod
     def kl_cost(self) -> tuple[tf.Tensor, int]:
         """
-        Compute the KL divergence between posterior and prior distributions.
+        Computes the KL divergence cost for weights and bias.
 
         Returns:
-            Tuple containing:
-                - kl_cost: Kullback-Leibler divergence for this module.
-                - num_params: Number of parameters contributing to KL.
+            A tuple containing:
+                - KL divergence cost.
+                - Total number of parameters in the layer.
         """

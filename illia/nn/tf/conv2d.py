@@ -1,7 +1,3 @@
-"""
-This module contains the code for the bayesian Conv2d.
-"""
-
 # Standard libraries
 from typing import Any, Optional
 
@@ -17,7 +13,10 @@ from illia.nn.tf.base import BayesianModule
 @saving.register_keras_serializable(package="illia", name="Conv2d")
 class Conv2d(BayesianModule):
     """
-    This class is the bayesian implementation of the Conv2d class.
+    Bayesian 2D convolutional layer with optional weight and bias priors.
+    This layer functions like a standard 2D convolution but treats weights
+    and bias as random variables sampled from specified distributions.
+    If frozen, the parameters become fixed and gradients are stopped.
     """
 
     bias_distribution: Optional[GaussianDistribution] = None
@@ -38,7 +37,7 @@ class Conv2d(BayesianModule):
         **kwargs: Any,
     ) -> None:
         """
-        Initializes a Bayesian Conv2d layer.
+        Initializes a Bayesian 2D convolutional layer.
 
         Args:
             input_channels: The number of channels in the input image.
@@ -58,6 +57,13 @@ class Conv2d(BayesianModule):
             bias_distribution: The Gaussian distribution for the bias,
                 if applicable.
             **kwargs: Additional keyword arguments.
+
+        Returns:
+            None.
+
+        Notes:
+            If kernel_size is an int, it is extended to a square tuple.
+            Gaussian distributions are used by default if none are provided.
         """
 
         # Call super class constructor
@@ -255,8 +261,12 @@ class Conv2d(BayesianModule):
 
     def freeze(self) -> None:
         """
-        Freezes the current module and all submodules that are instances
-        of BayesianModule. Sets the frozen state to True.
+        Freezes the layer parameters by stopping gradient computation.
+        If the weights or bias are not already sampled, they are sampled
+        before freezing. Once frozen, no further sampling occurs.
+
+        Returns:
+            None.
         """
 
         # Set indicator
@@ -277,12 +287,16 @@ class Conv2d(BayesianModule):
 
     def kl_cost(self) -> tuple[tf.Tensor, int]:
         """
-        Computes the Kullback-Leibler (KL) divergence cost for the
-        layer's weights and bias.
+        Computes the KL divergence cost for weights and bias.
 
         Returns:
-            Tuple containing KL divergence cost and total number of
-            parameters.
+            A tuple containing:
+                - KL divergence cost.
+                - Total number of parameters in the layer.
+
+        Notes:
+            Includes bias in the KL computation only if use_bias is
+            True.
         """
 
         # Compute log probs
@@ -301,11 +315,9 @@ class Conv2d(BayesianModule):
 
     def call(self, inputs: tf.Tensor) -> tf.Tensor:
         """
-        Performs a forward pass through the Bayesian Convolution 2D
-        layer. If the layer is not frozen, it samples weights and bias
-        from their respective distributions. If the layer is frozen
-        and the weights or bias are not initialized, it also performs
-        sampling.
+        Applies the 2D convolution to the input using current weights and bias.
+        If the layer is not frozen, new weights and bias are sampled prior to
+        computation.
 
         Args:
             inputs: Input tensor to the layer. Dimensions: [batch,

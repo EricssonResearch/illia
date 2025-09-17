@@ -1,9 +1,3 @@
-"""
-This module defines an abstract base class for Bayesian layers using
-PyTorch. It facilitates identifying, freezing, and computing KL
-costs for Bayesian-aware modules.
-"""
-
 # Standard libraries
 from abc import ABC
 
@@ -37,8 +31,9 @@ class BayesianModule(torch.nn.Module, ABC):
     @torch.jit.export
     def freeze(self) -> None:
         """
-        Freezes the current module by setting its `frozen` flag to True.
-        This flag can be used in derived classes to disable updates.
+        Freezes the layer parameters by stopping gradient computation.
+        If the weights or bias are not already sampled, they are sampled
+        before freezing. Once frozen, no further sampling occurs.
 
         Returns:
             None.
@@ -62,14 +57,16 @@ class BayesianModule(torch.nn.Module, ABC):
     @torch.jit.export
     def kl_cost(self) -> tuple[torch.Tensor, int]:
         """
-        Computes the Kullback-Leibler divergence between
-        posterior and prior distributions for the module's
-        learnable parameters.
+        Computes the KL divergence cost for weights and bias.
 
         Returns:
             A tuple containing:
-                - kl_cost: The Kullback-Leibler divergence.
-                - num_params: The number of contributing parameters.
+                - KL divergence cost.
+                - Total number of parameters in the layer.
+
+        Notes:
+            Includes bias in the KL computation only if use_bias is
+            True.
         """
 
         return torch.tensor(0.0), 0

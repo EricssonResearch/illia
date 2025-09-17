@@ -1,7 +1,3 @@
-"""
-This module contains the code for Embedding Bayesian layer.
-"""
-
 # Standard libraries
 from typing import Any, Optional
 
@@ -17,7 +13,10 @@ from illia.nn.tf.base import BayesianModule
 @saving.register_keras_serializable(package="illia", name="Embedding")
 class Embedding(BayesianModule):
     """
-    This class is the bayesian implementation of the Embedding class.
+    Bayesian embedding layer with optional padding and max-norm constraints.
+    Each embedding vector is sampled from a specified weight distribution.
+    If the layer is frozen, the embeddings are fixed and gradients are
+    stopped.
     """
 
     def __init__(
@@ -33,7 +32,7 @@ class Embedding(BayesianModule):
         **kwargs: Any,
     ) -> None:
         """
-        This method is the constructor of the embedding class.
+        Initializes a Embedding layer.
 
         Args:
             num_embeddings: Size of the dictionary of embeddings.
@@ -52,6 +51,13 @@ class Embedding(BayesianModule):
             weights_distribution: The Gaussian distribution for the
                 weights, if applicable.
             **kwargs: Additional keyword arguments.
+
+        Returns:
+            None.
+
+        Notes:
+            If weights_distribution is None, a GaussianDistribution is used
+            by default.
         """
 
         # Call super class constructor
@@ -167,8 +173,12 @@ class Embedding(BayesianModule):
 
     def freeze(self) -> None:
         """
-        Freezes the current module and all submodules that are instances
-        of BayesianModule. Sets the frozen state to True.
+        Freezes the layer parameters by stopping gradient computation.
+        If the weights or bias are not already sampled, they are sampled
+        before freezing. Once frozen, no further sampling occurs.
+
+        Returns:
+            None.
         """
 
         # Set indicator
@@ -183,12 +193,12 @@ class Embedding(BayesianModule):
 
     def kl_cost(self) -> tuple[tf.Tensor, int]:
         """
-        Computes the Kullback-Leibler (KL) divergence cost for the
-        layer's weights.
+        Computes the KL divergence cost for weights and bias.
 
         Returns:
-            Tuple containing KL divergence cost and total number of
-            parameters.
+            A tuple containing:
+                - KL divergence cost.
+                - Total number of parameters in the layer.
         """
 
         # Get log probs
@@ -201,11 +211,7 @@ class Embedding(BayesianModule):
 
     def call(self, inputs: tf.Tensor) -> tf.Tensor:
         """
-        Performs a forward pass through the Bayesian Embedding layer.
-
-        Samples weights from their posterior distributions if
-        the layer is not frozen. If frozen and not initialized, samples
-        them once.
+        Performs a forward pass using current embedding weights.
 
         Args:
             inputs: input tensor. Dimensions: [batch, *].

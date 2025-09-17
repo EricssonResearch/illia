@@ -1,7 +1,3 @@
-"""
-This module contains the code for bayesian Embedding layer.
-"""
-
 # Standard libraries
 from typing import Any, Optional
 
@@ -18,7 +14,10 @@ from illia.nn.jax.base import BayesianModule
 
 class Embedding(BayesianModule):
     """
-    This class is the bayesian implementation of the Embedding class.
+    Bayesian embedding layer with optional padding and max-norm constraints.
+    Each embedding vector is sampled from a specified weight distribution.
+    If the layer is frozen, the embeddings are fixed and gradients are
+    stopped.
     """
 
     def __init__(
@@ -34,7 +33,7 @@ class Embedding(BayesianModule):
         **kwargs: Any,
     ) -> None:
         """
-        This method is the constructor of the embedding class.
+        Initializes a Embedding layer.
 
         Args:
             num_embeddings: size of the dictionary of embeddings.
@@ -54,6 +53,10 @@ class Embedding(BayesianModule):
 
         Returns:
             None.
+
+        Notes:
+            If weights_distribution is None, a GaussianDistribution is used
+            by default.
         """
 
         # Call super class constructor
@@ -81,8 +84,9 @@ class Embedding(BayesianModule):
 
     def freeze(self) -> None:
         """
-        Freezes the current module and all submodules that are instances
-        of BayesianModule. Sets the frozen state to True.
+        Freezes the layer parameters by stopping gradient computation.
+        If the weights or bias are not already sampled, they are sampled
+        before freezing. Once frozen, no further sampling occurs.
 
         Returns:
             None.
@@ -100,12 +104,12 @@ class Embedding(BayesianModule):
 
     def kl_cost(self) -> tuple[jax.Array, int]:
         """
-        Computes the Kullback-Leibler (KL) divergence cost for the
-        layer's weights and bias.
+        Computes the KL divergence cost for weights and bias.
 
         Returns:
-            Tuple containing KL divergence cost and total number of
-            parameters.
+            A tuple containing:
+                - KL divergence cost.
+                - Total number of parameters in the layer.
         """
 
         # Compute log probs for weights
@@ -120,13 +124,14 @@ class Embedding(BayesianModule):
 
     def __call__(self, inputs: jax.Array) -> jax.Array:
         """
-        This method is the forward pass of the layer.
+        Performs a forward pass using current embedding weights.
 
         Args:
-            inputs: input tensor. Dimensions: [*].
+            inputs: Input array of indices into the embedding matrix.
 
         Returns:
-            outputs tensor. Dimension: [*, embedding dim].
+            Output array of shape [*, embeddings_dim] containing the
+                corresponding embedding vectors.
         """
 
         # Sample if model not frozen

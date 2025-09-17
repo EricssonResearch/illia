@@ -1,10 +1,3 @@
-"""
-Base class for building distribution modules using Tensorflow.
-Provides a standardized interface for sampling, computing log
-probabilities, and reporting the number of parameters in custom
-probabilistic layers.
-"""
-
 # Standard libraries
 from abc import ABC, abstractmethod
 from typing import Optional

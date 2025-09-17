@@ -1,7 +1,3 @@
-"""
-This module contains the code for the bayesian Conv1d.
-"""
-
 # Standard libraries
 from typing import Any, Optional
 
@@ -18,7 +14,10 @@ from illia.nn.jax.base import BayesianModule
 
 class Conv1d(BayesianModule):
     """
-    This class is the bayesian implementation of the Conv1d class.
+    Bayesian 1D convolutional layer with optional weight and bias
+    priors. This layer behaves like a standard Conv1d but treats weights
+    and bias as random variables sampled from specified distributions.
+    If the layer is frozen, the parameters become fixed.
     """
 
     bias_distribution: Optional[GaussianDistribution] = None
@@ -40,7 +39,7 @@ class Conv1d(BayesianModule):
         **kwargs: Any,
     ) -> None:
         """
-        Definition of a Bayesian Convolution 1D layer.
+        Initializes a Bayesian 1D convolutional layer.
 
         Args:
             input_channels: Number of input feature channels.
@@ -49,7 +48,8 @@ class Conv1d(BayesianModule):
             stride: Stride of the convolution operation.
             padding: Amount of zero-padding added to both sides.
             dilation: Spacing between kernel elements.
-            groups: Number of blocked connections between input and output.
+            groups: Number of blocked connections between input and
+                output.
             weights_distribution: Distribution to initialize weights.
             bias_distribution: Distribution to initialize bias.
             use_bias: Whether to include a bias term.
@@ -57,6 +57,10 @@ class Conv1d(BayesianModule):
 
         Returns:
             None.
+
+        Notes:
+            If no distributions are provided, Gaussian distributions are
+            used by default.
         """
 
         # Call super class constructor
@@ -109,8 +113,9 @@ class Conv1d(BayesianModule):
 
     def freeze(self) -> None:
         """
-        Freezes the current module and all submodules that are instances
-        of BayesianModule. Sets the frozen state to True.
+        Freezes the layer parameters by stopping gradient computation.
+        If the weights or bias are not already sampled, they are sampled
+        before freezing. Once frozen, no further sampling occurs.
 
         Returns:
             None.
@@ -134,12 +139,16 @@ class Conv1d(BayesianModule):
 
     def kl_cost(self) -> tuple[jax.Array, int]:
         """
-        Computes the Kullback-Leibler (KL) divergence cost for the
-        layer's weights and bias.
+        Computes the KL divergence cost for weights and bias.
 
         Returns:
-            Tuple containing KL divergence cost and total number of
-            parameters.
+            A tuple containing:
+                - KL divergence cost.
+                - Total number of parameters in the layer.
+
+        Notes:
+            Includes bias in the KL computation only if use_bias is
+            True.
         """
 
         # Compute log probs for weights
@@ -160,15 +169,15 @@ class Conv1d(BayesianModule):
 
     def __call__(self, inputs: jax.Array) -> jax.Array:
         """
-        Applies the convolution operation to the inputs using current weights
-        and bias. If the model is not frozen, samples new weights and bias
-        before computation.
+        Applies the convolution to the input using current weights and
+        bias. If the layer is not frozen, new weights and bias are
+        sampled before the computation.
 
         Args:
-            inputs: Input array to be convolved.
+            inputs: Input array with shape (batch, channels, length).
 
         Returns:
-            Output array after applying convolution and bias.
+            Output array after convolution with optional bias added.
         """
 
         # Sample if model not frozen

@@ -1,7 +1,3 @@
-"""
-This module contains the code for the bayesian Conv2d.
-"""
-
 # Standard libraries
 from typing import Any, Optional
 
@@ -18,7 +14,10 @@ from illia.nn.jax.base import BayesianModule
 
 class Conv2d(BayesianModule):
     """
-    This class is the bayesian implementation of the Conv2d class.
+    Bayesian 2D convolutional layer with optional weight and bias priors.
+    This layer functions like a standard 2D convolution but treats weights
+    and bias as random variables sampled from specified distributions.
+    If frozen, the parameters become fixed and gradients are stopped.
     """
 
     bias_distribution: Optional[GaussianDistribution] = None
@@ -40,7 +39,7 @@ class Conv2d(BayesianModule):
         **kwargs: Any,
     ) -> None:
         """
-        Definition of a Bayesian Convolution 2D layer.
+        Initializes a Bayesian 2D convolutional layer.
 
         Args:
             input_channels: Number of input feature channels.
@@ -57,6 +56,10 @@ class Conv2d(BayesianModule):
 
         Returns:
             None.
+
+        Notes:
+            If kernel_size is an int, it is extended to a square tuple.
+            Gaussian distributions are used by default if none are provided.
         """
 
         # Call super class constructor
@@ -114,8 +117,9 @@ class Conv2d(BayesianModule):
 
     def freeze(self) -> None:
         """
-        Freezes the current module and all submodules that are instances
-        of BayesianModule. Sets the frozen state to True.
+        Freezes the layer parameters by stopping gradient computation.
+        If the weights or bias are not already sampled, they are sampled
+        before freezing. Once frozen, no further sampling occurs.
 
         Returns:
             None.
@@ -139,12 +143,16 @@ class Conv2d(BayesianModule):
 
     def kl_cost(self) -> tuple[jax.Array, int]:
         """
-        Computes the Kullback-Leibler (KL) divergence cost for the
-        layer's weights and bias.
+        Computes the KL divergence cost for weights and bias.
 
         Returns:
-            Tuple containing KL divergence cost and total number of
-            parameters.
+            A tuple containing:
+                - KL divergence cost.
+                - Total number of parameters in the layer.
+
+        Notes:
+            Includes bias in the KL computation only if use_bias is
+            True.
         """
 
         # Compute log probs for weights
@@ -165,15 +173,15 @@ class Conv2d(BayesianModule):
 
     def __call__(self, inputs: jax.Array) -> jax.Array:
         """
-        Applies the convolution operation to the inputs using current weights
-        and bias. If the model is not frozen, samples new weights and bias
-        before computation.
+        Applies the 2D convolution to the input using current weights and bias.
+        If the layer is not frozen, new weights and bias are sampled prior to
+        computation.
 
         Args:
-            inputs: Input array to be convolved.
+            inputs: Input array with shape (batch, channels, height, width).
 
         Returns:
-            Output array after applying convolution and bias.
+            Output array after convolution and optional bias addition.
         """
 
         # Sample if model not frozen

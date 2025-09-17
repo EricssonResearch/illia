@@ -1,5 +1,7 @@
 # Neural Network Layers
 
+::: illia.nn.jax.base
+
 ::: illia.nn.jax.conv1d
 
 ::: illia.nn.jax.conv2d

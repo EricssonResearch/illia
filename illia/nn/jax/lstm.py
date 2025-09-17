@@ -1,7 +1,3 @@
-"""
-This module contains the code for the bayesian LSTM.
-"""
-
 # Standard libraries
 from typing import Any, Optional
 
@@ -19,7 +15,11 @@ from illia.nn.jax.embedding import Embedding
 
 class LSTM(BayesianModule):
     """
-    This class is the bayesian implementation of the TensorFlow LSTM layer.
+    Bayesian LSTM layer with embedding and probabilistic weights.
+    This class implements an LSTM similar to TensorFlow's LSTM. All
+    weights and biases are treated as random variables sampled from
+    Gaussian distributions. Freezing the layer fixes all parameters and
+    stops gradient computation.
     """
 
     def __init__(
@@ -35,21 +35,26 @@ class LSTM(BayesianModule):
         rngs: Rngs = nnx.Rngs(0),
         **kwargs: Any,
     ) -> None:
-        """_summary_
+        """
+        Initializes a Bayesian LSTM layer.
 
         Args:
-            num_embeddings (int): _description_
-            embeddings_dim (int): _description_
-            hidden_size (int): _description_
-            output_size (int): _description_
-            padding_idx (Optional[int], optional): _description_. Defaults to None.
-            max_norm (Optional[float], optional): _description_. Defaults to None.
-            norm_type (float, optional): _description_. Defaults to 2.0.
-            scale_grad_by_freq (bool, optional): _description_. Defaults to False.
-            rngs (Rngs, optional): _description_. Defaults to nnx.Rngs(0).
+            num_embeddings: Number of tokens in the vocabulary.
+            embeddings_dim: Dimensionality of token embeddings.
+            hidden_size: Number of units in the LSTM hidden state.
+            output_size: Size of the output layer.
+            padding_idx: Index in embeddings to ignore (optional).
+            max_norm: Maximum allowed norm for embeddings (optional).
+            norm_type: p-norm type for max_norm computation.
+            scale_grad_by_freq: Whether to scale gradients by token frequency.
+            rngs: Random number generators for reproducibility.
 
         Returns:
             None.
+
+        Notes:
+            Initializes Gaussian distributions for all LSTM weights and biases.
+            The embedding layer is also Bayesian.
         """
 
         # Call super-class constructor
@@ -131,8 +136,9 @@ class LSTM(BayesianModule):
 
     def freeze(self) -> None:
         """
-        Freezes the current module and all submodules that are instances
-        of BayesianModule. Sets the frozen state to True.
+        Freezes the layer parameters by stopping gradient computation.
+        If the weights or bias are not already sampled, they are sampled
+        before freezing. Once frozen, no further sampling occurs.
 
         Returns:
             None.
@@ -186,12 +192,12 @@ class LSTM(BayesianModule):
 
     def kl_cost(self) -> tuple[jax.Array, int]:
         """
-        Computes the Kullback-Leibler (KL) divergence cost for the
-        layer's weights and bias.
+        Computes the KL divergence cost for weights and bias.
 
         Returns:
-            tuple containing KL divergence cost and total number of
-            parameters.
+            A tuple containing:
+                - KL divergence cost.
+                - Total number of parameters in the layer.
         """
 
         # Compute log probs for each pair of weights and bias
@@ -237,15 +243,20 @@ class LSTM(BayesianModule):
     ) -> tuple[jax.Array, tuple[jax.Array, jax.Array]]:
         """
         Performs a forward pass through the Bayesian LSTM layer.
-        If the layer is not frozen, it samples weights and bias
-        from their respective distributions.
 
         Args:
-            inputs: Input tensor with token indices. Shape: [batch, seq_len, 1]
-            init_states: Optional initial hidden and cell states
+            inputs: Input token indices. Shape: [batch, seq_len, 1].
+            init_states: Optional tuple of initial hidden and cell states.
 
         Returns:
-            Tuple of (output, (hidden_state, cell_state))
+            Tuple containing:
+            - Output tensor of shape [batch, output_size].
+            - Tuple of (hidden_state, cell_state) after processing sequence.
+
+        Notes:
+            Samples new weights and biases if the layer is not frozen. Applies
+            Bayesian embedding to input tokens and processes the sequence
+            step-by-step using standard LSTM equations.
         """
 
         # Sample weights if not frozen

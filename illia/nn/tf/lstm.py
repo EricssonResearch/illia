@@ -1,7 +1,3 @@
-"""
-This module contains the code for the bayesian LSTM.
-"""
-
 # Standard libraries
 from typing import Any, Optional
 
@@ -206,8 +202,12 @@ class LSTM(BayesianModule):
 
     def freeze(self) -> None:
         """
-        Freezes the current module and all submodules that are instances
-        of BayesianModule. Sets the frozen state to True.
+        Freezes the layer parameters by stopping gradient computation.
+        If the weights or bias are not already sampled, they are sampled
+        before freezing. Once frozen, no further sampling occurs.
+
+        Returns:
+            None.
         """
 
         # Set indicator
@@ -258,12 +258,12 @@ class LSTM(BayesianModule):
 
     def kl_cost(self) -> tuple[tf.Tensor, int]:
         """
-        Computes the Kullback-Leibler (KL) divergence cost for the
-        layer's weights and bias.
+        Computes the KL divergence cost for weights and bias.
 
         Returns:
-            tuple containing KL divergence cost and total number of
-            parameters.
+            A tuple containing:
+                - KL divergence cost.
+                - Total number of parameters in the layer.
         """
 
         # Compute log probs for each pair of weights and bias

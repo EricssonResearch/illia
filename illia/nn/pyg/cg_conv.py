@@ -1,8 +1,3 @@
-"""
-This module contains the code for the Crystal Graph Convolutional
-operator.
-"""
-
 # Standard libraries
 from typing import Any
 

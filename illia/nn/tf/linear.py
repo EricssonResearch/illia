@@ -1,7 +1,3 @@
-"""
-This module contains the code for Linear Bayesian layer.
-"""
-
 # Standard libraries
 from typing import Any, Optional
 
@@ -120,8 +116,12 @@ class Linear(BayesianModule):
 
     def freeze(self) -> None:
         """
-        Freezes the current module and all submodules that are instances
-        of BayesianModule. Sets the frozen state to True.
+        Freezes the layer parameters by stopping gradient computation.
+        If the weights or bias are not already sampled, they are sampled
+        before freezing. Once frozen, no further sampling occurs.
+
+        Returns:
+            None.
         """
 
         # Set indicator
@@ -142,12 +142,16 @@ class Linear(BayesianModule):
 
     def kl_cost(self) -> tuple[tf.Tensor, int]:
         """
-        Computes the Kullback-Leibler (KL) divergence cost for the
-        layer's weights and bias.
+        Computes the KL divergence cost for weights and bias.
 
         Returns:
-            Tuple containing KL divergence cost and total number of
-            parameters.
+            A tuple containing:
+                - KL divergence cost.
+                - Total number of parameters in the layer.
+
+        Notes:
+            Includes bias in the KL computation only if use_bias is
+            True.
         """
 
         # Compute log probs

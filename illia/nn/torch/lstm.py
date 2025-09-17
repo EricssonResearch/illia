@@ -1,7 +1,3 @@
-"""
-This module contains the code for the bayesian LSTM.
-"""
-
 # Standard libraries
 from typing import Any, Optional
 
@@ -143,8 +139,12 @@ class LSTM(BayesianModule):
     @torch.jit.export
     def freeze(self) -> None:
         """
-        Freezes the current module and all submodules that are instances
-        of BayesianModule. Sets the frozen state to True.
+        Freezes the layer parameters by stopping gradient computation.
+        If the weights or bias are not already sampled, they are sampled
+        before freezing. Once frozen, no further sampling occurs.
+
+        Returns:
+            None.
         """
 
         # Set indicator

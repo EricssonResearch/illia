@@ -1,7 +1,3 @@
-"""
-This module contains the code for the bayesian Conv1d.
-"""
-
 # Standard libraries
 from typing import Any, Optional
 
@@ -17,7 +13,10 @@ from illia.nn.tf.base import BayesianModule
 @saving.register_keras_serializable(package="illia", name="Conv1d")
 class Conv1d(BayesianModule):
     """
-    This class is the bayesian implementation of the Conv1d class.
+    Bayesian 1D convolutional layer with optional weight and bias
+    priors. This layer behaves like a standard Conv1d but treats weights
+    and bias as random variables sampled from specified distributions.
+    If the layer is frozen, the parameters become fixed.
     """
 
     bias_distribution: Optional[GaussianDistribution] = None
@@ -38,7 +37,7 @@ class Conv1d(BayesianModule):
         **kwargs: Any,
     ) -> None:
         """
-        Initializes a Bayesian Conv1d layer.
+        Initializes a Bayesian 1D convolutional layer.
 
         Args:
             input_channels: The number of channels in the input image.
@@ -59,6 +58,13 @@ class Conv1d(BayesianModule):
                 if applicable.
             use_bias: Whether to include a bias term.
             **kwargs: Additional keyword arguments.
+
+        Returns:
+            None.
+
+        Notes:
+            If no distributions are provided, Gaussian distributions are
+            used by default.
         """
 
         # Call super class constructor
@@ -249,8 +255,12 @@ class Conv1d(BayesianModule):
 
     def freeze(self) -> None:
         """
-        Freezes the current module and all submodules that are instances
-        of BayesianModule. Sets the frozen state to True.
+        Freezes the layer parameters by stopping gradient computation.
+        If the weights or bias are not already sampled, they are sampled
+        before freezing. Once frozen, no further sampling occurs.
+
+        Returns:
+            None.
         """
 
         # Set indicator
@@ -271,12 +281,16 @@ class Conv1d(BayesianModule):
 
     def kl_cost(self) -> tuple[tf.Tensor, int]:
         """
-        Computes the Kullback-Leibler (KL) divergence cost for the
-        layer's weights and bias.
+        Computes the KL divergence cost for weights and bias.
 
         Returns:
-            Tuple containing KL divergence cost and total number of
-            parameters.
+            A tuple containing:
+                - KL divergence cost.
+                - Total number of parameters in the layer.
+
+        Notes:
+            Includes bias in the KL computation only if use_bias is
+            True.
         """
 
         # Compute log probs
@@ -295,17 +309,15 @@ class Conv1d(BayesianModule):
 
     def call(self, inputs: tf.Tensor) -> tf.Tensor:
         """
-        Performs a forward pass through the Bayesian Convolution 1D
-        layer. If the layer is not frozen, it samples weights and bias
-        from their respective distributions. If the layer is frozen
-        and the weights or bias are not initialized, it also performs
-        sampling.str
+        Applies the convolution to the input using current weights and
+        bias. If the layer is not frozen, new weights and bias are
+        sampled before the computation.
 
         Args:
-            inputs: Input tensor to the layer.
+            inputs: Input array.
 
         Returns:
-            Output tensor after passing through the layer.
+            Output array after convolution with optional bias added.
         """
 
         # Check if layer is frozen
