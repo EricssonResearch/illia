@@ -186,8 +186,12 @@ class Conv1d(BayesianModule):
             self.weights = nnx.Param(self.weights_distribution.sample(self.rngs))
 
             # Sample bias only if using bias
-            if self.bias is None and self.use_bias and self.bias_distribution:
+            if self.use_bias and self.bias_distribution:
                 self.bias = nnx.Param(self.bias_distribution.sample(self.rngs))
+        elif self.weights is None or (self.use_bias and self.bias is None):
+            raise ValueError(
+                "Module has been frozen with undefined weights and/or bias."
+            )
 
         # Compute outputs
         outputs = jax.lax.conv_general_dilated(
@@ -206,7 +210,7 @@ class Conv1d(BayesianModule):
         )
 
         # Add bias only if using bias
-        if self.use_bias and self.bias is not None:
+        if self.use_bias and self.bias:
             outputs += jnp.reshape(
                 a=jnp.asarray(self.bias), shape=(1, self.output_channels, 1)
             )

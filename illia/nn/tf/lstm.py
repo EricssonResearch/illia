@@ -336,18 +336,24 @@ class LSTM(BayesianModule):
             self.bo = self.bo_distribution.sample()
             self.wv = self.wv_distribution.sample()
             self.bv = self.bv_distribution.sample()
-        else:
-            if any(w is None for w in [self.wf, self.wi, self.wc, self.wo, self.wv]):
-                self.wf = self.wf_distribution.sample()
-                self.bf = self.bf_distribution.sample()
-                self.wi = self.wi_distribution.sample()
-                self.bi = self.bi_distribution.sample()
-                self.wc = self.wc_distribution.sample()
-                self.bc = self.bc_distribution.sample()
-                self.wo = self.wo_distribution.sample()
-                self.bo = self.bo_distribution.sample()
-                self.wv = self.wv_distribution.sample()
-                self.bv = self.bv_distribution.sample()
+        elif any(
+            p is None
+            for p in [
+                self.wf,
+                self.bf,
+                self.wi,
+                self.bi,
+                self.wc,
+                self.bc,
+                self.wo,
+                self.bo,
+                self.wv,
+                self.bv,
+            ]
+        ):
+            raise ValueError(
+                "Module has been frozen with undefined weights and/or bias."
+            )
 
         # Apply embedding layer to input indices
         inputs = tf.squeeze(inputs, axis=-1)

@@ -1,5 +1,6 @@
 # Standard libraries
 from abc import ABC
+from typing import Any
 
 # 3pps
 import torch
@@ -11,16 +12,19 @@ class BayesianModule(torch.nn.Module, ABC):
     Any Bayesian layer should inherit from this class.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         """
         Initializes the module with default Bayesian-specific flags.
+
+        Args:
+            **kwargs: Additional keyword arguments for the Layer base class.
 
         Returns:
             None.
         """
 
         # Call super class constructor
-        super().__init__()
+        super().__init__(**kwargs)
 
         # Set freeze false by default
         self.frozen: bool = False

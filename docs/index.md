@@ -19,15 +19,17 @@
 
 !!! warning
 
-    The library is evolving rapidly to ensure stable support across all
-    frameworks and backends. Expect ongoing changes as we improve
+    **illia is under active development.** The library is evolving rapidly to ensure
+    stable support across all frameworks. Expect ongoing changes as we improve
     functionality and performance.
 
 ## Introduction
 
-**illia** is a cutting-edge library for **Bayesian Neural Networks** that brings
-uncertainty quantification to deep learning. Designed with flexibility in mind, it
-seamlessly integrates with multiple backends and popular frameworks.
+**illia** is a library for **Bayesian Neural Networks** that brings uncertainty
+quantification to deep learning, a capability that is critical in sectors such as
+telecommunications, medicine, and beyond. Designed with flexibility in mind, it
+integrates seamlessly with multiple backends and popular frameworks, enabling a single
+codebase to support multiple backends with minimal modifications.
 
 For full documentation, please visit the site:
 [https://ericssonresearch.github.io/illia/](https://ericssonresearch.github.io/illia/)
@@ -41,7 +43,9 @@ For full documentation, please visit the site:
 
 ## Quick Start
 
-Get started with illia in just a few lines of code:
+To show how easy it is to use **illia**, here’s a quick example to get started. In this
+case, we explicitly choose the backend PyTorch, the underlying framework, and define a
+convolutional layer:
 
 ```python
 import os
@@ -55,24 +59,30 @@ from illia.nn import Conv2d
 
 # Create a Bayesian convolutional layer
 conv_layer = Conv2d(
-    input_channels=3,
-    output_channels=64,
+    input_channels=1,
+    output_channels=1,
     kernel_size=3,
-    bias=True
 )
 
-# Forward pass with uncertainty
-input_tensor = torch.rand(1, 3, 32, 32)
-output_mean, output_std = conv_layer(input_tensor)
+# Define input tensor
+input_tensor = torch.rand(1, 1, 4, 4)
 
-print(f"Output shape: {output_mean.shape}")
-print(f"Uncertainty quantified: {output_std.mean():.4f}")
+# Define the number of iterations to apply the forward pass
+num_passes = 10
+outputs = [conv_layer(input_tensor) for _ in range(num_passes)]
+
+# Stack outputs into a single tensor
+outputs = torch.stack(outputs)
+
+print(f"Output shape: {outputs.shape}")
+print(f"Output std: {outputs.std()}")
+print(f"Output var: {outputs.var()}")
 ```
 
 ## Contributing
 
-We welcome contributions from the community! Whether you're fixing bugs, adding features,
-or improving documentation:
+We welcome contributions from the community! Whether you're fixing bugs, adding
+features, or improving documentation:
 
 1. **Read our
    [contributing guide](https://github.com/EricssonResearch/illia/blob/main/CONTRIBUTING.md)**

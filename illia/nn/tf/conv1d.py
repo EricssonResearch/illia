@@ -271,12 +271,12 @@ class Conv1d(BayesianModule):
             self.w = self.weights_distribution.sample()
 
         # Sample bias is they are undefined
-        if self.use_bias and self.bias_distribution:
+        if self.use_bias and self.b is None and self.bias_distribution:
             self.b = self.bias_distribution.sample()
 
         # Stop gradient computation
         self.w = tf.stop_gradient(self.w)
-        if self.use_bias:
+        if self.use_bias and self.b is not None:
             self.b = tf.stop_gradient(self.b)
 
     def kl_cost(self) -> tuple[tf.Tensor, int]:
@@ -325,10 +325,9 @@ class Conv1d(BayesianModule):
             self.w = self.weights_distribution.sample()
 
             # Sample bias only if using bias
-            if self.b is None and self.use_bias and self.bias_distribution:
+            if self.use_bias and self.bias_distribution:
                 self.b = self.bias_distribution.sample()
-
-        elif self.w is None or self.b is None:
+        elif self.w is None or (self.use_bias and self.b is None):
             raise ValueError(
                 "Module has been frozen with undefined weights and/or bias."
             )
@@ -344,7 +343,7 @@ class Conv1d(BayesianModule):
         )
 
         # Add bias only if using bias
-        if self.use_bias is not None:
+        if self.use_bias and self.b is not None:
             outputs = tf.nn.bias_add(
                 value=outputs,
                 bias=self.b,

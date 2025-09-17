@@ -271,18 +271,24 @@ class LSTM(BayesianModule):
             self.bo = nnx.Param(self.bo_distribution.sample(self.rngs))
             self.wv = nnx.Param(self.wv_distribution.sample(self.rngs))
             self.bv = nnx.Param(self.bv_distribution.sample(self.rngs))
-        else:
-            if any(w is None for w in [self.wf, self.wi, self.wc, self.wo, self.wv]):
-                self.wf = nnx.Param(self.wf_distribution.sample(self.rngs))
-                self.bf = nnx.Param(self.bf_distribution.sample(self.rngs))
-                self.wi = nnx.Param(self.wi_distribution.sample(self.rngs))
-                self.bi = nnx.Param(self.bi_distribution.sample(self.rngs))
-                self.wc = nnx.Param(self.wc_distribution.sample(self.rngs))
-                self.bc = nnx.Param(self.bc_distribution.sample(self.rngs))
-                self.wo = nnx.Param(self.wo_distribution.sample(self.rngs))
-                self.bo = nnx.Param(self.bo_distribution.sample(self.rngs))
-                self.wv = nnx.Param(self.wv_distribution.sample(self.rngs))
-                self.bv = nnx.Param(self.bv_distribution.sample(self.rngs))
+        elif any(
+            p is None
+            for p in [
+                self.wf,
+                self.bf,
+                self.wi,
+                self.bi,
+                self.wc,
+                self.bc,
+                self.wo,
+                self.bo,
+                self.wv,
+                self.bv,
+            ]
+        ):
+            raise ValueError(
+                "Module has been frozen with undefined weights and/or bias."
+            )
 
         # Apply embedding layer to input indices
         inputs = jnp.squeeze(inputs, axis=-1)

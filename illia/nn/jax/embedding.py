@@ -138,6 +138,8 @@ class Embedding(BayesianModule):
         if not self.frozen:
             # Sample weights
             self.weights = nnx.Param(self.weights_distribution.sample(self.rngs))
+        elif self.weights is None:
+            raise ValueError("Module has been frozen with undefined weights.")
 
         # Perform embedding lookup
         outputs = self.weights.value[inputs]
