@@ -10,7 +10,7 @@
 <link href="../../../examples/Computer%20Vision/MNIST%20Bayesian%20CNN.html" rel="next"/>
 <link href="../../../assets/images/white_logo_illia.png" rel="icon"/>
 <meta content="mkdocs-1.6.1, mkdocs-material-9.6.16" name="generator"/>
-<title>Neural Network - illia</title>
+<title>Graph Neural Network Layers - illia</title>
 <link href="../../../assets/stylesheets/main.7e37652d.min.css" rel="stylesheet"/>
 <link href="../../../assets/stylesheets/palette.06af60db.min.css" rel="stylesheet"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
@@ -25,7 +25,7 @@
 <input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
 <label class="md-overlay" for="__drawer"></label>
 <div data-md-component="skip">
-<a class="md-skip" href="#neural-network">
+<a class="md-skip" href="#graph-neural-network-layers">10. 
           Skip to content
         </a>
 </div>
@@ -51,7 +51,7 @@
 <div class="md-header__topic" data-md-component="header-topic">
 <span class="md-ellipsis">
             
-              Neural Network
+              Graph Neural Network Layers
             
           </span>
 </div>
@@ -268,7 +268,7 @@
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../Deep%20Learning/Jax/nn.html">
 <span class="md-ellipsis">
-    Neural Network
+    Neural Network Layers
     
   </span>
 </a>
@@ -310,7 +310,7 @@
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../Deep%20Learning/PyTorch/nn.html">
 <span class="md-ellipsis">
-    Neural Network
+    Neural Network Layers
     
   </span>
 </a>
@@ -352,7 +352,7 @@
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../Deep%20Learning/Tensorflow/nn.html">
 <span class="md-ellipsis">
-    Neural Network
+    Neural Network Layers
     
   </span>
 </a>
@@ -397,14 +397,14 @@
 <input class="md-nav__toggle md-toggle" id="__toc" type="checkbox"/>
 <label class="md-nav__link md-nav__link--active" for="__toc">
 <span class="md-ellipsis">
-    Neural Network
+    Graph Neural Network Layers
     
   </span>
 <span class="md-nav__icon md-icon"></span>
 </label>
 <a class="md-nav__link md-nav__link--active" href="nn.html">
 <span class="md-ellipsis">
-    Neural Network
+    Graph Neural Network Layers
     
   </span>
 </a>
@@ -420,38 +420,6 @@
 <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code> CGConv
     </span>
 </a>
-<nav aria-label=" CGConv" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#illia.nn.pyg.cg_conv.CGConv.__repr__">
-<span class="md-ellipsis">
-<code class="doc-symbol doc-symbol-toc doc-symbol-method"></code> __repr__
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#illia.nn.pyg.cg_conv.CGConv.forward">
-<span class="md-ellipsis">
-<code class="doc-symbol doc-symbol-toc doc-symbol-method"></code> forward
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#illia.nn.pyg.cg_conv.CGConv.message">
-<span class="md-ellipsis">
-<code class="doc-symbol doc-symbol-toc doc-symbol-method"></code> message
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#illia.nn.pyg.cg_conv.CGConv.reset_parameters">
-<span class="md-ellipsis">
-<code class="doc-symbol doc-symbol-toc doc-symbol-method"></code> reset_parameters
-    </span>
-</a>
-</li>
-</ul>
-</nav>
 </li>
 </ul>
 </nav>
@@ -558,33 +526,23 @@
 </div>
 <div class="md-content" data-md-component="content">
 <article class="md-content__inner md-typeset">
-<h1 id="neural-network"><span class="enumerate-headings-plugin enumerate-heading-plugin">10.</span> Neural Network</h1>
+<h1 id="graph-neural-network-layers"><span class="enumerate-headings-plugin enumerate-heading-plugin">10.</span> Graph Neural Network Layers</h1>
 <div class="doc doc-object doc-module">
 <div class="doc doc-contents first">
-<p>This module contains the code for the Crystal Graph Convolutional
-operator.</p>
 <div class="doc doc-children">
 <div class="doc doc-object doc-class">
 <h2 class="doc doc-heading" id="illia.nn.pyg.cg_conv.CGConv"><span class="enumerate-headings-plugin enumerate-heading-plugin">10.1</span> 
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code> <code class="highlight language-python"><span class="n">CGConv</span><span class="p">(</span><span class="n">channels</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">aggr</span><span class="o">=</span><span class="s1">'add'</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code> <code>CGConv</code>
 </h2>
 <div class="doc doc-contents">
-<p>Definition of the Crystal Graph Convolutional operator.</p>
-<p>"Crystal Graph Convolutional Neural Networks for an Accurate
-and Interpretable Prediction of Material Properties"
-(https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.120.145301).</p>
-<p>The operation is defined as:</p>
-<div class="arithmatex">\[
-\mathbf{x}^{\prime}_i = \mathbf{x}_i + \sum_{j \in
-\mathcal{N}(i)}\sigma ( \mathbf{z}_{i,j} \mathbf{W}_f +
-\mathbf{b}_f )
-\odot g ( \mathbf{z}_{i,j} \mathbf{W}_s + \mathbf{b}_s )
-\]</div>
-<p>where <span class="arithmatex">\(\mathbf{z}_{i,j} = [ \mathbf{x}_i, \mathbf{x}_j,
-\mathbf{e}_{i,j} ]\)</span>
-denotes the concatenation of central node features, neighboring
-node features, and edge features. In addition, <span class="arithmatex">\(\sigma\)</span> and
-<span class="arithmatex">\(g\)</span> denote the sigmoid and softplus functions, respectively.</p>
+<p>Crystal Graph Convolutional operator for material property prediction.</p>
+<p>Updates node features using neighboring nodes and edge features as:</p>
+<pre><code>x'_i = x_i + sum_{j in N(i)} sigmoid(z_ij W_f + b_f) *
+       softplus(z_ij W_s + b_s)
+</code></pre>
+<p>where z_ij is the concatenation of central node features, neighbor
+features, and edge features. Applies element-wise sigmoid and
+softplus functions.</p>
 <p><span class="doc-section-title">Parameters:</span></p>
 <table>
 <thead>
@@ -601,13 +559,12 @@ node features, and edge features. In addition, <span class="arithmatex">\(\sigma
 <code>channels</code>
 </td>
 <td>
-<code><span title="int">int</span> or <span title="tuple">tuple</span></code>
+<code><span title="int">int</span> | <span title="tuple">tuple</span>[<span title="int">int</span>, <span title="int">int</span>]</code>
 </td>
 <td>
 <div class="doc-md-description">
-<p>The size of each input sample. A
-tuple corresponds to the sizes of source and target
-dimensionalities.</p>
+<p>Size of input features. If tuple, represents source and
+target feature dimensions.</p>
 </div>
 </td>
 <td>
@@ -623,7 +580,7 @@ dimensionalities.</p>
 </td>
 <td>
 <div class="doc-md-description">
-<p>The edge feature dimensionality.</p>
+<p>Dimensionality of edge features.</p>
 </div>
 </td>
 <td>
@@ -639,8 +596,7 @@ dimensionalities.</p>
 </td>
 <td>
 <div class="doc-md-description">
-<p>The aggregation operator to use
-("add", "mean", "max").</p>
+<p>Aggregation method ("add", "mean", "max").</p>
 </div>
 </td>
 <td>
@@ -652,12 +608,400 @@ dimensionalities.</p>
 <code>**kwargs</code>
 </td>
 <td>
-<code><span title="optional">optional</span></code>
+<code><span title="typing.Any">Any</span></code>
 </td>
 <td>
 <div class="doc-md-description">
-<p>Additional arguments for
-:class:<code>torch_geometric.nn.conv.MessagePassing</code>.</p>
+<p>Additional arguments for MessagePassing.</p>
+</div>
+</td>
+<td>
+<code>{}</code>
+</td>
+</tr>
+</tbody>
+</table>
+<p><span class="doc-section-title">Returns:</span></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+</td>
+<td>
+<div class="doc-md-description">
+<p>None.</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<details class="shapes" open="">
+<summary>Shapes</summary>
+<ul>
+<li>input: node features (|V|, F) or ((|Vs|, Fs), (|Vt|, Ft)) if
+  bipartite, edge indices (2, |E|), edge features (|E|, D) optional.</li>
+<li>output: node features (|V|, F) or (|Vt|, Ft) if bipartite.</li>
+</ul>
+</details>
+<details class="notes" open="">
+<summary>Notes</summary>
+<p>Based on "Crystal Graph Convolutional Neural Networks for an
+Accurate and Interpretable Prediction of Material Properties"
+(https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.120.145301)</p>
+</details>
+<details class="quote">
+<summary>Source code in <code>illia/nn/pyg/cg_conv.py</code></summary>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 15</span>
+<span class="normal"> 16</span>
+<span class="normal"> 17</span>
+<span class="normal"> 18</span>
+<span class="normal"> 19</span>
+<span class="normal"> 20</span>
+<span class="normal"> 21</span>
+<span class="normal"> 22</span>
+<span class="normal"> 23</span>
+<span class="normal"> 24</span>
+<span class="normal"> 25</span>
+<span class="normal"> 26</span>
+<span class="normal"> 27</span>
+<span class="normal"> 28</span>
+<span class="normal"> 29</span>
+<span class="normal"> 30</span>
+<span class="normal"> 31</span>
+<span class="normal"> 32</span>
+<span class="normal"> 33</span>
+<span class="normal"> 34</span>
+<span class="normal"> 35</span>
+<span class="normal"> 36</span>
+<span class="normal"> 37</span>
+<span class="normal"> 38</span>
+<span class="normal"> 39</span>
+<span class="normal"> 40</span>
+<span class="normal"> 41</span>
+<span class="normal"> 42</span>
+<span class="normal"> 43</span>
+<span class="normal"> 44</span>
+<span class="normal"> 45</span>
+<span class="normal"> 46</span>
+<span class="normal"> 47</span>
+<span class="normal"> 48</span>
+<span class="normal"> 49</span>
+<span class="normal"> 50</span>
+<span class="normal"> 51</span>
+<span class="normal"> 52</span>
+<span class="normal"> 53</span>
+<span class="normal"> 54</span>
+<span class="normal"> 55</span>
+<span class="normal"> 56</span>
+<span class="normal"> 57</span>
+<span class="normal"> 58</span>
+<span class="normal"> 59</span>
+<span class="normal"> 60</span>
+<span class="normal"> 61</span>
+<span class="normal"> 62</span>
+<span class="normal"> 63</span>
+<span class="normal"> 64</span>
+<span class="normal"> 65</span>
+<span class="normal"> 66</span>
+<span class="normal"> 67</span>
+<span class="normal"> 68</span>
+<span class="normal"> 69</span>
+<span class="normal"> 70</span>
+<span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">CGConv</span><span class="p">(</span><span class="n">MessagePassing</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Crystal Graph Convolutional operator for material property prediction.</span>
+
+<span class="sd">    Updates node features using neighboring nodes and edge features as:</span>
+
+<span class="sd">        x'_i = x_i + sum_{j in N(i)} sigmoid(z_ij W_f + b_f) *</span>
+<span class="sd">               softplus(z_ij W_s + b_s)</span>
+
+<span class="sd">    where z_ij is the concatenation of central node features, neighbor</span>
+<span class="sd">    features, and edge features. Applies element-wise sigmoid and</span>
+<span class="sd">    softplus functions.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        channels: Size of input features. If tuple, represents source and</span>
+<span class="sd">            target feature dimensions.</span>
+<span class="sd">        dim: Dimensionality of edge features.</span>
+<span class="sd">        aggr: Aggregation method ("add", "mean", "max").</span>
+<span class="sd">        **kwargs: Additional arguments for MessagePassing.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None.</span>
+
+<span class="sd">    Shapes:</span>
+<span class="sd">        - input: node features (|V|, F) or ((|Vs|, Fs), (|Vt|, Ft)) if</span>
+<span class="sd">          bipartite, edge indices (2, |E|), edge features (|E|, D) optional.</span>
+<span class="sd">        - output: node features (|V|, F) or (|Vt|, Ft) if bipartite.</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">        Based on "Crystal Graph Convolutional Neural Networks for an</span>
+<span class="sd">        Accurate and Interpretable Prediction of Material Properties"</span>
+<span class="sd">        (https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.120.145301)</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">channels</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+        <span class="n">dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">aggr</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"add"</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Initializes the CGConv layer with linear transformations.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            channels: Size of input features. Tuple for source and target.</span>
+<span class="sd">            dim: Dimensionality of edge features.</span>
+<span class="sd">            aggr: Aggregation operator ("add", "mean", "max").</span>
+<span class="sd">            **kwargs: Extra arguments passed to the base class.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None.</span>
+<span class="sd">        """</span>
+
+        <span class="c1"># Call super class constructor</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">aggr</span><span class="o">=</span><span class="n">aggr</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># Set attributes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channels</span> <span class="o">=</span> <span class="n">channels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">=</span> <span class="n">dim</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">channels</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">channels</span> <span class="o">=</span> <span class="p">(</span><span class="n">channels</span><span class="p">,</span> <span class="n">channels</span><span class="p">)</span>
+
+        <span class="c1"># Define linear layers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lin_f</span> <span class="o">=</span> <span class="n">Linear</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">channels</span><span class="p">)</span> <span class="o">+</span> <span class="n">dim</span><span class="p">,</span> <span class="n">channels</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lin_s</span> <span class="o">=</span> <span class="n">Linear</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">channels</span><span class="p">)</span> <span class="o">+</span> <span class="n">dim</span><span class="p">,</span> <span class="n">channels</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Resets parameters of the linear layers and optional batch norm.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None.</span>
+<span class="sd">        """</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">lin_f</span><span class="o">.</span><span class="n">reset_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lin_s</span><span class="o">.</span><span class="n">reset_parameters</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bn</span><span class="o">.</span><span class="n">reset_parameters</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="n">PairTensor</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">:</span> <span class="n">Adj</span><span class="p">,</span> <span class="n">edge_attr</span><span class="p">:</span> <span class="n">OptTensor</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Performs a forward pass of the convolutional layer.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x: Input node features, as a single tensor or a pair if bipartite.</span>
+<span class="sd">            edge_index: Edge indices.</span>
+<span class="sd">            edge_attr: Optional edge features.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Node features after applying the convolution.</span>
+<span class="sd">        """</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">):</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+
+        <span class="c1"># Propagate_type: (x: PairTensor, edge_attr: OptTensor)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">propagate</span><span class="p">(</span><span class="n">edge_index</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">edge_attr</span><span class="o">=</span><span class="n">edge_attr</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">+</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_i</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">x_j</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">edge_attr</span><span class="p">:</span> <span class="n">OptTensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Constructs messages passed to neighboring nodes.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x_i: Central node features.</span>
+<span class="sd">            x_j: Neighboring node features.</span>
+<span class="sd">            edge_attr: Optional edge features.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Aggregated messages for neighbors.</span>
+<span class="sd">        """</span>
+
+        <span class="k">if</span> <span class="n">edge_attr</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">x_i</span><span class="p">,</span> <span class="n">x_j</span><span class="p">],</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">x_i</span><span class="p">,</span> <span class="n">x_j</span><span class="p">,</span> <span class="n">edge_attr</span><span class="p">],</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># pylint: disable=E1102</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">lin_f</span><span class="p">(</span><span class="n">z</span><span class="p">)</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">()</span> <span class="o">*</span> <span class="n">F</span><span class="o">.</span><span class="n">softplus</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lin_s</span><span class="p">(</span><span class="n">z</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Returns a string representation of the module.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            String with class name, channels, and edge feature dimension.</span>
+<span class="sd">        """</span>
+
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="si">}</span><span class="s2">, dim=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="si">}</span><span class="s2">)"</span>
+</code></pre></div></td></tr></table></div>
+</details>
+<div class="doc doc-children">
+<div class="doc doc-object doc-function">
+<h3 class="doc doc-heading" id="illia.nn.pyg.cg_conv.CGConv.__init__"><span class="enumerate-headings-plugin enumerate-heading-plugin">10.1.1</span> 
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code> <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">channels</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">aggr</span><span class="o">=</span><span class="s1">'add'</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+</h3>
+<div class="doc doc-contents">
+<p>Initializes the CGConv layer with linear transformations.</p>
+<p><span class="doc-section-title">Parameters:</span></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<code>channels</code>
+</td>
+<td>
+<code><span title="int">int</span> | <span title="tuple">tuple</span>[<span title="int">int</span>, <span title="int">int</span>]</code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Size of input features. Tuple for source and target.</p>
+</div>
+</td>
+<td>
+<em>required</em>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>dim</code>
+</td>
+<td>
+<code><span title="int">int</span></code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Dimensionality of edge features.</p>
+</div>
+</td>
+<td>
+<code>0</code>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>aggr</code>
+</td>
+<td>
+<code><span title="str">str</span></code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Aggregation operator ("add", "mean", "max").</p>
+</div>
+</td>
+<td>
+<code>'add'</code>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>**kwargs</code>
+</td>
+<td>
+<code><span title="typing.Any">Any</span></code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Extra arguments passed to the base class.</p>
 </div>
 </td>
 <td>
@@ -687,45 +1031,9 @@ dimensionalities.</p>
 </tr>
 </tbody>
 </table>
-<details class="shapes" open="">
-<summary>Shapes</summary>
-<ul>
-<li><strong>input:</strong>
-node features <span class="arithmatex">\((|\mathcal{V}|, F)\)</span> or <span class="arithmatex">\(((|\mathcal{V_s}|,
-F_{s}), (|\mathcal{V_t}|, F_{t}))\)</span> if bipartite,
-edge indices <span class="arithmatex">\((2, |\mathcal{E}|)\)</span>,
-edge features <span class="arithmatex">\((|\mathcal{E}|, D)\)</span> <em>(optional)</em></li>
-<li><strong>output:</strong> node features <span class="arithmatex">\((|\mathcal{V}|, F)\)</span> or
-    <span class="arithmatex">\((|\mathcal{V_t}|, F_{t})\)</span> if bipartite</li>
-</ul>
-</details>
 <details class="quote">
 <summary>Source code in <code>illia/nn/pyg/cg_conv.py</code></summary>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">25</span>
-<span class="normal">26</span>
-<span class="normal">27</span>
-<span class="normal">28</span>
-<span class="normal">29</span>
-<span class="normal">30</span>
-<span class="normal">31</span>
-<span class="normal">32</span>
-<span class="normal">33</span>
-<span class="normal">34</span>
-<span class="normal">35</span>
-<span class="normal">36</span>
-<span class="normal">37</span>
-<span class="normal">38</span>
-<span class="normal">39</span>
-<span class="normal">40</span>
-<span class="normal">41</span>
-<span class="normal">42</span>
-<span class="normal">43</span>
-<span class="normal">44</span>
-<span class="normal">45</span>
-<span class="normal">46</span>
-<span class="normal">47</span>
-<span class="normal">48</span>
-<span class="normal">49</span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">49</span>
 <span class="normal">50</span>
 <span class="normal">51</span>
 <span class="normal">52</span>
@@ -757,60 +1065,24 @@ edge features <span class="arithmatex">\((|\mathcal{E}|, D)\)</span> <em>(option
 <span class="normal">78</span>
 <span class="normal">79</span>
 <span class="normal">80</span>
-<span class="normal">81</span>
-<span class="normal">82</span>
-<span class="normal">83</span>
-<span class="normal">84</span>
-<span class="normal">85</span>
-<span class="normal">86</span>
-<span class="normal">87</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">81</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">channels</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
     <span class="n">dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">aggr</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"add"</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    "Crystal Graph Convolutional Neural Networks for an Accurate</span>
-<span class="sd">    and Interpretable Prediction of Material Properties"</span>
-<span class="sd">    (https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.120.145301).</span>
-
-<span class="sd">    The operation is defined as:</span>
-
-<span class="sd">    $$</span>
-<span class="sd">    \mathbf{x}^{\prime}_i = \mathbf{x}_i + \sum_{j \in</span>
-<span class="sd">    \mathcal{N}(i)}\sigma ( \mathbf{z}_{i,j} \mathbf{W}_f +</span>
-<span class="sd">    \mathbf{b}_f )</span>
-<span class="sd">    \odot g ( \mathbf{z}_{i,j} \mathbf{W}_s + \mathbf{b}_s )</span>
-<span class="sd">    $$</span>
-
-<span class="sd">    where \(\mathbf{z}_{i,j} = [ \mathbf{x}_i, \mathbf{x}_j,</span>
-<span class="sd">    \mathbf{e}_{i,j} ]\)</span>
-<span class="sd">    denotes the concatenation of central node features, neighboring</span>
-<span class="sd">    node features, and edge features. In addition, \(\sigma\) and</span>
-<span class="sd">    \(g\) denote the sigmoid and softplus functions, respectively.</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Initializes the CGConv layer with linear transformations.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        channels (int or tuple): The size of each input sample. A</span>
-<span class="sd">            tuple corresponds to the sizes of source and target</span>
-<span class="sd">            dimensionalities.</span>
-<span class="sd">        dim (int, optional): The edge feature dimensionality.</span>
-<span class="sd">        aggr (str, optional): The aggregation operator to use</span>
-<span class="sd">            ("add", "mean", "max").</span>
-<span class="sd">        **kwargs (optional): Additional arguments for</span>
-<span class="sd">            :class:`torch_geometric.nn.conv.MessagePassing`.</span>
+<span class="sd">        channels: Size of input features. Tuple for source and target.</span>
+<span class="sd">        dim: Dimensionality of edge features.</span>
+<span class="sd">        aggr: Aggregation operator ("add", "mean", "max").</span>
+<span class="sd">        **kwargs: Extra arguments passed to the base class.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        None.</span>
-
-<span class="sd">    Shapes:</span>
-<span class="sd">        - **input:**</span>
-<span class="sd">        node features \((|\mathcal{V}|, F)\) or \(((|\mathcal{V_s}|,</span>
-<span class="sd">        F_{s}), (|\mathcal{V_t}|, F_{t}))\) if bipartite,</span>
-<span class="sd">        edge indices \((2, |\mathcal{E}|)\),</span>
-<span class="sd">        edge features \((|\mathcal{E}|, D)\) *(optional)*</span>
-<span class="sd">        - **output:** node features \((|\mathcal{V}|, F)\) or</span>
-<span class="sd">            \((|\mathcal{V_t}|, F_{t})\) if bipartite</span>
 <span class="sd">    """</span>
 
     <span class="c1"># Call super class constructor</span>
@@ -828,23 +1100,51 @@ edge features <span class="arithmatex">\((|\mathcal{E}|, D)\)</span> <em>(option
     <span class="bp">self</span><span class="o">.</span><span class="n">lin_s</span> <span class="o">=</span> <span class="n">Linear</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">channels</span><span class="p">)</span> <span class="o">+</span> <span class="n">dim</span><span class="p">,</span> <span class="n">channels</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 </code></pre></div></td></tr></table></div>
 </details>
-<div class="doc doc-children">
+</div>
+</div>
 <div class="doc doc-object doc-function">
-<h3 class="doc doc-heading" id="illia.nn.pyg.cg_conv.CGConv.__repr__"><span class="enumerate-headings-plugin enumerate-heading-plugin">10.1.1</span> 
+<h3 class="doc doc-heading" id="illia.nn.pyg.cg_conv.CGConv.__repr__"><span class="enumerate-headings-plugin enumerate-heading-plugin">10.1.2</span> 
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code> <code class="highlight language-python"><span class="fm">__repr__</span><span class="p">()</span></code>
 </h3>
 <div class="doc doc-contents">
 <p>Returns a string representation of the module.</p>
+<p><span class="doc-section-title">Returns:</span></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<code><span title="str">str</span></code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>String with class name, channels, and edge feature dimension.</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
 <details class="quote">
 <summary>Source code in <code>illia/nn/pyg/cg_conv.py</code></summary>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">144</span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
 <span class="normal">145</span>
 <span class="normal">146</span>
 <span class="normal">147</span>
-<span class="normal">148</span>
-<span class="normal">149</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="normal">148</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Returns a string representation of the module.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        String with class name, channels, and edge feature dimension.</span>
 <span class="sd">    """</span>
 
     <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="si">}</span><span class="s2">, dim=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="si">}</span><span class="s2">)"</span>
@@ -853,7 +1153,7 @@ edge features <span class="arithmatex">\((|\mathcal{E}|, D)\)</span> <em>(option
 </div>
 </div>
 <div class="doc doc-object doc-function">
-<h3 class="doc doc-heading" id="illia.nn.pyg.cg_conv.CGConv.forward"><span class="enumerate-headings-plugin enumerate-heading-plugin">10.1.2</span> 
+<h3 class="doc doc-heading" id="illia.nn.pyg.cg_conv.CGConv.forward"><span class="enumerate-headings-plugin enumerate-heading-plugin">10.1.3</span> 
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code> <code class="highlight language-python"><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">edge_attr</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 </h3>
 <div class="doc doc-contents">
@@ -878,8 +1178,7 @@ edge features <span class="arithmatex">\((|\mathcal{E}|, D)\)</span> <em>(option
 </td>
 <td>
 <div class="doc-md-description">
-<p>Input node features, either as a single tensor or a pair
-of tensors if bipartite.</p>
+<p>Input node features, as a single tensor or a pair if bipartite.</p>
 </div>
 </td>
 <td>
@@ -935,7 +1234,7 @@ of tensors if bipartite.</p>
 </td>
 <td>
 <div class="doc-md-description">
-<p>The output node features.</p>
+<p>Node features after applying the convolution.</p>
 </div>
 </td>
 </tr>
@@ -943,7 +1242,10 @@ of tensors if bipartite.</p>
 </table>
 <details class="quote">
 <summary>Source code in <code>illia/nn/pyg/cg_conv.py</code></summary>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 99</span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
 <span class="normal">100</span>
 <span class="normal">101</span>
 <span class="normal">102</span>
@@ -961,24 +1263,19 @@ of tensors if bipartite.</p>
 <span class="normal">114</span>
 <span class="normal">115</span>
 <span class="normal">116</span>
-<span class="normal">117</span>
-<span class="normal">118</span>
-<span class="normal">119</span>
-<span class="normal">120</span>
-<span class="normal">121</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
+<span class="normal">117</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="n">PairTensor</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">:</span> <span class="n">Adj</span><span class="p">,</span> <span class="n">edge_attr</span><span class="p">:</span> <span class="n">OptTensor</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Performs a forward pass of the convolutional layer.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        x: Input node features, either as a single tensor or a pair</span>
-<span class="sd">            of tensors if bipartite.</span>
+<span class="sd">        x: Input node features, as a single tensor or a pair if bipartite.</span>
 <span class="sd">        edge_index: Edge indices.</span>
 <span class="sd">        edge_attr: Optional edge features.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        The output node features.</span>
+<span class="sd">        Node features after applying the convolution.</span>
 <span class="sd">    """</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">):</span>
@@ -993,11 +1290,11 @@ of tensors if bipartite.</p>
 </div>
 </div>
 <div class="doc doc-object doc-function">
-<h3 class="doc doc-heading" id="illia.nn.pyg.cg_conv.CGConv.message"><span class="enumerate-headings-plugin enumerate-heading-plugin">10.1.3</span> 
+<h3 class="doc doc-heading" id="illia.nn.pyg.cg_conv.CGConv.message"><span class="enumerate-headings-plugin enumerate-heading-plugin">10.1.4</span> 
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code> <code class="highlight language-python"><span class="n">message</span><span class="p">(</span><span class="n">x_i</span><span class="p">,</span> <span class="n">x_j</span><span class="p">,</span> <span class="n">edge_attr</span><span class="p">)</span></code>
 </h3>
 <div class="doc doc-contents">
-<p>Constructs messages to be passed to neighboring nodes.</p>
+<p>Constructs messages passed to neighboring nodes.</p>
 <p><span class="doc-section-title">Parameters:</span></p>
 <table>
 <thead>
@@ -1074,7 +1371,7 @@ of tensors if bipartite.</p>
 </td>
 <td>
 <div class="doc-md-description">
-<p>The messages to be aggregated.</p>
+<p>Aggregated messages for neighbors.</p>
 </div>
 </td>
 </tr>
@@ -1082,7 +1379,11 @@ of tensors if bipartite.</p>
 </table>
 <details class="quote">
 <summary>Source code in <code>illia/nn/pyg/cg_conv.py</code></summary>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">123</span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
 <span class="normal">124</span>
 <span class="normal">125</span>
 <span class="normal">126</span>
@@ -1097,13 +1398,9 @@ of tensors if bipartite.</p>
 <span class="normal">135</span>
 <span class="normal">136</span>
 <span class="normal">137</span>
-<span class="normal">138</span>
-<span class="normal">139</span>
-<span class="normal">140</span>
-<span class="normal">141</span>
-<span class="normal">142</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_i</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">x_j</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">edge_attr</span><span class="p">:</span> <span class="n">OptTensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="normal">138</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_i</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">x_j</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">edge_attr</span><span class="p">:</span> <span class="n">OptTensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Constructs messages to be passed to neighboring nodes.</span>
+<span class="sd">    Constructs messages passed to neighboring nodes.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        x_i: Central node features.</span>
@@ -1111,7 +1408,7 @@ of tensors if bipartite.</p>
 <span class="sd">        edge_attr: Optional edge features.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        The messages to be aggregated.</span>
+<span class="sd">        Aggregated messages for neighbors.</span>
 <span class="sd">    """</span>
 
     <span class="k">if</span> <span class="n">edge_attr</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1126,24 +1423,51 @@ of tensors if bipartite.</p>
 </div>
 </div>
 <div class="doc doc-object doc-function">
-<h3 class="doc doc-heading" id="illia.nn.pyg.cg_conv.CGConv.reset_parameters"><span class="enumerate-headings-plugin enumerate-heading-plugin">10.1.4</span> 
+<h3 class="doc doc-heading" id="illia.nn.pyg.cg_conv.CGConv.reset_parameters"><span class="enumerate-headings-plugin enumerate-heading-plugin">10.1.5</span> 
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code> <code class="highlight language-python"><span class="n">reset_parameters</span><span class="p">()</span></code>
 </h3>
 <div class="doc doc-contents">
-<p>Resets the parameters of the linear layers.</p>
+<p>Resets parameters of the linear layers and optional batch norm.</p>
+<p><span class="doc-section-title">Returns:</span></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<code>None</code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>None.</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
 <details class="quote">
 <summary>Source code in <code>illia/nn/pyg/cg_conv.py</code></summary>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">89</span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span>
+<span class="normal">87</span>
+<span class="normal">88</span>
+<span class="normal">89</span>
 <span class="normal">90</span>
 <span class="normal">91</span>
 <span class="normal">92</span>
 <span class="normal">93</span>
-<span class="normal">94</span>
-<span class="normal">95</span>
-<span class="normal">96</span>
-<span class="normal">97</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">reset_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">94</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">reset_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Resets the parameters of the linear layers.</span>
+<span class="sd">    Resets parameters of the linear layers and optional batch norm.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None.</span>
 <span class="sd">    """</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">lin_f</span><span class="o">.</span><span class="n">reset_parameters</span><span class="p">()</span>
@@ -1165,7 +1489,7 @@ of tensors if bipartite.</p>
 <span class="md-icon" title="Last update">
 <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"></path></svg>
 </span>
-<span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 29, 2025 11:54:03 UTC">August 29, 2025</span>
+<span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 18, 2025 16:49:42 UTC">September 18, 2025</span>
 </span>
 <span class="md-source-file__fact">
 <span class="md-icon" title="Contributors">

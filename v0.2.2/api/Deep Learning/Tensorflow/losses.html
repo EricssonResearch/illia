@@ -25,7 +25,7 @@
 <input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
 <label class="md-overlay" for="__drawer"></label>
 <div data-md-component="skip">
-<a class="md-skip" href="#losses">
+<a class="md-skip" href="#losses">8. 
           Skip to content
         </a>
 </div>
@@ -268,7 +268,7 @@
 <li class="md-nav__item">
 <a class="md-nav__link" href="../Jax/nn.html">
 <span class="md-ellipsis">
-    Neural Network
+    Neural Network Layers
     
   </span>
 </a>
@@ -310,7 +310,7 @@
 <li class="md-nav__item">
 <a class="md-nav__link" href="../PyTorch/nn.html">
 <span class="md-ellipsis">
-    Neural Network
+    Neural Network Layers
     
   </span>
 </a>
@@ -368,17 +368,6 @@
 <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code> KLDivergenceLoss
     </span>
 </a>
-<nav aria-label=" KLDivergenceLoss" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#illia.losses.tf.kl.KLDivergenceLoss.__call__">
-<span class="md-ellipsis">
-<code class="doc-symbol doc-symbol-toc doc-symbol-method"></code> __call__
-    </span>
-</a>
-</li>
-</ul>
-</nav>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#illia.losses.tf.elbo.ELBOLoss">
@@ -386,17 +375,6 @@
 <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code> ELBOLoss
     </span>
 </a>
-<nav aria-label=" ELBOLoss" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#illia.losses.tf.elbo.ELBOLoss.__call__">
-<span class="md-ellipsis">
-<code class="doc-symbol doc-symbol-toc doc-symbol-method"></code> __call__
-    </span>
-</a>
-</li>
-</ul>
-</nav>
 </li>
 </ul>
 </nav>
@@ -404,7 +382,7 @@
 <li class="md-nav__item">
 <a class="md-nav__link" href="nn.html">
 <span class="md-ellipsis">
-    Neural Network
+    Neural Network Layers
     
   </span>
 </a>
@@ -448,7 +426,7 @@
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../Geometric%20Deep%20Learning/PyG/nn.html">
 <span class="md-ellipsis">
-    Neural Network
+    Graph Neural Network Layers
     
   </span>
 </a>
@@ -558,148 +536,208 @@
 <h1 id="losses"><span class="enumerate-headings-plugin enumerate-heading-plugin">8.</span> Losses</h1>
 <div class="doc doc-object doc-module">
 <div class="doc doc-contents first">
-<p>This module implements the Kullback-Leibler (KL) divergence
-loss for Bayesian neural networks in Tensorflow.</p>
 <div class="doc doc-children">
 <div class="doc doc-object doc-class">
 <h2 class="doc doc-heading" id="illia.losses.tf.kl.KLDivergenceLoss"><span class="enumerate-headings-plugin enumerate-heading-plugin">8.1</span> 
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code> <code class="highlight language-python"><span class="n">KLDivergenceLoss</span><span class="p">(</span><span class="n">reduction</span><span class="o">=</span><span class="s1">'mean'</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code> <code>KLDivergenceLoss</code>
 </h2>
 <div class="doc doc-contents">
-<p>Computes the Kullback-Leibler divergence loss across
-all Bayesian modules.</p>
-<p>Initializes the Kullback-Leibler divergence loss computation.</p>
-<p><span class="doc-section-title">Parameters:</span></p>
-<table>
-<thead>
-<tr>
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr class="doc-section-item">
-<td>
-<code>reduction</code>
-</td>
-<td>
-<code><span title="typing.Literal">Literal</span>['mean']</code>
-</td>
-<td>
-<div class="doc-md-description">
-<p>Reduction method for the loss.</p>
-</div>
-</td>
-<td>
-<code>'mean'</code>
-</td>
-</tr>
-<tr class="doc-section-item">
-<td>
-<code>weight</code>
-</td>
-<td>
-<code><span title="float">float</span></code>
-</td>
-<td>
-<div class="doc-md-description">
-<p>Scaling factor applied to the total KL loss.</p>
-</div>
-</td>
-<td>
-<code>1.0</code>
-</td>
-</tr>
-<tr class="doc-section-item">
-<td>
-<code>**kwargs</code>
-</td>
-<td>
-<code><span title="typing.Any">Any</span></code>
-</td>
-<td>
-<div class="doc-md-description">
-<p>Additional keyword arguments.</p>
-</div>
-</td>
-<td>
-<code>{}</code>
-</td>
-</tr>
-</tbody>
-</table>
-<p><span class="doc-section-title">Returns:</span></p>
-<table>
-<thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="doc-section-item">
-<td>
-<code>None</code>
-</td>
-<td>
-<div class="doc-md-description">
-<p>None.</p>
-</div>
-</td>
-</tr>
-</tbody>
-</table>
+<p>Compute Kullback-Leibler divergence across Bayesian modules.
+This loss sums the KL divergence from all Bayesian layers in
+the model. It can be reduced by averaging and scaled by a
+weight factor.</p>
+<details class="notes" open="">
+<summary>Notes</summary>
+<p>Assumes the model contains submodules derived from
+<code>BayesianModule</code>.</p>
+</details>
 <details class="quote">
 <summary>Source code in <code>illia/losses/tf/kl.py</code></summary>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">24</span>
-<span class="normal">25</span>
-<span class="normal">26</span>
-<span class="normal">27</span>
-<span class="normal">28</span>
-<span class="normal">29</span>
-<span class="normal">30</span>
-<span class="normal">31</span>
-<span class="normal">32</span>
-<span class="normal">33</span>
-<span class="normal">34</span>
-<span class="normal">35</span>
-<span class="normal">36</span>
-<span class="normal">37</span>
-<span class="normal">38</span>
-<span class="normal">39</span>
-<span class="normal">40</span>
-<span class="normal">41</span>
-<span class="normal">42</span>
-<span class="normal">43</span>
-<span class="normal">44</span>
-<span class="normal">45</span>
-<span class="normal">46</span>
-<span class="normal">47</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span>
-    <span class="n">reduction</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"mean"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"mean"</span><span class="p">,</span>
-    <span class="n">weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 12</span>
+<span class="normal"> 13</span>
+<span class="normal"> 14</span>
+<span class="normal"> 15</span>
+<span class="normal"> 16</span>
+<span class="normal"> 17</span>
+<span class="normal"> 18</span>
+<span class="normal"> 19</span>
+<span class="normal"> 20</span>
+<span class="normal"> 21</span>
+<span class="normal"> 22</span>
+<span class="normal"> 23</span>
+<span class="normal"> 24</span>
+<span class="normal"> 25</span>
+<span class="normal"> 26</span>
+<span class="normal"> 27</span>
+<span class="normal"> 28</span>
+<span class="normal"> 29</span>
+<span class="normal"> 30</span>
+<span class="normal"> 31</span>
+<span class="normal"> 32</span>
+<span class="normal"> 33</span>
+<span class="normal"> 34</span>
+<span class="normal"> 35</span>
+<span class="normal"> 36</span>
+<span class="normal"> 37</span>
+<span class="normal"> 38</span>
+<span class="normal"> 39</span>
+<span class="normal"> 40</span>
+<span class="normal"> 41</span>
+<span class="normal"> 42</span>
+<span class="normal"> 43</span>
+<span class="normal"> 44</span>
+<span class="normal"> 45</span>
+<span class="normal"> 46</span>
+<span class="normal"> 47</span>
+<span class="normal"> 48</span>
+<span class="normal"> 49</span>
+<span class="normal"> 50</span>
+<span class="normal"> 51</span>
+<span class="normal"> 52</span>
+<span class="normal"> 53</span>
+<span class="normal"> 54</span>
+<span class="normal"> 55</span>
+<span class="normal"> 56</span>
+<span class="normal"> 57</span>
+<span class="normal"> 58</span>
+<span class="normal"> 59</span>
+<span class="normal"> 60</span>
+<span class="normal"> 61</span>
+<span class="normal"> 62</span>
+<span class="normal"> 63</span>
+<span class="normal"> 64</span>
+<span class="normal"> 65</span>
+<span class="normal"> 66</span>
+<span class="normal"> 67</span>
+<span class="normal"> 68</span>
+<span class="normal"> 69</span>
+<span class="normal"> 70</span>
+<span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@saving</span><span class="o">.</span><span class="n">register_keras_serializable</span><span class="p">(</span><span class="n">package</span><span class="o">=</span><span class="s2">"illia"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"KLDivergenceLoss"</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">KLDivergenceLoss</span><span class="p">(</span><span class="n">losses</span><span class="o">.</span><span class="n">Loss</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Initializes the Kullback-Leibler divergence loss computation.</span>
+<span class="sd">    Compute Kullback-Leibler divergence across Bayesian modules.</span>
+<span class="sd">    This loss sums the KL divergence from all Bayesian layers in</span>
+<span class="sd">    the model. It can be reduced by averaging and scaled by a</span>
+<span class="sd">    weight factor.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        reduction: Reduction method for the loss.</span>
-<span class="sd">        weight: Scaling factor applied to the total KL loss.</span>
-<span class="sd">        **kwargs: Additional keyword arguments.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        None.</span>
+<span class="sd">    Notes:</span>
+<span class="sd">        Assumes the model contains submodules derived from</span>
+<span class="sd">        `BayesianModule`.</span>
 <span class="sd">    """</span>
 
-    <span class="c1"># Call super class constructor</span>
-    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">reduction</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"mean"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"mean"</span><span class="p">,</span>
+        <span class="n">weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Initialize the KL divergence loss.</span>
 
-    <span class="c1"># Set attributes</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">=</span> <span class="n">reduction</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">weight</span>
+<span class="sd">        Args:</span>
+<span class="sd">            reduction: Method used to reduce the KL loss.</span>
+<span class="sd">            weight: Scaling factor for the KL divergence.</span>
+<span class="sd">            **kwargs: Extra arguments passed to the base class.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
+
+        <span class="c1"># Call super class constructor</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># Set attributes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">=</span> <span class="n">reduction</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">weight</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Return the configuration dictionary for serialization.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Dictionary containing the KL loss configuration.</span>
+<span class="sd">        """</span>
+
+        <span class="c1"># Get the base configuration</span>
+        <span class="n">base_config</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_config</span><span class="p">()</span>
+
+        <span class="c1"># Add custom configurations</span>
+        <span class="n">custom_config</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"reduction"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span><span class="p">,</span> <span class="s2">"weight"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">}</span>
+
+        <span class="c1"># Combine both configurations</span>
+        <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">base_config</span><span class="p">,</span> <span class="o">**</span><span class="n">custom_config</span><span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Compute KL divergence for all Bayesian modules in a model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            *args: Unused positional arguments.</span>
+<span class="sd">            **kwargs: Must include 'model' containing Bayesian</span>
+<span class="sd">                layers.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tf.Tensor: Weighted KL divergence loss.</span>
+
+<span class="sd">        Notes:</span>
+<span class="sd">            The KL loss is averaged over the number of parameters</span>
+<span class="sd">            and scaled by the `weight` attribute.</span>
+<span class="sd">        """</span>
+
+        <span class="n">model</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"model"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Model must be provided as a keyword argument"</span><span class="p">)</span>
+
+        <span class="n">kl_global_cost</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="n">num_params_global</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># Iterate through the model's layers</span>
+        <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">layers</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">BayesianModule</span><span class="p">):</span>
+                <span class="n">kl_cost</span><span class="p">,</span> <span class="n">num_params</span> <span class="o">=</span> <span class="n">layer</span><span class="o">.</span><span class="n">kl_cost</span><span class="p">()</span>
+                <span class="n">kl_global_cost</span> <span class="o">+=</span> <span class="n">kl_cost</span>
+                <span class="n">num_params_global</span> <span class="o">+=</span> <span class="n">num_params</span>
+
+        <span class="c1"># Compute mean KL cost and scale by weight</span>
+        <span class="n">kl_global_cost</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span>
+            <span class="n">kl_global_cost</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">num_params_global</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">kl_global_cost</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">kl_global_cost</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">kl_global_cost</span>
 </code></pre></div></td></tr></table></div>
 </details>
 <div class="doc doc-children">
@@ -708,8 +746,7 @@ all Bayesian modules.</p>
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code> <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 </h3>
 <div class="doc doc-contents">
-<p>Computes Kullback-Leibler divergence for all Bayesian
-modules in the model.</p>
+<p>Compute KL divergence for all Bayesian modules in a model.</p>
 <p><span class="doc-section-title">Parameters:</span></p>
 <table>
 <thead>
@@ -746,7 +783,8 @@ modules in the model.</p>
 </td>
 <td>
 <div class="doc-md-description">
-<p>Must include 'model' as a keyword argument.</p>
+<p>Must include 'model' containing Bayesian
+layers.</p>
 </div>
 </td>
 <td>
@@ -770,12 +808,17 @@ modules in the model.</p>
 </td>
 <td>
 <div class="doc-md-description">
-<p>Scaled Kullback-Leibler divergence loss as a scalar array.</p>
+<p>tf.Tensor: Weighted KL divergence loss.</p>
 </div>
 </td>
 </tr>
 </tbody>
 </table>
+<details class="notes" open="">
+<summary>Notes</summary>
+<p>The KL loss is averaged over the number of parameters
+and scaled by the <code>weight</code> attribute.</p>
+</details>
 <details class="quote">
 <summary>Source code in <code>illia/losses/tf/kl.py</code></summary>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 67</span>
@@ -811,17 +854,25 @@ modules in the model.</p>
 <span class="normal"> 97</span>
 <span class="normal"> 98</span>
 <span class="normal"> 99</span>
-<span class="normal">100</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Computes Kullback-Leibler divergence for all Bayesian</span>
-<span class="sd">    modules in the model.</span>
+<span class="sd">    Compute KL divergence for all Bayesian modules in a model.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        *args: Unused positional arguments.</span>
-<span class="sd">        **kwargs: Must include 'model' as a keyword argument.</span>
+<span class="sd">        **kwargs: Must include 'model' containing Bayesian</span>
+<span class="sd">            layers.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Scaled Kullback-Leibler divergence loss as a scalar array.</span>
+<span class="sd">        tf.Tensor: Weighted KL divergence loss.</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">        The KL loss is averaged over the number of parameters</span>
+<span class="sd">        and scaled by the `weight` attribute.</span>
 <span class="sd">    """</span>
 
     <span class="n">model</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"model"</span><span class="p">)</span>
@@ -849,27 +900,12 @@ modules in the model.</p>
 </details>
 </div>
 </div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="doc doc-object doc-module">
-<div class="doc doc-contents first">
-<p>This module implements  the Evidence Lower Bound
-(ELBO) loss for Bayesian neural networks in TensorFlow.</p>
-<div class="doc doc-children">
-<div class="doc doc-object doc-class">
-<h2 class="doc doc-heading" id="illia.losses.tf.elbo.ELBOLoss"><span class="enumerate-headings-plugin enumerate-heading-plugin">8.2</span> 
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code> <code class="highlight language-python"><span class="n">ELBOLoss</span><span class="p">(</span><span class="n">loss_function</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">kl_weight</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
-</h2>
+<div class="doc doc-object doc-function">
+<h3 class="doc doc-heading" id="illia.losses.tf.kl.KLDivergenceLoss.__init__"><span class="enumerate-headings-plugin enumerate-heading-plugin">8.1.2</span> 
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code> <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">reduction</span><span class="o">=</span><span class="s1">'mean'</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+</h3>
 <div class="doc doc-contents">
-<p>Computes the Evidence Lower Bound (ELBO) loss function for
-Bayesian neural networks.</p>
-<p>This combines a reconstruction loss and a KL divergence term,
-estimated using Monte Carlo sampling.</p>
-<p>Initializes the ELBO loss with sampling and KL scaling.</p>
+<p>Initialize the KL divergence loss.</p>
 <p><span class="doc-section-title">Parameters:</span></p>
 <table>
 <thead>
@@ -883,50 +919,50 @@ estimated using Monte Carlo sampling.</p>
 <tbody>
 <tr class="doc-section-item">
 <td>
-<code>loss_function</code>
+<code>reduction</code>
 </td>
 <td>
-<code><span title="typing.Callable">Callable</span>[[<span title="tensorflow.Tensor">Tensor</span>, <span title="tensorflow.Tensor">Tensor</span>], <span title="tensorflow.Tensor">Tensor</span>]</code>
+<code><span title="typing.Literal">Literal</span>['mean']</code>
 </td>
 <td>
 <div class="doc-md-description">
-<p>Module for computing reconstruction loss.</p>
+<p>Method used to reduce the KL loss.</p>
 </div>
 </td>
 <td>
-<em>required</em>
+<code>'mean'</code>
 </td>
 </tr>
 <tr class="doc-section-item">
 <td>
-<code>num_samples</code>
-</td>
-<td>
-<code><span title="int">int</span></code>
-</td>
-<td>
-<div class="doc-md-description">
-<p>Number of MC samples for estimation.</p>
-</div>
-</td>
-<td>
-<code>1</code>
-</td>
-</tr>
-<tr class="doc-section-item">
-<td>
-<code>kl_weight</code>
+<code>weight</code>
 </td>
 <td>
 <code><span title="float">float</span></code>
 </td>
 <td>
 <div class="doc-md-description">
-<p>Weight applied to the KL loss.</p>
+<p>Scaling factor for the KL divergence.</p>
 </div>
 </td>
 <td>
-<code>0.001</code>
+<code>1.0</code>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>**kwargs</code>
+</td>
+<td>
+<code><span title="typing.Any">Any</span></code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Extra arguments passed to the base class.</p>
+</div>
+</td>
+<td>
+<code>{}</code>
 </td>
 </tr>
 </tbody>
@@ -946,15 +982,17 @@ estimated using Monte Carlo sampling.</p>
 </td>
 <td>
 <div class="doc-md-description">
-<p>None.</p>
+<p>None</p>
 </div>
 </td>
 </tr>
 </tbody>
 </table>
 <details class="quote">
-<summary>Source code in <code>illia/losses/tf/elbo.py</code></summary>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">27</span>
+<summary>Source code in <code>illia/losses/tf/kl.py</code></summary>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
 <span class="normal">28</span>
 <span class="normal">29</span>
 <span class="normal">30</span>
@@ -975,38 +1013,265 @@ estimated using Monte Carlo sampling.</p>
 <span class="normal">45</span>
 <span class="normal">46</span>
 <span class="normal">47</span>
-<span class="normal">48</span>
-<span class="normal">49</span>
-<span class="normal">50</span>
-<span class="normal">51</span>
-<span class="normal">52</span>
-<span class="normal">53</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">48</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
-    <span class="n">loss_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span>
-    <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-    <span class="n">kl_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-3</span><span class="p">,</span>
+    <span class="n">reduction</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"mean"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"mean"</span><span class="p">,</span>
+    <span class="n">weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Initializes the ELBO loss with sampling and KL scaling.</span>
+<span class="sd">    Initialize the KL divergence loss.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        loss_function: Module for computing reconstruction loss.</span>
-<span class="sd">        num_samples: Number of MC samples for estimation.</span>
-<span class="sd">        kl_weight: Weight applied to the KL loss.</span>
+<span class="sd">        reduction: Method used to reduce the KL loss.</span>
+<span class="sd">        weight: Scaling factor for the KL divergence.</span>
+<span class="sd">        **kwargs: Extra arguments passed to the base class.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        None.</span>
+<span class="sd">        None</span>
 <span class="sd">    """</span>
 
     <span class="c1"># Call super class constructor</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="c1"># Set attributes</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">loss_function</span> <span class="o">=</span> <span class="n">loss_function</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">num_samples</span> <span class="o">=</span> <span class="n">num_samples</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">kl_weight</span> <span class="o">=</span> <span class="n">kl_weight</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">kl_loss</span> <span class="o">=</span> <span class="n">KLDivergenceLoss</span><span class="p">(</span><span class="n">weight</span><span class="o">=</span><span class="n">kl_weight</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">=</span> <span class="n">reduction</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">weight</span>
+</code></pre></div></td></tr></table></div>
+</details>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="doc doc-object doc-module">
+<div class="doc doc-contents first">
+<div class="doc doc-children">
+<div class="doc doc-object doc-class">
+<h2 class="doc doc-heading" id="illia.losses.tf.elbo.ELBOLoss"><span class="enumerate-headings-plugin enumerate-heading-plugin">8.2</span> 
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code> <code>ELBOLoss</code>
+</h2>
+<div class="doc doc-contents">
+<p>Compute the Evidence Lower Bound (ELBO) loss for Bayesian
+networks. Combines a reconstruction loss with a KL divergence
+term. Monte Carlo sampling can estimate the expected
+reconstruction loss over stochastic layers.</p>
+<details class="notes" open="">
+<summary>Notes</summary>
+<p>The KL term is weighted by <code>kl_weight</code>. The model is
+assumed to contain Bayesian layers compatible with
+<code>KLDivergenceLoss</code>.</p>
+</details>
+<details class="quote">
+<summary>Source code in <code>illia/losses/tf/elbo.py</code></summary>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 12</span>
+<span class="normal"> 13</span>
+<span class="normal"> 14</span>
+<span class="normal"> 15</span>
+<span class="normal"> 16</span>
+<span class="normal"> 17</span>
+<span class="normal"> 18</span>
+<span class="normal"> 19</span>
+<span class="normal"> 20</span>
+<span class="normal"> 21</span>
+<span class="normal"> 22</span>
+<span class="normal"> 23</span>
+<span class="normal"> 24</span>
+<span class="normal"> 25</span>
+<span class="normal"> 26</span>
+<span class="normal"> 27</span>
+<span class="normal"> 28</span>
+<span class="normal"> 29</span>
+<span class="normal"> 30</span>
+<span class="normal"> 31</span>
+<span class="normal"> 32</span>
+<span class="normal"> 33</span>
+<span class="normal"> 34</span>
+<span class="normal"> 35</span>
+<span class="normal"> 36</span>
+<span class="normal"> 37</span>
+<span class="normal"> 38</span>
+<span class="normal"> 39</span>
+<span class="normal"> 40</span>
+<span class="normal"> 41</span>
+<span class="normal"> 42</span>
+<span class="normal"> 43</span>
+<span class="normal"> 44</span>
+<span class="normal"> 45</span>
+<span class="normal"> 46</span>
+<span class="normal"> 47</span>
+<span class="normal"> 48</span>
+<span class="normal"> 49</span>
+<span class="normal"> 50</span>
+<span class="normal"> 51</span>
+<span class="normal"> 52</span>
+<span class="normal"> 53</span>
+<span class="normal"> 54</span>
+<span class="normal"> 55</span>
+<span class="normal"> 56</span>
+<span class="normal"> 57</span>
+<span class="normal"> 58</span>
+<span class="normal"> 59</span>
+<span class="normal"> 60</span>
+<span class="normal"> 61</span>
+<span class="normal"> 62</span>
+<span class="normal"> 63</span>
+<span class="normal"> 64</span>
+<span class="normal"> 65</span>
+<span class="normal"> 66</span>
+<span class="normal"> 67</span>
+<span class="normal"> 68</span>
+<span class="normal"> 69</span>
+<span class="normal"> 70</span>
+<span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@saving</span><span class="o">.</span><span class="n">register_keras_serializable</span><span class="p">(</span><span class="n">package</span><span class="o">=</span><span class="s2">"illia"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"ELBOLoss"</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ELBOLoss</span><span class="p">(</span><span class="n">losses</span><span class="o">.</span><span class="n">Loss</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Compute the Evidence Lower Bound (ELBO) loss for Bayesian</span>
+<span class="sd">    networks. Combines a reconstruction loss with a KL divergence</span>
+<span class="sd">    term. Monte Carlo sampling can estimate the expected</span>
+<span class="sd">    reconstruction loss over stochastic layers.</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">        The KL term is weighted by `kl_weight`. The model is</span>
+<span class="sd">        assumed to contain Bayesian layers compatible with</span>
+<span class="sd">        `KLDivergenceLoss`.</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">loss_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span>
+        <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">kl_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-3</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Initialize the ELBO loss with reconstruction and KL</span>
+<span class="sd">        components.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            loss_function: Function used to compute reconstruction</span>
+<span class="sd">                loss.</span>
+<span class="sd">            num_samples: Number of Monte Carlo samples used for</span>
+<span class="sd">                estimation.</span>
+<span class="sd">            kl_weight: Weight applied to the KL divergence term.</span>
+<span class="sd">            **kwargs: Extra arguments passed to the base class.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
+
+        <span class="c1"># Call super class constructor</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># Set attributes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loss_function</span> <span class="o">=</span> <span class="n">loss_function</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_samples</span> <span class="o">=</span> <span class="n">num_samples</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kl_weight</span> <span class="o">=</span> <span class="n">kl_weight</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kl_loss</span> <span class="o">=</span> <span class="n">KLDivergenceLoss</span><span class="p">(</span><span class="n">weight</span><span class="o">=</span><span class="n">kl_weight</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Return the configuration dictionary for serialization.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Dictionary containing the layer configuration.</span>
+<span class="sd">        """</span>
+
+        <span class="c1"># Get the base configuration</span>
+        <span class="n">base_config</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_config</span><span class="p">()</span>
+
+        <span class="c1"># Add custom configurations</span>
+        <span class="n">custom_config</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">"loss_function"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_function</span><span class="p">,</span>
+            <span class="s2">"num_samples"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_samples</span><span class="p">,</span>
+            <span class="s2">"kl_weight"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">kl_weight</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Combine both configurations</span>
+        <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">base_config</span><span class="p">,</span> <span class="o">**</span><span class="n">custom_config</span><span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">y_true</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Compute the ELBO loss with Monte Carlo sampling and KL</span>
+<span class="sd">        regularization.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            y_true: Ground truth targets.</span>
+<span class="sd">            y_pred: Predictions from the model.</span>
+<span class="sd">            *args: Unused positional arguments.</span>
+<span class="sd">            **kwargs: Must include 'model' containing Bayesian</span>
+<span class="sd">                layers.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tf.Tensor: Scalar ELBO loss averaged over samples.</span>
+
+<span class="sd">        Notes:</span>
+<span class="sd">            The loss is averaged over `num_samples` Monte Carlo</span>
+<span class="sd">            draws.</span>
+<span class="sd">        """</span>
+
+        <span class="n">model</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"model"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Model must be provided as a keyword argument"</span><span class="p">)</span>
+
+        <span class="n">loss_value</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_samples</span><span class="p">):</span>
+            <span class="n">current_loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_function</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">kl_loss</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+            <span class="n">loss_value</span> <span class="o">+=</span> <span class="n">current_loss</span>
+
+        <span class="c1"># Average the loss across samples</span>
+        <span class="n">loss_value</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">loss_value</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">loss_value</span>
 </code></pre></div></td></tr></table></div>
 </details>
 <div class="doc doc-children">
@@ -1015,7 +1280,8 @@ estimated using Monte Carlo sampling.</p>
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code> <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 </h3>
 <div class="doc doc-contents">
-<p>Computes the ELBO loss using KL regularization and reconstruction error.</p>
+<p>Compute the ELBO loss with Monte Carlo sampling and KL
+regularization.</p>
 <p><span class="doc-section-title">Parameters:</span></p>
 <table>
 <thead>
@@ -1052,7 +1318,7 @@ estimated using Monte Carlo sampling.</p>
 </td>
 <td>
 <div class="doc-md-description">
-<p>Model predictions.</p>
+<p>Predictions from the model.</p>
 </div>
 </td>
 <td>
@@ -1084,7 +1350,8 @@ estimated using Monte Carlo sampling.</p>
 </td>
 <td>
 <div class="doc-md-description">
-<p>Must include 'model' containing Bayesian layers.</p>
+<p>Must include 'model' containing Bayesian
+layers.</p>
 </div>
 </td>
 <td>
@@ -1108,18 +1375,20 @@ estimated using Monte Carlo sampling.</p>
 </td>
 <td>
 <div class="doc-md-description">
-<p>Scalar tensor representing the total ELBO loss.</p>
+<p>tf.Tensor: Scalar ELBO loss averaged over samples.</p>
 </div>
 </td>
 </tr>
 </tbody>
 </table>
+<details class="notes" open="">
+<summary>Notes</summary>
+<p>The loss is averaged over <code>num_samples</code> Monte Carlo
+draws.</p>
+</details>
 <details class="quote">
 <summary>Source code in <code>illia/losses/tf/elbo.py</code></summary>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 76</span>
-<span class="normal"> 77</span>
-<span class="normal"> 78</span>
-<span class="normal"> 79</span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 79</span>
 <span class="normal"> 80</span>
 <span class="normal"> 81</span>
 <span class="normal"> 82</span>
@@ -1145,20 +1414,35 @@ estimated using Monte Carlo sampling.</p>
 <span class="normal">102</span>
 <span class="normal">103</span>
 <span class="normal">104</span>
-<span class="normal">105</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">y_true</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Computes the ELBO loss using KL regularization and reconstruction error.</span>
+<span class="sd">    Compute the ELBO loss with Monte Carlo sampling and KL</span>
+<span class="sd">    regularization.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        y_true: Ground truth targets.</span>
-<span class="sd">        y_pred: Model predictions.</span>
+<span class="sd">        y_pred: Predictions from the model.</span>
 <span class="sd">        *args: Unused positional arguments.</span>
-<span class="sd">        **kwargs: Must include 'model' containing Bayesian layers.</span>
+<span class="sd">        **kwargs: Must include 'model' containing Bayesian</span>
+<span class="sd">            layers.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Scalar tensor representing the total ELBO loss.</span>
+<span class="sd">        tf.Tensor: Scalar ELBO loss averaged over samples.</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">        The loss is averaged over `num_samples` Monte Carlo</span>
+<span class="sd">        draws.</span>
 <span class="sd">    """</span>
 
     <span class="n">model</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"model"</span><span class="p">)</span>
@@ -1175,6 +1459,180 @@ estimated using Monte Carlo sampling.</p>
     <span class="n">loss_value</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">loss_value</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">loss_value</span>
+</code></pre></div></td></tr></table></div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-function">
+<h3 class="doc doc-heading" id="illia.losses.tf.elbo.ELBOLoss.__init__"><span class="enumerate-headings-plugin enumerate-heading-plugin">8.2.2</span> 
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code> <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">loss_function</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">kl_weight</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+</h3>
+<div class="doc doc-contents">
+<p>Initialize the ELBO loss with reconstruction and KL
+components.</p>
+<p><span class="doc-section-title">Parameters:</span></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<code>loss_function</code>
+</td>
+<td>
+<code><span title="typing.Callable">Callable</span>[[<span title="tensorflow.Tensor">Tensor</span>, <span title="tensorflow.Tensor">Tensor</span>], <span title="tensorflow.Tensor">Tensor</span>]</code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Function used to compute reconstruction
+loss.</p>
+</div>
+</td>
+<td>
+<em>required</em>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>num_samples</code>
+</td>
+<td>
+<code><span title="int">int</span></code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Number of Monte Carlo samples used for
+estimation.</p>
+</div>
+</td>
+<td>
+<code>1</code>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>kl_weight</code>
+</td>
+<td>
+<code><span title="float">float</span></code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Weight applied to the KL divergence term.</p>
+</div>
+</td>
+<td>
+<code>0.001</code>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>**kwargs</code>
+</td>
+<td>
+<code><span title="typing.Any">Any</span></code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Extra arguments passed to the base class.</p>
+</div>
+</td>
+<td>
+<code>{}</code>
+</td>
+</tr>
+</tbody>
+</table>
+<p><span class="doc-section-title">Returns:</span></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<code>None</code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>None</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<details class="quote">
+<summary>Source code in <code>illia/losses/tf/elbo.py</code></summary>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">loss_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span>
+    <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">kl_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-3</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Initialize the ELBO loss with reconstruction and KL</span>
+<span class="sd">    components.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        loss_function: Function used to compute reconstruction</span>
+<span class="sd">            loss.</span>
+<span class="sd">        num_samples: Number of Monte Carlo samples used for</span>
+<span class="sd">            estimation.</span>
+<span class="sd">        kl_weight: Weight applied to the KL divergence term.</span>
+<span class="sd">        **kwargs: Extra arguments passed to the base class.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    """</span>
+
+    <span class="c1"># Call super class constructor</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="c1"># Set attributes</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">loss_function</span> <span class="o">=</span> <span class="n">loss_function</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">num_samples</span> <span class="o">=</span> <span class="n">num_samples</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">kl_weight</span> <span class="o">=</span> <span class="n">kl_weight</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">kl_loss</span> <span class="o">=</span> <span class="n">KLDivergenceLoss</span><span class="p">(</span><span class="n">weight</span><span class="o">=</span><span class="n">kl_weight</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
 </details>
 </div>

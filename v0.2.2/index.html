@@ -716,7 +716,7 @@
   
   
   <span class="md-ellipsis">
-    Neural Network
+    Neural Network Layers
     
   </span>
   
@@ -844,7 +844,7 @@
   
   
   <span class="md-ellipsis">
-    Neural Network
+    Neural Network Layers
     
   </span>
   
@@ -972,7 +972,7 @@
   
   
   <span class="md-ellipsis">
-    Neural Network
+    Neural Network Layers
     
   </span>
   
@@ -1105,7 +1105,7 @@
   
   
   <span class="md-ellipsis">
-    Neural Network
+    Graph Neural Network Layers
     
   </span>
   
@@ -1435,26 +1435,31 @@
   </a>
 </p>
 
-<div class="admonition info">
-<p class="admonition-title">Info</p>
-<p>illia is actively developed and maintained. While we're working
-toward full stability across all backends, the core functionality is production-ready.
-Join our community to stay updated!</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><strong>illia is under active development.</strong> The library is evolving rapidly to ensure
+stable support across all frameworks. Expect ongoing changes as we improve
+functionality and performance.</p>
 </div>
 <h2 id="introduction">Introduction</h2>
-<p><strong>illia</strong> is a cutting-edge library for <strong>Bayesian Neural Networks</strong> that brings
-uncertainty quantification to deep learning. Designed with flexibility in mind, it
-seamlessly integrates with multiple backends and popular frameworks.</p>
+<p><strong>illia</strong> is a library for <strong>Bayesian Neural Networks</strong> that brings uncertainty
+quantification to deep learning, a capability that is critical in sectors such as
+telecommunications, medicine, and beyond. Designed with flexibility in mind, it
+integrates seamlessly with multiple backends and popular frameworks, enabling a single
+codebase to support multiple backends with minimal modifications.</p>
 <p>For full documentation, please visit the site:
 <a href="https://ericssonresearch.github.io/illia/">https://ericssonresearch.github.io/illia/</a></p>
 <h2 id="why-choose-illia">Why Choose illia?</h2>
 <ul>
 <li><strong>Multi-Backend Support</strong>: Works with PyTorch, TensorFlow, and JAX.</li>
-<li><strong>Graph Neural Networks</strong>: Integrated with PyTorch Geometric, DGL, and Spektral.</li>
+<li><strong>Graph Neural Networks</strong>: Currently integrated with PyTorch Geometric, with planned
+  support for DGL and/or Spektral in future releases.</li>
 <li><strong>Developer Friendly</strong>: Intuitive API design and comprehensive documentation.</li>
 </ul>
 <h2 id="quick-start">Quick Start</h2>
-<p>Get started with illia in just a few lines of code:</p>
+<p>To show how easy it is to use <strong>illia</strong>, here’s a quick example to get started. In this
+case, we explicitly choose the backend PyTorch, the underlying framework, and define a
+convolutional layer:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 
@@ -1466,22 +1471,28 @@ seamlessly integrates with multiple backends and popular frameworks.</p>
 
 <span class="c1"># Create a Bayesian convolutional layer</span>
 <span class="n">conv_layer</span> <span class="o">=</span> <span class="n">Conv2d</span><span class="p">(</span>
-    <span class="n">input_channels</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-    <span class="n">output_channels</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+    <span class="n">input_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">output_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-    <span class="n">bias</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span>
 
-<span class="c1"># Forward pass with uncertainty</span>
-<span class="n">input_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
-<span class="n">output_mean</span><span class="p">,</span> <span class="n">output_std</span> <span class="o">=</span> <span class="n">conv_layer</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">)</span>
+<span class="c1"># Define input tensor</span>
+<span class="n">input_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Output shape: </span><span class="si">{</span><span class="n">output_mean</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Uncertainty quantified: </span><span class="si">{</span><span class="n">output_std</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># Define the number of iterations to apply the forward pass</span>
+<span class="n">num_passes</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">outputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">conv_layer</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_passes</span><span class="p">)]</span>
+
+<span class="c1"># Stack outputs into a single tensor</span>
+<span class="n">outputs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Output shape: </span><span class="si">{</span><span class="n">outputs</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Output std: </span><span class="si">{</span><span class="n">outputs</span><span class="o">.</span><span class="n">std</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Output var: </span><span class="si">{</span><span class="n">outputs</span><span class="o">.</span><span class="n">var</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="contributing">Contributing</h2>
-<p>We welcome contributions from the community! Whether you're fixing bugs, adding features,
-or improving documentation:</p>
+<p>We welcome contributions from the community! Whether you're fixing bugs, adding
+features, or improving documentation:</p>
 <ol>
 <li><strong>Read our
    <a href="https://github.com/EricssonResearch/illia/blob/main/CONTRIBUTING.md">contributing guide</a></strong>
@@ -1514,7 +1525,7 @@ find it useful and inspiring for your projects!</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2025 17:10:01 UTC">September 16, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 18, 2025 16:49:42 UTC">September 18, 2025</span>
   </span>
 
     
