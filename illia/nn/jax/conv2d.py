@@ -53,7 +53,7 @@ class Conv2d(BayesianModule):
             bias_distribution: Distribution to initialize bias.
             use_bias: Whether to include a bias term.
             rngs: Random number generators for reproducibility.
-            **kwargs: Additional keyword arguments for the base class.
+            **kwargs: Extra arguments passed to the base class.
 
         Returns:
             None.

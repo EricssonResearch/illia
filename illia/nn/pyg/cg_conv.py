@@ -60,7 +60,7 @@ class CGConv(MessagePassing):
             channels: Size of input features. Tuple for source and target.
             dim: Dimensionality of edge features.
             aggr: Aggregation operator ("add", "mean", "max").
-            **kwargs: Extra arguments for MessagePassing.
+            **kwargs: Extra arguments passed to the base class.
 
         Returns:
             None.

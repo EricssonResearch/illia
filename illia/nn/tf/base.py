@@ -25,7 +25,7 @@ class BayesianModule(layers.Layer, ABC):
         Sets `frozen` to False and `is_bayesian` to True.
 
         Args:
-            **kwargs: Additional keyword arguments passed to the base class.
+            **kwargs: Extra arguments passed to the base class.
 
         Returns:
             None.

@@ -48,6 +48,7 @@ class Embedding(BayesianModule):
                 sparse tensor.
             weights_distribution: distribution for the weights of the
                 layer.
+            **kwargs: Extra arguments passed to the base class.
         
         Returns:
             None.

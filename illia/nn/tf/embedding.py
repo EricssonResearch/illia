@@ -42,7 +42,7 @@ class Embedding(BayesianModule):
             scale_grad_by_freq: Scale gradient by inverse frequency.
             sparse: Use sparse gradient updates.
             weights_distribution: Distribution for embedding weights.
-            **kwargs: Additional keyword arguments.
+            **kwargs: Extra arguments passed to the base class.
 
         Returns:
             None.

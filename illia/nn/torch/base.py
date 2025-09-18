@@ -23,8 +23,7 @@ class BayesianModule(torch.nn.Module, ABC):
         Sets `frozen` to False and `is_bayesian` to True.
 
         Args:
-            **kwargs: Additional keyword arguments for the base
-                torch.nn.Module class.
+            **kwargs: Extra arguments passed to the base class.
 
         Returns:
             None.

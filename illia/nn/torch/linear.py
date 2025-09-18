@@ -38,7 +38,7 @@ class Linear(BayesianModule):
             bias_distribution: GaussianDistribution for the bias of the layer.
                 Defaults to None.
             use_bias: Whether to include a bias term.
-            **kwargs: Additional keyword arguments.
+            **kwargs: Extra arguments passed to the base class.
 
         Returns:
             None.

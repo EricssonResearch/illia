@@ -44,7 +44,7 @@ class Embedding(BayesianModule):
             scale_grad_by_freq: Scale gradients by inverse word frequency.
             weights_distribution: Distribution to initialize embeddings.
             rngs: Random number generators for reproducibility.
-            **kwargs: Additional arguments passed to the base class.
+            **kwargs: Extra arguments passed to the base class.
 
         Returns:
             None.

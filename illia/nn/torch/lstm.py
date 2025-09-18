@@ -63,7 +63,7 @@ class LSTM(BayesianModule):
             norm_type: Norm type used for max_norm.
             scale_grad_by_freq: Scale gradient by inverse frequency.
             sparse: Use sparse embedding updates.
-            **kwargs: Additional keyword arguments.
+            **kwargs: Extra arguments passed to the base class.
 
         Returns:
             None.

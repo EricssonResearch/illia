@@ -48,7 +48,7 @@ class LSTM(BayesianModule):
             norm_type: p-norm for max_norm computation.
             scale_grad_by_freq: Scale gradients by token frequency.
             rngs: Random number generators for reproducibility.
-            **kwargs: Additional arguments for the base class.
+            **kwargs: Extra arguments passed to the base class.
 
         Returns:
             None.

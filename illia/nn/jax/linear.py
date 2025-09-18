@@ -51,7 +51,7 @@ class Linear(BayesianModule):
             precision: Precision for dot product computations.
             dot_general: Function for generalized dot products.
             rngs: Random number generators for reproducibility.
-            **kwargs: Additional arguments passed to the base class.
+            **kwargs: Extra arguments passed to the base class.
 
         Returns:
             None.

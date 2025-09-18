@@ -51,7 +51,7 @@ class Conv2d(BayesianModule):
             weights_distribution: Distribution for weights sampling.
             bias_distribution: Distribution for bias sampling.
             use_bias: Whether to include a bias term.
-            **kwargs: Additional keyword arguments.
+            **kwargs: Extra arguments passed to the base class.
 
         Returns:
             None.
