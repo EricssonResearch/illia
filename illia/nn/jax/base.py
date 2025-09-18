@@ -1,5 +1,6 @@
 # Standard libraries
 from abc import ABC, abstractmethod
+from typing import Any
 
 # 3pps
 import jax
@@ -17,17 +18,22 @@ class BayesianModule(nnx.Module, ABC):
         Derived classes must implement `freeze` and `kl_cost`.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         """
         Initialize the module with default Bayesian-specific flags.
         Sets `frozen` to False and `is_bayesian` to True.
+
+        Args:
+            **kwargs: Additional keyword arguments for the Layer base class.
 
         Returns:
             None.
         """
 
-        super().__init__()
+        # Call super class constructor
+        super().__init__(**kwargs)
 
+        # Set attributes
         self.frozen: bool = False
         self.is_bayesian: bool = True
 

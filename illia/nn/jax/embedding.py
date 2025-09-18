@@ -50,6 +50,7 @@ class Embedding(BayesianModule):
             weights_distribution: distribution for the weights of the
                 layer.
             rngs: Random number generators for reproducibility.
+            **kwargs: Additional keyword arguments for the Layer base class.
 
         Returns:
             None.

@@ -49,6 +49,7 @@ class Linear(BayesianModule):
             precision: Precision used in dot product operations.
             dot_general: Function for computing generalized dot
                 products.
+            **kwargs: Additional keyword arguments for the Layer base class.
 
         Returns:
             None.

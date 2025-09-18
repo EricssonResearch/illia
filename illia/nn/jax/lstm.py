@@ -48,6 +48,7 @@ class LSTM(BayesianModule):
             norm_type: p-norm type for max_norm computation.
             scale_grad_by_freq: Whether to scale gradients by token frequency.
             rngs: Random number generators for reproducibility.
+            **kwargs: Additional keyword arguments for the Layer base class.
 
         Returns:
             None.
