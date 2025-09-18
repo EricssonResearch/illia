@@ -1,7 +1,3 @@
-"""
-This module contains the code for the bayesian LSTM.
-"""
-
 # Standard libraries
 from typing import Any, Optional
 
@@ -16,7 +12,9 @@ from illia.nn.torch.embedding import Embedding
 
 class LSTM(BayesianModule):
     """
-    This class is the bayesian implementation of the torch LSTM layer.
+    Bayesian LSTM layer with embedding and probabilistic weights.
+    All weights and biases are sampled from Gaussian distributions.
+    Freezing the layer fixes parameters and stops gradient computation.
     """
 
     # Forget gate
@@ -52,6 +50,28 @@ class LSTM(BayesianModule):
         sparse: bool = False,
         **kwargs: Any,
     ) -> None:
+        """
+        Initializes the Bayesian LSTM layer.
+
+        Args:
+            num_embeddings: Size of the embedding dictionary.
+            embeddings_dim: Dimensionality of each embedding vector.
+            hidden_size: Number of hidden units in the LSTM.
+            output_size: Size of the final output.
+            padding_idx: Index to ignore in embeddings.
+            max_norm: Maximum norm for embedding vectors.
+            norm_type: Norm type used for max_norm.
+            scale_grad_by_freq: Scale gradient by inverse frequency.
+            sparse: Use sparse embedding updates.
+            **kwargs: Extra arguments passed to the base class.
+
+        Returns:
+            None.
+
+        Notes:
+            Gaussian distributions are used by default if none are
+            provided.
+        """
 
         # Call super-class constructor
         super().__init__(**kwargs)
@@ -143,8 +163,12 @@ class LSTM(BayesianModule):
     @torch.jit.export
     def freeze(self) -> None:
         """
-        Freezes the current module and all submodules that are instances
-        of BayesianModule. Sets the frozen state to True.
+        Freeze the module's parameters to stop gradient computation.
+        If weights or biases are not sampled yet, they are sampled first.
+        Once frozen, parameters are not resampled or updated.
+
+        Returns:
+            None.
         """
 
         # Set indicator
@@ -196,12 +220,12 @@ class LSTM(BayesianModule):
     @torch.jit.export
     def kl_cost(self) -> tuple[torch.Tensor, int]:
         """
-        Computes the Kullback-Leibler (KL) divergence cost for the
-        layer's weights and bias.
+        Compute the KL divergence cost for all Bayesian parameters.
 
         Returns:
-            Tuple containing KL divergence cost and total number of
-            parameters.
+            tuple[torch.Tensor, int]: A tuple containing the KL
+                divergence cost and the total number of parameters in
+                the layer.
         """
 
         # Compute log probs for each pair of weights and bias
@@ -258,12 +282,16 @@ class LSTM(BayesianModule):
         sampling.
 
         Args:
-            inputs: Input tensor to the layer. Dimensions: [batch,
+            inputs: Input tensor to the layer with shape [batch,
                 input channels, input width, input height].
 
         Returns:
-            Output tensor after passing through the layer. Dimensions:
+            Output tensor after passing through the layer with shape
                 [batch, output channels, output width, output height].
+
+        Raises:
+            ValueError: If the layer is frozen but weights are
+                undefined.
         """
 
         # Sample weights if not frozen
@@ -278,18 +306,24 @@ class LSTM(BayesianModule):
             self.bo = self.bo_distribution.sample()
             self.wv = self.wv_distribution.sample()
             self.bv = self.bv_distribution.sample()
-        else:
-            if any(w is None for w in [self.wf, self.wi, self.wc, self.wo, self.wv]):
-                self.wf = self.wf_distribution.sample()
-                self.bf = self.bf_distribution.sample()
-                self.wi = self.wi_distribution.sample()
-                self.bi = self.bi_distribution.sample()
-                self.wc = self.wc_distribution.sample()
-                self.bc = self.bc_distribution.sample()
-                self.wo = self.wo_distribution.sample()
-                self.bo = self.bo_distribution.sample()
-                self.wv = self.wv_distribution.sample()
-                self.bv = self.bv_distribution.sample()
+        elif any(
+            p is None
+            for p in [
+                self.wf,
+                self.bf,
+                self.wi,
+                self.bi,
+                self.wc,
+                self.bc,
+                self.wo,
+                self.bo,
+                self.wv,
+                self.bv,
+            ]
+        ):
+            raise ValueError(
+                "Module has been frozen with undefined weights and/or bias."
+            )
 
         # Apply embedding layer to input indices
         inputs = inputs.squeeze(dim=-1)

@@ -1,7 +1,3 @@
-"""
-This module contains the code for the bayesian Conv2d.
-"""
-
 # Standard libraries
 from typing import Any, Optional
 
@@ -16,7 +12,10 @@ from illia.nn.torch.base import BayesianModule
 
 class Conv2d(BayesianModule):
     """
-    This class is the bayesian implementation of the Conv2d class.
+    Bayesian 2D convolutional layer with optional weight and bias priors.
+    Behaves like a standard Conv2d but treats weights and bias as random
+    variables sampled from specified distributions. Parameters become fixed
+    when the layer is frozen.
     """
 
     weights: torch.Tensor
@@ -33,10 +32,11 @@ class Conv2d(BayesianModule):
         groups: int = 1,
         weights_distribution: Optional[GaussianDistribution] = None,
         bias_distribution: Optional[GaussianDistribution] = None,
+        use_bias: bool = True,
         **kwargs: Any,
     ) -> None:
         """
-        Definition of a Bayesian Convolution 2D layer.
+        Initializes a Bayesian 2D convolutional layer.
 
         Args:
             kernel_size: Size of the convolving kernel.
@@ -47,6 +47,15 @@ class Conv2d(BayesianModule):
                 to output channels.
             weights_distribution: The distribution for the weights.
             bias_distribution: The distribution for the bias.
+            use_bias: Whether to include a bias term.
+            **kwargs: Extra arguments passed to the base class.
+
+        Returns:
+            None.
+
+        Notes:
+            Gaussian distributions are used by default if none are
+            provided.
         """
 
         # Call super class constructor
@@ -60,6 +69,7 @@ class Conv2d(BayesianModule):
         self.padding = padding
         self.dilation = dilation
         self.groups = groups
+        self.use_bias = use_bias
 
         # Set weights distribution
         if weights_distribution is None:
@@ -79,25 +89,35 @@ class Conv2d(BayesianModule):
             self.weights_distribution = weights_distribution
 
         # Set bias distribution
-        if bias_distribution is None:
-            # Define weights distribution
-            self.bias_distribution = GaussianDistribution((self.output_channels,))
+        if self.use_bias:
+            if bias_distribution is None:
+                self.bias_distribution = GaussianDistribution((self.output_channels,))
+            else:
+                self.bias_distribution = bias_distribution
         else:
-            self.bias_distribution = bias_distribution
+            self.bias_distribution = None  # type: ignore
 
         # Sample initial weights
         weights = self.weights_distribution.sample()
-        bias = self.bias_distribution.sample()
 
         # Register buffers
         self.register_buffer("weights", weights)
-        self.register_buffer("bias", bias)
+
+        if self.use_bias and self.bias_distribution is not None:
+            bias = self.bias_distribution.sample()
+            self.register_buffer("bias", bias)
+        else:
+            self.bias = None  # type: ignore
 
     @torch.jit.export
     def freeze(self) -> None:
         """
-        Freezes the current module and all submodules that are instances
-        of BayesianModule. Sets the frozen state to True.
+        Freeze the module's parameters to stop gradient computation.
+        If weights or biases are not sampled yet, they are sampled first.
+        Once frozen, parameters are not resampled or updated.
+
+        Returns:
+            None.
         """
 
         # Set indicator
@@ -107,34 +127,37 @@ class Conv2d(BayesianModule):
         if self.weights is None:
             self.weights = self.weights_distribution.sample()
 
-        # Sample bias is they are undefined
-        if self.bias is None:
-            self.bias = self.bias_distribution.sample()
+        # Sample bias if they are undefined and bias is used
+        if self.use_bias and self.bias_distribution is not None:
+            if not hasattr(self, "bias") or self.bias is None:
+                self.bias = self.bias_distribution.sample()
+            self.bias = self.bias.detach()
 
         # Detach weights and bias
         self.weights = self.weights.detach()
-        self.bias = self.bias.detach()
 
     @torch.jit.export
     def kl_cost(self) -> tuple[torch.Tensor, int]:
         """
-        Computes the Kullback-Leibler (KL) divergence cost for the
-        layer's weights and bias.
+        Compute the KL divergence cost for all Bayesian parameters.
 
         Returns:
-            Tuple containing KL divergence cost and total number of
-            parameters.
+            tuple[torch.Tensor, int]: A tuple containing the KL
+                divergence cost and the total number of parameters in
+                the layer.
         """
 
         # Compute log probs
-        log_probs: torch.Tensor = self.weights_distribution.log_prob(
-            self.weights
-        ) + self.bias_distribution.log_prob(self.bias)
+        log_probs: torch.Tensor = self.weights_distribution.log_prob(self.weights)
+
+        # Add bias log probs if bias is used
+        if self.use_bias and self.bias_distribution is not None:
+            log_probs += self.bias_distribution.log_prob(self.bias)
 
         # Compute number of parameters
-        num_params: int = (
-            self.weights_distribution.num_params() + self.bias_distribution.num_params()
-        )
+        num_params: int = self.weights_distribution.num_params()
+        if self.use_bias and self.bias_distribution is not None:
+            num_params += self.bias_distribution.num_params()
 
         return log_probs, num_params
 
@@ -147,31 +170,45 @@ class Conv2d(BayesianModule):
         sampling.
 
         Args:
-            inputs: Input tensor to the layer. Dimensions: [batch,
-                input channels, input width, input height].
+            inputs: Input tensor to the layer with shape (batch,
+                input channels, input width, input height).
 
         Returns:
-            Output tensor after passing through the layer. Dimensions:
-                [batch, output channels, output width, output height].
+            Output tensor after passing through the layer with shape
+                (batch, output channels, output width, output height).
+
+        Raises:
+            ValueError: If the layer is frozen but weights or bias are
+                undefined.
         """
 
-        # Forward depending of frozen state
+        # Check if layer is frozen
         if not self.frozen:
             self.weights = self.weights_distribution.sample()
-            self.bias = self.bias_distribution.sample()
-        else:
-            if self.weights is None or self.bias is None:
-                self.weights = self.weights_distribution.sample()
-                self.bias = self.bias_distribution.sample()
 
-        # Execute torch forward
+            # Sample bias only if using bias
+            if self.use_bias and self.bias_distribution is not None:
+                self.bias = self.bias_distribution.sample()
+        elif self.weights is None or (self.use_bias and self.bias is None):
+            raise ValueError(
+                "Module has been frozen with undefined weights and/or bias."
+            )
+
+        # Compute outputs
         # pylint: disable=E1102
-        return F.conv2d(
+        outputs: torch.Tensor = F.conv2d(
             input=inputs,
             weight=self.weights,
             bias=self.bias,
-            stride=self.stride,
             padding=self.padding,
             dilation=self.dilation,
             groups=self.groups,
         )
+
+        # Add bias only if using bias
+        if self.use_bias and self.bias is not None:
+            outputs += torch.reshape(
+                input=self.bias, shape=(1, self.output_channels, 1, 1)
+            )
+
+        return outputs

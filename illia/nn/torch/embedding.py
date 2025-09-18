@@ -1,7 +1,3 @@
-"""
-This module contains the code for bayesian Embedding layer.
-"""
-
 # Standard libraries
 from typing import Any, Optional
 
@@ -34,7 +30,7 @@ class Embedding(BayesianModule):
         **kwargs: Any,
     ) -> None:
         """
-        This method is the constructor of the embedding class.
+        Initializes a Embedding layer.
 
         Args:
             num_embeddings: size of the dictionary of embeddings.
@@ -52,24 +48,32 @@ class Embedding(BayesianModule):
                 sparse tensor.
             weights_distribution: distribution for the weights of the
                 layer.
+            **kwargs: Extra arguments passed to the base class.
+
+        Returns:
+            None.
+
+        Notes:
+            Gaussian distributions are used by default if none are
+            provided.
         """
 
         # Call super class constructor
         super().__init__(**kwargs)
 
         # Set embeddings atributtes
-        self.embedding_params: tuple[Any, ...] = (
-            padding_idx,
-            max_norm,
-            norm_type,
-            scale_grad_by_freq,
-            sparse,
-        )
+        self.num_embeddings = num_embeddings
+        self.embeddings_dim = embeddings_dim
+        self.padding_idx = padding_idx
+        self.max_norm = max_norm
+        self.norm_type = norm_type
+        self.scale_grad_by_freq = scale_grad_by_freq
+        self.sparse = sparse
 
         # Set weights distribution
         if weights_distribution is None:
             self.weights_distribution = GaussianDistribution(
-                (num_embeddings, embeddings_dim)
+                (self.num_embeddings, self.embeddings_dim)
             )
         else:
             self.weights_distribution = weights_distribution
@@ -83,8 +87,12 @@ class Embedding(BayesianModule):
     @torch.jit.export
     def freeze(self) -> None:
         """
-        Freezes the current module and all submodules that are instances
-        of BayesianModule. Sets the frozen state to True.
+        Freeze the module's parameters to stop gradient computation.
+        If weights or biases are not sampled yet, they are sampled first.
+        Once frozen, parameters are not resampled or updated.
+
+        Returns:
+            None.
         """
 
         # set indicator
@@ -100,12 +108,12 @@ class Embedding(BayesianModule):
     @torch.jit.export
     def kl_cost(self) -> tuple[torch.Tensor, int]:
         """
-        Computes the Kullback-Leibler (KL) divergence cost for the
-        layer's weights and bias.
+        Compute the KL divergence cost for all Bayesian parameters.
 
         Returns:
-            Tuple containing KL divergence cost and total number of
-            parameters.
+            tuple[torch.Tensor, int]: A tuple containing the KL
+                divergence cost and the total number of parameters in
+                the layer.
         """
 
         # get log posterior and log prior
@@ -123,11 +131,12 @@ class Embedding(BayesianModule):
         Args:
             inputs: input tensor. Dimensions: [*].
 
-        Raises:
-            ValueError: Module has been frozen with undefined weights.
-
         Returns:
             outputs tensor. Dimension: [*, embedding dim].
+
+        Raises:
+            ValueError: If the layer is frozen but weights are
+                undefined.
         """
 
         # Forward depeding of frozen state
@@ -137,8 +146,12 @@ class Embedding(BayesianModule):
             raise ValueError("Module has been frozen with undefined weights")
 
         # Run torch forward
-        outputs: torch.Tensor = F.embedding(
-            inputs, self.weights, *self.embedding_params
+        return F.embedding(
+            input=inputs,
+            weight=self.weights,
+            padding_idx=self.padding_idx,
+            max_norm=self.max_norm,
+            norm_type=self.norm_type,
+            scale_grad_by_freq=self.scale_grad_by_freq,
+            sparse=self.sparse,
         )
-
-        return outputs

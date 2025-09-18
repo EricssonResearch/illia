@@ -1,10 +1,3 @@
-"""
-Defines a Gaussian (Normal) distribution using Flax
-with trainable mean and standard deviation parameters. Includes
-methods for sampling from the distribution and computing
-log-probabilities of given inputs.
-"""
-
 # Standard libraries
 from typing import Any, Optional
 
@@ -20,16 +13,15 @@ from illia.distributions.jax.base import DistributionModule
 
 class GaussianDistribution(DistributionModule):
     """
-    Learnable Gaussian distribution using Flax.
-
-    Represents a diagonal Gaussian distribution with trainable mean and
-    standard deviation parameters. The standard deviation is derived from
-    `rho` using a softplus transformation to ensure positivity.
+    Learnable Gaussian distribution with diagonal covariance.
+    Represents a Gaussian with trainable mean and standard
+    deviation. The standard deviation is derived from `rho`
+    using a softplus transformation to ensure positivity.
 
     Notes:
-        Assumes a diagonal covariance matrix. KL divergence between
-        distributions can be computed using log-probability differences
-        obtained from `log_prob`.
+        Assumes diagonal covariance. KL divergence can be
+        estimated via log-probability differences from
+        `log_prob`.
     """
 
     def __init__(
@@ -43,19 +35,19 @@ class GaussianDistribution(DistributionModule):
         **kwargs: Any,
     ) -> None:
         """
-        Initializes the GaussianDistribution module.
+        Initialize a learnable Gaussian distribution module.
 
         Args:
             shape: Shape of the learnable parameters.
             mu_prior: Mean of the Gaussian prior.
             std_prior: Standard deviation of the prior.
             mu_init: Initial value for the learnable mean.
-            rho_init: Initial value for the learnable rho parameter.
+            rho_init: Initial value for the learnable rho.
             rngs: RNG container for parameter initialization.
-            **kwargs: Additional arguments passed to the base class.
+            **kwargs: Extra arguments passed to the base class.
 
         Returns:
-            None.
+            None
         """
 
         # Call super-class constructor
@@ -78,14 +70,16 @@ class GaussianDistribution(DistributionModule):
 
     def sample(self, rngs: Rngs = nnx.Rngs(0)) -> jax.Array:
         """
-        Generates and returns a sample from the Gaussian distribution.
+        Draw a sample from the Gaussian distribution.
 
         Args:
             rngs: RNG container used for sampling.
 
         Returns:
-            Sample array matching the shape and structure defined by
-            the distribution parameters.
+            jax.Array: A sample drawn from the distribution.
+
+        Notes:
+            Sampling is reproducible with the same RNG.
         """
 
         # Compute epsilon and sigma
@@ -96,19 +90,19 @@ class GaussianDistribution(DistributionModule):
 
     def log_prob(self, x: Optional[jax.Array] = None) -> jax.Array:
         """
-        Computes the log-probability of an input sample.
-        If no sample is provided, a new one is drawn internally from the
-        current distribution before computing the log-probability.
+        Compute the log-probability of a given sample. If no
+        sample is provided, one is drawn internally.
 
         Args:
-            x: Optional sample tensor to evaluate.
+            x: Optional input sample to evaluate. If None,
+                a new sample is drawn from the distribution.
 
         Returns:
-            Scalar tensor representing the computed log-probability.
+            jax.Array: Scalar log-probability value.
 
         Notes:
-            This method supports both user-supplied samples and internally
-            generated ones for convenience when evaluating likelihoods.
+            Supports both user-supplied and internally drawn
+            samples.
         """
 
         # Sample if x is None
@@ -145,20 +139,21 @@ class GaussianDistribution(DistributionModule):
     @property
     def num_params(self) -> int:
         """
-        Returns the total number of learnable parameters in the distribution.
+        Return the number of learnable parameters in the
+        distribution.
 
         Returns:
-            Integer representing the total number of learnable parameters.
+            int: Total count of learnable parameters.
         """
 
         return len(self.mu.reshape(-1))
 
     def __call__(self) -> jax.Array:
         """
-        Performs a forward pass by sampling from the distribution.
+        Perform a forward pass by drawing a sample.
 
         Returns:
-            A sample from the distribution.
+            jax.Array: A sample from the distribution.
         """
 
         return self.sample()

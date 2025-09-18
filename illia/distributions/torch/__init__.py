@@ -1,7 +1,8 @@
 """
-This module consolidates and exposes distribution-related classes
-implemented in PyTorch. It imports core base classes and specific
-distribution implementations for easier access in other modules.
+This module provides a unified interface for distribution-related
+classes implemented in PyTorch. It imports the fundamental base class
+along with specific distribution implementations, facilitating their
+accessibility and use in other modules.
 """
 
 # Own modules

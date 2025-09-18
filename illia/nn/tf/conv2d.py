@@ -1,7 +1,3 @@
-"""
-This module contains the code for the bayesian Conv2d.
-"""
-
 # Standard libraries
 from typing import Any, Optional
 
@@ -17,7 +13,10 @@ from illia.nn.tf.base import BayesianModule
 @saving.register_keras_serializable(package="illia", name="Conv2d")
 class Conv2d(BayesianModule):
     """
-    This class is the bayesian implementation of the Conv2d class.
+    Bayesian 2D convolutional layer with optional weight and bias priors.
+    Behaves like a standard Conv2d but treats weights and bias as random
+    variables sampled from specified distributions. Parameters become fixed
+    when the layer is frozen.
     """
 
     bias_distribution: Optional[GaussianDistribution] = None
@@ -38,26 +37,28 @@ class Conv2d(BayesianModule):
         **kwargs: Any,
     ) -> None:
         """
-        Initializes a Bayesian Conv2d layer.
+        Initializes a Bayesian 2D convolutional layer.
 
         Args:
-            input_channels: The number of channels in the input image.
-            output_channels: The number of channels produced by the
-                convolution.
-            kernel_size: The size of the convolving kernel.
-            stride: The stride of the convolution.
-            padding: The padding added to all four sides of the input.
-                Can be 'VALID' or 'SAME'.
-            dilation: The spacing between kernel elements.
-            groups: The number of blocked connections from input channels
-                to output channels.
-            data_format: The data format for the convolution, either
-                'NHWC' or 'NCHW'.
-            weights_distribution: The Gaussian distribution for the
-                weights, if applicable.
-            bias_distribution: The Gaussian distribution for the bias,
-                if applicable.
-            **kwargs: Additional keyword arguments.
+            input_channels: Number of channels in the input image.
+            output_channels: Number of channels produced by the conv.
+            kernel_size: Convolution kernel size as int or list.
+            stride: Convolution stride as int or list.
+            padding: Padding type 'VALID', 'SAME', or list of ints.
+            dilation: Spacing between kernel elements as int or list.
+            groups: Number of blocked connections between input/output.
+            data_format: 'NHWC' or 'NCHW' format for input data.
+            weights_distribution: Distribution for weights sampling.
+            bias_distribution: Distribution for bias sampling.
+            use_bias: Whether to include a bias term.
+            **kwargs: Extra arguments passed to the base class.
+
+        Returns:
+            None.
+
+        Notes:
+            Gaussian distributions are used by default if none are
+            provided.
         """
 
         # Call super class constructor
@@ -119,22 +120,17 @@ class Conv2d(BayesianModule):
         data_format: Optional[str],
     ) -> None:
         """
-        Checks the validity of the parameters for the convolution
-        operation.
+        Validates parameters for the 2D convolution operation.
 
         Args:
-            kernel_size: The size of the convolving kernel.
-            groups: The number of blocked connections from input
-                channels to output channels.
-            stride: The stride of the convolution.
-            dilation: The spacing between kernel elements.
-            data_format: The data format for the convolution, either
-                "NHWC" or "NCHW".
+            kernel_size: Convolution kernel size.
+            groups: Number of blocked connections.
+            stride: Convolution stride as int or list.
+            dilation: Kernel spacing as int or list.
+            data_format: 'NHWC' or 'NCHW' for input tensor.
 
         Raises:
-            ValueError: If the kernel size is invalid, the groups is
-                invalid, the stride is invalid, the dilation is
-                invalid, or the data format is invalid.
+            ValueError: If any parameter is invalid.
         """
 
         if kernel_size is not None and isinstance(kernel_size, int):
@@ -160,10 +156,13 @@ class Conv2d(BayesianModule):
 
     def build(self, input_shape: tf.TensorShape) -> None:
         """
-        Builds the Conv2d layer.
+        Build trainable and non-trainable parameters.
 
         Args:
-            input_shape: Input shape of the layer.
+            input_shape: Input shape used to trigger layer build.
+
+        Returns:
+            None
         """
 
         # Register non-trainable variables
@@ -176,7 +175,7 @@ class Conv2d(BayesianModule):
             trainable=False,
         )
 
-        if self.use_bias and self.bias_distribution:
+        if self.use_bias and self.bias_distribution is not None:
             self.b = self.add_weight(
                 name="bias",
                 initializer=tf.constant_initializer(
@@ -191,10 +190,10 @@ class Conv2d(BayesianModule):
 
     def get_config(self) -> dict:
         """
-        Retrieves the configuration of the Conv2d layer.
+        Return the configuration dictionary for serialization.
 
         Returns:
-            Dictionary containing layer configuration.
+            dict: Dictionary with the layer configuration.
         """
 
         # Get the base configuration
@@ -225,21 +224,18 @@ class Conv2d(BayesianModule):
         dilation: Optional[int | list[int]] = None,
     ) -> tf.Tensor:
         """
-        Applies a 2D convolution operation to the input tensor.
+        Performs a 2D convolution using provided weights.
 
         Args:
-            inputs: The input tensor.
-            weight: The convolutional kernel weights.
-            stride: The stride of the convolution.
-            padding: The padding strategy to be applied, either
-                'VALID' or 'SAME'.
-            data_format: The data format for the input tensor, either
-                'NHWC' or 'NCHW'.
-            dilation: The dilation rate for spacing between kernel
-                elements.
+            inputs: Input tensor.
+            weight: Convolutional kernel tensor.
+            stride: Convolution stride as int or list.
+            padding: Padding type 'VALID', 'SAME', or list of ints.
+            data_format: 'NHWC' or 'NCHW' input format.
+            dilation: Kernel spacing as int or list.
 
         Returns:
-            The output tensor after applying the 1D convolution.
+            Tensor after 2D convolution.
         """
 
         output: tf.Tensor = tf.nn.conv2d(
@@ -255,8 +251,12 @@ class Conv2d(BayesianModule):
 
     def freeze(self) -> None:
         """
-        Freezes the current module and all submodules that are instances
-        of BayesianModule. Sets the frozen state to True.
+        Freeze the module's parameters to stop gradient computation.
+        If weights or biases are not sampled yet, they are sampled first.
+        Once frozen, parameters are not resampled or updated.
+
+        Returns:
+            None.
         """
 
         # Set indicator
@@ -267,7 +267,7 @@ class Conv2d(BayesianModule):
             self.w = self.weights_distribution.sample()
 
         # Sample bias is they are undefined
-        if self.use_bias is None and self.bias_distribution:
+        if self.use_bias and self.b is None and self.bias_distribution is not None:
             self.b = self.bias_distribution.sample()
 
         # Stop gradient computation
@@ -277,24 +277,23 @@ class Conv2d(BayesianModule):
 
     def kl_cost(self) -> tuple[tf.Tensor, int]:
         """
-        Computes the Kullback-Leibler (KL) divergence cost for the
-        layer's weights and bias.
+        Compute the KL divergence cost for all Bayesian parameters.
 
         Returns:
-            Tuple containing KL divergence cost and total number of
-            parameters.
+            tuple[tf.Tensor, int]: A tuple containing the KL divergence
+                cost and the total number of parameters in the layer.
         """
 
         # Compute log probs
         log_probs: tf.Tensor = self.weights_distribution.log_prob(self.w)
 
         # Add bias log probs only if using bias
-        if self.use_bias and self.bias_distribution:
+        if self.use_bias and self.b is not None and self.bias_distribution is not None:
             log_probs += self.bias_distribution.log_prob(self.b)
 
         # Compute number of parameters
         num_params: int = self.weights_distribution.num_params
-        if self.use_bias and self.bias_distribution:
+        if self.use_bias and self.bias_distribution is not None:
             num_params += self.bias_distribution.num_params
 
         return log_probs, num_params
@@ -308,12 +307,15 @@ class Conv2d(BayesianModule):
         sampling.
 
         Args:
-            inputs: Input tensor to the layer. Dimensions: [batch,
-                input channels, input width, input height].
+            inputs: Input tensor with shape [batch, height, width,
+                channels] if NHWC or [batch, channels, height, width] if NCHW.
 
         Returns:
-            Output tensor after passing through the layer. Dimensions:
-                [batch, output channels, output width, output height].
+            Output tensor after convolution with optional bias added.
+
+        Raises:
+            ValueError: If the layer is frozen but weights or bias are
+                undefined.
         """
 
         # Check if layer is frozen
@@ -321,9 +323,9 @@ class Conv2d(BayesianModule):
             self.w = self.weights_distribution.sample()
 
             # Sample bias only if using bias
-            if self.use_bias and self.bias_distribution:
+            if self.use_bias and self.bias_distribution is not None:
                 self.b = self.bias_distribution.sample()
-        elif self.w is None or self.b is None:
+        elif self.w is None or (self.use_bias and self.b is None):
             raise ValueError(
                 "Module has been frozen with undefined weights and/or bias."
             )
@@ -339,7 +341,7 @@ class Conv2d(BayesianModule):
         )
 
         # Add bias only if using bias
-        if self.use_bias is not None:
+        if self.use_bias and self.b is not None:
             outputs = tf.nn.bias_add(
                 value=outputs,
                 bias=self.b,

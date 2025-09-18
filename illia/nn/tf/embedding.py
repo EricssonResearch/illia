@@ -1,7 +1,3 @@
-"""
-This module contains the code for Embedding Bayesian layer.
-"""
-
 # Standard libraries
 from typing import Any, Optional
 
@@ -17,7 +13,9 @@ from illia.nn.tf.base import BayesianModule
 @saving.register_keras_serializable(package="illia", name="Embedding")
 class Embedding(BayesianModule):
     """
-    This class is the bayesian implementation of the Embedding class.
+    Bayesian embedding layer with optional padding and max-norm. Each
+    embedding vector is sampled from a specified distribution. Can be
+    frozen to fix embeddings and stop gradients.
     """
 
     def __init__(
@@ -33,25 +31,25 @@ class Embedding(BayesianModule):
         **kwargs: Any,
     ) -> None:
         """
-        This method is the constructor of the embedding class.
+        Initializes a Bayesian Embedding layer.
 
         Args:
-            num_embeddings: Size of the dictionary of embeddings.
-            embeddings_dim: The size of each embedding vector.
-            padding_idx: If specified, the entries at padding_idx do
-                not contribute to the gradient.
-            max_norm: If given, each embedding vector with norm larger
-                than max_norm is renormalized to have norm max_norm.
-            norm_type: The p of the p-norm to compute for the max_norm
-                option.
-            scale_grad_by_freq: If given, this will scale gradients by
-                the inverse of frequency of the words in the
-                mini-batch.
-            sparse: If True, gradient w.r.t. weight matrix will be a
-                sparse tensor.
-            weights_distribution: The Gaussian distribution for the
-                weights, if applicable.
-            **kwargs: Additional keyword arguments.
+            num_embeddings: Size of the embedding dictionary.
+            embeddings_dim: Dimensionality of each embedding vector.
+            padding_idx: Index to exclude from gradient computation.
+            max_norm: Maximum norm for embedding vectors.
+            norm_type: p of the p-norm for max_norm.
+            scale_grad_by_freq: Scale gradient by inverse frequency.
+            sparse: Use sparse gradient updates.
+            weights_distribution: Distribution for embedding weights.
+            **kwargs: Extra arguments passed to the base class.
+
+        Returns:
+            None.
+
+        Notes:
+            Gaussian distributions are used by default if none are
+            provided.
         """
 
         # Call super class constructor
@@ -76,10 +74,13 @@ class Embedding(BayesianModule):
 
     def build(self, input_shape: tf.TensorShape) -> None:
         """
-        Builds the Embedding layer.
+        Build trainable and non-trainable parameters.
 
         Args:
-            input_shape: Input shape of the layer.
+            input_shape: Input shape used to trigger layer build.
+
+        Returns:
+            None
         """
 
         # Create a variable for weights
@@ -97,10 +98,10 @@ class Embedding(BayesianModule):
 
     def get_config(self) -> dict:
         """
-        Retrieves the configuration of the Embedding layer.
+        Return the configuration dictionary for serialization.
 
         Returns:
-            Dictionary containing layer configuration.
+            dict: Dictionary with the layer configuration.
         """
 
         # Get the base configuration
@@ -130,19 +131,18 @@ class Embedding(BayesianModule):
         sparse: bool = False,
     ) -> tf.Tensor:
         """
-        Computes the embedding lookup with optional padding and
-        normalization.
+        Computes embedding lookup with optional padding and normalization.
 
         Args:
-            inputs: Input tensor for lookup.
-            weight: Weight tensor for embeddings.
-            padding_idx: Index to pad embeddings.
+            inputs: Input tensor of indices.
+            weight: Embedding weight tensor.
+            padding_idx: Index to mask out.
             max_norm: Maximum norm for embeddings.
-            norm_type: Norm type for normalization.
-            sparse: Use sparse lookup.
+            norm_type: Norm type for max_norm.
+            sparse: Use sparse lookup if True.
 
         Returns:
-            Tensor containing the computed embeddings.
+            Tensor of embeddings.
         """
 
         inputs = tf.cast(inputs, tf.int32)
@@ -167,8 +167,12 @@ class Embedding(BayesianModule):
 
     def freeze(self) -> None:
         """
-        Freezes the current module and all submodules that are instances
-        of BayesianModule. Sets the frozen state to True.
+        Freeze the module's parameters to stop gradient computation.
+        If weights or biases are not sampled yet, they are sampled first.
+        Once frozen, parameters are not resampled or updated.
+
+        Returns:
+            None.
         """
 
         # Set indicator
@@ -183,12 +187,11 @@ class Embedding(BayesianModule):
 
     def kl_cost(self) -> tuple[tf.Tensor, int]:
         """
-        Computes the Kullback-Leibler (KL) divergence cost for the
-        layer's weights.
+        Compute the KL divergence cost for all Bayesian parameters.
 
         Returns:
-            Tuple containing KL divergence cost and total number of
-            parameters.
+            tuple[tf.Tensor, int]: A tuple containing the KL divergence
+                cost and the total number of parameters in the layer.
         """
 
         # Get log probs
@@ -201,20 +204,17 @@ class Embedding(BayesianModule):
 
     def call(self, inputs: tf.Tensor) -> tf.Tensor:
         """
-        Performs a forward pass through the Bayesian Embedding layer.
-
-        Samples weights from their posterior distributions if
-        the layer is not frozen. If frozen and not initialized, samples
-        them once.
+        Performs embedding lookup using current weights.
 
         Args:
-            inputs: input tensor. Dimensions: [batch, *].
-
-        Raises:
-            ValueError: Module has been frozen with undefined weights.
+            inputs: Input tensor of indices with shape [batch, *].
 
         Returns:
-            Output tensor after linear transformation.
+            Tensor of embeddings.
+
+        Raises:
+            ValueError: If the layer is frozen but weights are
+                undefined.
         """
 
         # Check if layer is frozen

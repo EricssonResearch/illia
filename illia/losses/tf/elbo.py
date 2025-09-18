@@ -1,8 +1,3 @@
-"""
-This module implements  the Evidence Lower Bound
-(ELBO) loss for Bayesian neural networks in TensorFlow.
-"""
-
 # Standard libraries
 from typing import Any, Callable
 
@@ -17,11 +12,15 @@ from illia.losses.tf.kl import KLDivergenceLoss
 @saving.register_keras_serializable(package="illia", name="ELBOLoss")
 class ELBOLoss(losses.Loss):
     """
-    Computes the Evidence Lower Bound (ELBO) loss function for
-    Bayesian neural networks.
+    Compute the Evidence Lower Bound (ELBO) loss for Bayesian
+    networks. Combines a reconstruction loss with a KL divergence
+    term. Monte Carlo sampling can estimate the expected
+    reconstruction loss over stochastic layers.
 
-    This combines a reconstruction loss and a KL divergence term,
-    estimated using Monte Carlo sampling.
+    Notes:
+        The KL term is weighted by `kl_weight`. The model is
+        assumed to contain Bayesian layers compatible with
+        `KLDivergenceLoss`.
     """
 
     def __init__(
@@ -32,15 +31,19 @@ class ELBOLoss(losses.Loss):
         **kwargs: Any,
     ) -> None:
         """
-        Initializes the ELBO loss with sampling and KL scaling.
+        Initialize the ELBO loss with reconstruction and KL
+        components.
 
         Args:
-            loss_function: Module for computing reconstruction loss.
-            num_samples: Number of MC samples for estimation.
-            kl_weight: Weight applied to the KL loss.
+            loss_function: Function used to compute reconstruction
+                loss.
+            num_samples: Number of Monte Carlo samples used for
+                estimation.
+            kl_weight: Weight applied to the KL divergence term.
+            **kwargs: Extra arguments passed to the base class.
 
         Returns:
-            None.
+            None
         """
 
         # Call super class constructor
@@ -54,10 +57,10 @@ class ELBOLoss(losses.Loss):
 
     def get_config(self) -> dict:
         """
-        Returns the configuration of the ELBO loss.
+        Return the configuration dictionary for serialization.
 
         Returns:
-            Dictionary with configuration values.
+            dict: Dictionary containing the layer configuration.
         """
 
         # Get the base configuration
@@ -77,16 +80,22 @@ class ELBOLoss(losses.Loss):
         self, y_true: tf.Tensor, y_pred: tf.Tensor, *args: Any, **kwargs: Any
     ) -> tf.Tensor:
         """
-        Computes the ELBO loss using KL regularization and reconstruction error.
+        Compute the ELBO loss with Monte Carlo sampling and KL
+        regularization.
 
         Args:
             y_true: Ground truth targets.
-            y_pred: Model predictions.
+            y_pred: Predictions from the model.
             *args: Unused positional arguments.
-            **kwargs: Must include 'model' containing Bayesian layers.
+            **kwargs: Must include 'model' containing Bayesian
+                layers.
 
         Returns:
-            Scalar tensor representing the total ELBO loss.
+            tf.Tensor: Scalar ELBO loss averaged over samples.
+
+        Notes:
+            The loss is averaged over `num_samples` Monte Carlo
+            draws.
         """
 
         model = kwargs.get("model")

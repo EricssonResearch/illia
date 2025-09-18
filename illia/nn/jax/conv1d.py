@@ -1,7 +1,3 @@
-"""
-This module contains the code for the bayesian Conv1d.
-"""
-
 # Standard libraries
 from typing import Any, Optional
 
@@ -18,7 +14,10 @@ from illia.nn.jax.base import BayesianModule
 
 class Conv1d(BayesianModule):
     """
-    This class is the bayesian implementation of the Conv1d class.
+    Bayesian 1D convolutional layer with optional weight and bias priors.
+    Behaves like a standard Conv1d but treats weights and bias as random
+    variables sampled from specified distributions. Parameters become fixed
+    when the layer is frozen.
     """
 
     bias_distribution: Optional[GaussianDistribution] = None
@@ -40,23 +39,28 @@ class Conv1d(BayesianModule):
         **kwargs: Any,
     ) -> None:
         """
-        Definition of a Bayesian Convolution 1D layer.
+        Initializes a Bayesian 1D convolutional layer.
 
         Args:
             input_channels: Number of input feature channels.
             output_channels: Number of output feature channels.
-            kernel_size: Size of the convolutional kernel.
+            kernel_size: Size of the convolution kernel.
             stride: Stride of the convolution operation.
-            padding: Amount of zero-padding added to both sides.
+            padding: Amount of zero-padding on both sides.
             dilation: Spacing between kernel elements.
             groups: Number of blocked connections between input and output.
             weights_distribution: Distribution to initialize weights.
             bias_distribution: Distribution to initialize bias.
             use_bias: Whether to include a bias term.
             rngs: Random number generators for reproducibility.
+            **kwargs: Extra arguments passed to the base class.
 
         Returns:
             None.
+
+        Notes:
+            Gaussian distributions are used by default if none are
+            provided.
         """
 
         # Call super class constructor
@@ -102,15 +106,16 @@ class Conv1d(BayesianModule):
         self.weights = nnx.Param(self.weights_distribution.sample(self.rngs))
 
         # Sample initial bias only if using bias
-        if self.use_bias and self.bias_distribution:
+        if self.use_bias and self.bias_distribution is not None:
             self.bias = nnx.Param(self.bias_distribution.sample(self.rngs))
         else:
             self.bias = None
 
     def freeze(self) -> None:
         """
-        Freezes the current module and all submodules that are instances
-        of BayesianModule. Sets the frozen state to True.
+        Freeze the module's parameters to stop gradient computation.
+        If weights or biases are not sampled yet, they are sampled first.
+        Once frozen, parameters are not resampled or updated.
 
         Returns:
             None.
@@ -124,22 +129,21 @@ class Conv1d(BayesianModule):
             self.weights = nnx.Param(self.weights_distribution.sample(self.rngs))
 
         # Sample bias if they are undefined and bias is used
-        if self.use_bias and self.bias is None and self.bias_distribution:
+        if self.use_bias and self.bias is None and self.bias_distribution is not None:
             self.bias = nnx.Param(self.bias_distribution.sample(self.rngs))
 
         # Stop gradient computation
         self.weights = jax.lax.stop_gradient(self.weights)
-        if self.use_bias and self.bias:
+        if self.use_bias:
             self.bias = jax.lax.stop_gradient(self.bias)
 
     def kl_cost(self) -> tuple[jax.Array, int]:
         """
-        Computes the Kullback-Leibler (KL) divergence cost for the
-        layer's weights and bias.
+        Compute the KL divergence cost for all Bayesian parameters.
 
         Returns:
-            Tuple containing KL divergence cost and total number of
-            parameters.
+            tuple[jax.Array, int]: A tuple containing the KL divergence
+                cost and the total number of parameters in the layer.
         """
 
         # Compute log probs for weights
@@ -148,27 +152,38 @@ class Conv1d(BayesianModule):
         )
 
         # Add bias log probs only if using bias
-        if self.use_bias and self.bias and self.bias_distribution:
+        if (
+            self.use_bias
+            and self.bias is not None
+            and self.bias_distribution is not None
+        ):
             log_probs += self.bias_distribution.log_prob(jnp.asarray(self.bias))
 
         # Compute number of parameters
         num_params: int = self.weights_distribution.num_params
-        if self.use_bias and self.bias_distribution:
+        if self.use_bias and self.bias_distribution is not None:
             num_params += self.bias_distribution.num_params
 
         return log_probs, num_params
 
     def __call__(self, inputs: jax.Array) -> jax.Array:
         """
-        Applies the convolution operation to the inputs using current weights
-        and bias. If the model is not frozen, samples new weights and bias
-        before computation.
+        Performs a forward pass through the Bayesian Convolution 1D
+        layer. If the layer is not frozen, it samples weights and bias
+        from their respective distributions. If the layer is frozen
+        and the weights or bias are not initialized, it also performs
+        sampling.
 
         Args:
-            inputs: Input array to be convolved.
+            inputs: Input tensor to the layer with shape
+                (batch, channels, length).
 
         Returns:
-            Output array after applying convolution and bias.
+            Output array after convolution with optional bias added.
+
+        Raises:
+            ValueError: If the layer is frozen but weights or bias are
+                undefined.
         """
 
         # Sample if model not frozen
@@ -177,8 +192,12 @@ class Conv1d(BayesianModule):
             self.weights = nnx.Param(self.weights_distribution.sample(self.rngs))
 
             # Sample bias only if using bias
-            if self.bias is None and self.use_bias and self.bias_distribution:
+            if self.use_bias and self.bias_distribution is not None:
                 self.bias = nnx.Param(self.bias_distribution.sample(self.rngs))
+        elif self.weights is None or (self.use_bias and self.bias is None):
+            raise ValueError(
+                "Module has been frozen with undefined weights and/or bias."
+            )
 
         # Compute outputs
         outputs = jax.lax.conv_general_dilated(

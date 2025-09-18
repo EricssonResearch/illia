@@ -1,7 +1,3 @@
-"""
-This module contains the code for Linear Bayesian layer.
-"""
-
 # Standard libraries
 from typing import Any, Optional
 
@@ -20,7 +16,10 @@ from illia.nn.jax.base import BayesianModule
 
 class Linear(BayesianModule):
     """
-    This class is the bayesian implementation of the Linear class.
+    Bayesian linear (fully connected) layer with optional weight and bias
+    priors. Functions like a standard linear layer but treats weights and
+    bias as probabilistic variables. Freezing the layer fixes parameters
+    and stops gradient computation.
     """
 
     bias_distribution: Optional[GaussianDistribution] = None
@@ -39,20 +38,27 @@ class Linear(BayesianModule):
         **kwargs: Any,
     ) -> None:
         """
-        This is the constructor of the Linear class.
+        Initialize a Bayesian linear layer with optional priors for weights
+        and bias. Samples initial parameter values from the specified
+        distributions.
 
         Args:
-            input_size: Size of the input features.
-            output_size: Size of the output features.
-            weights_distribution: Prior distribution of the weights.
-            bias_distribution: Prior distribution of the bias.
-            use_bias: Whether to include a bias term in the layer.
-            precision: Precision used in dot product operations.
-            dot_general: Function for computing generalized dot
-                products.
+            input_size: Number of input features.
+            output_size: Number of output features.
+            weights_distribution: Distribution for weights.
+            bias_distribution: Distribution for bias.
+            use_bias: Whether to include a bias term.
+            precision: Precision for dot product computations.
+            dot_general: Function for generalized dot products.
+            rngs: Random number generators for reproducibility.
+            **kwargs: Extra arguments passed to the base class.
 
         Returns:
             None.
+
+        Notes:
+            Gaussian distributions are used by default if none are
+            provided.
         """
 
         # Call super class constructor
@@ -89,15 +95,16 @@ class Linear(BayesianModule):
         self.weights = nnx.Param(self.weights_distribution.sample(self.rngs))
 
         # Sample initial bias only if using bias
-        if self.use_bias and self.bias_distribution:
+        if self.use_bias and self.bias_distribution is not None:
             self.bias = nnx.Param(self.bias_distribution.sample(self.rngs))
         else:
             self.bias = None
 
     def freeze(self) -> None:
         """
-        Freezes the current module and all submodules that are instances
-        of BayesianModule. Sets the frozen state to True.
+        Freeze the module's parameters to stop gradient computation.
+        If weights or biases are not sampled yet, they are sampled first.
+        Once frozen, parameters are not resampled or updated.
 
         Returns:
             None.
@@ -111,22 +118,21 @@ class Linear(BayesianModule):
             self.weights = nnx.Param(self.weights_distribution.sample(self.rngs))
 
         # Sample bias if they are undefined and bias is used
-        if self.use_bias and self.bias is None and self.bias_distribution:
+        if self.use_bias and self.bias is None and self.bias_distribution is not None:
             self.bias = nnx.Param(self.bias_distribution.sample(self.rngs))
 
         # Stop gradient computation
         self.weights = jax.lax.stop_gradient(self.weights)
-        if self.use_bias and self.bias:
+        if self.use_bias:
             self.bias = jax.lax.stop_gradient(self.bias)
 
     def kl_cost(self) -> tuple[jax.Array, int]:
         """
-        Computes the Kullback-Leibler (KL) divergence cost for the
-        layer's weights and bias.
+        Compute the KL divergence cost for all Bayesian parameters.
 
         Returns:
-            Tuple containing KL divergence cost and total number of
-            parameters.
+            tuple[jax.Array, int]: A tuple containing the KL divergence
+                cost and the total number of parameters in the layer.
         """
 
         # Compute log probs for weights
@@ -135,25 +141,34 @@ class Linear(BayesianModule):
         )
 
         # Add bias log probs only if using bias
-        if self.use_bias and self.bias and self.bias_distribution:
+        if (
+            self.use_bias
+            and self.bias is not None
+            and self.bias_distribution is not None
+        ):
             log_probs += self.bias_distribution.log_prob(jnp.asarray(self.bias))
 
         # Compute number of parameters
         num_params: int = self.weights_distribution.num_params
-        if self.use_bias and self.bias_distribution:
+        if self.use_bias and self.bias_distribution is not None:
             num_params += self.bias_distribution.num_params
 
         return log_probs, num_params
 
     def __call__(self, inputs: jax.Array) -> jax.Array:
         """
-        This method is the forward pass of the model.
+        Perform a forward pass using current weights and bias. Samples new
+        parameters if the layer is not frozen.
 
         Args:
-            inputs: Inputs of the model. Dimensions: [*, input size].
+            inputs: Input array with shape [*, input_size].
 
         Returns:
-            Output tensor. Dimension: [*, output size].
+            Output array with shape [*, output_size].
+
+        Raises:
+            ValueError: If the layer is frozen but weights or bias are
+                undefined.
         """
 
         # Sample if model not frozen
@@ -162,14 +177,18 @@ class Linear(BayesianModule):
             self.weights = nnx.Param(self.weights_distribution.sample(self.rngs))
 
             # Sample bias only if using bias
-            if self.bias is None and self.use_bias and self.bias_distribution:
+            if self.use_bias and self.bias_distribution is not None:
                 self.bias = nnx.Param(self.bias_distribution.sample(self.rngs))
+        elif self.weights is None or (self.use_bias and self.bias is None):
+            raise ValueError(
+                "Module has been frozen with undefined weights and/or bias."
+            )
 
         # Compute outputs
         outputs = inputs @ self.weights.T
 
         # Add bias only if using bias
-        if self.use_bias and self.bias:
+        if self.use_bias and self.bias is not None:
             outputs += jnp.reshape(
                 jnp.asarray(self.bias), (1,) * (outputs.ndim - 1) + (-1,)
             )

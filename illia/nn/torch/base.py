@@ -1,11 +1,6 @@
-"""
-This module defines an abstract base class for Bayesian layers using
-PyTorch. It facilitates identifying, freezing, and computing KL
-costs for Bayesian-aware modules.
-"""
-
 # Standard libraries
 from abc import ABC
+from typing import Any
 
 # 3pps
 import torch
@@ -13,35 +8,46 @@ import torch
 
 class BayesianModule(torch.nn.Module, ABC):
     """
-    Abstract base for Bayesian-aware modules in Flax's nnx framework.
-    Any Bayesian layer should inherit from this class.
+    Abstract base for Bayesian-aware modules in PyTorch.
+    Provides mechanisms to track if a module is Bayesian and control
+    parameter updates through freezing/unfreezing.
+
+    Notes:
+        All derived classes must implement `freeze` and `kl_cost` to
+        handle parameter management and compute the KL divergence cost.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         """
-        Initializes the module with default Bayesian-specific flags.
+        Initialize the Bayesian module with default flags.
+        Sets `frozen` to False and `is_bayesian` to True.
+
+        Args:
+            **kwargs: Extra arguments passed to the base class.
 
         Returns:
             None.
         """
 
         # Call super class constructor
-        super().__init__()
+        super().__init__(**kwargs)
 
-        # Set freeze false by default
+        # Set attributes
         self.frozen: bool = False
-
-        # Create attribute to know is a bayesian layer
         self.is_bayesian: bool = True
 
     @torch.jit.export
     def freeze(self) -> None:
         """
-        Freezes the current module by setting its `frozen` flag to True.
-        This flag can be used in derived classes to disable updates.
+        Freeze the module's parameters to stop gradient computation.
+        If weights or biases are not sampled yet, they are sampled first.
+        Once frozen, parameters are not resampled or updated.
 
         Returns:
             None.
+
+        Notes:
+            Must be implemented by all subclasses.
         """
 
         # Set frozen indicator to true for current layer
@@ -50,7 +56,8 @@ class BayesianModule(torch.nn.Module, ABC):
     @torch.jit.export
     def unfreeze(self) -> None:
         """
-        Unfreezes the current module by setting its `frozen` flag to False.
+        Unfreeze the module by setting its `frozen` flag to False.
+        Allows parameters to be sampled and updated again.
 
         Returns:
             None.
@@ -62,14 +69,15 @@ class BayesianModule(torch.nn.Module, ABC):
     @torch.jit.export
     def kl_cost(self) -> tuple[torch.Tensor, int]:
         """
-        Computes the Kullback-Leibler divergence between
-        posterior and prior distributions for the module's
-        learnable parameters.
+        Compute the KL divergence cost for all Bayesian parameters.
 
         Returns:
-            A tuple containing:
-                - kl_cost: The Kullback-Leibler divergence.
-                - num_params: The number of contributing parameters.
+            tuple[torch.Tensor, int]: A tuple containing the KL
+                divergence cost and the total number of parameters in
+                the layer.
+
+        Notes:
+            Must be implemented by all subclasses.
         """
 
         return torch.tensor(0.0), 0

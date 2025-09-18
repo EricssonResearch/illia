@@ -1,7 +1,3 @@
-"""
-This module contains the code for the bayesian LSTM.
-"""
-
 # Standard libraries
 from typing import Any, Optional
 
@@ -19,7 +15,10 @@ from illia.nn.jax.embedding import Embedding
 
 class LSTM(BayesianModule):
     """
-    This class is the bayesian implementation of the TensorFlow LSTM layer.
+    Bayesian LSTM layer with embedding and probabilistic weights.
+    All weights and biases are treated as random variables sampled from
+    Gaussian distributions. Freezing the layer fixes parameters and
+    stops gradient computation.
     """
 
     def __init__(
@@ -35,21 +34,28 @@ class LSTM(BayesianModule):
         rngs: Rngs = nnx.Rngs(0),
         **kwargs: Any,
     ) -> None:
-        """_summary_
+        """
+        Initialize a Bayesian LSTM layer with embedding and probabilistic
+        weights. Sets up all gate distributions and samples initial weights.
 
         Args:
-            num_embeddings (int): _description_
-            embeddings_dim (int): _description_
-            hidden_size (int): _description_
-            output_size (int): _description_
-            padding_idx (Optional[int], optional): _description_. Defaults to None.
-            max_norm (Optional[float], optional): _description_. Defaults to None.
-            norm_type (float, optional): _description_. Defaults to 2.0.
-            scale_grad_by_freq (bool, optional): _description_. Defaults to False.
-            rngs (Rngs, optional): _description_. Defaults to nnx.Rngs(0).
+            num_embeddings: Vocabulary size.
+            embeddings_dim: Dimension of token embeddings.
+            hidden_size: Number of units in LSTM hidden state.
+            output_size: Size of the output layer.
+            padding_idx: Index in embeddings to ignore (optional).
+            max_norm: Maximum norm for embeddings (optional).
+            norm_type: p-norm for max_norm computation.
+            scale_grad_by_freq: Scale gradients by token frequency.
+            rngs: Random number generators for reproducibility.
+            **kwargs: Extra arguments passed to the base class.
 
         Returns:
             None.
+
+        Notes:
+            Gaussian distributions are used by default if none are
+            provided.
         """
 
         # Call super-class constructor
@@ -131,8 +137,9 @@ class LSTM(BayesianModule):
 
     def freeze(self) -> None:
         """
-        Freezes the current module and all submodules that are instances
-        of BayesianModule. Sets the frozen state to True.
+        Freeze the module's parameters to stop gradient computation.
+        If weights or biases are not sampled yet, they are sampled first.
+        Once frozen, parameters are not resampled or updated.
 
         Returns:
             None.
@@ -186,12 +193,11 @@ class LSTM(BayesianModule):
 
     def kl_cost(self) -> tuple[jax.Array, int]:
         """
-        Computes the Kullback-Leibler (KL) divergence cost for the
-        layer's weights and bias.
+        Compute the KL divergence cost for all Bayesian parameters.
 
         Returns:
-            tuple containing KL divergence cost and total number of
-            parameters.
+            tuple[jax.Array, int]: A tuple containing the KL divergence
+                cost and the total number of parameters in the layer.
         """
 
         # Compute log probs for each pair of weights and bias
@@ -236,16 +242,20 @@ class LSTM(BayesianModule):
         init_states: Optional[tuple[jax.Array, jax.Array]] = None,
     ) -> tuple[jax.Array, tuple[jax.Array, jax.Array]]:
         """
-        Performs a forward pass through the Bayesian LSTM layer.
-        If the layer is not frozen, it samples weights and bias
-        from their respective distributions.
+        Perform a forward pass through the Bayesian LSTM layer.
 
         Args:
-            inputs: Input tensor with token indices. Shape: [batch, seq_len, 1]
-            init_states: Optional initial hidden and cell states
+            inputs: Token indices with shape [batch, seq_len, 1].
+            init_states: Optional tuple of initial hidden and cell states.
 
         Returns:
-            Tuple of (output, (hidden_state, cell_state))
+            Tuple containing:
+            - Output tensor of shape [batch, output_size].
+            - Tuple of (hidden_state, cell_state) after sequence processing.
+
+        Raises:
+            ValueError: If the layer is frozen but weights are
+                undefined.
         """
 
         # Sample weights if not frozen
@@ -260,18 +270,24 @@ class LSTM(BayesianModule):
             self.bo = nnx.Param(self.bo_distribution.sample(self.rngs))
             self.wv = nnx.Param(self.wv_distribution.sample(self.rngs))
             self.bv = nnx.Param(self.bv_distribution.sample(self.rngs))
-        else:
-            if any(w is None for w in [self.wf, self.wi, self.wc, self.wo, self.wv]):
-                self.wf = nnx.Param(self.wf_distribution.sample(self.rngs))
-                self.bf = nnx.Param(self.bf_distribution.sample(self.rngs))
-                self.wi = nnx.Param(self.wi_distribution.sample(self.rngs))
-                self.bi = nnx.Param(self.bi_distribution.sample(self.rngs))
-                self.wc = nnx.Param(self.wc_distribution.sample(self.rngs))
-                self.bc = nnx.Param(self.bc_distribution.sample(self.rngs))
-                self.wo = nnx.Param(self.wo_distribution.sample(self.rngs))
-                self.bo = nnx.Param(self.bo_distribution.sample(self.rngs))
-                self.wv = nnx.Param(self.wv_distribution.sample(self.rngs))
-                self.bv = nnx.Param(self.bv_distribution.sample(self.rngs))
+        elif any(
+            p is None
+            for p in [
+                self.wf,
+                self.bf,
+                self.wi,
+                self.bi,
+                self.wc,
+                self.bc,
+                self.wo,
+                self.bo,
+                self.wv,
+                self.bv,
+            ]
+        ):
+            raise ValueError(
+                "Module has been frozen with undefined weights and/or bias."
+            )
 
         # Apply embedding layer to input indices
         inputs = jnp.squeeze(inputs, axis=-1)
