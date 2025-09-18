@@ -12,7 +12,10 @@ from illia.nn.torch.base import BayesianModule
 
 class Conv1d(BayesianModule):
     """
-    This class is the bayesian implementation of the Conv1d class.
+    Bayesian 1D convolutional layer with optional weight and bias priors.
+    Behaves like a standard Conv1d but treats weights and bias as random
+    variables sampled from specified distributions. Parameters become fixed
+    when the layer is frozen.
     """
 
     weights: torch.Tensor
@@ -36,27 +39,24 @@ class Conv1d(BayesianModule):
         Initializes a Bayesian 1D convolutional layer.
 
         Args:
-            input_channels: Number of channels in the input image.
-            output_channels: Number of channels produced by the
-                convolution.
-            kernel_size: Size of the convolving kernel.
-            stride: Stride of the convolution. Deafults to 1.
-            padding: Padding added to all four sides of the input.
-                Defaults to 0.
+            input_channels: Number of input channels.
+            output_channels: Number of output channels.
+            kernel_size: Size of the convolution kernel.
+            stride: Stride of the convolution.
+            padding: Padding added to both sides of the input.
             dilation: Spacing between kernel elements.
-            groups: Number of blocked connections from input channels
-                to output channels. Defaults to 1.
-            weights_distribution: The distribution for the weights.
-            bias_distribution: The distribution for the bias.
+            groups: Number of blocked connections.
+            weights_distribution: Distribution for the weights.
+            bias_distribution: Distribution for the bias.
             use_bias: Whether to include a bias term.
-            **kwargs: Additional keyword arguments.
+            **kwargs: Additional arguments passed to the base class.
 
         Returns:
             None.
 
         Notes:
-            If no distributions are provided, Gaussian distributions are
-            used by default.
+            Gaussian distributions are used by default if none are
+            provided.
         """
 
         # Call super class constructor
@@ -109,9 +109,9 @@ class Conv1d(BayesianModule):
     @torch.jit.export
     def freeze(self) -> None:
         """
-        Freezes the layer parameters by stopping gradient computation.
-        If the weights or bias are not already sampled, they are sampled
-        before freezing. Once frozen, no further sampling occurs.
+        Freeze the module's parameters to stop gradient computation.
+        If weights or biases are not sampled yet, they are sampled first.
+        Once frozen, parameters are not resampled or updated.
 
         Returns:
             None.
@@ -136,12 +136,12 @@ class Conv1d(BayesianModule):
     @torch.jit.export
     def kl_cost(self) -> tuple[torch.Tensor, int]:
         """
-        Computes the Kullback-Leibler (KL) divergence cost for the
-        layer's weights and bias.
+        Compute the KL divergence cost for all Bayesian parameters.
 
         Returns:
-            Tuple containing KL divergence cost and total number of
-            parameters.
+            tuple[torch.Tensor, int]: A tuple containing the KL
+                divergence cost and the total number of parameters in
+                the layer.
         """
 
         # Compute log probs
@@ -160,19 +160,23 @@ class Conv1d(BayesianModule):
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
-        Performs a forward pass through the Bayesian Convolution 2D
+        Performs a forward pass through the Bayesian Convolution 1D
         layer. If the layer is not frozen, it samples weights and bias
         from their respective distributions. If the layer is frozen
         and the weights or bias are not initialized, it also performs
         sampling.
 
         Args:
-            inputs: Input tensor to the layer. Dimensions: [batch,
-                input channels, input width, input height].
+            inputs: Input tensor to the layer with shape (batch,
+                input channels, input width, input height).
 
         Returns:
-            Output tensor after passing through the layer. Dimensions:
-                [batch, output channels, output width, output height].
+            Output tensor after passing through the layer with shape
+                (batch, output channels, output width, output height).
+        
+        Raises:
+            ValueError: If the layer is frozen but weights or bias are
+                undefined.
         """
 
         # Check if layer is frozen

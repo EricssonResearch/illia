@@ -13,8 +13,37 @@ from illia.nn.torch.linear import Linear
 
 
 class CGConv(MessagePassing):
-    """
-    Definition of the Crystal Graph Convolutional operator.
+    r"""
+    Crystal Graph Convolutional operator for material property prediction.
+
+    Updates node features using neighboring nodes and edge features as:
+
+        x'_i = x_i + sum_{j in N(i)} sigmoid(z_ij W_f + b_f) *
+               softplus(z_ij W_s + b_s)
+
+    where z_ij is the concatenation of central node features, neighbor
+    features, and edge features. Applies element-wise sigmoid and
+    softplus functions.
+
+    Args:
+        channels: Size of input features. If tuple, represents source and
+            target feature dimensions.
+        dim: Dimensionality of edge features.
+        aggr: Aggregation method ("add", "mean", "max").
+        **kwargs: Additional arguments for MessagePassing.
+
+    Returns:
+        None.
+
+    Shapes:
+        - input: node features (|V|, F) or ((|Vs|, Fs), (|Vt|, Ft)) if
+          bipartite, edge indices (2, |E|), edge features (|E|, D) optional.
+        - output: node features (|V|, F) or (|Vt|, Ft) if bipartite.
+
+    Notes:
+        Based on "Crystal Graph Convolutional Neural Networks for an
+        Accurate and Interpretable Prediction of Material Properties"
+        (https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.120.145301)
     """
 
     def __init__(
@@ -24,47 +53,17 @@ class CGConv(MessagePassing):
         aggr: str = "add",
         **kwargs: Any,
     ) -> None:
-        r"""
-        "Crystal Graph Convolutional Neural Networks for an Accurate
-        and Interpretable Prediction of Material Properties"
-        (https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.120.145301).
-
-        The operation is defined as:
-
-        $$
-        \mathbf{x}^{\prime}_i = \mathbf{x}_i + \sum_{j \in
-        \mathcal{N}(i)}\sigma ( \mathbf{z}_{i,j} \mathbf{W}_f +
-        \mathbf{b}_f )
-        \odot g ( \mathbf{z}_{i,j} \mathbf{W}_s + \mathbf{b}_s )
-        $$
-
-        where \(\mathbf{z}_{i,j} = [ \mathbf{x}_i, \mathbf{x}_j,
-        \mathbf{e}_{i,j} ]\)
-        denotes the concatenation of central node features, neighboring
-        node features, and edge features. In addition, \(\sigma\) and
-        \(g\) denote the sigmoid and softplus functions, respectively.
+        """
+        Initializes the CGConv layer with linear transformations.
 
         Args:
-            channels (int or tuple): The size of each input sample. A
-                tuple corresponds to the sizes of source and target
-                dimensionalities.
-            dim (int, optional): The edge feature dimensionality.
-            aggr (str, optional): The aggregation operator to use
-                ("add", "mean", "max").
-            **kwargs (optional): Additional arguments for
-                :class:`torch_geometric.nn.conv.MessagePassing`.
+            channels: Size of input features. Tuple for source and target.
+            dim: Dimensionality of edge features.
+            aggr: Aggregation operator ("add", "mean", "max").
+            **kwargs: Extra arguments for MessagePassing.
 
         Returns:
             None.
-
-        Shapes:
-            - **input:**
-            node features \((|\mathcal{V}|, F)\) or \(((|\mathcal{V_s}|,
-            F_{s}), (|\mathcal{V_t}|, F_{t}))\) if bipartite,
-            edge indices \((2, |\mathcal{E}|)\),
-            edge features \((|\mathcal{E}|, D)\) *(optional)*
-            - **output:** node features \((|\mathcal{V}|, F)\) or
-                \((|\mathcal{V_t}|, F_{t})\) if bipartite
         """
 
         # Call super class constructor
@@ -83,7 +82,10 @@ class CGConv(MessagePassing):
 
     def reset_parameters(self) -> None:
         """
-        Resets the parameters of the linear layers.
+        Resets parameters of the linear layers and optional batch norm.
+
+        Returns:
+            None.
         """
 
         self.lin_f.reset_parameters()
@@ -98,13 +100,12 @@ class CGConv(MessagePassing):
         Performs a forward pass of the convolutional layer.
 
         Args:
-            x: Input node features, either as a single tensor or a pair
-                of tensors if bipartite.
+            x: Input node features, as a single tensor or a pair if bipartite.
             edge_index: Edge indices.
             edge_attr: Optional edge features.
 
         Returns:
-            The output node features.
+            Node features after applying the convolution.
         """
 
         if isinstance(x, Tensor):
@@ -117,7 +118,7 @@ class CGConv(MessagePassing):
 
     def message(self, x_i: Tensor, x_j: Tensor, edge_attr: OptTensor) -> Tensor:
         """
-        Constructs messages to be passed to neighboring nodes.
+        Constructs messages passed to neighboring nodes.
 
         Args:
             x_i: Central node features.
@@ -125,7 +126,7 @@ class CGConv(MessagePassing):
             edge_attr: Optional edge features.
 
         Returns:
-            The messages to be aggregated.
+            Aggregated messages for neighbors.
         """
 
         if edge_attr is None:
@@ -139,6 +140,9 @@ class CGConv(MessagePassing):
     def __repr__(self) -> str:
         """
         Returns a string representation of the module.
+
+        Returns:
+            String with class name, channels, and edge feature dimension.
         """
 
         return f"{self.__class__.__name__}({self.channels}, dim={self.dim})"

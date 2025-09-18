@@ -44,8 +44,8 @@ class Linear(BayesianModule):
             None.
 
         Notes:
-            If no distributions are provided, Gaussian distributions are
-            used by default.
+            Gaussian distributions are used by default if none are
+            provided.
         """
 
         # Call super-class constructor
@@ -88,14 +88,14 @@ class Linear(BayesianModule):
     @torch.jit.export
     def freeze(self) -> None:
         """
-        Freezes the layer parameters by stopping gradient computation.
-        If the weights or bias are not already sampled, they are sampled
-        before freezing. Once frozen, no further sampling occurs.
+        Freeze the module's parameters to stop gradient computation.
+        If weights or biases are not sampled yet, they are sampled first.
+        Once frozen, parameters are not resampled or updated.
 
         Returns:
             None.
         """
-
+        
         # Set indicator
         self.frozen = True
 
@@ -115,12 +115,12 @@ class Linear(BayesianModule):
     @torch.jit.export
     def kl_cost(self) -> tuple[torch.Tensor, int]:
         """
-        Computes the Kullback-Leibler (KL) divergence cost for the
-        layer's weights and bias.
+        Compute the KL divergence cost for all Bayesian parameters.
 
         Returns:
-            Tuple containing KL divergence cost and total number of
-            parameters.
+            tuple[torch.Tensor, int]: A tuple containing the KL
+                divergence cost and the total number of parameters in
+                the layer.
         """
 
         # Compute log probs
@@ -144,11 +144,12 @@ class Linear(BayesianModule):
         Args:
             inputs: input tensor. Dimensions: [batch, *].
 
-        Raises:
-            ValueError: Module has been frozen with undefined weights.
-
         Returns:
             outputs tensor. Dimensions: [batch, *].
+        
+        Raises:
+            ValueError: If the layer is frozen but weights or bias are
+                undefined.
         """
 
         # Check if layer is frozen

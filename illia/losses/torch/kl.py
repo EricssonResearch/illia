@@ -10,9 +10,10 @@ from illia.nn.torch.base import BayesianModule
 
 class KLDivergenceLoss(torch.nn.Module):
     """
-    Computes Kullback-Leibler divergence across Bayesian modules.
-    This loss sums the KL divergence from all Bayesian layers in the
-    model. It can be reduced by averaging and scaled by a weight factor.
+    Compute Kullback-Leibler divergence across Bayesian modules.
+    This loss sums the KL divergence from all Bayesian layers in
+    the model. It can be reduced by averaging and scaled by a
+    weight factor.
 
     Notes:
         Assumes the model contains submodules derived from
@@ -26,15 +27,15 @@ class KLDivergenceLoss(torch.nn.Module):
         **kwargs: Any,
     ) -> None:
         """
-        Initialize the KL divergence loss computation.
+        Initialize the KL divergence loss.
 
         Args:
-            reduction: Method for reducing the KL loss.
-            weight: Scaling factor applied to the total KL loss.
-            **kwargs: Additional arguments passed to the base class.
+            reduction: Method used to reduce the KL loss.
+            weight: Scaling factor for the KL divergence.
+            **kwargs: Extra arguments passed to the base class.
 
         Returns:
-            None.
+            None
         """
 
         # call super class constructor
@@ -52,11 +53,11 @@ class KLDivergenceLoss(torch.nn.Module):
             model: Model containing Bayesian submodules.
 
         Returns:
-            Scalar array representing the weighted KL divergence loss.
+            torch.Tensor: Weighted KL divergence loss.
 
         Notes:
-            The loss is averaged over the number of parameters and
-            scaled by the `weight` attribute.
+            The KL loss is averaged over the number of parameters
+            and scaled by the `weight` attribute.
         """
 
         # Get device and dtype

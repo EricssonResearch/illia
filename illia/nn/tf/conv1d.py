@@ -13,10 +13,10 @@ from illia.nn.tf.base import BayesianModule
 @saving.register_keras_serializable(package="illia", name="Conv1d")
 class Conv1d(BayesianModule):
     """
-    Bayesian 1D convolutional layer with optional weight and bias
-    priors. This layer behaves like a standard Conv1d but treats weights
-    and bias as random variables sampled from specified distributions.
-    If the layer is frozen, the parameters become fixed.
+    Bayesian 1D convolutional layer with optional weight and bias priors.
+    Behaves like a standard Conv1d but treats weights and bias as random
+    variables sampled from specified distributions. Parameters become fixed
+    when the layer is frozen.
     """
 
     bias_distribution: Optional[GaussianDistribution] = None
@@ -40,31 +40,25 @@ class Conv1d(BayesianModule):
         Initializes a Bayesian 1D convolutional layer.
 
         Args:
-            input_channels: The number of channels in the input image.
-            output_channels: The number of channels produced by the
-                convolution.
-            kernel_size: The size of the convolving kernel.
-            stride: The stride of the convolution.
-            padding: The padding added to all four sides of the input.
-                Can be 'VALID' or 'SAME'.
-            dilation: The spacing between kernel elements.
-            groups: The number of blocked connections from input
-                channels to output channels.
-            data_format: The data format for the convolution, either
-                'NWC' or 'NCW'.
-            weights_distribution: The Gaussian distribution for the
-                weights, if applicable.
-            bias_distribution: The Gaussian distribution for the bias,
-                if applicable.
+            input_channels: Number of channels in the input.
+            output_channels: Number of channels produced by the conv.
+            kernel_size: Size of the convolution kernel.
+            stride: Stride of the convolution.
+            padding: Padding type, 'VALID' or 'SAME'.
+            dilation: Spacing between kernel elements.
+            groups: Number of blocked connections between input/output.
+            data_format: 'NWC' or 'NCW' format for input data.
+            weights_distribution: Distribution for weights sampling.
+            bias_distribution: Distribution for bias sampling.
             use_bias: Whether to include a bias term.
-            **kwargs: Additional keyword arguments.
+            **kwargs: Additional arguments passed to the base class.
 
         Returns:
             None.
 
         Notes:
-            If no distributions are provided, Gaussian distributions are
-            used by default.
+            Gaussian distributions are used by default if none are
+            provided.
         """
 
         # Call super class constructor
@@ -121,22 +115,17 @@ class Conv1d(BayesianModule):
         data_format: Optional[str],
     ) -> None:
         """
-        Checks the validity of the parameters for the convolution
-        operation.
+        Validates convolution parameters for correctness.
 
         Args:
-            kernel_size: The size of the convolving kernel.
-            groups: The number of blocked connections from input
-                channels to output channels.
-            stride: The stride of the convolution.
-            dilation: The spacing between kernel elements.
-            data_format: The data format for the convolution, either
-                "NHWC" or "NCHW".
+            kernel_size: Convolution kernel size.
+            groups: Number of blocked connections.
+            stride: Convolution stride.
+            dilation: Spacing between kernel elements.
+            data_format: 'NWC' or 'NCW' for input tensor.
 
         Raises:
-            ValueError: If the kernel size is invalid, the groups is
-                invalid, the stride is invalid, the dilation is
-                invalid, or the data format is invalid.
+            ValueError: If any parameter is invalid.
         """
 
         if kernel_size is not None and (kernel_size <= 0 or kernel_size % groups != 0):
@@ -160,10 +149,13 @@ class Conv1d(BayesianModule):
 
     def build(self, input_shape: tf.TensorShape) -> None:
         """
-        Builds the Conv1d layer.
+        Build trainable and non-trainable parameters.
 
         Args:
-            input_shape: Input shape of the layer.
+            input_shape: Input shape used to trigger layer build.
+
+        Returns:
+            None
         """
 
         # Register non-trainable variables
@@ -191,10 +183,10 @@ class Conv1d(BayesianModule):
 
     def get_config(self) -> dict:
         """
-        Retrieves the configuration of the Conv1d layer.
+        Return the configuration dictionary for serialization.
 
         Returns:
-            Dictionary containing layer configuration.
+            dict: Dictionary with the layer configuration.
         """
 
         # Get the base configuration
@@ -225,21 +217,18 @@ class Conv1d(BayesianModule):
         dilation: Optional[int | list[int]] = None,
     ) -> tf.Tensor:
         """
-        Applies a 1D convolution operation to the input tensor.
+        Performs a 1D convolution using provided weights.
 
         Args:
-            inputs: The input tensor.
-            weight: The convolutional kernel weights.
-            stride: The stride of the convolution.
-            padding: The padding strategy to be applied, either
-                'VALID' or 'SAME'.
-            data_format: The data format for the input tensor, either
-                'NWC' or 'NCW'.
-            dilation: The dilation rate for spacing between kernel
-                elements.
+            inputs: Input tensor.
+            weight: Convolutional kernel tensor.
+            stride: Convolution stride.
+            padding: Padding strategy 'VALID' or 'SAME'.
+            data_format: 'NWC' or 'NCW' input format.
+            dilation: Spacing between kernel elements.
 
         Returns:
-            The output tensor after applying the 1D convolution.
+            Tensor after 1D convolution.
         """
 
         output: tf.Tensor = tf.nn.conv1d(
@@ -255,9 +244,9 @@ class Conv1d(BayesianModule):
 
     def freeze(self) -> None:
         """
-        Freezes the layer parameters by stopping gradient computation.
-        If the weights or bias are not already sampled, they are sampled
-        before freezing. Once frozen, no further sampling occurs.
+        Freeze the module's parameters to stop gradient computation.
+        If weights or biases are not sampled yet, they are sampled first.
+        Once frozen, parameters are not resampled or updated.
 
         Returns:
             None.
@@ -281,16 +270,11 @@ class Conv1d(BayesianModule):
 
     def kl_cost(self) -> tuple[tf.Tensor, int]:
         """
-        Computes the KL divergence cost for weights and bias.
+        Compute the KL divergence cost for all Bayesian parameters.
 
         Returns:
-            A tuple containing:
-                - KL divergence cost.
-                - Total number of parameters in the layer.
-
-        Notes:
-            Includes bias in the KL computation only if use_bias is
-            True.
+            tuple[tf.Tensor, int]: A tuple containing the KL divergence
+                cost and the total number of parameters in the layer.
         """
 
         # Compute log probs
@@ -309,15 +293,24 @@ class Conv1d(BayesianModule):
 
     def call(self, inputs: tf.Tensor) -> tf.Tensor:
         """
-        Applies the convolution to the input using current weights and
-        bias. If the layer is not frozen, new weights and bias are
-        sampled before the computation.
+        Performs a forward pass through the Bayesian Convolution 1D
+        layer. If the layer is not frozen, it samples weights and bias
+        from their respective distributions. If the layer is frozen
+        and the weights or bias are not initialized, it also performs
+        sampling.
 
         Args:
-            inputs: Input array.
+            inputs: Input tensor to the layer with shape
+                (batch, length, output_channels) if 'data_format' is
+                'NWC' or (batch, output_channels, length) if
+                'data_format' is 'NCW'
 
         Returns:
-            Output array after convolution with optional bias added.
+            Output tensor after convolution with optional bias added.
+        
+        Raises:
+            ValueError: If the layer is frozen but weights or bias are
+                undefined.
         """
 
         # Check if layer is frozen

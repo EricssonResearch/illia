@@ -12,7 +12,10 @@ from illia.nn.torch.base import BayesianModule
 
 class Conv2d(BayesianModule):
     """
-    This class is the bayesian implementation of the Conv2d class.
+    Bayesian 2D convolutional layer with optional weight and bias priors.
+    Behaves like a standard Conv2d but treats weights and bias as random
+    variables sampled from specified distributions. Parameters become fixed
+    when the layer is frozen.
     """
 
     weights: torch.Tensor
@@ -51,8 +54,8 @@ class Conv2d(BayesianModule):
             None.
 
         Notes:
-            If no distributions are provided, Gaussian distributions are
-            used by default.
+            Gaussian distributions are used by default if none are
+            provided.
         """
 
         # Call super class constructor
@@ -109,9 +112,9 @@ class Conv2d(BayesianModule):
     @torch.jit.export
     def freeze(self) -> None:
         """
-        Freezes the layer parameters by stopping gradient computation.
-        If the weights or bias are not already sampled, they are sampled
-        before freezing. Once frozen, no further sampling occurs.
+        Freeze the module's parameters to stop gradient computation.
+        If weights or biases are not sampled yet, they are sampled first.
+        Once frozen, parameters are not resampled or updated.
 
         Returns:
             None.
@@ -136,12 +139,12 @@ class Conv2d(BayesianModule):
     @torch.jit.export
     def kl_cost(self) -> tuple[torch.Tensor, int]:
         """
-        Computes the Kullback-Leibler (KL) divergence cost for the
-        layer's weights and bias.
+        Compute the KL divergence cost for all Bayesian parameters.
 
         Returns:
-            Tuple containing KL divergence cost and total number of
-            parameters.
+            tuple[torch.Tensor, int]: A tuple containing the KL
+                divergence cost and the total number of parameters in
+                the layer.
         """
 
         # Compute log probs
@@ -167,12 +170,16 @@ class Conv2d(BayesianModule):
         sampling.
 
         Args:
-            inputs: Input tensor to the layer. Dimensions: [batch,
-                input channels, input width, input height].
+            inputs: Input tensor to the layer with shape (batch,
+                input channels, input width, input height).
 
         Returns:
-            Output tensor after passing through the layer. Dimensions:
-                [batch, output channels, output width, output height].
+            Output tensor after passing through the layer with shape
+                (batch, output channels, output width, output height).
+        
+        Raises:
+            ValueError: If the layer is frozen but weights or bias are
+                undefined.
         """
 
         # Check if layer is frozen

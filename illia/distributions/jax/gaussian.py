@@ -14,13 +14,14 @@ from illia.distributions.jax.base import DistributionModule
 class GaussianDistribution(DistributionModule):
     """
     Learnable Gaussian distribution with diagonal covariance.
-    Represents a Gaussian with trainable mean and standard deviation.
-    Standard deviation is derived from `rho` using a softplus
-    transformation to ensure positivity.
+    Represents a Gaussian with trainable mean and standard
+    deviation. The standard deviation is derived from `rho`
+    using a softplus transformation to ensure positivity.
 
     Notes:
-        Assumes diagonal covariance. KL divergence can be computed
-        using log-probability differences from `log_prob`.
+        Assumes diagonal covariance. KL divergence can be
+        estimated via log-probability differences from
+        `log_prob`.
     """
 
     def __init__(
@@ -34,19 +35,19 @@ class GaussianDistribution(DistributionModule):
         **kwargs: Any,
     ) -> None:
         """
-        Initializes the Gaussian distribution layer.
+        Initialize a learnable Gaussian distribution module.
 
         Args:
             shape: Shape of the learnable parameters.
             mu_prior: Mean of the Gaussian prior.
             std_prior: Standard deviation of the prior.
             mu_init: Initial value for the learnable mean.
-            rho_init: Initial value for the learnable rho parameter.
+            rho_init: Initial value for the learnable rho.
             rngs: RNG container for parameter initialization.
-            **kwargs: Additional arguments passed to the base class.
+            **kwargs: Extra arguments passed to the base class.
 
         Returns:
-            None.
+            None
         """
 
         # Call super-class constructor
@@ -69,16 +70,16 @@ class GaussianDistribution(DistributionModule):
 
     def sample(self, rngs: Rngs = nnx.Rngs(0)) -> jax.Array:
         """
-        Generate a sample from the Gaussian distribution.
+        Draw a sample from the Gaussian distribution.
 
         Args:
             rngs: RNG container used for sampling.
 
         Returns:
-            Array containing a sample matching the distribution shape.
+            jax.Array: A sample drawn from the distribution.
 
         Notes:
-            This method should be deterministic given the same RNG.
+            Sampling is reproducible with the same RNG.
         """
 
         # Compute epsilon and sigma
@@ -89,18 +90,19 @@ class GaussianDistribution(DistributionModule):
 
     def log_prob(self, x: Optional[jax.Array] = None) -> jax.Array:
         """
-        Compute the log-probability of a given sample. If no sample is
-        provided, a new one is drawn internally from the distribution.
+        Compute the log-probability of a given sample. If no
+        sample is provided, one is drawn internally.
 
         Args:
-            x: Optional sample tensor to evaluate.
+            x: Optional input sample to evaluate. If None,
+                a new sample is drawn from the distribution.
 
         Returns:
-            Scalar array containing the log-probability.
+            jax.Array: Scalar log-probability value.
 
         Notes:
-            Supports both user-supplied and internally generated
-                samples.
+            Supports both user-supplied and internally drawn
+            samples.
         """
 
         # Sample if x is None
@@ -137,21 +139,21 @@ class GaussianDistribution(DistributionModule):
     @property
     def num_params(self) -> int:
         """
-        Return the total number of learnable parameters in the
+        Return the number of learnable parameters in the
         distribution.
 
         Returns:
-            Integer count of all learnable parameters.
+            int: Total count of learnable parameters.
         """
 
         return len(self.mu.reshape(-1))
 
     def __call__(self) -> jax.Array:
         """
-        Perform a forward pass by sampling from the distribution.
+        Perform a forward pass by drawing a sample.
 
         Returns:
-            A sample from the Gaussian distribution.
+            jax.Array: A sample from the distribution.
         """
 
         return self.sample()

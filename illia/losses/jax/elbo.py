@@ -12,14 +12,14 @@ from illia.losses.jax.kl import KLDivergenceLoss
 
 class ELBOLoss(nnx.Module):
     """
-    Computes the Evidence Lower Bound (ELBO) loss for Bayesian networks.
-    The ELBO loss combines a reconstruction loss with a KL divergence
-    term. Monte Carlo sampling can be used to estimate the expected
-    reconstruction loss over the model's stochastic layers.
+    Compute the Evidence Lower Bound (ELBO) loss for Bayesian
+    networks. Combines a reconstruction loss with a KL divergence
+    term. Monte Carlo sampling can estimate the expected
+    reconstruction loss over stochastic layers.
 
     Notes:
-        The KL term is weighted by `kl_weight`. This module assumes the
-        model contains Bayesian layers compatible with
+        The KL term is weighted by `kl_weight`. The model is
+        assumed to contain Bayesian layers compatible with
         `KLDivergenceLoss`.
     """
 
@@ -31,16 +31,19 @@ class ELBOLoss(nnx.Module):
         **kwargs: Any,
     ) -> None:
         """
-        Initialize the ELBO loss with sampling and KL regularization.
+        Initialize the ELBO loss with reconstruction and KL
+        components.
 
         Args:
-            loss_function: Function for computing reconstruction loss.
-            num_samples: Number of Monte Carlo samples for estimation.
+            loss_function: Function to compute reconstruction
+                loss.
+            num_samples: Number of Monte Carlo samples used for
+                estimation.
             kl_weight: Weight applied to the KL divergence term.
-            **kwargs: Additional arguments passed to the base class.
+            **kwargs: Extra arguments passed to the base class.
 
         Returns:
-            None.
+            None
         """
 
         # Call super class constructor
@@ -56,7 +59,7 @@ class ELBOLoss(nnx.Module):
         self, outputs: jax.Array, targets: jax.Array, model: nnx.Module
     ) -> jax.Array:
         """
-        Compute the ELBO loss using Monte Carlo sampling and KL
+        Compute the ELBO loss with Monte Carlo sampling and KL
         regularization.
 
         Args:
@@ -65,10 +68,11 @@ class ELBOLoss(nnx.Module):
             model: Model containing Bayesian layers.
 
         Returns:
-            Scalar array representing the average ELBO loss.
+            jax.Array: Scalar ELBO loss averaged over samples.
 
         Notes:
-            The loss is averaged over `num_samples` Monte Carlo draws.
+            The loss is averaged over `num_samples` Monte Carlo
+            draws.
         """
 
         loss_value: jax.Array = jnp.array(0.0)

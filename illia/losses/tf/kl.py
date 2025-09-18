@@ -12,9 +12,10 @@ from illia.nn.tf.base import BayesianModule
 @saving.register_keras_serializable(package="illia", name="KLDivergenceLoss")
 class KLDivergenceLoss(losses.Loss):
     """
-    Computes Kullback-Leibler divergence across Bayesian modules.
-    This loss sums the KL divergence from all Bayesian layers in the
-    model. It can be reduced by averaging and scaled by a weight factor.
+    Compute Kullback-Leibler divergence across Bayesian modules.
+    This loss sums the KL divergence from all Bayesian layers in
+    the model. It can be reduced by averaging and scaled by a
+    weight factor.
 
     Notes:
         Assumes the model contains submodules derived from
@@ -28,15 +29,15 @@ class KLDivergenceLoss(losses.Loss):
         **kwargs: Any,
     ) -> None:
         """
-        Initialize the KL divergence loss computation.
+        Initialize the KL divergence loss.
 
         Args:
-            reduction: Method for reducing the KL loss.
-            weight: Scaling factor applied to the total KL loss.
-            **kwargs: Additional arguments passed to the base class.
+            reduction: Method used to reduce the KL loss.
+            weight: Scaling factor for the KL divergence.
+            **kwargs: Extra arguments passed to the base class.
 
         Returns:
-            None.
+            None
         """
 
         # Call super class constructor
@@ -48,11 +49,10 @@ class KLDivergenceLoss(losses.Loss):
 
     def get_config(self) -> dict:
         """
-        Returns the configuration of the Kullback-Leibler
-        divergence loss.
+        Return the configuration dictionary for serialization.
 
         Returns:
-            Dictionary containing configuration values.
+            dict: Dictionary containing the KL loss configuration.
         """
 
         # Get the base configuration
@@ -70,14 +70,15 @@ class KLDivergenceLoss(losses.Loss):
 
         Args:
             *args: Unused positional arguments.
-            **kwargs: Must include 'model' as a keyword argument.
+            **kwargs: Must include 'model' containing Bayesian
+                layers.
 
         Returns:
-            Scalar array representing the weighted KL divergence loss.
+            tf.Tensor: Weighted KL divergence loss.
 
         Notes:
-            The loss is averaged over the number of parameters and
-            scaled by the `weight` attribute.
+            The KL loss is averaged over the number of parameters
+            and scaled by the `weight` attribute.
         """
 
         model = kwargs.get("model")

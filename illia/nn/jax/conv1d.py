@@ -14,10 +14,10 @@ from illia.nn.jax.base import BayesianModule
 
 class Conv1d(BayesianModule):
     """
-    Bayesian 1D convolutional layer with optional weight and bias
-    priors. This layer behaves like a standard Conv1d but treats weights
-    and bias as random variables sampled from specified distributions.
-    If the layer is frozen, the parameters become fixed.
+    Bayesian 1D convolutional layer with optional weight and bias priors.
+    Behaves like a standard Conv1d but treats weights and bias as random
+    variables sampled from specified distributions. Parameters become fixed
+    when the layer is frozen.
     """
 
     bias_distribution: Optional[GaussianDistribution] = None
@@ -44,24 +44,23 @@ class Conv1d(BayesianModule):
         Args:
             input_channels: Number of input feature channels.
             output_channels: Number of output feature channels.
-            kernel_size: Size of the convolutional kernel.
+            kernel_size: Size of the convolution kernel.
             stride: Stride of the convolution operation.
-            padding: Amount of zero-padding added to both sides.
+            padding: Amount of zero-padding on both sides.
             dilation: Spacing between kernel elements.
-            groups: Number of blocked connections between input and
-                output.
+            groups: Number of blocked connections between input and output.
             weights_distribution: Distribution to initialize weights.
             bias_distribution: Distribution to initialize bias.
             use_bias: Whether to include a bias term.
             rngs: Random number generators for reproducibility.
-            **kwargs: Additional keyword arguments for the Layer base class.
+            **kwargs: Additional arguments passed to the base class.
 
         Returns:
             None.
 
         Notes:
-            If no distributions are provided, Gaussian distributions are
-            used by default.
+            Gaussian distributions are used by default if none are
+            provided.
         """
 
         # Call super class constructor
@@ -114,9 +113,9 @@ class Conv1d(BayesianModule):
 
     def freeze(self) -> None:
         """
-        Freezes the layer parameters by stopping gradient computation.
-        If the weights or bias are not already sampled, they are sampled
-        before freezing. Once frozen, no further sampling occurs.
+        Freeze the module's parameters to stop gradient computation.
+        If weights or biases are not sampled yet, they are sampled first.
+        Once frozen, parameters are not resampled or updated.
 
         Returns:
             None.
@@ -140,16 +139,11 @@ class Conv1d(BayesianModule):
 
     def kl_cost(self) -> tuple[jax.Array, int]:
         """
-        Computes the KL divergence cost for weights and bias.
+        Compute the KL divergence cost for all Bayesian parameters.
 
         Returns:
-            A tuple containing:
-                - KL divergence cost.
-                - Total number of parameters in the layer.
-
-        Notes:
-            Includes bias in the KL computation only if use_bias is
-            True.
+            tuple[jax.Array, int]: A tuple containing the KL divergence
+                cost and the total number of parameters in the layer.
         """
 
         # Compute log probs for weights
@@ -174,15 +168,22 @@ class Conv1d(BayesianModule):
 
     def __call__(self, inputs: jax.Array) -> jax.Array:
         """
-        Applies the convolution to the input using current weights and
-        bias. If the layer is not frozen, new weights and bias are
-        sampled before the computation.
+        Performs a forward pass through the Bayesian Convolution 1D
+        layer. If the layer is not frozen, it samples weights and bias
+        from their respective distributions. If the layer is frozen
+        and the weights or bias are not initialized, it also performs
+        sampling.
 
         Args:
-            inputs: Input array with shape (batch, channels, length).
+            inputs: Input tensor to the layer with shape
+                (batch, channels, length).
 
         Returns:
             Output array after convolution with optional bias added.
+
+        Raises:
+            ValueError: If the layer is frozen but weights or bias are
+                undefined.
         """
 
         # Sample if model not frozen

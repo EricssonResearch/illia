@@ -14,13 +14,14 @@ from illia.distributions.tf.base import DistributionModule
 class GaussianDistribution(DistributionModule):
     """
     Learnable Gaussian distribution with diagonal covariance.
-    Represents a Gaussian with trainable mean and standard deviation.
-    Standard deviation is derived from `rho` using a softplus
-    transformation to ensure positivity.
+    Represents a Gaussian with trainable mean and standard
+    deviation. The standard deviation is derived from `rho`
+    using a softplus transformation to ensure positivity.
 
     Notes:
-        Assumes diagonal covariance. KL divergence can be computed
-        using log-probability differences from `log_prob`.
+        Assumes diagonal covariance. KL divergence can be
+        estimated via log-probability differences from
+        `log_prob`.
     """
 
     def __init__(
@@ -33,18 +34,18 @@ class GaussianDistribution(DistributionModule):
         **kwargs: Any,
     ) -> None:
         """
-        Initializes the Gaussian distribution layer.
+        Initialize a learnable Gaussian distribution layer.
 
         Args:
             shape: Shape of the learnable parameters.
             mu_prior: Mean of the Gaussian prior.
             std_prior: Standard deviation of the prior.
             mu_init: Initial value for the learnable mean.
-            rho_init: Initial value for the learnable rho parameter.
-            **kwargs: Additional arguments passed to the base class.
+            rho_init: Initial value for the learnable rho.
+            **kwargs: Extra arguments passed to the base class.
 
         Returns:
-            None.
+            None
         """
 
         # Call super class constructor
@@ -62,13 +63,13 @@ class GaussianDistribution(DistributionModule):
 
     def build(self, input_shape: tf.TensorShape) -> None:
         """
-        Builds trainable and non-trainable parameters.
+        Build trainable and non-trainable parameters.
 
         Args:
-            input_shape: Input shape used to trigger layer building.
+            input_shape: Input shape used to trigger layer build.
 
         Returns:
-            None.
+            None
         """
 
         # Define non-trainable priors variables
@@ -106,10 +107,10 @@ class GaussianDistribution(DistributionModule):
 
     def get_config(self) -> dict:
         """
-        Returns the configuration for serialization.
+        Return the configuration dictionary for serialization.
 
         Returns:
-            A dictionary containing the layer's config.
+            dict: Dictionary with the layer configuration.
         """
 
         base_config = super().get_config()
@@ -126,10 +127,10 @@ class GaussianDistribution(DistributionModule):
 
     def sample(self) -> tf.Tensor:
         """
-        Generate a sample from the Gaussian distribution.
+        Draw a sample from the Gaussian distribution.
 
         Returns:
-            Array containing a sample matching the distribution shape.
+            tf.Tensor: A sample drawn from the distribution.
         """
 
         # Sampling with reparametrization trick
@@ -140,18 +141,19 @@ class GaussianDistribution(DistributionModule):
 
     def log_prob(self, x: Optional[tf.Tensor] = None) -> tf.Tensor:
         """
-        Compute the log-probability of a given sample. If no sample is
-        provided, a new one is drawn internally from the distribution.
+        Compute the log-probability of a given sample. If no
+        sample is provided, one is drawn internally.
 
         Args:
-            x: Optional sample tensor to evaluate.
+            x: Optional input sample to evaluate. If None,
+                a new sample is drawn from the distribution.
 
         Returns:
-            Scalar array containing the log-probability.
+            tf.Tensor: Scalar log-probability value.
 
         Notes:
-            Supports both user-supplied and internally generated
-                samples.
+            Supports both user-supplied and internally drawn
+            samples.
         """
 
         # Sample if x is None
@@ -188,11 +190,11 @@ class GaussianDistribution(DistributionModule):
     @property
     def num_params(self) -> int:
         """
-        Return the total number of learnable parameters in the
+        Return the number of learnable parameters in the
         distribution.
 
         Returns:
-            Integer count of all learnable parameters.
+            int: Total count of learnable parameters.
         """
 
         return int(tf.size(self.mu))

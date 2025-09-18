@@ -12,7 +12,9 @@ from illia.nn.torch.embedding import Embedding
 
 class LSTM(BayesianModule):
     """
-    This class is the bayesian implementation of the torch LSTM layer.
+    Bayesian LSTM layer with embedding and probabilistic weights.
+    All weights and biases are sampled from Gaussian distributions.
+    Freezing the layer fixes parameters and stops gradient computation.
     """
 
     # Forget gate
@@ -49,18 +51,26 @@ class LSTM(BayesianModule):
         **kwargs: Any,
     ) -> None:
         """
-        Initializes a LSTM layer.
+        Initializes the Bayesian LSTM layer.
 
         Args:
-            num_embeddings (int): _description_
-            embeddings_dim (int): _description_
-            hidden_size (int): _description_
-            output_size (int): _description_
-            padding_idx (Optional[int], optional): _description_. Defaults to None.
-            max_norm (Optional[float], optional): _description_. Defaults to None.
-            norm_type (float, optional): _description_. Defaults to 2.0.
-            scale_grad_by_freq (bool, optional): _description_. Defaults to False.
-            sparse (bool, optional): _description_. Defaults to False.
+            num_embeddings: Size of the embedding dictionary.
+            embeddings_dim: Dimensionality of each embedding vector.
+            hidden_size: Number of hidden units in the LSTM.
+            output_size: Size of the final output.
+            padding_idx: Index to ignore in embeddings.
+            max_norm: Maximum norm for embedding vectors.
+            norm_type: Norm type used for max_norm.
+            scale_grad_by_freq: Scale gradient by inverse frequency.
+            sparse: Use sparse embedding updates.
+            **kwargs: Additional keyword arguments.
+
+        Returns:
+            None.
+
+        Notes:
+            Gaussian distributions are used by default if none are
+            provided.
         """
 
         # Call super-class constructor
@@ -153,9 +163,9 @@ class LSTM(BayesianModule):
     @torch.jit.export
     def freeze(self) -> None:
         """
-        Freezes the layer parameters by stopping gradient computation.
-        If the weights or bias are not already sampled, they are sampled
-        before freezing. Once frozen, no further sampling occurs.
+        Freeze the module's parameters to stop gradient computation.
+        If weights or biases are not sampled yet, they are sampled first.
+        Once frozen, parameters are not resampled or updated.
 
         Returns:
             None.
@@ -210,12 +220,12 @@ class LSTM(BayesianModule):
     @torch.jit.export
     def kl_cost(self) -> tuple[torch.Tensor, int]:
         """
-        Computes the Kullback-Leibler (KL) divergence cost for the
-        layer's weights and bias.
+        Compute the KL divergence cost for all Bayesian parameters.
 
         Returns:
-            Tuple containing KL divergence cost and total number of
-            parameters.
+            tuple[torch.Tensor, int]: A tuple containing the KL
+                divergence cost and the total number of parameters in
+                the layer.
         """
 
         # Compute log probs for each pair of weights and bias
@@ -272,12 +282,16 @@ class LSTM(BayesianModule):
         sampling.
 
         Args:
-            inputs: Input tensor to the layer. Dimensions: [batch,
+            inputs: Input tensor to the layer with shape [batch,
                 input channels, input width, input height].
 
         Returns:
-            Output tensor after passing through the layer. Dimensions:
+            Output tensor after passing through the layer with shape
                 [batch, output channels, output width, output height].
+        
+        Raises:
+            ValueError: If the layer is frozen but weights are
+                undefined.
         """
 
         # Sample weights if not frozen

@@ -16,9 +16,9 @@ from illia.nn.jax.base import BayesianModule
 
 class Linear(BayesianModule):
     """
-    Bayesian linear layer with optional bias and weight priors.
-    Functions like a standard fully connected layer but treats weights and
-    bias as probabilistic variables. Freezing the layer fixes the parameters
+    Bayesian linear (fully connected) layer with optional weight and bias
+    priors. Functions like a standard linear layer but treats weights and
+    bias as probabilistic variables. Freezing the layer fixes parameters
     and stops gradient computation.
     """
 
@@ -38,25 +38,27 @@ class Linear(BayesianModule):
         **kwargs: Any,
     ) -> None:
         """
-        Initializes a Linear layer.
+        Initialize a Bayesian linear layer with optional priors for weights
+        and bias. Samples initial parameter values from the specified
+        distributions.
 
         Args:
-            input_size: Size of the input features.
-            output_size: Size of the output features.
-            weights_distribution: Prior distribution of the weights.
-            bias_distribution: Prior distribution of the bias.
-            use_bias: Whether to include a bias term in the layer.
-            precision: Precision used in dot product operations.
-            dot_general: Function for computing generalized dot
-                products.
-            **kwargs: Additional keyword arguments for the Layer base class.
+            input_size: Number of input features.
+            output_size: Number of output features.
+            weights_distribution: Distribution for weights.
+            bias_distribution: Distribution for bias.
+            use_bias: Whether to include a bias term.
+            precision: Precision for dot product computations.
+            dot_general: Function for generalized dot products.
+            rngs: Random number generators for reproducibility.
+            **kwargs: Additional arguments passed to the base class.
 
         Returns:
             None.
 
         Notes:
-            If distributions are not provided, Gaussian distributions are
-            used by default.
+            Gaussian distributions are used by default if none are
+            provided.
         """
 
         # Call super class constructor
@@ -100,9 +102,9 @@ class Linear(BayesianModule):
 
     def freeze(self) -> None:
         """
-        Freezes the layer parameters by stopping gradient computation.
-        If the weights or bias are not already sampled, they are sampled
-        before freezing. Once frozen, no further sampling occurs.
+        Freeze the module's parameters to stop gradient computation.
+        If weights or biases are not sampled yet, they are sampled first.
+        Once frozen, parameters are not resampled or updated.
 
         Returns:
             None.
@@ -126,16 +128,11 @@ class Linear(BayesianModule):
 
     def kl_cost(self) -> tuple[jax.Array, int]:
         """
-        Computes the KL divergence cost for weights and bias.
+        Compute the KL divergence cost for all Bayesian parameters.
 
         Returns:
-            A tuple containing:
-                - KL divergence cost.
-                - Total number of parameters in the layer.
-
-        Notes:
-            Includes bias in the KL computation only if use_bias is
-            True.
+            tuple[jax.Array, int]: A tuple containing the KL divergence
+                cost and the total number of parameters in the layer.
         """
 
         # Compute log probs for weights
@@ -160,7 +157,8 @@ class Linear(BayesianModule):
 
     def __call__(self, inputs: jax.Array) -> jax.Array:
         """
-        Performs a forward pass using current weights and bias.
+        Perform a forward pass using current weights and bias. Samples new
+        parameters if the layer is not frozen.
 
         Args:
             inputs: Input array with shape [*, input_size].
@@ -168,9 +166,9 @@ class Linear(BayesianModule):
         Returns:
             Output array with shape [*, output_size].
 
-        Notes:
-            If the layer is not frozen, new weights and bias are sampled
-            before computation.
+        Raises:
+            ValueError: If the layer is frozen but weights or bias are
+                undefined.
         """
 
         # Sample if model not frozen

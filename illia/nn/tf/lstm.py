@@ -14,7 +14,9 @@ from illia.nn.tf.embedding import Embedding
 @saving.register_keras_serializable(package="illia", name="LSTM")
 class LSTM(BayesianModule):
     """
-    This class is the bayesian implementation of the TensorFlow LSTM layer.
+    Bayesian LSTM layer with embedding and probabilistic weights.
+    All weights and biases are sampled from Gaussian distributions.
+    Freezing the layer fixes parameters and stops gradient computation.
     """
 
     def __init__(
@@ -30,6 +32,28 @@ class LSTM(BayesianModule):
         sparse: bool = False,
         **kwargs: Any,
     ) -> None:
+        """
+        Initializes the Bayesian LSTM layer.
+
+        Args:
+            num_embeddings: Size of the embedding dictionary.
+            embeddings_dim: Dimensionality of each embedding vector.
+            hidden_size: Number of hidden units in the LSTM.
+            output_size: Size of the final output.
+            padding_idx: Index to ignore in embeddings.
+            max_norm: Maximum norm for embedding vectors.
+            norm_type: Norm type used for max_norm.
+            scale_grad_by_freq: Scale gradient by inverse frequency.
+            sparse: Use sparse embedding updates.
+            **kwargs: Additional keyword arguments.
+
+        Returns:
+            None.
+
+        Notes:
+            Gaussian distributions are used by default if none are
+            provided.
+        """
 
         # Call super-class constructor
         super().__init__(**kwargs)
@@ -89,10 +113,13 @@ class LSTM(BayesianModule):
 
     def build(self, input_shape: tf.TensorShape) -> None:
         """
-        Builds the Bayesian LSTM layer by creating all gate weights and biases.
+        Build trainable and non-trainable parameters.
 
         Args:
-            input_shape: Input shape of the layer.
+            input_shape: Input shape used to trigger layer build.
+
+        Returns:
+            None
         """
 
         # Forget gate weights and bias
@@ -175,10 +202,10 @@ class LSTM(BayesianModule):
 
     def get_config(self) -> dict:
         """
-        Retrieves the configuration of the Conv2d layer.
+        Return the configuration dictionary for serialization.
 
         Returns:
-            Dictionary containing layer configuration.
+            dict: Dictionary with the layer configuration.
         """
 
         # Get the base configuration
@@ -202,9 +229,9 @@ class LSTM(BayesianModule):
 
     def freeze(self) -> None:
         """
-        Freezes the layer parameters by stopping gradient computation.
-        If the weights or bias are not already sampled, they are sampled
-        before freezing. Once frozen, no further sampling occurs.
+        Freeze the module's parameters to stop gradient computation.
+        If weights or biases are not sampled yet, they are sampled first.
+        Once frozen, parameters are not resampled or updated.
 
         Returns:
             None.
@@ -258,12 +285,11 @@ class LSTM(BayesianModule):
 
     def kl_cost(self) -> tuple[tf.Tensor, int]:
         """
-        Computes the KL divergence cost for weights and bias.
+        Compute the KL divergence cost for all Bayesian parameters.
 
         Returns:
-            A tuple containing:
-                - KL divergence cost.
-                - Total number of parameters in the layer.
+            tuple[tf.Tensor, int]: A tuple containing the KL divergence
+                cost and the total number of parameters in the layer.
         """
 
         # Compute log probs for each pair of weights and bias
@@ -312,18 +338,22 @@ class LSTM(BayesianModule):
         init_states: Optional[tuple[tf.Tensor, tf.Tensor]] = None,
     ) -> tuple[tf.Tensor, tuple[tf.Tensor, tf.Tensor]]:
         """
-        Performs a forward pass through the Bayesian LSTM layer.
-        If the layer is not frozen, it samples weights and bias
-        from their respective distributions.
+        Performs a forward pass through the Bayesian LSTM.
 
         Args:
-            inputs: Input tensor with token indices. Shape: [batch, seq_len, 1]
-            init_states: Optional initial hidden and cell states
+            inputs: Input tensor of token indices. Shape: [batch, seq_len, 1].
+            init_states: Optional tuple of initial (hidden, cell) states.
 
         Returns:
-            Tuple of (output, (hidden_state, cell_state))
+            Tuple containing:
+                - Output tensor after final linear transformation.
+                - Tuple of final hidden and cell states.
+        
+        Raises:
+            ValueError: If the layer is frozen but weights are
+                undefined.
         """
-
+        
         # Sample weights if not frozen
         if not self.frozen:
             self.wf = self.wf_distribution.sample()

@@ -16,8 +16,7 @@ class Embedding(BayesianModule):
     """
     Bayesian embedding layer with optional padding and max-norm constraints.
     Each embedding vector is sampled from a specified weight distribution.
-    If the layer is frozen, the embeddings are fixed and gradients are
-    stopped.
+    If the layer is frozen, embeddings are fixed and gradients are stopped.
     """
 
     def __init__(
@@ -33,31 +32,26 @@ class Embedding(BayesianModule):
         **kwargs: Any,
     ) -> None:
         """
-        Initializes a Embedding layer.
+        Initialize a Bayesian embedding layer with optional constraints.
+        Sets up the embedding weight distribution and samples initial values.
 
         Args:
-            num_embeddings: size of the dictionary of embeddings.
-            embeddings_dim: the size of each embedding vector.
-            padding_idx: If specified, the entries at padding_idx do
-                not contribute to the gradient.
-            max_norm: If given, each embedding vector with norm larger
-                than max_norm is renormalized to have norm max_norm.
-            norm_type: The p of the p-norm to compute for the max_norm
-                option.
-            scale_grad_by_freq: If given, this will scale gradients by
-                the inverse of frequency of the words in the
-                mini-batch.
-            weights_distribution: distribution for the weights of the
-                layer.
+            num_embeddings: Size of the embedding dictionary.
+            embeddings_dim: Dimension of each embedding vector.
+            padding_idx: Index whose embeddings are ignored in gradient.
+            max_norm: Maximum norm for each embedding vector.
+            norm_type: p value for the p-norm in max_norm option.
+            scale_grad_by_freq: Scale gradients by inverse word frequency.
+            weights_distribution: Distribution to initialize embeddings.
             rngs: Random number generators for reproducibility.
-            **kwargs: Additional keyword arguments for the Layer base class.
+            **kwargs: Additional arguments passed to the base class.
 
         Returns:
             None.
 
         Notes:
-            If weights_distribution is None, a GaussianDistribution is used
-            by default.
+            Gaussian distributions are used by default if none are
+            provided.
         """
 
         # Call super class constructor
@@ -85,9 +79,9 @@ class Embedding(BayesianModule):
 
     def freeze(self) -> None:
         """
-        Freezes the layer parameters by stopping gradient computation.
-        If the weights or bias are not already sampled, they are sampled
-        before freezing. Once frozen, no further sampling occurs.
+        Freeze the module's parameters to stop gradient computation.
+        If weights or biases are not sampled yet, they are sampled first.
+        Once frozen, parameters are not resampled or updated.
 
         Returns:
             None.
@@ -105,12 +99,11 @@ class Embedding(BayesianModule):
 
     def kl_cost(self) -> tuple[jax.Array, int]:
         """
-        Computes the KL divergence cost for weights and bias.
+        Compute the KL divergence cost for all Bayesian parameters.
 
         Returns:
-            A tuple containing:
-                - KL divergence cost.
-                - Total number of parameters in the layer.
+            tuple[jax.Array, int]: A tuple containing the KL divergence
+                cost and the total number of parameters in the layer.
         """
 
         # Compute log probs for weights
@@ -125,14 +118,22 @@ class Embedding(BayesianModule):
 
     def __call__(self, inputs: jax.Array) -> jax.Array:
         """
-        Performs a forward pass using current embedding weights.
+        Perform a forward pass using current embedding weights.
 
         Args:
-            inputs: Input array of indices into the embedding matrix.
+            inputs: Array of indices into the embedding matrix.
 
         Returns:
-            Output array of shape [*, embeddings_dim] containing the
-                corresponding embedding vectors.
+            Array of shape [*, embeddings_dim] containing the embedding
+            vectors corresponding to the input indices.
+
+        Raises:
+            ValueError: If the layer is frozen but weights are
+                undefined.
+
+        Notes:
+            Embeddings at padding_idx are zeroed out, and vectors exceeding
+            max_norm are renormalized if specified.
         """
 
         # Sample if model not frozen

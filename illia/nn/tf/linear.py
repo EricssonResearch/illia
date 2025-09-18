@@ -13,7 +13,9 @@ from illia.nn.tf.base import BayesianModule
 @saving.register_keras_serializable(package="illia", name="Linear")
 class Linear(BayesianModule):
     """
-    This class is the bayesian implementation of the Linear class.
+    Bayesian linear layer (fully connected) with optional weight and bias
+    distributions. Can be frozen to stop gradient updates and fix
+    parameters.
     """
 
     bias_distribution: Optional[GaussianDistribution] = None
@@ -28,16 +30,22 @@ class Linear(BayesianModule):
         **kwargs: Any,
     ) -> None:
         """
-        This is the constructor of the Linear class.
+        Initializes a Bayesian Linear layer.
 
         Args:
-            input_size: Input size of the linear layer.
-            output_size: Output size of the linear layer.
-            weights_distribution: The Gaussian distribution for the
-                weights, if applicable.
-            bias_distribution: The Gaussian distribution for the bias,
-                if applicable.
+            input_size: Number of input features.
+            output_size: Number of output features.
+            weights_distribution: Distribution for the weights.
+            bias_distribution: Distribution for the bias.
+            use_bias: Whether to include a bias term.
             **kwargs: Additional keyword arguments.
+
+        Returns:
+            None.
+
+        Notes:
+            Gaussian distributions are used by default if none are
+            provided.
         """
 
         # Call super-class constructor
@@ -65,10 +73,13 @@ class Linear(BayesianModule):
 
     def build(self, input_shape: tf.TensorShape) -> None:
         """
-        Builds the Linear layer.
+        Build trainable and non-trainable parameters.
 
         Args:
-            input_shape: Input shape of the layer.
+            input_shape: Input shape used to trigger layer build.
+
+        Returns:
+            None
         """
 
         # Register non-trainable variables
@@ -96,10 +107,10 @@ class Linear(BayesianModule):
 
     def get_config(self) -> dict:
         """
-        Retrieves the configuration of the Linear layer.
+        Return the configuration dictionary for serialization.
 
         Returns:
-            Dictionary containing layer configuration.
+            dict: Dictionary with the layer configuration.
         """
 
         # Get the base configuration
@@ -116,9 +127,9 @@ class Linear(BayesianModule):
 
     def freeze(self) -> None:
         """
-        Freezes the layer parameters by stopping gradient computation.
-        If the weights or bias are not already sampled, they are sampled
-        before freezing. Once frozen, no further sampling occurs.
+        Freeze the module's parameters to stop gradient computation.
+        If weights or biases are not sampled yet, they are sampled first.
+        Once frozen, parameters are not resampled or updated.
 
         Returns:
             None.
@@ -142,16 +153,11 @@ class Linear(BayesianModule):
 
     def kl_cost(self) -> tuple[tf.Tensor, int]:
         """
-        Computes the KL divergence cost for weights and bias.
+        Compute the KL divergence cost for all Bayesian parameters.
 
         Returns:
-            A tuple containing:
-                - KL divergence cost.
-                - Total number of parameters in the layer.
-
-        Notes:
-            Includes bias in the KL computation only if use_bias is
-            True.
+            tuple[tf.Tensor, int]: A tuple containing the KL divergence
+                cost and the total number of parameters in the layer.
         """
 
         # Compute log probs
@@ -170,20 +176,20 @@ class Linear(BayesianModule):
 
     def call(self, inputs: tf.Tensor) -> tf.Tensor:
         """
-        Performs a forward pass through the Bayesian Linear layer.
+        Performs forward pass using current weights and bias.
 
-        Samples weights and bias from their posterior distributions if
-        the layer is not frozen. If frozen and not initialized, samples
-        them once.
+        Samples parameters if layer is not frozen. Raises an error if
+        frozen weights are undefined.
 
         Args:
-            inputs: input tensor. Dimensions: [batch, *].
-
-        Raises:
-            ValueError: Module has been frozen with undefined weights.
+            inputs: Input tensor of shape [batch, features].
 
         Returns:
             Output tensor after linear transformation.
+        
+        Raises:
+            ValueError: If the layer is frozen but weights or bias are
+                undefined.
         """
 
         # Check if layer is frozen
