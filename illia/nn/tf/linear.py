@@ -81,7 +81,7 @@ class Linear(BayesianModule):
             trainable=False,
         )
 
-        if self.use_bias and self.bias_distribution:
+        if self.use_bias and self.bias_distribution is not None:
             self.b = self.add_weight(
                 name="bias",
                 initializer=tf.constant_initializer(
@@ -132,12 +132,12 @@ class Linear(BayesianModule):
             self.w = self.weights_distribution.sample()
 
         # Sample bias is they are undefined
-        if self.use_bias and self.b is None and self.bias_distribution:
+        if self.use_bias and self.b is None and self.bias_distribution is not None:
             self.b = self.bias_distribution.sample()
 
         # Stop gradient computation
         self.w = tf.stop_gradient(self.w)
-        if self.use_bias and self.b is not None:
+        if self.use_bias:
             self.b = tf.stop_gradient(self.b)
 
     def kl_cost(self) -> tuple[tf.Tensor, int]:
@@ -158,12 +158,12 @@ class Linear(BayesianModule):
         log_probs: tf.Tensor = self.weights_distribution.log_prob(self.w)
 
         # Add bias log probs only if using bias
-        if self.use_bias and self.bias_distribution:
+        if self.use_bias and self.b is not None and self.bias_distribution is not None:
             log_probs += self.bias_distribution.log_prob(self.b)
 
         # Compute number of parameters
         num_params: int = self.weights_distribution.num_params
-        if self.use_bias and self.bias_distribution:
+        if self.use_bias and self.bias_distribution is not None:
             num_params += self.bias_distribution.num_params
 
         return log_probs, num_params
@@ -191,7 +191,7 @@ class Linear(BayesianModule):
             self.w = self.weights_distribution.sample()
 
             # Sample bias only if using bias
-            if self.use_bias and self.bias_distribution:
+            if self.use_bias and self.bias_distribution is not None:
                 self.b = self.bias_distribution.sample()
         elif self.w is None or (self.use_bias and self.b is None):
             raise ValueError(

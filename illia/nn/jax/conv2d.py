@@ -110,7 +110,7 @@ class Conv2d(BayesianModule):
         self.weights = nnx.Param(self.weights_distribution.sample(self.rngs))
 
         # Sample initial bias only if using bias
-        if self.use_bias and self.bias_distribution:
+        if self.use_bias and self.bias_distribution is not None:
             self.bias = nnx.Param(self.bias_distribution.sample(self.rngs))
         else:
             self.bias = None
@@ -133,12 +133,12 @@ class Conv2d(BayesianModule):
             self.weights = nnx.Param(self.weights_distribution.sample(self.rngs))
 
         # Sample bias if they are undefined and bias is used
-        if self.use_bias and self.bias is None and self.bias_distribution:
+        if self.use_bias and self.bias is None and self.bias_distribution is not None:
             self.bias = nnx.Param(self.bias_distribution.sample(self.rngs))
 
         # Stop gradient computation
         self.weights = jax.lax.stop_gradient(self.weights)
-        if self.use_bias and self.bias:
+        if self.use_bias:
             self.bias = jax.lax.stop_gradient(self.bias)
 
     def kl_cost(self) -> tuple[jax.Array, int]:
@@ -161,12 +161,16 @@ class Conv2d(BayesianModule):
         )
 
         # Add bias log probs only if using bias
-        if self.use_bias and self.bias and self.bias_distribution:
+        if (
+            self.use_bias
+            and self.bias is not None
+            and self.bias_distribution is not None
+        ):
             log_probs += self.bias_distribution.log_prob(jnp.asarray(self.bias))
 
         # Compute number of parameters
         num_params: int = self.weights_distribution.num_params
-        if self.use_bias and self.bias_distribution:
+        if self.use_bias and self.bias_distribution is not None:
             num_params += self.bias_distribution.num_params
 
         return log_probs, num_params
@@ -190,7 +194,7 @@ class Conv2d(BayesianModule):
             self.weights = nnx.Param(self.weights_distribution.sample(self.rngs))
 
             # Sample bias only if using bias
-            if self.use_bias and self.bias_distribution:
+            if self.use_bias and self.bias_distribution is not None:
                 self.bias = nnx.Param(self.bias_distribution.sample(self.rngs))
         elif self.weights is None or (self.use_bias and self.bias is None):
             raise ValueError(
@@ -214,7 +218,7 @@ class Conv2d(BayesianModule):
         )
 
         # Add bias only if using bias
-        if self.use_bias and self.bias:
+        if self.use_bias and self.bias is not None:
             outputs += jnp.reshape(
                 a=jnp.asarray(self.bias), shape=(1, self.output_channels, 1, 1)
             )

@@ -48,6 +48,20 @@ class LSTM(BayesianModule):
         sparse: bool = False,
         **kwargs: Any,
     ) -> None:
+        """
+        Initializes a LSTM layer.
+
+        Args:
+            num_embeddings (int): _description_
+            embeddings_dim (int): _description_
+            hidden_size (int): _description_
+            output_size (int): _description_
+            padding_idx (Optional[int], optional): _description_. Defaults to None.
+            max_norm (Optional[float], optional): _description_. Defaults to None.
+            norm_type (float, optional): _description_. Defaults to 2.0.
+            scale_grad_by_freq (bool, optional): _description_. Defaults to False.
+            sparse (bool, optional): _description_. Defaults to False.
+        """
 
         # Call super-class constructor
         super().__init__(**kwargs)

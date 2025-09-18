@@ -24,10 +24,11 @@ class Linear(BayesianModule):
         output_size: int,
         weights_distribution: Optional[GaussianDistribution] = None,
         bias_distribution: Optional[GaussianDistribution] = None,
+        use_bias: bool = True,
         **kwargs: Any,
     ) -> None:
         """
-        This is the constructor of the Linear class.
+        Initializes a Linear layer.
 
         Args:
             input_size: Input size of the linear layer.
@@ -36,6 +37,15 @@ class Linear(BayesianModule):
                 layer. Defaults to None.
             bias_distribution: GaussianDistribution for the bias of the layer.
                 Defaults to None.
+            use_bias: Whether to include a bias term.
+            **kwargs: Additional keyword arguments.
+
+        Returns:
+            None.
+
+        Notes:
+            If no distributions are provided, Gaussian distributions are
+            used by default.
         """
 
         # Call super-class constructor
@@ -44,6 +54,7 @@ class Linear(BayesianModule):
         # Set attributes
         self.input_size = input_size
         self.output_size = output_size
+        self.use_bias = use_bias
 
         # Set weights distribution
         if weights_distribution is None:
@@ -54,18 +65,25 @@ class Linear(BayesianModule):
             self.weights_distribution = weights_distribution
 
         # Set bias distribution
-        if bias_distribution is None:
-            self.bias_distribution = GaussianDistribution((self.output_size,))
+        if self.use_bias:
+            if bias_distribution is None:
+                self.bias_distribution = GaussianDistribution((self.output_size,))
+            else:
+                self.bias_distribution = bias_distribution
         else:
-            self.bias_distribution = bias_distribution
+            self.bias_distribution = None  # type: ignore
 
         # Sample initial weights
         weights = self.weights_distribution.sample()
-        bias = self.bias_distribution.sample()
 
         # Register buffers
         self.register_buffer("weights", weights)
-        self.register_buffer("bias", bias)
+
+        if self.use_bias and self.bias_distribution is not None:
+            bias = self.bias_distribution.sample()
+            self.register_buffer("bias", bias)
+        else:
+            self.bias = None  # type: ignore
 
     @torch.jit.export
     def freeze(self) -> None:
@@ -85,13 +103,14 @@ class Linear(BayesianModule):
         if self.weights is None:
             self.weights = self.weights_distribution.sample()
 
-        # Sample bias is they are undefined
-        if self.bias is None:
-            self.bias = self.bias_distribution.sample()
+        # Sample bias if they are undefined and bias is used
+        if self.use_bias and self.bias_distribution is not None:
+            if not hasattr(self, "bias") or self.bias is None:
+                self.bias = self.bias_distribution.sample()
+            self.bias = self.bias.detach()
 
         # Detach weights and bias
         self.weights = self.weights.detach()
-        self.bias = self.bias.detach()
 
     @torch.jit.export
     def kl_cost(self) -> tuple[torch.Tensor, int]:
@@ -105,14 +124,16 @@ class Linear(BayesianModule):
         """
 
         # Compute log probs
-        log_probs: torch.Tensor = self.weights_distribution.log_prob(
-            self.weights
-        ) + self.bias_distribution.log_prob(self.bias)
+        log_probs: torch.Tensor = self.weights_distribution.log_prob(self.weights)
 
-        # Compute the number of parameters
-        num_params: int = (
-            self.weights_distribution.num_params() + self.bias_distribution.num_params()
-        )
+        # Add bias log probs if bias is used
+        if self.use_bias and self.bias_distribution is not None:
+            log_probs += self.bias_distribution.log_prob(self.bias)
+
+        # Compute number of parameters
+        num_params: int = self.weights_distribution.num_params()
+        if self.use_bias and self.bias_distribution is not None:
+            num_params += self.bias_distribution.num_params()
 
         return log_probs, num_params
 
@@ -133,14 +154,21 @@ class Linear(BayesianModule):
         # Check if layer is frozen
         if not self.frozen:
             self.weights = self.weights_distribution.sample()
-            self.bias = self.bias_distribution.sample()
-        elif self.weights is None or self.bias is None:
-            raise ValueError("Module has been frozen with undefined weights")
+
+            # Sample bias only if using bias
+            if self.use_bias and self.bias_distribution is not None:
+                self.bias = self.bias_distribution.sample()
+        elif self.weights is None or (self.use_bias and self.bias is None):
+            raise ValueError(
+                "Module has been frozen with undefined weights and/or bias."
+            )
 
         # Compute outputs
         # pylint: disable=E1102
-        outputs: torch.Tensor = F.linear(
-            input=inputs, weight=self.weights, bias=self.bias
-        )
+        outputs: torch.Tensor = F.linear(input=inputs, weight=self.weights)
+
+        # Add bias only if using bias
+        if self.use_bias and self.bias is not None:
+            outputs += torch.reshape(input=self.bias, shape=(1, self.output_size))
 
         return outputs

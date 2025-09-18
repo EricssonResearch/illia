@@ -30,7 +30,7 @@ class Embedding(BayesianModule):
         **kwargs: Any,
     ) -> None:
         """
-        This method is the constructor of the embedding class.
+        Initializes a Embedding layer.
 
         Args:
             num_embeddings: size of the dictionary of embeddings.
