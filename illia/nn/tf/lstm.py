@@ -348,12 +348,12 @@ class LSTM(BayesianModule):
             Tuple containing:
                 - Output tensor after final linear transformation.
                 - Tuple of final hidden and cell states.
-        
+
         Raises:
             ValueError: If the layer is frozen but weights are
                 undefined.
         """
-        
+
         # Sample weights if not frozen
         if not self.frozen:
             self.wf = self.wf_distribution.sample()

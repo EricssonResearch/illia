@@ -95,7 +95,7 @@ class Linear(BayesianModule):
         Returns:
             None.
         """
-        
+
         # Set indicator
         self.frozen = True
 
@@ -146,7 +146,7 @@ class Linear(BayesianModule):
 
         Returns:
             outputs tensor. Dimensions: [batch, *].
-        
+
         Raises:
             ValueError: If the layer is frozen but weights or bias are
                 undefined.

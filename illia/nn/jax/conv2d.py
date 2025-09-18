@@ -40,7 +40,7 @@ class Conv2d(BayesianModule):
     ) -> None:
         """
         Initializes a Bayesian 2D convolutional layer.
-        
+
         Args:
             input_channels: Number of input feature channels.
             output_channels: Number of output feature channels.

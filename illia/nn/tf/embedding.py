@@ -211,7 +211,7 @@ class Embedding(BayesianModule):
 
         Returns:
             Tensor of embeddings.
-        
+
         Raises:
             ValueError: If the layer is frozen but weights are
                 undefined.

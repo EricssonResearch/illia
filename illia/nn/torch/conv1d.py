@@ -173,7 +173,7 @@ class Conv1d(BayesianModule):
         Returns:
             Output tensor after passing through the layer with shape
                 (batch, output channels, output width, output height).
-        
+
         Raises:
             ValueError: If the layer is frozen but weights or bias are
                 undefined.

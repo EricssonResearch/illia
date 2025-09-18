@@ -49,7 +49,7 @@ class Embedding(BayesianModule):
             weights_distribution: distribution for the weights of the
                 layer.
             **kwargs: Extra arguments passed to the base class.
-        
+
         Returns:
             None.
 
@@ -57,7 +57,7 @@ class Embedding(BayesianModule):
             Gaussian distributions are used by default if none are
             provided.
         """
-        
+
         # Call super class constructor
         super().__init__(**kwargs)
 
@@ -133,7 +133,7 @@ class Embedding(BayesianModule):
 
         Returns:
             outputs tensor. Dimension: [*, embedding dim].
-        
+
         Raises:
             ValueError: If the layer is frozen but weights are
                 undefined.

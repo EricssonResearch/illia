@@ -307,7 +307,7 @@ class Conv1d(BayesianModule):
 
         Returns:
             Output tensor after convolution with optional bias added.
-        
+
         Raises:
             ValueError: If the layer is frozen but weights or bias are
                 undefined.

@@ -186,7 +186,7 @@ class Linear(BayesianModule):
 
         Returns:
             Output tensor after linear transformation.
-        
+
         Raises:
             ValueError: If the layer is frozen but weights or bias are
                 undefined.
