@@ -17,6 +17,14 @@ body {
   justify-content: center;
 }
 
+.md-typeset__table {
+  min-width: 100%;
+}
+
+.md-typeset table:not([class]) {
+  display: table;
+}
+
 /* Logo for light mode (hide white logo) */
 [data-md-color-scheme="default"] .logo-black {
   display: inline-block;
