@@ -63,7 +63,7 @@ jax = [
     "jax==0.4.31",
 ]
 pyg = [
-    "torch-geometric==2.5.1",
+    "torch-geometric==2.7.0",
 ]
 
 [dependency-groups]
