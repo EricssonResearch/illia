@@ -85,7 +85,7 @@ documentation = [
     "mkdocs==1.6.1",
     "mkdocstrings[python]==0.30.1",
     "mkdocs-material==9.6.16",
-    "mkdocs-git-revision-date-localized-plugin==1.4.7",
+    "mkdocs-git-revision-date-localized-plugin==1.5.0",
     "mkdocs-git-authors-plugin==0.10.0",
     "mkdocs-enumerate-headings-plugin==0.6.2",
     "mkdocs-jupyter==0.25.1",
