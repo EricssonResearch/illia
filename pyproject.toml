@@ -70,7 +70,7 @@ pyg = [
 pipeline = [
     "black==25.9.0",
     "black[jupyter]",
-    "complexipy==4.2.0",
+    "complexipy==5.0.0",
     "flake8==7.3.0",
     "Flake8-pyproject==1.2.3",
     "isort==7.0.0",
