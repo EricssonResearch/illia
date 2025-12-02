@@ -77,8 +77,8 @@ pipeline = [
     "nox==2025.11.12",
     "pylint==4.0.4",
     "pytest-order==1.3.0",
-    "pytest==8.4.2",
     "mypy==1.19.0",
+    "pytest==9.0.1",
     "bandit==1.9.2",
 ]
 documentation = [
