@@ -75,7 +75,7 @@ pipeline = [
     "Flake8-pyproject==1.2.3",
     "isort==7.0.0",
     "nox==2025.11.12",
-    "pylint==4.0.2",
+    "pylint==4.0.4",
     "pytest-order==1.3.0",
     "pytest==8.4.2",
     "mypy==1.18.2",
