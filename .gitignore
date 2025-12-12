@@ -15,6 +15,7 @@ __pycache__/
 ./examples/illia_all_backend_all_modules_pytests.ipynb
 *.egg-info/
 /docs/examples/Computer Vision/data*
+.complexipy_cache/
 
 # Files
 *.txt

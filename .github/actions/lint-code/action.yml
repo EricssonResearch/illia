@@ -38,7 +38,7 @@ runs:
       shell: bash
       run: |
         echo "Running Complexipy..."
-        uv run complexipy -d low "${{ inputs.src-project-folder }}/"
+        uv run complexipy -f "${{ inputs.src-project-folder }}/"
 
     - name: Check Type Hints with Mypy
       shell: bash
