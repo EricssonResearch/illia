@@ -40,10 +40,8 @@ class KLDivergenceLoss(losses.Loss):
             None
         """
 
-        # Call super class constructor
         super().__init__(**kwargs)
 
-        # Set attributes
         self.reduction = reduction
         self.weight = weight
 
@@ -55,13 +53,10 @@ class KLDivergenceLoss(losses.Loss):
             dict: Dictionary containing the KL loss configuration.
         """
 
-        # Get the base configuration
         base_config = super().get_config()
 
-        # Add custom configurations
         custom_config = {"reduction": self.reduction, "weight": self.weight}
 
-        # Combine both configurations
         return {**base_config, **custom_config}
 
     def __call__(self, *args: Any, **kwargs: Any) -> tf.Tensor:

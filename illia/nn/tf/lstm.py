@@ -55,10 +55,8 @@ class LSTM(BayesianModule):
             provided.
         """
 
-        # Call super-class constructor
         super().__init__(**kwargs)
 
-        # Set attributes
         self.num_embeddings = num_embeddings
         self.embeddings_dim = embeddings_dim
         self.hidden_size = hidden_size
@@ -197,7 +195,6 @@ class LSTM(BayesianModule):
             trainable=False,
         )
 
-        # Call super-class build method
         super().build(input_shape)
 
     def get_config(self) -> dict:
@@ -208,10 +205,8 @@ class LSTM(BayesianModule):
             dict: Dictionary with the layer configuration.
         """
 
-        # Get the base configuration
         base_config = super().get_config()
 
-        # Add the custom configurations
         custom_config = {
             "num_embeddings": self.num_embeddings,
             "embeddings_dim": self.embeddings_dim,
@@ -224,7 +219,6 @@ class LSTM(BayesianModule):
             "sparse": self.sparse,
         }
 
-        # Combine both configurations
         return {**base_config, **custom_config}
 
     def freeze(self) -> None:

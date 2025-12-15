@@ -73,10 +73,8 @@ class LSTM(BayesianModule):
             provided.
         """
 
-        # Call super-class constructor
         super().__init__(**kwargs)
 
-        # Set attributes
         self.num_embeddings = num_embeddings
         self.embeddings_dim = embeddings_dim
         self.hidden_size = hidden_size

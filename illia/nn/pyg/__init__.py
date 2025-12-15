@@ -9,7 +9,6 @@ other modules.
 from illia.nn.pyg.cg_conv import CGConv
 
 
-# Define all names to be imported
 __all__: list[str] = [
     "CGConv",
 ]

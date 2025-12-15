@@ -46,10 +46,8 @@ class ELBOLoss(losses.Loss):
             None
         """
 
-        # Call super class constructor
         super().__init__(**kwargs)
 
-        # Set attributes
         self.loss_function = loss_function
         self.num_samples = num_samples
         self.kl_weight = kl_weight
@@ -63,17 +61,14 @@ class ELBOLoss(losses.Loss):
             dict: Dictionary containing the layer configuration.
         """
 
-        # Get the base configuration
         base_config = super().get_config()
 
-        # Add custom configurations
         custom_config = {
             "loss_function": self.loss_function,
             "num_samples": self.num_samples,
             "kl_weight": self.kl_weight,
         }
 
-        # Combine both configurations
         return {**base_config, **custom_config}
 
     def __call__(

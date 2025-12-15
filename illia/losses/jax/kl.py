@@ -40,10 +40,8 @@ class KLDivergenceLoss(nnx.Module):
             None
         """
 
-        # Call super class constructor
         super().__init__(**kwargs)
 
-        # Set attributes
         self.reduction = reduction
         self.weight = weight
 

@@ -13,7 +13,6 @@ from illia.nn.jax.linear import Linear
 from illia.nn.jax.lstm import LSTM
 
 
-# Define all names to be imported
 __all__: list[str] = [
     "BayesianModule",
     "Conv1d",

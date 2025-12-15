@@ -34,7 +34,6 @@ class ComposedModel(torch.nn.Module):
             None.
         """
 
-        # Call super class constructor
         super().__init__()
 
         # Set up models
@@ -75,7 +74,6 @@ class BayesianComposedModel(BayesianModule):
             None.
         """
 
-        # Call super class constructor
         super().__init__()
 
         # Set up models

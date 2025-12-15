@@ -4,7 +4,7 @@ This module defines fixtures for illia.torch.nn.
 
 # Standard libraries
 import os
-from typing import Optional, Union
+from typing import Optional
 
 
 # Change Illia Backend
@@ -101,10 +101,10 @@ def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2d, torch.Tensor
     batch_size: int
     input_channels: int
     output_channels: int
-    kernel_size: Union[int, tuple[int, int]]
-    stride: Union[int, tuple[int, int]]
-    padding: Union[int, tuple[int, int]]
-    dilation: Union[int, tuple[int, int]] = 1
+    kernel_size: int | tuple[int, int]
+    stride: int | tuple[int, int]
+    padding: int | tuple[int, int]
+    dilation: int | tuple[int, int] = 1
     groups: int = 1
     weights_distribution: Optional[GaussianDistribution]
     bias_distribution: Optional[GaussianDistribution]

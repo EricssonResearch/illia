@@ -66,10 +66,8 @@ class CGConv(MessagePassing):
             None.
         """
 
-        # Call super class constructor
         super().__init__(aggr=aggr, **kwargs)
 
-        # Set attributes
         self.channels = channels
         self.dim = dim
 

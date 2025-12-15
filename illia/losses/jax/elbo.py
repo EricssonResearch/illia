@@ -46,10 +46,8 @@ class ELBOLoss(nnx.Module):
             None
         """
 
-        # Call super class constructor
         super().__init__(**kwargs)
 
-        # Set attributes
         self.loss_function = loss_function
         self.num_samples = num_samples
         self.kl_weight = kl_weight

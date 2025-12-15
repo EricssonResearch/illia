@@ -48,7 +48,6 @@ class Linear(BayesianModule):
             provided.
         """
 
-        # Call super-class constructor
         super().__init__(**kwargs)
 
         # Set parameters
@@ -102,7 +101,6 @@ class Linear(BayesianModule):
                 trainable=False,
             )
 
-        # Call super-class build method
         super().build(input_shape)
 
     def get_config(self) -> dict:
@@ -113,16 +111,13 @@ class Linear(BayesianModule):
             dict: Dictionary with the layer configuration.
         """
 
-        # Get the base configuration
         base_config = super().get_config()
 
-        # Add the custom configurations
         custom_config = {
             "input_size": self.input_size,
             "output_size": self.output_size,
         }
 
-        # Combine both configurations
         return {**base_config, **custom_config}
 
     def freeze(self) -> None:
