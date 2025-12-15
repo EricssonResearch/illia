@@ -30,10 +30,8 @@ class BayesianModule(nnx.Module, ABC):
             None.
         """
 
-        # Call super class constructor
         super().__init__(**kwargs)
 
-        # Set attributes
         self.frozen: bool = False
         self.is_bayesian: bool = True
 

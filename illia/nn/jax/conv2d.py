@@ -63,10 +63,8 @@ class Conv2d(BayesianModule):
             provided.
         """
 
-        # Call super class constructor
         super().__init__(**kwargs)
 
-        # Set attributes
         self.input_channels = input_channels
         self.output_channels = output_channels
         self.kernel_size = kernel_size

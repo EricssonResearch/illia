@@ -41,7 +41,6 @@ class KLDivergenceLoss(torch.nn.Module):
         # call super class constructor
         super().__init__(**kwargs)
 
-        # Set attributes
         self.reduction = reduction
         self.weight = weight
 

@@ -45,10 +45,8 @@ class GaussianDistribution(DistributionModule):
             None
         """
 
-        # Call super-class constructor
         super().__init__(**kwargs)
 
-        # Set attributes
         self.shape = shape
         self.mu_init = mu_init
         self.rho_init = rho_init

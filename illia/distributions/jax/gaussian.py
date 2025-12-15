@@ -50,10 +50,8 @@ class GaussianDistribution(DistributionModule):
             None
         """
 
-        # Call super-class constructor
         super().__init__(**kwargs)
 
-        # Set attributes
         self.shape = shape
         self.mu_prior = mu_prior
         self.std_prior = std_prior

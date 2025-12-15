@@ -48,10 +48,8 @@ class Linear(BayesianModule):
             provided.
         """
 
-        # Call super-class constructor
         super().__init__(**kwargs)
 
-        # Set attributes
         self.input_size = input_size
         self.output_size = output_size
         self.use_bias = use_bias

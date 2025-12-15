@@ -54,10 +54,8 @@ class Embedding(BayesianModule):
             provided.
         """
 
-        # Call super class constructor
         super().__init__(**kwargs)
 
-        # Set attributes
         self.num_embeddings = num_embeddings
         self.embeddings_dim = embeddings_dim
         self.padding_idx = padding_idx

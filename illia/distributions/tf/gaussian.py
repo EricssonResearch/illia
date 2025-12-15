@@ -48,17 +48,14 @@ class GaussianDistribution(DistributionModule):
             None
         """
 
-        # Call super class constructor
         super().__init__(**kwargs)
 
-        # Set attributes
         self.shape = shape
         self.mu_prior_value = mu_prior
         self.std_prior_value = std_prior
         self.mu_init = mu_init
         self.rho_init = rho_init
 
-        # Call build method
         self.build(self.shape)
 
     def build(self, input_shape: tf.TensorShape) -> None:
@@ -102,7 +99,6 @@ class GaussianDistribution(DistributionModule):
             name="rho",
         )
 
-        # Call super-class build method
         super().build(input_shape)
 
     def get_config(self) -> dict:

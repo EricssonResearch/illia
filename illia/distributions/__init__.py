@@ -3,7 +3,7 @@ Backend-agnostic interface for probability distributions.
 """
 
 # Standard libraries
-from typing import Any, Union
+from typing import Any
 
 # Own modules
 from illia import BackendManager
@@ -24,7 +24,7 @@ def __getattr__(name: str) -> None:
     # Obtain parameters for distributions
     module_type: str = "distributions"
     backend: str = BackendManager.get_backend()
-    module_path: Union[Any, dict[str, Any]] = BackendManager.get_backend_module(
+    module_path: Any | dict[str, Any] = BackendManager.get_backend_module(
         backend, module_type
     )
 

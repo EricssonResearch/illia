@@ -7,7 +7,7 @@ import importlib
 import os
 import warnings
 from functools import lru_cache
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 # Own modules
 from illia.support import (
@@ -25,8 +25,11 @@ class BackendManager:
     Backend manager that dynamically loads modules.
     """
 
+    # Configuration data
     _backend_modules: dict[str, list[str]] = BACKEND_MODULES
     _backend_capabilities: dict[str, dict[str, set[str]]] = BACKEND_CAPABILITIES
+
+    # Runtime state
     _loaded_backends: dict[str, dict[str, Any]] = {}
     _active_backend: Optional[str] = None
     _module_cache: dict[str, Any] = {}
@@ -35,7 +38,7 @@ class BackendManager:
     @classmethod
     def get_backend_module(
         cls, backend_name: str, module_type: Optional[str] = None
-    ) -> Union[Any, dict[str, Any]]:
+    ) -> Any | dict[str, Any]:
         """
         Retrieve a backend module or all its modules.
 
@@ -45,29 +48,32 @@ class BackendManager:
 
         Returns:
             The specified module or a dictionary of all modules for the
-            backend.
+                backend.
 
         Raises:
             ValueError: If the backend or module is not found.
             ImportError: If the module import fails.
         """
 
-        # Early validation without repeated property access
+        # Check if we're trying to switch backends, this isn't allowed
         if cls._active_backend and cls._active_backend != backend_name:
             raise RuntimeError(
-                f"Backend already set to '{cls._active_backend}' "
-                f"cannot switch to '{backend_name}'. Restart to change."
+                f"Already using '{cls._active_backend}'. "
+                f"Can't switch to '{backend_name}'. Restart to change backends."
             )
 
+        # Validate backend exists
         if backend_name not in cls._backend_modules:
+            available = list(cls._backend_modules.keys())
             raise ImportError(
-                f"Backend '{backend_name}' is not available. "
-                f"Available backends: {list(cls._backend_modules.keys())}"
+                f"Backend '{backend_name}' doesn't exist. "
+                f"Available backends: {available}."
             )
 
-        # Initialize backend storage if needed
+        # Initialize storage for this backend
         if backend_name not in cls._loaded_backends:
             cls._loaded_backends[backend_name] = {}
+
         cls._active_backend = backend_name
 
         if module_type:
@@ -108,10 +114,10 @@ class BackendManager:
 
         if not target_module:
             raise ImportError(
-                f"Module '{module_type}' not available for backend '{backend_name}'"
+                f"Module '{module_type}' not available for backend '{backend_name}'."
             )
 
-        # Use module cache to avoid repeated imports
+        # Load the module with caching
         if target_module in cls._module_cache:
             loaded_module = cls._module_cache[target_module]
         else:
@@ -121,7 +127,7 @@ class BackendManager:
             except ImportError as e:
                 raise ImportError(
                     f"Failed to import module '{module_type}' "
-                    f"from backend '{backend_name}'. Error: {e}"
+                    f"from backend '{backend_name}'. Error: {e}."
                 ) from e
 
         cls._loaded_backends[backend_name][module_key] = loaded_module
@@ -163,7 +169,7 @@ class BackendManager:
                     loaded_module = importlib.import_module(module_path)
                     cls._module_cache[module_path] = loaded_module
                 except ImportError as e:
-                    warnings.warn(f"Could not load module '{module_path}': {e}")
+                    warnings.warn(f"Could not load module '{module_path}': {e}.")
                     continue
 
             cls._loaded_backends[backend_name][module_key] = loaded_module
@@ -203,7 +209,7 @@ class BackendManager:
         backend_name: str,
         class_name: str,
         module_type: str,
-        module_path: Union[Any, dict[str, Any]],
+        module_path: Any | dict[str, Any],
     ) -> Any:
         """
         Retrieve a class from a backend module, checking its availability.
@@ -229,7 +235,7 @@ class BackendManager:
             )
             msg = f"Class '{class_name}' is not available in backend '{backend_name}'."
             if available_backends:
-                msg += f" Available in: {available_backends}"
+                msg += f" Available in: {available_backends}."
             raise ImportError(msg)
 
         return getattr(module_path, class_name)
@@ -313,6 +319,7 @@ class BackendManager:
             cls._available_backends = list(
                 AVAILABLE_DNN_BACKENDS | AVAILABLE_GNN_BACKENDS
             )
+
         return cls._available_backends.copy()
 
     @classmethod
@@ -341,17 +348,6 @@ class BackendManager:
         """
 
         cls.get_backend_module(cls.get_backend())
-
-    @classmethod
-    def clear_cache(cls) -> None:
-        """
-        Clear all caches. Useful for testing or when backend capabilities change.
-        """
-
-        cls.is_class_available.cache_clear()
-        cls.get_available_classes.cache_clear()
-        cls.get_all_available_backends_for_class.cache_clear()
-        cls.is_backend_available.cache_clear()
 
 
 def __getattr__(name: str) -> Any:

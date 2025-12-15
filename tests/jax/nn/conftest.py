@@ -4,7 +4,7 @@ This module defines fixtures for illia.jax.nn.
 
 # Standard libraries
 import os
-from typing import Optional, Union
+from typing import Optional
 
 
 # Change Illia Backend
@@ -191,7 +191,7 @@ def conv2d_fixture(request: pytest.FixtureRequest) -> tuple[Conv2d, jax.Array]:
     batch_size: int
     input_channels: int
     output_channels: int
-    kernel_size: Union[int, tuple[int, int]]
+    kernel_size: int | tuple[int, int]
     stride: tuple[int]
     padding: tuple[int, int]
     dilation: tuple[int]

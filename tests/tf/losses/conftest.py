@@ -1,5 +1,5 @@
 """
-This module defines fixtures for illia.torch.nn.
+This module defines fixtures for illia.tf.losses.
 """
 
 # Standard libraries

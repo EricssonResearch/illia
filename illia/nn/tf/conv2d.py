@@ -61,13 +61,11 @@ class Conv2d(BayesianModule):
             provided.
         """
 
-        # Call super class constructor
         super().__init__(**kwargs)
 
         # Check data format
         self._check_params(kernel_size, groups, stride, dilation, data_format)
 
-        # Set attributes
         self.input_channels = input_channels
         self.output_channels = output_channels
         self.kernel_size = kernel_size
@@ -185,7 +183,6 @@ class Conv2d(BayesianModule):
                 trainable=False,
             )
 
-        # Call super-class build method
         super().build(input_shape)
 
     def get_config(self) -> dict:
@@ -196,10 +193,8 @@ class Conv2d(BayesianModule):
             dict: Dictionary with the layer configuration.
         """
 
-        # Get the base configuration
         base_config = super().get_config()
 
-        # Add the custom configurations
         custom_config = {
             "input_channels": self.input_channels,
             "output_channels": self.output_channels,
@@ -211,7 +206,6 @@ class Conv2d(BayesianModule):
             "data_format": self.data_format,
         }
 
-        # Combine both configurations
         return {**base_config, **custom_config}
 
     def _conv2d(

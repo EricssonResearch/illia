@@ -9,7 +9,6 @@ from illia.losses.torch.elbo import ELBOLoss
 from illia.losses.torch.kl import KLDivergenceLoss
 
 
-# Define all names to be imported
 __all__: list[str] = [
     "ELBOLoss",
     "KLDivergenceLoss",

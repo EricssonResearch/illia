@@ -52,7 +52,6 @@ class Embedding(BayesianModule):
             provided.
         """
 
-        # Call super class constructor
         super().__init__(**kwargs)
 
         # Set atributtes
@@ -93,7 +92,6 @@ class Embedding(BayesianModule):
             trainable=False,
         )
 
-        # Call super-class build method
         super().build(input_shape)
 
     def get_config(self) -> dict:
@@ -104,10 +102,8 @@ class Embedding(BayesianModule):
             dict: Dictionary with the layer configuration.
         """
 
-        # Get the base configuration
         base_config = super().get_config()
 
-        # Add the custom configurations
         config = {
             "num_embeddings": self.num_embeddings,
             "embeddings_dim": self.embeddings_dim,
@@ -118,7 +114,6 @@ class Embedding(BayesianModule):
             "sparse": self.sparse,
         }
 
-        # Combine both configurations
         return {**base_config, **config}
 
     def _embedding(
