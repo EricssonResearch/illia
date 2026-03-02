@@ -29,6 +29,11 @@ def __getattr__(name: str) -> Any:
     if (path := NONPARAMETRIC_LAYER_MAP.get(backend, {}).get(name)) is not None:
         module_name, class_name = path.rsplit(".", 1)
         layer_class = BackendManager.import_external_class(module_name, class_name)
+        
+        # HACK: Special handling for TensorFlow Activation layers
+        if backend == "tf" and class_name == "Activation":
+            from functools import partial
+            layer_class = partial(layer_class, name.lower())
     else:
         # Otherwise, get Bayesian layer from illia implementation, or failure.
         module = BackendManager.get_backend_module(backend, module_type)

@@ -129,6 +129,7 @@ BACKEND_CAPABILITIES: Final[dict[str, dict[str, set[str]]]] = {
             "Sigmoid",
             "Tanh",
             "LeakyReLU",
+            "GELU",
             *_NORMALIZATION_LAYERS,
             *_REGULARIZATION_LAYERS,
             "Flatten",  # No Identity in TF
@@ -171,26 +172,27 @@ NONPARAMETRIC_LAYER_MAP: Final[dict[str, dict[str, str]]] = {
     "tf": {
         # TODO: decide: import from tf or update to keras only.
         # Pooling : diff naming convention
-        "MaxPool1d": "tf.keras.layers.MaxPooling1D",
-        "MaxPool2d": "tf.keras.layers.MaxPooling2D",
-        "AvgPool1d": "tf.keras.layers.AveragePooling1D",
-        "AvgPool2d": "tf.keras.layers.AveragePooling2D",
-        "AdaptiveAvgPool2d": "tf.keras.layers.GlobalAveragePooling2D",
+        "MaxPool1d": "tensorflow.keras.layers.MaxPooling1D",
+        "MaxPool2d": "tensorflow.keras.layers.MaxPooling2D",
+        "AvgPool1d": "tensorflow.keras.layers.AveragePooling1D",
+        "AvgPool2d": "tensorflow.keras.layers.AveragePooling2D",
+        "AdaptiveAvgPool2d": "tensorflow.keras.layers.GlobalAveragePooling2D",
         # Activations
-        "ReLU": "tf.keras.layers.ReLU",
-        "Sigmoid": "tf.keras.layers.Activation('sigmoid')",
-        "Tanh": "tf.keras.layers.Activation('tanh')",
-        "LeakyReLU": "tf.keras.layers.LeakyReLU",
+        "ReLU": "tensorflow.keras.layers.Activation",
+        "Sigmoid": "tensorflow.keras.layers.Activation",
+        "Tanh": "tensorflow.keras.layers.Activation",
+        "LeakyReLU": "tensorflow.keras.layers.LeakyReLU",  # HACK: name inconsistency
+        "GELU" : "tensorflow.keras.layers.Activation",
         # Normalization
-        "BatchNorm1d": "tf.keras.layers.BatchNormalization",
-        "BatchNorm2d": "tf.keras.layers.BatchNormalization",
-        "BatchNorm3d": "tf.keras.layers.BatchNormalization",
-        "LayerNorm": "tf.keras.layers.LayerNormalization",
+        "BatchNorm1d": "tensorflow.keras.layers.BatchNormalization",
+        "BatchNorm2d": "tensorflow.keras.layers.BatchNormalization",
+        "BatchNorm3d": "tensorflow.keras.layers.BatchNormalization",
+        "LayerNorm": "tensorflow.keras.layers.LayerNormalization",
         # Regularization
-        "Dropout": "tf.keras.layers.Dropout",
-        "Dropout2d": "tf.keras.layers.SpatialDropout2D",
+        "Dropout": "tensorflow.keras.layers.Dropout",
+        "Dropout2d": "tensorflow.keras.layers.SpatialDropout2D",
         # Utility
-        "Flatten": "tf.keras.layers.Flatten",
+        "Flatten": "tensorflow.keras.layers.Flatten",
     },
     "jax": {
         # JAX/Flax diff naming
