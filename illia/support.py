@@ -45,33 +45,163 @@ BACKEND_MODULES: Final[dict[str, list[str]]] = {
     "pyg": ["illia.nn.pyg"],
 }
 
+# Bayesian layers shared across torch/tf/jax
+_BAYESIAN_LAYERS: Final[frozenset[str]] = frozenset(
+    {
+        "BayesianModule",
+        "Conv1d",
+        "Conv2d",
+        "Embedding",
+        "Linear",
+        "LSTM",
+    }
+)
+
+# Non-parametric layers by category
+_POOLING_LAYERS: Final[frozenset[str]] = frozenset(
+    {
+        "MaxPool1d",
+        "MaxPool2d",
+        "AvgPool1d",
+        "AvgPool2d",
+        "AdaptiveAvgPool2d",
+        "AdaptiveMaxPool2d",
+    }
+)
+
+_ACTIVATION_LAYERS: Final[frozenset[str]] = frozenset(
+    {
+        "ReLU",
+        "Sigmoid",
+        "Tanh",
+        "LeakyReLU",
+        "GELU",
+    }
+)
+
+_NORMALIZATION_LAYERS: Final[frozenset[str]] = frozenset(
+    {
+        "BatchNorm1d",
+        "BatchNorm2d",
+        "LayerNorm",
+    }
+)
+
+_REGULARIZATION_LAYERS: Final[frozenset[str]] = frozenset(
+    {
+        "Dropout",
+        "Dropout2d",
+    }
+)
+
+_UTILITY_LAYERS: Final[frozenset[str]] = frozenset(
+    {
+        "Flatten",
+        "Identity",
+    }
+)
+
 # Dictionary describing the layers and capabilities supported by each backend
 BACKEND_CAPABILITIES: Final[dict[str, dict[str, set[str]]]] = {
     "torch": {
-        "nn": {"BayesianModule", "Conv1d", "Conv2d", "Embedding", "Linear", "LSTM"},
-        "distributions": {"DistributionModule", "GaussianDistribution"},
-        "losses": {
-            "KLDivergenceLoss",
-            "ELBOLoss",
+        "nn": {
+            *_BAYESIAN_LAYERS,
+            *_POOLING_LAYERS,
+            *_ACTIVATION_LAYERS,
+            *_NORMALIZATION_LAYERS,
+            *_REGULARIZATION_LAYERS,
+            *_UTILITY_LAYERS,
         },
+        "distributions": {"DistributionModule", "GaussianDistribution"},
+        "losses": {"KLDivergenceLoss", "ELBOLoss"},
     },
     "tf": {
-        "nn": {"BayesianModule", "Conv1d", "Conv2d", "Embedding", "Linear", "LSTM"},
-        "distributions": {"DistributionModule", "GaussianDistribution"},
-        "losses": {
-            "KLDivergenceLoss",
-            "ELBOLoss",
+        "nn": {
+            *_BAYESIAN_LAYERS,
+            # Pooling (except AdaptiveMaxPool2d)
+            "MaxPool1d",
+            "MaxPool2d",
+            "AvgPool1d",
+            "AvgPool2d",
+            "AdaptiveAvgPool2d",
+            # Activations (except GELU in older TF)
+            "ReLU",
+            "Sigmoid",
+            "Tanh",
+            "LeakyReLU",
+            *_NORMALIZATION_LAYERS,
+            *_REGULARIZATION_LAYERS,
+            "Flatten",  # No Identity in TF
         },
+        "distributions": {"DistributionModule", "GaussianDistribution"},
+        "losses": {"KLDivergenceLoss", "ELBOLoss"},
     },
     "jax": {
-        "nn": {"BayesianModule", "Conv1d", "Conv2d", "Embedding", "Linear", "LSTM"},
-        "distributions": {"DistributionModule", "GaussianDistribution"},
-        "losses": {
-            "KLDivergenceLoss",
-            "ELBOLoss",
+        "nn": {
+            *_BAYESIAN_LAYERS,
+            # JAX limited non-parametric layers
+            "MaxPool2d",
+            "AvgPool2d",
+            "ReLU",
+            "Sigmoid",
+            "Tanh",
+            "GELU",
+            "BatchNorm2d",
+            "LayerNorm",
+            "Dropout",
         },
+        "distributions": {"DistributionModule", "GaussianDistribution"},
+        "losses": {"KLDivergenceLoss", "ELBOLoss"},
     },
     "pyg": {
         "nn": {"CGConv"},
+    },
+}
+
+# HACK: risk of path hard-coding.
+# Mapping for non-parametric layers to native backend implementations
+NONPARAMETRIC_LAYER_MAP: Final[dict[str, dict[str, str]]] = {
+    "torch": {
+        **{layer: f"torch.nn.{layer}" for layer in _POOLING_LAYERS},
+        **{layer: f"torch.nn.{layer}" for layer in _ACTIVATION_LAYERS},
+        **{layer: f"torch.nn.{layer}" for layer in _NORMALIZATION_LAYERS},
+        **{layer: f"torch.nn.{layer}" for layer in _REGULARIZATION_LAYERS},
+        **{layer: f"torch.nn.{layer}" for layer in _UTILITY_LAYERS},
+    },
+    "tf": {
+        # TODO: decide: import from tf or update to keras only.
+        # Pooling : diff naming convention
+        "MaxPool1d": "tf.keras.layers.MaxPooling1D",
+        "MaxPool2d": "tf.keras.layers.MaxPooling2D",
+        "AvgPool1d": "tf.keras.layers.AveragePooling1D",
+        "AvgPool2d": "tf.keras.layers.AveragePooling2D",
+        "AdaptiveAvgPool2d": "tf.keras.layers.GlobalAveragePooling2D",
+        # Activations
+        "ReLU": "tf.keras.layers.ReLU",
+        "Sigmoid": "tf.keras.layers.Activation('sigmoid')",
+        "Tanh": "tf.keras.layers.Activation('tanh')",
+        "LeakyReLU": "tf.keras.layers.LeakyReLU",
+        # Normalization
+        "BatchNorm1d": "tf.keras.layers.BatchNormalization",
+        "BatchNorm2d": "tf.keras.layers.BatchNormalization",
+        "BatchNorm3d": "tf.keras.layers.BatchNormalization",
+        "LayerNorm": "tf.keras.layers.LayerNormalization",
+        # Regularization
+        "Dropout": "tf.keras.layers.Dropout",
+        "Dropout2d": "tf.keras.layers.SpatialDropout2D",
+        # Utility
+        "Flatten": "tf.keras.layers.Flatten",
+    },
+    "jax": {
+        # JAX/Flax diff naming
+        "MaxPool2d": "flax.linen.max_pool",
+        "AvgPool2d": "flax.linen.avg_pool",
+        "ReLU": "flax.linen.relu",
+        "Sigmoid": "flax.linen.sigmoid",
+        "Tanh": "flax.linen.tanh",
+        "GELU": "flax.linen.gelu",
+        "BatchNorm2d": "flax.linen.BatchNorm",
+        "LayerNorm": "flax.linen.LayerNorm",
+        "Dropout": "flax.linen.Dropout",
     },
 }

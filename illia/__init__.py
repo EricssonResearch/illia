@@ -290,6 +290,22 @@ class BackendManager:
         )
 
     @classmethod
+    def import_external_class(cls, module_name: str, class_name: str) -> Any:
+        """
+        Import a class from an external module with caching.
+
+        Args:
+            module_name: Module path (e.g., "torch.nn").
+            class_name: Class name (e.g., "MaxPool2d").
+
+        Returns:
+            The requested class object.
+        """
+        if module_name not in cls._module_cache:
+            cls._module_cache[module_name] = importlib.import_module(module_name)
+        return getattr(cls._module_cache[module_name], class_name)
+
+    @classmethod
     def get_backend(cls) -> str:
         """
         Get current backend from environment variable.
