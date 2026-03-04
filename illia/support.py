@@ -7,6 +7,15 @@ It serves as a central configuration for backend-specific capabilities.
 # Standard libraries
 from typing import Final
 
+# Own modules
+from illia.nonparametric import (
+    _POOLING_LAYERS,
+    _ACTIVATION_LAYERS,
+    _NORMALIZATION_LAYERS,
+    _REGULARIZATION_LAYERS,
+    _UTILITY_LAYERS,
+)
+
 
 # Name of the environment variable to switch between backends at runtime
 ENV_OS_NAME: Final[str] = "ILLIA_BACKEND"
@@ -57,50 +66,6 @@ _BAYESIAN_LAYERS: Final[frozenset[str]] = frozenset(
     }
 )
 
-# Non-parametric layers by category
-_POOLING_LAYERS: Final[frozenset[str]] = frozenset(
-    {
-        "MaxPool1d",
-        "MaxPool2d",
-        "AvgPool1d",
-        "AvgPool2d",
-        "AdaptiveAvgPool2d",
-        "AdaptiveMaxPool2d",
-    }
-)
-
-_ACTIVATION_LAYERS: Final[frozenset[str]] = frozenset(
-    {
-        "ReLU",
-        "Sigmoid",
-        "Tanh",
-        "LeakyReLU",
-        "GELU",
-    }
-)
-
-_NORMALIZATION_LAYERS: Final[frozenset[str]] = frozenset(
-    {
-        "BatchNorm1d",
-        "BatchNorm2d",
-        "LayerNorm",
-    }
-)
-
-_REGULARIZATION_LAYERS: Final[frozenset[str]] = frozenset(
-    {
-        "Dropout",
-        "Dropout2d",
-    }
-)
-
-_UTILITY_LAYERS: Final[frozenset[str]] = frozenset(
-    {
-        "Flatten",
-        "Identity",
-    }
-)
-
 # Dictionary describing the layers and capabilities supported by each backend
 BACKEND_CAPABILITIES: Final[dict[str, dict[str, set[str]]]] = {
     "torch": {
@@ -118,13 +83,11 @@ BACKEND_CAPABILITIES: Final[dict[str, dict[str, set[str]]]] = {
     "tf": {
         "nn": {
             *_BAYESIAN_LAYERS,
-            # Pooling (except AdaptiveMaxPool2d)
-            "MaxPool1d",
+            "MaxPool1d",  # TBD: name overwritten: Y/N
             "MaxPool2d",
             "AvgPool1d",
             "AvgPool2d",
             "AdaptiveAvgPool2d",
-            # Activations (except GELU in older TF)
             "ReLU",
             "Sigmoid",
             "Tanh",
@@ -132,7 +95,7 @@ BACKEND_CAPABILITIES: Final[dict[str, dict[str, set[str]]]] = {
             "GELU",
             *_NORMALIZATION_LAYERS,
             *_REGULARIZATION_LAYERS,
-            "Flatten",  # No Identity in TF
+            "Flatten",
         },
         "distributions": {"DistributionModule", "GaussianDistribution"},
         "losses": {"KLDivergenceLoss", "ELBOLoss"},
@@ -140,8 +103,7 @@ BACKEND_CAPABILITIES: Final[dict[str, dict[str, set[str]]]] = {
     "jax": {
         "nn": {
             *_BAYESIAN_LAYERS,
-            # JAX limited non-parametric layers
-            "MaxPool2d",
+            "MaxPool2d",  # TBD: name overwritten: Y/N
             "AvgPool2d",
             "ReLU",
             "Sigmoid",
@@ -156,54 +118,5 @@ BACKEND_CAPABILITIES: Final[dict[str, dict[str, set[str]]]] = {
     },
     "pyg": {
         "nn": {"CGConv"},
-    },
-}
-
-# HACK: risk of path hard-coding.
-# Mapping for non-parametric layers to native backend implementations
-NONPARAMETRIC_LAYER_MAP: Final[dict[str, dict[str, str]]] = {
-    "torch": {
-        **{layer: f"torch.nn.{layer}" for layer in _POOLING_LAYERS},
-        **{layer: f"torch.nn.{layer}" for layer in _ACTIVATION_LAYERS},
-        **{layer: f"torch.nn.{layer}" for layer in _NORMALIZATION_LAYERS},
-        **{layer: f"torch.nn.{layer}" for layer in _REGULARIZATION_LAYERS},
-        **{layer: f"torch.nn.{layer}" for layer in _UTILITY_LAYERS},
-    },
-    "tf": {
-        # TODO: decide: import from tf or update to keras only.
-        # Pooling : diff naming convention
-        "MaxPool1d": "tensorflow.keras.layers.MaxPooling1D",
-        "MaxPool2d": "tensorflow.keras.layers.MaxPooling2D",
-        "AvgPool1d": "tensorflow.keras.layers.AveragePooling1D",
-        "AvgPool2d": "tensorflow.keras.layers.AveragePooling2D",
-        "AdaptiveAvgPool2d": "tensorflow.keras.layers.GlobalAveragePooling2D",
-        # Activations
-        "ReLU": "tensorflow.keras.layers.Activation",
-        "Sigmoid": "tensorflow.keras.layers.Activation",
-        "Tanh": "tensorflow.keras.layers.Activation",
-        "LeakyReLU": "tensorflow.keras.layers.LeakyReLU",  # HACK: name inconsistency
-        "GELU" : "tensorflow.keras.layers.Activation",
-        # Normalization
-        "BatchNorm1d": "tensorflow.keras.layers.BatchNormalization",
-        "BatchNorm2d": "tensorflow.keras.layers.BatchNormalization",
-        "BatchNorm3d": "tensorflow.keras.layers.BatchNormalization",
-        "LayerNorm": "tensorflow.keras.layers.LayerNormalization",
-        # Regularization
-        "Dropout": "tensorflow.keras.layers.Dropout",
-        "Dropout2d": "tensorflow.keras.layers.SpatialDropout2D",
-        # Utility
-        "Flatten": "tensorflow.keras.layers.Flatten",
-    },
-    "jax": {
-        # JAX/Flax diff naming
-        "MaxPool2d": "flax.linen.max_pool",
-        "AvgPool2d": "flax.linen.avg_pool",
-        "ReLU": "flax.linen.relu",
-        "Sigmoid": "flax.linen.sigmoid",
-        "Tanh": "flax.linen.tanh",
-        "GELU": "flax.linen.gelu",
-        "BatchNorm2d": "flax.linen.BatchNorm",
-        "LayerNorm": "flax.linen.LayerNorm",
-        "Dropout": "flax.linen.Dropout",
     },
 }

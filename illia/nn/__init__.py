@@ -4,10 +4,11 @@ Backend-agnostic interface for neural network layers.
 
 # Standard libraries
 from typing import Any
+from functools import partial
 
 # Own modules
 from illia import BackendManager
-from illia.support import NONPARAMETRIC_LAYER_MAP
+from illia.nonparametric import NONPARAMETRIC_LAYER_MAP, LAYER_CATEGORY_MAP
 
 
 def __getattr__(name: str) -> Any:
@@ -25,15 +26,23 @@ def __getattr__(name: str) -> Any:
     module_type: str = "nn"
     backend: str = BackendManager.get_backend()
 
+    # Direct O(1) lookup for category
+    category = LAYER_CATEGORY_MAP.get(name)
+    path = (
+        NONPARAMETRIC_LAYER_MAP.get(backend, {}).get(category, {}).get(name)
+        if category
+        else None
+    )
+
     # Check if this is a non-parametric layer (redirect to native backend)
-    if (path := NONPARAMETRIC_LAYER_MAP.get(backend, {}).get(name)) is not None:
+    if path is not None:
         module_name, class_name = path.rsplit(".", 1)
         layer_class = BackendManager.import_external_class(module_name, class_name)
-        
+
         # HACK: Special handling for TensorFlow Activation layers
-        if backend == "tf" and class_name == "Activation":
-            from functools import partial
+        if backend == "tf" and category == "activation" and class_name == "Activation":
             layer_class = partial(layer_class, name.lower())
+
     else:
         # Otherwise, get Bayesian layer from illia implementation, or failure.
         module = BackendManager.get_backend_module(backend, module_type)

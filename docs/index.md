@@ -1,6 +1,6 @@
 <p align="center">
-  <img src="./assets/images/white_logo_illia.png" class="logo-white" height="200" width="200"/>
-  <img src="./assets/images/black_logo_illia.png" class="logo-black" height="200" width="200"/>
+  <img src="./assets/images/white_logo_description.png" class="logo-white" height="400" width="400"/>
+  <img src="./assets/images/black_logo_description.png" class="logo-black" height="400" width="400"/>
   <br />
 </p>
 
@@ -78,6 +78,15 @@ print(f"Output shape: {outputs.shape}")
 print(f"Output std: {outputs.std()}")
 print(f"Output var: {outputs.var()}")
 ```
+
+## Non-Parametric Definitions
+
+**illia** provides non-parametric layers (pooling, activation, normalization, regularization, and utility layers) imported from `illia.nn` using PyTorch-style naming conventions. However, the initialization parameters and API usage are backend-specific and not standardized across PyTorch, TensorFlow, and JAX.
+
+Key characteristics:
+- **PyTorch Naming**: Layer names follow PyTorch conventions (e.g., MaxPool2d, ReLU, BatchNorm2d)
+- **Backend-Specific Parameters**: Initialization arguments vary by backend
+- **Non-Standard API**: JAX uses functional definitions, while PyTorch and TensorFlow use class/object-oriented layers
 
 ## Contributing
 
