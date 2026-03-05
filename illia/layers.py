@@ -1,9 +1,10 @@
 """
-Non-parametric layer mappings for different backends.
+Layer definitions and mappings for different backends.
 """
 
 # Standard libraries
 from typing import Final
+
 
 # Non-parametric layers by category
 _POOLING_LAYERS: Final[frozenset[str]] = frozenset(
@@ -49,7 +50,20 @@ _UTILITY_LAYERS: Final[frozenset[str]] = frozenset(
     }
 )
 
-# Mapping for non-parametric layers to native backend implementations, grouped by category
+# Bayesian layers shared across torch/tf/jax
+_BAYESIAN_LAYERS: Final[frozenset[str]] = frozenset(
+    {
+        "BayesianModule",
+        "Conv1d",
+        "Conv2d",
+        "Embedding",
+        "Linear",
+        "LSTM",
+    }
+)
+
+# Mapping for non-parametric layers to native backend implementations,
+# grouped by category
 NONPARAMETRIC_LAYER_MAP: Final[dict[str, dict[str, dict[str, str]]]] = {
     "torch": {
         "pooling": {layer: f"torch.nn.{layer}" for layer in _POOLING_LAYERS},
@@ -111,7 +125,7 @@ NONPARAMETRIC_LAYER_MAP: Final[dict[str, dict[str, dict[str, str]]]] = {
     },
 }
 
-# Flat mapping: layer_name -> category for O(1) lookup
+# Flat mapping
 LAYER_CATEGORY_MAP: Final[dict[str, str]] = {
     **{layer: "pooling" for layer in _POOLING_LAYERS},
     **{layer: "activation" for layer in _ACTIVATION_LAYERS},

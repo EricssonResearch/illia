@@ -290,7 +290,7 @@ class BackendManager:
         )
 
     @classmethod
-    def import_external_class(cls, module_name: str, class_name: str) -> Any:
+    def import_native_backend_class(cls, module_name: str, class_name: str) -> Any:
         """
         Import a class from an external module with caching.
 

@@ -8,10 +8,11 @@ It serves as a central configuration for backend-specific capabilities.
 from typing import Final
 
 # Own modules
-from illia.nonparametric import (
-    _POOLING_LAYERS,
+from illia.layers import (
     _ACTIVATION_LAYERS,
+    _BAYESIAN_LAYERS,
     _NORMALIZATION_LAYERS,
+    _POOLING_LAYERS,
     _REGULARIZATION_LAYERS,
     _UTILITY_LAYERS,
 )
@@ -55,16 +56,7 @@ BACKEND_MODULES: Final[dict[str, list[str]]] = {
 }
 
 # Bayesian layers shared across torch/tf/jax
-_BAYESIAN_LAYERS: Final[frozenset[str]] = frozenset(
-    {
-        "BayesianModule",
-        "Conv1d",
-        "Conv2d",
-        "Embedding",
-        "Linear",
-        "LSTM",
-    }
-)
+_BAYESIAN_LAYERS: Final[frozenset[str]] = _BAYESIAN_LAYERS
 
 # Dictionary describing the layers and capabilities supported by each backend
 BACKEND_CAPABILITIES: Final[dict[str, dict[str, set[str]]]] = {

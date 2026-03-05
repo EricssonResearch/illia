@@ -3,12 +3,12 @@ Backend-agnostic interface for neural network layers.
 """
 
 # Standard libraries
-from typing import Any
 from functools import partial
+from typing import Any
 
 # Own modules
 from illia import BackendManager
-from illia.nonparametric import NONPARAMETRIC_LAYER_MAP, LAYER_CATEGORY_MAP
+from illia.layers import _BAYESIAN_LAYERS, LAYER_CATEGORY_MAP, NONPARAMETRIC_LAYER_MAP
 
 
 def __getattr__(name: str) -> Any:
@@ -26,31 +26,35 @@ def __getattr__(name: str) -> Any:
     module_type: str = "nn"
     backend: str = BackendManager.get_backend()
 
-    # Direct O(1) lookup for category
-    category = LAYER_CATEGORY_MAP.get(name)
-    path = (
-        NONPARAMETRIC_LAYER_MAP.get(backend, {}).get(category, {}).get(name)
-        if category
-        else None
-    )
-
-    # Check if this is a non-parametric layer (redirect to native backend)
-    if path is not None:
-        module_name, class_name = path.rsplit(".", 1)
-        layer_class = BackendManager.import_external_class(module_name, class_name)
-
-        # HACK: Special handling for TensorFlow Activation layers
-        if backend == "tf" and category == "activation" and class_name == "Activation":
-            layer_class = partial(layer_class, name.lower())
-
-    else:
-        # Otherwise, get Bayesian layer from illia implementation, or failure.
+    #  get Bayesian layer from illia implementation, or failure.
+    if name in _BAYESIAN_LAYERS:
         module = BackendManager.get_backend_module(backend, module_type)
         layer_class = BackendManager.get_class(
             backend_name=backend,
             class_name=name,
             module_type=module_type,
             module_path=module,
+        )
+
+    elif (category := LAYER_CATEGORY_MAP.get(name)) is not None:
+        # Otherwise, this is a non-parametric layer (redirect to native backend)
+        module_path = (
+            NONPARAMETRIC_LAYER_MAP.get(backend, {}).get(category, {}).get(name)
+            if category
+            else None
+        )
+        module_name, class_name = module_path.rsplit(".", 1)
+        layer_class = BackendManager.import_native_backend_class(
+            module_name, class_name
+        )
+
+        # HACK: Special handling for TensorFlow Activation layers
+        if backend == "tf" and category == "activation" and class_name == "Activation":
+            layer_class = partial(layer_class, name.lower())
+
+    else:
+        raise ImportError(
+            f"Module '{module_type}', {name} not available for backend '{backend}'."
         )
 
     globals()[name] = layer_class

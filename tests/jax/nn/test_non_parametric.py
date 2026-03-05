@@ -10,8 +10,8 @@ import os
 os.environ["ILLIA_BACKEND"] = "jax"
 
 # 3pps
-import pytest
 import jax.numpy as jnp
+import pytest
 
 
 class TestNonParametricLayers:
