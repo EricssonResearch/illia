@@ -55,9 +55,6 @@ BACKEND_MODULES: Final[dict[str, list[str]]] = {
     "pyg": ["illia.nn.pyg"],
 }
 
-# Bayesian layers shared across torch/tf/jax
-_BAYESIAN_LAYERS: Final[frozenset[str]] = _BAYESIAN_LAYERS
-
 # Dictionary describing the layers and capabilities supported by each backend
 BACKEND_CAPABILITIES: Final[dict[str, dict[str, set[str]]]] = {
     "torch": {

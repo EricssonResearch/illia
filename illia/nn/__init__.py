@@ -36,21 +36,28 @@ def __getattr__(name: str) -> Any:
             module_path=module,
         )
 
-    elif (category := LAYER_CATEGORY_MAP.get(name)) is not None:
+    elif (category := LAYER_CATEGORY_MAP.get(name, None)) is not None:
         # Otherwise, this is a non-parametric layer (redirect to native backend)
         module_path = (
             NONPARAMETRIC_LAYER_MAP.get(backend, {}).get(category, {}).get(name)
-            if category
-            else None
         )
-        module_name, class_name = module_path.rsplit(".", 1)
-        layer_class = BackendManager.import_native_backend_class(
-            module_name, class_name
-        )
+        if module_path:
+            module_name, class_name = module_path.rsplit(".", 1)
+            layer_class = BackendManager.import_native_backend_class(
+                module_name, class_name
+            )
 
-        # HACK: Special handling for TensorFlow Activation layers
-        if backend == "tf" and category == "activation" and class_name == "Activation":
-            layer_class = partial(layer_class, name.lower())
+            # HACK: Special handling for TensorFlow Activation layers
+            if (
+                backend == "tf"
+                and category == "activation"
+                and class_name == "Activation"
+            ):
+                layer_class = partial(layer_class, name.lower())
+        else:
+            raise ImportError(
+                f"Module '{module_type}', {name} not available for backend '{backend}'."
+            )
 
     else:
         raise ImportError(
