@@ -28,18 +28,6 @@ def set_random_seeds():
     torch.cuda.manual_seed_all(42)
 
 
-@pytest.fixture
-def tensor_2d():
-    """Fixture for 2D tensor inputs (batch, channels, height, width)."""
-    return torch.rand(32, 16, 28, 28)
-
-
-@pytest.fixture
-def tensor_1d():
-    """Fixture for 1D tensor inputs (batch, channels, length)."""
-    return torch.rand(32, 16, 64)
-
-
 @pytest.fixture(
     params=[
         (32, 30, 20, None, None),
