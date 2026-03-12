@@ -6,8 +6,6 @@ layers implementations for easier access in other modules.
 
 # Own modules
 from illia.nn.torch.activation import GELU, LeakyReLU, ReLU, Sigmoid, Tanh
-
-# Own modules - Bayesian layers
 from illia.nn.torch.base import BayesianModule
 from illia.nn.torch.conv1d import Conv1d
 from illia.nn.torch.conv2d import Conv2d
@@ -15,8 +13,6 @@ from illia.nn.torch.embedding import Embedding
 from illia.nn.torch.linear import Linear
 from illia.nn.torch.lstm import LSTM
 from illia.nn.torch.normalization import BatchNorm1d, BatchNorm2d, LayerNorm
-
-# Own modules - Non-parametric layers
 from illia.nn.torch.pooling import (
     AdaptiveAvgPool2d,
     AdaptiveMaxPool2d,
@@ -30,34 +26,28 @@ from illia.nn.torch.utility import Flatten, Identity
 
 
 __all__: list[str] = [
-    # Bayesian layers
+    "AdaptiveAvgPool2d",
+    "AdaptiveMaxPool2d",
+    "AvgPool1d",
+    "AvgPool2d",
+    "BatchNorm1d",
+    "BatchNorm2d",
     "BayesianModule",
     "Conv1d",
     "Conv2d",
+    "Dropout",
+    "Dropout2d",
     "Embedding",
-    "Linear",
+    "Flatten",
+    "GELU",
+    "Identity",
     "LSTM",
-    # Pooling layers
+    "LayerNorm",
+    "LeakyReLU",
+    "Linear",
     "MaxPool1d",
     "MaxPool2d",
-    "AvgPool1d",
-    "AvgPool2d",
-    "AdaptiveAvgPool2d",
-    "AdaptiveMaxPool2d",
-    # Activation layers
     "ReLU",
     "Sigmoid",
     "Tanh",
-    "LeakyReLU",
-    "GELU",
-    # Normalization layers
-    "BatchNorm1d",
-    "BatchNorm2d",
-    "LayerNorm",
-    # Regularization layers
-    "Dropout",
-    "Dropout2d",
-    # Utility layers
-    "Flatten",
-    "Identity",
 ]
