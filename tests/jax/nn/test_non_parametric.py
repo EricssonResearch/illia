@@ -10,10 +10,8 @@ import os
 os.environ["ILLIA_BACKEND"] = "jax"
 
 # 3pps
-import jax
 import jax.numpy as jnp
 import pytest
-from flax import nnx
 
 
 class TestNonParametricLayers:
@@ -31,7 +29,9 @@ class TestNonParametricLayers:
             ("AvgPool2d", (32, 16, 28, 28), (2, 2)),
         ],
     )
-    def test_pooling(self, layer_name: str, input_shape: tuple, window_shape: tuple) -> None:
+    def test_pooling(
+        self, layer_name: str, input_shape: tuple, window_shape: tuple
+    ) -> None:
         """
         Test pooling functions.
 
@@ -86,17 +86,21 @@ class TestNonParametricLayers:
             rngs_fixture: JAX RNG fixture for consistent random number generation.
         """
         # Test BatchNorm1d
-        BatchNorm1d = getattr(__import__("illia.nn", fromlist=["BatchNorm1d"]), "BatchNorm1d")
+        BatchNorm1d = getattr(
+            __import__("illia.nn", fromlist=["BatchNorm1d"]), "BatchNorm1d"
+        )
         layer1d = BatchNorm1d(num_features=16, rngs=rngs_fixture)
         assert layer1d is not None
         assert callable(layer1d)
-        
+
         # Test BatchNorm2d
-        BatchNorm2d = getattr(__import__("illia.nn", fromlist=["BatchNorm2d"]), "BatchNorm2d")
+        BatchNorm2d = getattr(
+            __import__("illia.nn", fromlist=["BatchNorm2d"]), "BatchNorm2d"
+        )
         layer2d = BatchNorm2d(num_features=16, rngs=rngs_fixture)
         assert layer2d is not None
         assert callable(layer2d)
-        
+
         # Test LayerNorm
         LayerNorm = getattr(__import__("illia.nn", fromlist=["LayerNorm"]), "LayerNorm")
         layer_norm = LayerNorm(num_features=16, rngs=rngs_fixture)
