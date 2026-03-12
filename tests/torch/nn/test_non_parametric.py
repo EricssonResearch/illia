@@ -109,8 +109,6 @@ class TestNonParametricLayers:
         assert isinstance(output, torch.Tensor)
         assert tuple(output.shape) == tuple(inputs.shape)
         assert output.dtype == inputs.dtype
-        # assert torch.abs(torch.mean(output)) < 0.1
-        # assert torch.abs(torch.std(output) - 1.0) < 0.1
 
     @pytest.mark.order(4)
     @pytest.mark.parametrize(

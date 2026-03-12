@@ -92,8 +92,6 @@ class TestNonParametricLayers:
         assert isinstance(output, tf.Tensor)
         assert tuple(output.shape) == tuple(inputs.shape)
         assert output.dtype == inputs.dtype
-        # assert tf.abs(tf.reduce_mean(output)) < 0.1
-        # assert tf.abs(tf.math.reduce_std(output) - 1.0) < 0.1
 
     @pytest.mark.order(4)
     @pytest.mark.parametrize(
