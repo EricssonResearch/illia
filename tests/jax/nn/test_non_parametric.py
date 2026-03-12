@@ -21,17 +21,19 @@ class TestNonParametricLayers:
 
     @pytest.mark.order(1)
     @pytest.mark.parametrize(
-        "layer_name,kwargs,input_shape",
+        "layer_name,input_shape",
         [
-            ("MaxPool2d", {"window_shape": (2, 2)}, (32, 16, 28, 28)),
-            ("AvgPool2d", {"window_shape": (2, 2)}, (32, 16, 28, 28)),
+            ("MaxPool1d", (32, 16, 28, 28)),
+            ("MaxPool2d", (32, 16, 28, 28)),
+            ("AvgPool1d", (32, 16, 28, 28)),
+            ("AvgPool2d", (32, 16, 28, 28)),
         ],
     )
-    def test_pooling(self, layer_name: str, kwargs: dict, input_shape: tuple) -> None:
+    def test_pooling(self, layer_name: str, input_shape: tuple) -> None:
         """Test pooling functions."""
         pool_fn = getattr(__import__("illia.nn", fromlist=[layer_name]), layer_name)
         inputs = jnp.ones(input_shape)
-        output = pool_fn(inputs, **kwargs)
+        output = pool_fn(inputs)
         assert isinstance(output, jnp.ndarray)
         assert output.dtype == inputs.dtype
 
@@ -49,7 +51,7 @@ class TestNonParametricLayers:
         assert output.dtype == inputs.dtype
 
     @pytest.mark.order(3)
-    @pytest.mark.parametrize("layer_name", ["BatchNorm2d", "LayerNorm", "Dropout"])
+    @pytest.mark.parametrize("layer_name", ["BatchNorm1d", "BatchNorm2d", "LayerNorm", "Dropout"])
     def test_stateful_import(self, layer_name: str) -> None:
         """Test that stateful layers can be imported."""
         layer_class = getattr(__import__("illia.nn", fromlist=[layer_name]), layer_name)

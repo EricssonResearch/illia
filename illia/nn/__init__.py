@@ -54,6 +54,20 @@ def __getattr__(name: str) -> Any:
                 and class_name == "Activation"
             ):
                 layer_class = partial(layer_class, name.lower())
+            # HACK: Special handling for JAX
+            elif backend == "jax":
+                match category:
+                    case "pooling":  # jax pooling functions
+                        if "1d" in name:
+                            layer_class = partial(layer_class, window_shape=(1,))
+                        elif "2d" in name:
+                            layer_class = partial(layer_class, window_shape=(2, 2))
+                    case "normalization":  # jax normalizarion layer
+                        if "1d" in name:
+                            layer_class = partial(layer_class, num_features=1)
+                        elif "2d" in name:
+                            layer_class = partial(layer_class, num_features=2)
+
         else:
             raise ImportError(
                 f"Module '{module_type}', {name} not available for backend '{backend}'."

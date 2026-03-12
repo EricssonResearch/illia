@@ -106,7 +106,9 @@ NONPARAMETRIC_LAYER_MAP: Final[dict[str, dict[str, dict[str, str]]]] = {
     },
     "jax": {
         "pooling": {
-            "MaxPool2d": "flax.nnx.max_pool",  # TBD: name 2d?: Y/N
+            "MaxPool1d": "flax.nnx.max_pool",
+            "MaxPool2d": "flax.nnx.max_pool",
+            "AvgPool1d": "flax.nnx.avg_pool",
             "AvgPool2d": "flax.nnx.avg_pool",
         },
         "activation": {
@@ -116,7 +118,8 @@ NONPARAMETRIC_LAYER_MAP: Final[dict[str, dict[str, dict[str, str]]]] = {
             "GELU": "flax.nnx.gelu",
         },
         "normalization": {
-            "BatchNorm2d": "flax.nnx.BatchNorm",  # TBD: name 2d?: Y/N
+            "BatchNorm1d": "flax.nnx.BatchNorm",
+            "BatchNorm2d": "flax.nnx.BatchNorm",
             "LayerNorm": "flax.nnx.LayerNorm",
         },
         "regularization": {
