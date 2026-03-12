@@ -7,16 +7,6 @@ It serves as a central configuration for backend-specific capabilities.
 # Standard libraries
 from typing import Final
 
-# Own modules
-from illia.layers import (
-    _ACTIVATION_LAYERS,
-    _BAYESIAN_LAYERS,
-    _NORMALIZATION_LAYERS,
-    _POOLING_LAYERS,
-    _REGULARIZATION_LAYERS,
-    _UTILITY_LAYERS,
-)
-
 
 # Name of the environment variable to switch between backends at runtime
 ENV_OS_NAME: Final[str] = "ILLIA_BACKEND"
@@ -59,31 +49,69 @@ BACKEND_MODULES: Final[dict[str, list[str]]] = {
 BACKEND_CAPABILITIES: Final[dict[str, dict[str, set[str]]]] = {
     "torch": {
         "nn": {
-            *_BAYESIAN_LAYERS,
-            *_POOLING_LAYERS,
-            *_ACTIVATION_LAYERS,
-            *_NORMALIZATION_LAYERS,
-            *_REGULARIZATION_LAYERS,
-            *_UTILITY_LAYERS,
+            # Bayesian layers
+            "BayesianModule",
+            "Conv1d",
+            "Conv2d",
+            "Embedding",
+            "Linear",
+            "LSTM",
+            # Pooling layers
+            "MaxPool1d",
+            "MaxPool2d",
+            "AvgPool1d",
+            "AvgPool2d",
+            "AdaptiveAvgPool2d",
+            "AdaptiveMaxPool2d",
+            # Activation layers
+            "ReLU",
+            "Sigmoid",
+            "Tanh",
+            "LeakyReLU",
+            "GELU",
+            # Normalization layers
+            "BatchNorm1d",
+            "BatchNorm2d",
+            "LayerNorm",
+            # Regularization layers
+            "Dropout",
+            "Dropout2d",
+            # Utility layers
+            "Flatten",
+            "Identity",
         },
         "distributions": {"DistributionModule", "GaussianDistribution"},
         "losses": {"KLDivergenceLoss", "ELBOLoss"},
     },
     "tf": {
         "nn": {
-            *_BAYESIAN_LAYERS,
-            "MaxPool1d",  # TBD: name overwritten: Y/N
+            # Bayesian layers
+            "BayesianModule",
+            "Conv1d",
+            "Conv2d",
+            "Embedding",
+            "Linear",
+            "LSTM",
+            # Pooling layers
+            "MaxPool1d",
             "MaxPool2d",
             "AvgPool1d",
             "AvgPool2d",
             "AdaptiveAvgPool2d",
+            # Activation layers
             "ReLU",
             "Sigmoid",
             "Tanh",
             "LeakyReLU",
             "GELU",
-            *_NORMALIZATION_LAYERS,
-            *_REGULARIZATION_LAYERS,
+            # Normalization layers
+            "BatchNorm1d",
+            "BatchNorm2d",
+            "LayerNorm",
+            # Regularization layers
+            "Dropout",
+            "Dropout2d",
+            # Utility layers
             "Flatten",
         },
         "distributions": {"DistributionModule", "GaussianDistribution"},
@@ -91,15 +119,28 @@ BACKEND_CAPABILITIES: Final[dict[str, dict[str, set[str]]]] = {
     },
     "jax": {
         "nn": {
-            *_BAYESIAN_LAYERS,
-            "MaxPool2d",  # TBD: name overwritten: Y/N
+            # Bayesian layers
+            "BayesianModule",
+            "Conv1d",
+            "Conv2d",
+            "Embedding",
+            "Linear",
+            "LSTM",
+            # Pooling layers
+            "MaxPool1d",
+            "MaxPool2d",
+            "AvgPool1d",
             "AvgPool2d",
+            # Activation layers
             "ReLU",
             "Sigmoid",
             "Tanh",
             "GELU",
+            # Normalization layers
+            "BatchNorm1d",
             "BatchNorm2d",
             "LayerNorm",
+            # Regularization layers
             "Dropout",
         },
         "distributions": {"DistributionModule", "GaussianDistribution"},

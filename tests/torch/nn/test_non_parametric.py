@@ -44,7 +44,15 @@ class TestNonParametricLayers:
     def test_pooling(
         self, layer_name: str, kwargs: dict, input_shape: tuple, expected_shape: tuple
     ) -> None:
-        """Test pooling layers."""
+        """
+        Test pooling layers.
+
+        Args:
+            layer_name: Name of the pooling layer to test.
+            kwargs: Keyword arguments for layer initialization.
+            input_shape: Shape of the input tensor for testing.
+            expected_shape: Expected shape of the output tensor.
+        """
         layer = getattr(__import__("illia.nn", fromlist=[layer_name]), layer_name)(
             **kwargs
         )
@@ -59,7 +67,12 @@ class TestNonParametricLayers:
         "layer_name", ["ReLU", "Sigmoid", "Tanh", "LeakyReLU", "GELU"]
     )
     def test_activation(self, layer_name: str) -> None:
-        """Test activation layers."""
+        """
+        Test activation layers.
+
+        Args:
+            layer_name: Name of the activation layer to test.
+        """
         layer = getattr(__import__("illia.nn", fromlist=[layer_name]), layer_name)()
         inputs = torch.rand((32, 16, 28, 28))
         output = layer(inputs)
@@ -79,7 +92,14 @@ class TestNonParametricLayers:
     def test_normalization(
         self, layer_name: str, kwargs: dict, input_shape: tuple
     ) -> None:
-        """Test normalization layers."""
+        """
+        Test normalization layers.
+
+        Args:
+            layer_name: Name of the normalization layer to test.
+            kwargs: Keyword arguments for layer initialization.
+            input_shape: Shape of the input tensor for testing.
+        """
         layer = getattr(__import__("illia.nn", fromlist=[layer_name]), layer_name)(
             **kwargs
         )
@@ -103,7 +123,14 @@ class TestNonParametricLayers:
     def test_regularization(
         self, layer_name: str, rate: float, input_shape: tuple
     ) -> None:
-        """Test regularization layers."""
+        """
+        Test regularization layers.
+
+        Args:
+            layer_name: Name of the regularization layer to test.
+            rate: Dropout rate for the regularization layer.
+            input_shape: Shape of the input tensor for testing.
+        """
         layer = getattr(__import__("illia.nn", fromlist=[layer_name]), layer_name)(rate)
         layer.train()
         inputs = torch.rand(input_shape)
@@ -123,7 +150,14 @@ class TestNonParametricLayers:
     def test_utility(
         self, layer_name: str, input_shape: tuple, expected_shape: tuple
     ) -> None:
-        """Test utility layers."""
+        """
+        Test utility layers.
+
+        Args:
+            layer_name: Name of the utility layer to test.
+            input_shape: Shape of the input tensor for testing.
+            expected_shape: Expected shape of the output tensor.
+        """
         layer = getattr(__import__("illia.nn", fromlist=[layer_name]), layer_name)()
         inputs = torch.rand(input_shape)
         output = layer(inputs)

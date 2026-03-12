@@ -301,6 +301,7 @@ class BackendManager:
         Returns:
             The requested class object.
         """
+
         if module_name not in cls._module_cache:
             cls._module_cache[module_name] = importlib.import_module(module_name)
         return getattr(cls._module_cache[module_name], class_name)

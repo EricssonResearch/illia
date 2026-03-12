@@ -20,6 +20,13 @@ from illia.distributions import GaussianDistribution
 from illia.nn import LSTM, Conv1d, Conv2d, Embedding, Linear
 
 
+@pytest.fixture(scope="session", autouse=True)
+def set_random_seeds():
+    """Set random seeds for reproducibility."""
+    tf.keras.utils.set_random_seed(42)
+    tf.config.experimental.enable_op_determinism()
+
+
 @pytest.fixture(
     params=[
         (32, 30, 20, None, None),

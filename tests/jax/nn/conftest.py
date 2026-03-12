@@ -21,6 +21,12 @@ from illia.distributions import GaussianDistribution
 from illia.nn import LSTM, Conv1d, Conv2d, Embedding, Linear
 
 
+@pytest.fixture(scope="function")
+def rngs_fixture():
+    """Provide consistent RNG for JAX tests."""
+    return nnx.Rngs(42)
+
+
 @pytest.fixture(
     params=[
         (32, 30, 20, None, None),
