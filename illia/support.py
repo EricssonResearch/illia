@@ -48,28 +48,103 @@ BACKEND_MODULES: Final[dict[str, list[str]]] = {
 # Dictionary describing the layers and capabilities supported by each backend
 BACKEND_CAPABILITIES: Final[dict[str, dict[str, set[str]]]] = {
     "torch": {
-        "nn": {"BayesianModule", "Conv1d", "Conv2d", "Embedding", "Linear", "LSTM"},
-        "distributions": {"DistributionModule", "GaussianDistribution"},
-        "losses": {
-            "KLDivergenceLoss",
-            "ELBOLoss",
+        "nn": {
+            # Bayesian layers
+            "BayesianModule",
+            "Conv1d",
+            "Conv2d",
+            "Embedding",
+            "Linear",
+            "LSTM",
+            # Pooling layers
+            "MaxPool1d",
+            "MaxPool2d",
+            "AvgPool1d",
+            "AvgPool2d",
+            "AdaptiveAvgPool2d",
+            "AdaptiveMaxPool2d",
+            # Activation layers
+            "ReLU",
+            "Sigmoid",
+            "Tanh",
+            "LeakyReLU",
+            "GELU",
+            # Normalization layers
+            "BatchNorm1d",
+            "BatchNorm2d",
+            "LayerNorm",
+            # Regularization layers
+            "Dropout",
+            "Dropout2d",
+            # Utility layers
+            "Flatten",
+            "Identity",
         },
+        "distributions": {"DistributionModule", "GaussianDistribution"},
+        "losses": {"KLDivergenceLoss", "ELBOLoss"},
     },
     "tf": {
-        "nn": {"BayesianModule", "Conv1d", "Conv2d", "Embedding", "Linear", "LSTM"},
-        "distributions": {"DistributionModule", "GaussianDistribution"},
-        "losses": {
-            "KLDivergenceLoss",
-            "ELBOLoss",
+        "nn": {
+            # Bayesian layers
+            "BayesianModule",
+            "Conv1d",
+            "Conv2d",
+            "Embedding",
+            "Linear",
+            "LSTM",
+            # Pooling layers
+            "MaxPool1d",
+            "MaxPool2d",
+            "AvgPool1d",
+            "AvgPool2d",
+            "AdaptiveAvgPool2d",
+            # Activation layers
+            "ReLU",
+            "Sigmoid",
+            "Tanh",
+            "LeakyReLU",
+            "GELU",
+            # Normalization layers
+            "BatchNorm1d",
+            "BatchNorm2d",
+            "LayerNorm",
+            # Regularization layers
+            "Dropout",
+            "Dropout2d",
+            # Utility layers
+            "Flatten",
         },
+        "distributions": {"DistributionModule", "GaussianDistribution"},
+        "losses": {"KLDivergenceLoss", "ELBOLoss"},
     },
     "jax": {
-        "nn": {"BayesianModule", "Conv1d", "Conv2d", "Embedding", "Linear", "LSTM"},
-        "distributions": {"DistributionModule", "GaussianDistribution"},
-        "losses": {
-            "KLDivergenceLoss",
-            "ELBOLoss",
+        "nn": {
+            # Bayesian layers
+            "BayesianModule",
+            "Conv1d",
+            "Conv2d",
+            "Embedding",
+            "Linear",
+            "LSTM",
+            # Pooling layers
+            "MaxPool1d",
+            "MaxPool2d",
+            "AvgPool1d",
+            "AvgPool2d",
+            # Activation layers
+            "ReLU",
+            "Sigmoid",
+            "Tanh",
+            "GELU",
+            # Normalization layers
+            "BatchNorm1d",
+            "BatchNorm2d",
+            "LayerNorm",
+            # Regularization layers
+            "Dropout",
         },
+        "distributions": {"DistributionModule", "GaussianDistribution"},
+        "losses": {"KLDivergenceLoss", "ELBOLoss"},
     },
     "pyg": {
         "nn": {"CGConv"},

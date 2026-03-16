@@ -9,29 +9,19 @@ from typing import Any
 from illia import BackendManager
 
 
-# Obtain the library to import
-def __getattr__(name: str) -> None:
+def __getattr__(name: str) -> Any:
     """
-    Dynamically import a class from backend distributions.
+    Dynamically import a class from backend.
 
     Args:
         name: Name of the class to be imported.
 
     Returns:
-        None.
+        The requested layer/module class.
     """
+    backend = BackendManager.get_backend()
+    module = BackendManager.get_backend_module(backend, "nn")
+    layer_class = BackendManager.get_class(backend, name, "nn", module)
 
-    # Obtain parameters for nn
-    module_type: str = "nn"
-    backend: str = BackendManager.get_backend()
-    module_path: Any | dict[str, Any] = BackendManager.get_backend_module(
-        backend, module_type
-    )
-
-    # Set class to global namespace
-    globals()[name] = BackendManager.get_class(
-        backend_name=backend,
-        class_name=name,
-        module_type=module_type,
-        module_path=module_path,
-    )
+    globals()[name] = layer_class
+    return layer_class

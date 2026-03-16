@@ -21,6 +21,15 @@ from illia.nn import LSTM, BayesianModule, Conv1d, Conv2d, Embedding, Linear
 from tests.torch.nn.utils import BayesianComposedModel, ComposedModel
 
 
+@pytest.fixture(scope="session", autouse=True)
+def set_random_seeds():
+    """Set random seeds for reproducibility."""
+    torch.manual_seed(42)
+    torch.cuda.manual_seed_all(42)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+
 @pytest.fixture(
     params=[
         (32, 30, 20, None, None),
